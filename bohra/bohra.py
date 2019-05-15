@@ -4,8 +4,8 @@ import argparse
 import pathlib
 import sys
 import os
-from scripts.SnpDetection import RunSnpDetection
-from scripts.ReRunSnpDetection import ReRunSnpDetection
+from SnpDetection import RunSnpDetection
+from ReRunSnpDetection import ReRunSnpDetection
 # from scripts.InitValidation import InitValidationDir
 # from scripts.RunValidation import RunValidation
 
@@ -43,7 +43,7 @@ if __name__ == '__main__':
     parser_sub_run.add_argument('--prefillpath','-pf',help='Path to existing assemblies - in the form path_to_somewhere/isolatename/contigs.fa')
     parser_sub_run.add_argument('--mdu', default=True, help='If running on MDU data')
     parser_sub_run.add_argument('--workdir','-w', default = f"{pathlib.Path.cwd().absolute()}", help='Working directory, default is current directory')
-    parser_sub_run.add_argument('--resources','-s', default = f"{pathlib.Path(__file__).parent.parent / 'templates'}", help='Directory where templates are stored')
+    parser_sub_run.add_argument('--resources','-s', default = f"{pathlib.Path(__file__).parent / 'templates'}", help='Directory where templates are stored')
     parser_sub_run.add_argument('--force','-f', action="store_true", help = "Add if you would like to force a complete restart of the pipeline. All previous logs will be lost.")
     parser_sub_run.add_argument('--dryrun','-n', action="store_true", help = "If you would like to see a dry run of commands to be executed.")
     parser_sub_run.add_argument('--gubbins','-g', action="store_true", help = "If you would like to run gubbins. NOT IN USE YET - PLEASE DO NOT USE")
@@ -55,7 +55,7 @@ if __name__ == '__main__':
     parser_sub_rerun.add_argument('--mask','-m',default = '', help='Path to mask file if used (.bed)')
     parser_sub_rerun.add_argument('--cpus','-c',help='Number of CPU cores to run, will define how many rules are run at a time', default=36)
     parser_sub_rerun.add_argument('--workdir','-w', default = f"{pathlib.Path.cwd().absolute()}", help='Working directory, default is current directory')
-    parser_sub_rerun.add_argument('--resources','-s', default = f"{pathlib.Path(__file__).parent.parent / 'templates'}", help='Directory where templates are stored')
+    parser_sub_rerun.add_argument('--resources','-s', default = f"{pathlib.Path(__file__).parent / 'templates'}", help='Directory where templates are stored')
     parser_sub_rerun.add_argument('--dryrun','-n', action="store_true", help = "If you would like to see a dry run of commands to be executed.")
     parser_sub_rerun.add_argument('--gubbins','-g', action="store_true", help = "If you would like to run gubbins. NOT IN USE YET - PLEASE DO NOT USE")
     parser_sub_rerun.add_argument('--keep', '-k', action= 'store_true', help="Keep report from previous run")
