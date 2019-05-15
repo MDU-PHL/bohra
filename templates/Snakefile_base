@@ -1,0 +1,14 @@
+{{workdir}}
+{{configfile}}
+
+SAMPLE = config['isolates'].split()
+
+# SAMPLE, = glob_wildcards('READS/{sample}/R1.fq.gz')
+# will need to edit this from config
+
+{{config_params}}
+# if gubbins is true then extra input will be here
+		{{gubbins_input}}
+
+{{pipeline}}
+
