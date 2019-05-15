@@ -9,10 +9,10 @@ setup (name = 'bohra',
        url = 'https://github.com/MDU-PHL/bohra',
        install_requires = ['jinja2','biopython>=1.70','pandas>=0.23.0', 'pathlib', 'numpy', 'snakemake>=5.3.0'],
        python_requires='>=3.6',
-       entry_points={
-        "console_scripts": [
-            "bohra = bohra:main"
-        ],},
+       #entry_points={
+        #"console_scripts": [
+         #   "bohra = bohra:main"
+        #],},
         setup_requires=['pytest-runner'],
         tests_require = ['pytest'],
         test_suite = 'test'
