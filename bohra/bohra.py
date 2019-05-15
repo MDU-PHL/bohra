@@ -22,7 +22,7 @@ def rerun_pipeline(args):
     return(R.run_pipeline())
 
 
-if __name__ == '__main__':
+def main():
     # setup the parser
   
     parser = argparse.ArgumentParser(description='Bohra - a bacterial genomics pipeline',formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -73,4 +73,6 @@ if __name__ == '__main__':
         logging.basicConfig(filename='job.log',level=logging.INFO, format='[%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
         args.func(args)
 	
+if __name__ == '__main__':
+    main()
 # Bohra exinct tree kangaroo that lived on the nullarbor
