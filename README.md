@@ -49,7 +49,7 @@ At the moment bohra can only be installed via github - other options will follow
 
 
 ```
-usage: bohra.py run [-h] [--input_file INPUT_FILE] [--job_id JOB_ID]
+usage: bohra run [-h] [--input_file INPUT_FILE] [--job_id JOB_ID]
                     [--reference REFERENCE] [--mask MASK]
                     [--pipeline {sa,s,a,all}]
                     [--assembler {shovill,skesa,spades}] [--cpus CPUS]
@@ -102,8 +102,9 @@ optional arguments:
   --gubbins, -g         If you would like to run gubbins. NOT IN USE YET -
                         PLEASE DO NOT USE (default: False)
 ```
+**Minimal run**
 
-`python3 bohra.py run -r path_to_ref -i path_to_input -j job_id`
+`bohra run -r path_to_ref -i path_to_input -j job_id`
 
 ### Subsequent run
 
@@ -118,7 +119,8 @@ Once a run has been completed you can rerun bohra
 3. Change the mask file
 
 ```
-usage: bohra.py rerun [-h] [--reference REFERENCE] [--mask MASK] [--cpus CPUS]
+
+usage: bohra rerun [-h] [--reference REFERENCE] [--mask MASK] [--cpus CPUS]
                       [--workdir WORKDIR] [--resources RESOURCES] [--dryrun]
                       [--gubbins] [--keep]
 
@@ -143,11 +145,11 @@ optional arguments:
 ```
 #### Rerun with different combination of isolates
 
-`python3 bohra.py rerun`
+`bohra rerun`
 
 #### Rerun with different reference/mask
 
-`python3 bohra.py rerun -r pathtonewref -m pathtonewmask`
+`bohra rerun -r pathtonewref -m pathtonewmask`
 
 ## Etymology
 
