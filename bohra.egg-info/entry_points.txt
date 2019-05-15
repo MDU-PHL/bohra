@@ -1,0 +1,3 @@
+[console_scripts]
+bohra = bohra.bohra:main
+
