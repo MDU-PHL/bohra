@@ -9,10 +9,9 @@ import datetime
 import numpy
 import itertools
 import subprocess
-from cleo import Command, argument, option
 from Bio import SeqIO, Phylo
-from write_snakemake import MakeWorkflow
-from write_report import Report
+from bohra.write_snakemake import MakeWorkflow
+from bohra.write_report import Report
 
 
 class RunSnpDetection(object):

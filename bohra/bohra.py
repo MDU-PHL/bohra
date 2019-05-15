@@ -4,8 +4,8 @@ import argparse
 import pathlib
 import sys
 import os
-from SnpDetection import RunSnpDetection
-from ReRunSnpDetection import ReRunSnpDetection
+from bohra.SnpDetection import RunSnpDetection
+from bohra.ReRunSnpDetection import ReRunSnpDetection
 # from scripts.InitValidation import InitValidationDir
 # from scripts.RunValidation import RunValidation
 

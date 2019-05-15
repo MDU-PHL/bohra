@@ -9,9 +9,8 @@ import datetime
 import numpy
 import itertools
 import subprocess
-from cleo import Command, argument, option
 from Bio import SeqIO, Phylo
-from SnpDetection import RunSnpDetection
+from bohra.SnpDetection import RunSnpDetection
 
 class ReRunSnpDetection(RunSnpDetection):
 
