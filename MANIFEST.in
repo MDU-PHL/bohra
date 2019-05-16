@@ -1,2 +1,2 @@
-include test/*
-include templates/*
+include bohra/test/*
+include bohra/templates/*
