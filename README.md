@@ -10,6 +10,14 @@ Bohra was inspired by Nullarbor (https://github.com/tseemann/nullarbor) to be us
 
 Bohra is restricted to Illumina or Ion Torrent read sets. It has been built with the goal of being able to be run in HPC environments, although the configurations at this initial committ have not been included.
 
+### Dependencies
+
+Bohra requires >=python3.6 and is dependent on snakemake
+
+```
+pip3 install snakemake
+```
+
 ## Pipeline
 
 Bohra can be run in three modes

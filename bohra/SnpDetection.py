@@ -107,6 +107,7 @@ class RunSnpDetection(object):
         check that the working directory, resources directory and the input file exist
         '''
         self.path_exists(self.workdir, v = False) 
+        print(self.resources)
         self.path_exists(self.resources, v = False)
         self.path_exists(self.input_file)
     
