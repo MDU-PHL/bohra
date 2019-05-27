@@ -251,7 +251,7 @@ class Report:
         tree.main(treepath=nwk, outpath=out)
         return(f"core_tree.svg")
 
-    def main(self,workdir, resources, gubbins = False, pipeline = 'sa'):
+    def main(self,workdir, resources, job_id, gubbins = False, pipeline = 'sa'):
         # set up paths variables
         # path to report data
         reportdir = pathlib.Path(workdir,'report')
@@ -311,7 +311,7 @@ class Report:
         
         # fill template
         report_template = jinja2.Template(pathlib.Path(indexhtml).read_text())
-        reporthtml.write_text(report_template.render(td = td))
+        reporthtml.write_text(report_template.render(td = td, job_id = job_id))
         # reporthtml.write_text(report_template.render(
         #     seqtablehead = td['seqdata']['head'], seqtablebody = td['seqdata']['body'],seqdatafile=td['seqdata']['file'],
         #     speciesidhead = td['species_identification']['head'], speciesidbody = td['species_identification']['body'],speciesidfile=td['species_identification']['file'],
@@ -330,4 +330,5 @@ if __name__ == '__main__':
     report = Report()
     wd = f"{sys.argv[1]}"
     p = f"{sys.argv[3]}"
-    report.main(resources=f"{sys.argv[2]}", workdir=wd, pipeline = p)
+    i = f"{sys.argv[3]"
+    report.main(resources=f"{sys.argv[2]}", workdir=wd, pipeline = p, job_id = i)

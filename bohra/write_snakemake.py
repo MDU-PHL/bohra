@@ -162,7 +162,7 @@ rule combine_seqdata:
 		for sd in sdfiles:
 
 			p = pathlib.Path(sd)
-			df = pandas.read_csv(sd, sep = '\\t')
+			df = pandas.read_csv(sd, sep = "\t")
 			df.columns = ['Isolate', f"{{p.parts[0]}}"]
 			#print(df)
 			dft = df.transpose()
@@ -180,7 +180,7 @@ rule combine_seqdata:
 		seqdata['Quality'] = numpy.where(seqdata['Depth'] >= 40, 'PASS','FAIL')
 		seqdata = seqdata.reset_index()
 		seqdata = seqdata.rename(columns={{seqdata.columns[0]: 'Isolate'}})
-		seqdata.to_csv(f"{{output}}", sep = '\\t', index = False)
+		seqdata.to_csv(f"{{output}}", sep = '\t', index = False)
 		
 
 """)
@@ -664,7 +664,7 @@ rule write_html_report:
 		"shub://phgenomics-singularity/ete3@latest"
 	shell:
 		\"""
-		python3 {script_path}/write_report.py {wd_string} {resources} {pipeline}
+		python3 {script_path}/write_report.py {wd_string} {resources} {pipeline} {job_id}
 		\"""
 
 		

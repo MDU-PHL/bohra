@@ -37,7 +37,7 @@ class ReRunSnpDetection(RunSnpDetection):
             self.check_for_snippy()
             self.mask = self.check_mask(args.mask, original_mask = self.original_mask)
                 
-        print(self.mask)
+        # print(self.mask)
         # min aln 
         
         # set threads
