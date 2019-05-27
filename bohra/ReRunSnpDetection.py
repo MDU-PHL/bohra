@@ -141,7 +141,7 @@ class ReRunSnpDetection(RunSnpDetection):
         subprocess.run(cmd, shell = True)
     
     def remove_core(self):
-        corefiles = sorted(pathlib.Path(self.workdir, self.job_id).glob('core.*'))
+        corefiles = sorted(pathlib.Path(self.workdir, self.job_id).glob('core*'))
         if corefiles:
             for core in corefiles:
                 core.unlink()
