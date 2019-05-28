@@ -161,13 +161,20 @@ optional arguments:
                         PLEASE DO NOT USE (default: False)
   --keep, -k            Keep report from previous run (default: False)
 ```
+
 **Rerun with different combination of isolates**
+
 
 `bohra rerun`
 
 **Rerun with different reference/mask**
 
+
 `bohra rerun -r pathtonewref -m pathtonewmask`
+
+## Output
+
+Bohra outputs a directory with a `report.html` and all data required for visualisation in a web browser. 
 
 ## Etymology
 
