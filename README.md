@@ -10,14 +10,6 @@ Bohra was inspired by Nullarbor (https://github.com/tseemann/nullarbor) to be us
 
 Bohra is restricted to Illumina or Ion Torrent read sets. It has been built with the goal of being able to be run in HPC environments, although the configurations at this initial committ have not been included.
 
-### Dependencies
-
-Bohra requires >=python3.6 and is dependent on snakemake
-
-```
-pip3 install snakemake
-```
-
 ## Pipeline
 
 Bohra can be run in three modes
@@ -49,9 +41,27 @@ Bohra can be run in three modes
 
 ### Installation
 
+#### Dependencies
+
+Bohra requires >=python3.6 and is dependent on snakemake
+
 At the moment bohra can only be installed via github - other options will follow
 
-`pip3 install git+https://github.com/MDU-PHL/bohra`
+```
+pip3 install snakemake
+pip3 install git+https://github.com/MDU-PHL/bohra
+```
+If you are installing on a server in your local directory use
+
+```
+pip3 install git+https://github.com/MDU-PHL/bohra --user
+```
+
+Don't forget to add your local installation to your path. For example this should work.
+
+```
+export PATH=~/.local/bin:=$PATH
+```
 
 ### Initial run
 
@@ -119,7 +129,7 @@ optional arguments:
 Once a run has been completed you can rerun bohra
 1. Add or remove isolates
 * Add - add a new tab-delimited line
-* Prepend a `#` to the lines to remove
+* Remove - Prepend a `#` to the lines you wish to remove
 
 2. Change the reference 
 * If changing the reference re-alignment and variant calling will be performed
@@ -151,11 +161,11 @@ optional arguments:
                         PLEASE DO NOT USE (default: False)
   --keep, -k            Keep report from previous run (default: False)
 ```
-#### Rerun with different combination of isolates
+**Rerun with different combination of isolates**
 
 `bohra rerun`
 
-#### Rerun with different reference/mask
+**Rerun with different reference/mask**
 
 `bohra rerun -r pathtonewref -m pathtonewmask`
 
