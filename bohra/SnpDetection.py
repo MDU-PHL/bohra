@@ -29,7 +29,8 @@ class RunSnpDetection(object):
         self.resources = pathlib.Path(args.resources)
         # path to reference and mask
         self.ref = pathlib.Path(args.reference)
-        # print(args.mask)
+        # 
+        # (args.mask)
         if args.mask:
             rerun_core = self.check_mask(args.mask)
         else:
@@ -52,11 +53,13 @@ class RunSnpDetection(object):
         # user
         self.user = getpass.getuser()
         # gubbins TODO add back in later!!
-        if not args.gubbins:
-            self.gubbins = numpy.nan
-        else:
-            self.gubbins = args.gubbins
+        # if not args.gubbins:
+        #     self.gubbins = numpy.nan
+        # else:
+        #     self.gubbins = args.gubbins
         
+        self.gubbins = numpy.nan
+
         if isinstance(args.prefillpath, str):
             self.prefillpath = args.prefillpath
         elif args.mdu:
@@ -172,6 +175,7 @@ class RunSnpDetection(object):
         snippycore = self.check_snippycore()
         snpdists = self.check_snpdists()
         iqtree = self.check_iqtree
+        self.sftwrversion = pandas.DataFrame({'Tool': ['Snippy', ]})
         return snippy
 
     def check_validation(self, validation_type):
@@ -365,7 +369,7 @@ class RunSnpDetection(object):
         output:
             :mask: path to mask  file in workingdir (str) and a boolean True == rerun snippy-core, tree and distance, False == no need to rerun snippy-core and tree
         '''
-        print(mask, original_mask)
+        
         # if there is a file path added the generate a symlink
         if len(mask) > 0:
                 m = pathlib.Path(mask)
@@ -469,6 +473,7 @@ class RunSnpDetection(object):
         self.check_reads_exists(tab=tab)
         
         lf = pandas.DataFrame({'Isolate': [i for i in list(tab.iloc[ : , 0]) if '#' not in i ], 'Status': f"INCLUDED", 'Date': self.day})
+        lf['Status'] = numpy.where(lf['Isolate'].str.contains('#'), f"REMOVED", lf['Status'])
         isolates = lf[lf['Status'].isin(['INCLUDED', 'ADDED'])]['Isolate']
         lf.to_csv(logfile, sep = '\t', index = False)
         return list(isolates)
@@ -605,9 +610,9 @@ class RunSnpDetection(object):
             force = f""
         os.chdir(self.workdir)
         if self.dryrun:
-            cmd = f"snakemake -np -s {snake_name} "
+            cmd = f"snakemake -np -s {snake_name} 2>&1 | tee -a job.log"
         else:
-            cmd = f"snakemake -s {snake_name} --cores {self.cpus} {force} "
+            cmd = f"snakemake -s {snake_name} --cores {self.cpus} {force} 2>&1 | tee -a job.log"
             # cmd = f"snakemake -s {snake_name} --cores {self.cpus} {force} "
         wkf = subprocess.run(cmd, shell = True)
         if wkf.returncode == 0:
