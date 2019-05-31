@@ -192,15 +192,15 @@ class RunSnpDetection(object):
                 vers = vers.stdout.decode().strip('\n')
                 self.acc_versions[a] =  f"{a} {self.version_pat.search(vers)}"
             else:
-                
+                self.log_messages('warning', f"Roary is not installed, please check dependencies and try again.")
+                raise SystemExit
     
     def check_roary(self):
 
         if shutil.which('roary'):
             self.log_messages('info', f"Roary is installed")
         else:
-            self.log_messages('warning', f"Roary is not installed, please check dependencies and try again.")
-            raise SystemExit
+            
 
 
     def check_deps(self):
