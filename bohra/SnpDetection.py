@@ -134,13 +134,13 @@ class RunSnpDetection(object):
         '''
         check for snippy-core
         '''
-        self.check_snippy_versions('snippy-core')
+        self.check_installation('snippy-core')
 
     def check_snpdists(self):
         '''
         check for snp-dists
         '''
-        self.check_snippy_versions('snp-dists')
+        self.check_installation('snp-dists')
 
 
 
@@ -148,17 +148,14 @@ class RunSnpDetection(object):
         '''
         check iqtree
         '''
-        self.check_snippy_versions('iqtree')
+        self.check_installation('iqtree')
 
-    def check_snippy_versions(self,software):
+    def check_installation(self,software):
 
-        try:
-            sft = subprocess.run([software, '--version'], stdout=subprocess.PIPE)
-            sft = sft.stdout.decode().strip()
-            self.log_messages('info', f"{software} v.{self.version_pat.search(sft)} found.")
-            self.acc_versions[sft] = f"{software} v.{self.version_pat.search(sft)}"
-        except FileNotFoundError:
-            self.log_messages('warning', f"{sft} is not installed.")
+        if shutil.which(software):
+            self.log_messages('info', f"{software} is installed")
+        else:
+            self.log_messages('warning', f"{software} is not installed, please check dependencies and try again.")
             raise SystemExit
 
 
@@ -169,39 +166,19 @@ class RunSnpDetection(object):
         '''
         ret = 0
         assembler_dict = {'shovill': 'shovill', 'skesa':'skesa','spades':'spades.py'}
-        try:
-            sft = subprocess.run(f"{assembler_dict[self.assembler]} --version", shell = True)
-            self.assembler_version = f"{assembler_dict[self.assembler]} v.{self.version_pat.search(sft)}"
-            self.log_messages('info', f"{self.assembler_version} found. Good job!")
-            self.acc_versions[assembler_dict[self.assembler]] =  f"{self.assembler_version}"
-        except subprocess.CalledProcessError as e:
-            ret = e.retuncode
-        if ret == 0:
-            return True
-        else:
-            return False
+        self.check_installation(assembler_dict[self.assembler])
+
 
     def check_assemble_accesories(self):
 
         accessories = ['mlst', 'kraken2', 'abricate', 'prokka']
         
         for a in accessories:
-            if shutil.which(a):
-                self.log_messages('info', f"{a} is installed")
-                vers = subprocess.run([a, '--version'], stdout=subprocess.PIPE)
-                vers = vers.stdout.decode().strip('\n')
-                self.acc_versions[a] =  f"{a} {self.version_pat.search(vers)}"
-            else:
-                self.log_messages('warning', f"Roary is not installed, please check dependencies and try again.")
-                raise SystemExit
+            self.check_installation(a)
     
     def check_roary(self):
 
-        if shutil.which('roary'):
-            self.log_messages('info', f"Roary is installed")
-        else:
-            self.log_messages('warning', f"Roary is not installed, please check dependencies and try again.")
-            raise SystemExit
+        self.check_installation('roary')
 
 
     def check_deps(self):
@@ -218,9 +195,7 @@ class RunSnpDetection(object):
             self.check_iqtree()
             return(self.check_snippy())
         elif self.pipeline != 's':
-            if not self.check_assembler():
-                self.log_messages('warning', f"The chosen assembler {self.assembler} is not installed. Exiting")
-                raise SystemExit
+            self.check_assembler():
             self.check_assemble_accesories()
         if self.pipeline == 'all':
             self.check_roary()
