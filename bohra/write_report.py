@@ -261,14 +261,15 @@ class Report:
         else:
             v = '--version'
         
-        if software == 'snippy':
+        if software in ['snippy', 'prokka']:
             sft = subprocess.run([software, v], stderr=subprocess.PIPE)
             sft = sft.stderr.decode().strip()
         else:
             sft = subprocess.run([software, v], stdout=subprocess.PIPE)
             sft = sft.stdout.decode().strip()
-
-        sft_version = f"{software} {version_pat.search(sft)}"
+        v = version_pat.search(sft)
+        v = v.group()
+        sft_version = f"{software} v.{v}"
         return(sft_version)
     
     def make_dict_versions(self, tools):
@@ -356,9 +357,9 @@ class Report:
         # add data to sections
         versions_td = {'file': 'software_versions.tab', 'title': 'Tools', 'type': 'versions', 'link':'versions'}
         td.append(versions_td)
-        # print(td)
+        
         for t in range(len(td)):
-            print(td[t])
+            
             if td[t]['type'] == 'table':
                 td[t]['head'], td[t]['body'] = self.write_tables(reportdir=reportdir, table=td[t]['file'])
             if td[t]['type'] == 'tree':
