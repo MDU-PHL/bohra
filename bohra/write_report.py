@@ -259,7 +259,7 @@ class Report:
         if software == 'snp-dists':
             v = '-v'
         else:
-            v = '--v'
+            v = '--version'
         
         if software == 'snippy':
             sft = subprocess.run([software, v], stderr=subprocess.PIPE)
@@ -323,6 +323,8 @@ class Report:
         # table dictionary for each option
         
         td = [{'file':'seqdata.tab', 'title':'Sequence Data', 'link': 'sequencedata', 'type' : 'table'}]
+        
+        
         core_genome_td = {'file': 'core_genome.tab', 'title': 'Core Genome', 'link':'coregenome', 'type':'table'}
         snp_density_td = {'title': 'SNP density', 'link':'snpdensity', 'type':'graph'}
         core_phylogeny_td = {'title': 'Core Phylogeny', 'link':'corephylogeny', 'file': 'core.treefile', 'type': 'tree'}
@@ -354,6 +356,7 @@ class Report:
         # add data to sections
         versions_td = {'file': 'software_versions.tab', 'title': 'Tools', 'type': 'versions'}
         td.extend(versions_td)
+        print(td)
         for t in range(len(td)):
             if td[t]['type'] == 'table':
                 td[t]['head'], td[t]['body'] = self.write_tables(reportdir=reportdir, table=td[t]['file'])
