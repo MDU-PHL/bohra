@@ -354,10 +354,11 @@ class Report:
             td.extend(s_td)
             td.extend(roary_td)
         # add data to sections
-        versions_td = {'file': 'software_versions.tab', 'title': 'Tools', 'type': 'versions'}
+        versions_td = {'file': 'software_versions.tab', 'title': 'Tools', 'type': 'versions', 'link':'versions'}
         td.append(versions_td)
-        print(td)
+        # print(td)
         for t in range(len(td)):
+            print(td[t])
             if td[t]['type'] == 'table':
                 td[t]['head'], td[t]['body'] = self.write_tables(reportdir=reportdir, table=td[t]['file'])
             if td[t]['type'] == 'tree':
