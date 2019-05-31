@@ -6,8 +6,6 @@ import sys
 import os
 from bohra.SnpDetection import RunSnpDetection
 from bohra.ReRunSnpDetection import ReRunSnpDetection
-# from scripts.InitValidation import InitValidationDir
-# from scripts.RunValidation import RunValidation
 
 
 
@@ -22,7 +20,7 @@ def rerun_pipeline(args):
     return(R.run_pipeline())
 
 
-def main():
+def set_parsers():
     # setup the parser
   
     parser = argparse.ArgumentParser(description='Bohra - a bacterial genomics pipeline',formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -37,7 +35,7 @@ def main():
     parser_sub_run.add_argument('--reference','-r',help='Path to reference (.gbk or .fa)', default = '')
     parser_sub_run.add_argument('--mask','-m',default = False, help='Path to mask file if used (.bed)')
     parser_sub_run.add_argument('--pipeline','-p', default = 'sa', choices=['sa','s','a', 'all'], help=f"The pipeline to run. SNPS ('s') will call SNPs and generate phylogeny, ASSEMBLIES ('a') will generate assemblies and perform mlst and species identification using kraken2, SNPs and ASSEMBLIES ('sa' - default) will perform SNPs and ASSEMBLIES. ALL ('all') will perform SNPS, ASSEMBLIES and ROARY for pan-genome analysis")
-    parser_sub_run.add_argument('--assembler','-a', default = 'skesa', choices=['shovill','skesa','spades'], help=f"Assembler to use.")
+    parser_sub_run.add_argument('--assembler','-a', default = 'shovill', choices=['shovill','skesa','spades'], help=f"Assembler to use.")
     parser_sub_run.add_argument('--cpus','-c',help='Number of CPU cores to run, will define how many rules are run at a time', default=36)
     parser_sub_run.add_argument('--minaln','-ma',help='Minimum percent alignment', default=0)
     parser_sub_run.add_argument('--prefillpath','-pf',help='Path to existing assemblies - in the form path_to_somewhere/isolatename/contigs.fa')
@@ -65,8 +63,11 @@ def main():
     
     parser_sub_rerun.set_defaults(func = rerun_pipeline)
     args = parser.parse_args()
+    return(args)
 
+def main():
 
+    args = set_parsers()
     if vars(args) == {}:
         parser.print_help(sys.stderr)
     else:
