@@ -7,6 +7,7 @@ from Bio import Phylo
 import jinja2, pathlib, pandas, numpy, re
 from bokeh.plotting import figure, show, output_file
 from bokeh.embed import components
+from packaging import version
 # from bokeh.io import export_png
 # import PyQt5
 # from ete3 import Tree, TreeStyle, NodeStyle, TextFace
@@ -251,8 +252,62 @@ class Report:
         tree.main(treepath=nwk, outpath=out)
         return(f"core_tree.svg")
 
-    def main(self,workdir, resources, job_id, gubbins = False, pipeline = 'sa'):
+    def get_software_versions(self, software):
+
+        version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
+
+        if software == 'snp-dists':
+            v = '-v'
+        else:
+            v = '--v'
+        
+        if software == 'snippy':
+            sft = subprocess.run([software, v], stderr=subprocess.PIPE)
+            sft = sft.stderr.decode().strip()
+        else:
+            sft = subprocess.run([software, v], stdout=subprocess.PIPE)
+            sft = sft.stdout.decode().strip()
+
+        sft_version = f"{software} {version_pat.search(sft)}"
+        return(sft_version)
+    
+    def make_dict_versions(self, tools):
+        tool_dict = {}
+        for t in tools:
+               v = self.get_software_versions(t)
+               tool_dict[t] = v
+        return(tool_dict)
+
+    def get_software_file(self, reportdir, pipeline, assembler ):
+
+        snippy_tools = ['snippy', 'snippy-core', 'snp-dists', 'iqtree']
+        assembly_tools = ['mlst', 'kraken2', 'prokka', 'abricate', assembler]
+        
+        if pipeline == 's':
+            tool_dict = self.make_dict_versions(snippy_tools)
+        elif pipeline == 'a':
+            tool_dict = self.make_dict_versions(assembly_tools)
+        elif pipeline == 'sa':
+            snippy_tools.extend(assembly_tools)
+            tool_dict = self.make_dict_versions(snippy_tools)
+        elif pipeline == 'all':
+            snippy_tools.extend(assembly_tools)
+            snippy_tools.append('roary')
+            tool_dict = self.make_dict_versions(snippy_tools)
+        
+        
+        versions = ['Software versions']
+        for t in tool_dict:
+            versions.append(tool_dict[t])
+        
+        p = reportdir / 'software_versions.tab'
+
+        p.write_text('\n'.join(versions))
+        
+
+    def main(self,workdir, resources, job_id, assembler = 'shovill', gubbins = False, pipeline = 'sa'):
         # set up paths variables
+        
         # path to report data
         reportdir = pathlib.Path(workdir,'report')
         reporthtml = reportdir / 'report.html'
@@ -262,6 +317,9 @@ class Report:
         csstemplate = jinja2.Template(pathlib.Path(resources,'job.css').read_text())
         csstarget = reportdir / 'job.css'
         csstarget.write_text(csstemplate.render())
+        # save tool table
+        self.get_software_file(reportdir = reportdir, pipeline = pipeline, assembler = assembler)
+
         # table dictionary for each option
         
         td = [{'file':'seqdata.tab', 'title':'Sequence Data', 'link': 'sequencedata', 'type' : 'table'}]
@@ -294,7 +352,8 @@ class Report:
             td.extend(s_td)
             td.extend(roary_td)
         # add data to sections
-        
+        versions_td = {'file': 'software_versions.tab', 'title': 'Tools', 'type': 'versions'}
+        td.extend(versions_td)
         for t in range(len(td)):
             if td[t]['type'] == 'table':
                 td[t]['head'], td[t]['body'] = self.write_tables(reportdir=reportdir, table=td[t]['file'])
@@ -307,7 +366,8 @@ class Report:
                 td[t]['script'], td[t]['div'] = self.plot_distances(reportdir=reportdir)
             if td[t]['link'] == 'snpdensity':
                 td[t]['script'], td[t]['div'] = self.plot_snpdensity(reportdir= reportdir)
-        
+            if td[t]['type'] == 'versions':
+                td[t]['head'], td[t]['body'] = self.write_tables(reportdir=reportdir, table=td[t]['file'])
         
         # fill template
         report_template = jinja2.Template(pathlib.Path(indexhtml).read_text())
@@ -320,4 +380,5 @@ if __name__ == '__main__':
     wd = f"{sys.argv[1]}"
     p = f"{sys.argv[3]}"
     i = f"{sys.argv[4]}"
-    report.main(resources=f"{sys.argv[2]}", workdir=wd, pipeline = p, job_id = i)
+    a = f"{sys.argv[5]}"
+    report.main(resources=f"{sys.argv[2]}", workdir=wd, pipeline = p, job_id = i, assembler=a)

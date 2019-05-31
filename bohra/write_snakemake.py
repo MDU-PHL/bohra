@@ -639,7 +639,7 @@ rule collate_report:
 		{run_string}
 """)
 
-	def write_html(self, workdir, resources, job_id, script_path, pipeline = 'sa'):
+	def write_html(self, workdir, resources, job_id, script_path,assembler, pipeline = 'sa'):
 		seq = f"'report/seqdata.tab'"
 		s = f"'report/core_genome.tab', 'report/core.treefile', 'report/distances.tab'"
 		a = f"'report/assembly.tab','report/mlst.tab', 'report/species_identification.tab','report/resistome.tab'"

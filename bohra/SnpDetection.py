@@ -10,6 +10,7 @@ import numpy
 import itertools
 import subprocess
 from Bio import SeqIO, Phylo
+from packaging import version
 from bohra.write_snakemake import MakeWorkflow
 from bohra.write_report import Report
 
@@ -73,7 +74,7 @@ class RunSnpDetection(object):
         self.assembler = args.assembler
         self.snippy_version = ''
         self.version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
-        self.acc_versions = {}
+        self.assembler_dict = {'shovill': 'shovill', 'skesa':'skesa','spades':'spades.py'}
 
     def log_messages(self, type, message):
         '''
@@ -165,8 +166,8 @@ class RunSnpDetection(object):
         :software: name of software (str)
         '''
         ret = 0
-        assembler_dict = {'shovill': 'shovill', 'skesa':'skesa','spades':'spades.py'}
-        self.check_installation(assembler_dict[self.assembler])
+        
+        self.check_installation(self.assembler_dict[self.assembler])
 
 
     def check_assemble_accesories(self):
@@ -535,7 +536,7 @@ class RunSnpDetection(object):
         roary_pipeline = [p.write_roary(), p.write_pan_graph()]
 
         # pipeline can always ends with report
-        report_pipeline = [p.write_report_collation(pipeline = self.pipeline), p.write_html(pipeline = self.pipeline,workdir = self.workdir, resources = resource_path, job_id = self.job_id, script_path = script_path)]
+        report_pipeline = [p.write_report_collation(pipeline = self.pipeline), p.write_html(pipeline = self.pipeline,workdir = self.workdir, resources = resource_path, job_id = self.job_id, script_path = script_path, assembler = self.assembler_dict[self.assembler])]
         
         if self.pipeline == 's':
             pipelinelist.extend(snps_pipeline)

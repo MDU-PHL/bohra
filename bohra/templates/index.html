@@ -145,6 +145,25 @@
       </table>
       <!-- end of table -->
       </div>
+
+  {% if t.type == 'versions' %}
+  <div class="table-responsive">
+      <!-- buttons for dowload -->
+      
+          <table id="khtable" class="table table-striped table-bordered table-sortable">
+          <thead>
+            <tr><!-- header of table -->
+            {{t.head}}
+            </tr>
+          </thead>
+          <tbody>
+            <!-- content of table -->
+            {{t.body}}
+          </tbody>
+          <!-- end of table body -->
+        </table>
+        <!-- end of table -->
+      </div>
   {% endif %}
 {% endfor %}
 
