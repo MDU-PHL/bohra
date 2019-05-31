@@ -1,5 +1,5 @@
 __author__ = "Kristy Horan"
-__license__ = "MIT"
+__license__ = "GPL"
 __version__ = "1.0.1"
 __maintainer__ = "Kristy Horan"
 __email__ = "kristyhoran15@gmail.com"
