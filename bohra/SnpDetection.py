@@ -200,7 +200,8 @@ class RunSnpDetection(object):
         if shutil.which('roary'):
             self.log_messages('info', f"Roary is installed")
         else:
-            
+            self.log_messages('warning', f"Roary is not installed, please check dependencies and try again.")
+            raise SystemExit
 
 
     def check_deps(self):
