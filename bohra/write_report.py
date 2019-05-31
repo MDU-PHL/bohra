@@ -171,7 +171,7 @@ class Report:
         for i in range(1,len(data)):
             row = [f"<tr>"]
             for d in data[i].split('\t'):
-                row.append(f"<td>{d}</td>")
+                row.append(f"<td align=\"center\">{d}</td>")
             row.append(f"</tr>")
             body = body + row
         return('\n'.join(tablehead),'\n'.join(body))
