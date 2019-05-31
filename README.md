@@ -8,7 +8,7 @@ Bohra was inspired by Nullarbor (https://github.com/tseemann/nullarbor) to be us
 
 ### Limitations
 
-Bohra is restricted to Illumina or Ion Torrent read sets. It has been built with the goal of being able to be run in HPC environments, although the configurations at this initial committ have not been included.
+Bohra is restricted to Illumina read sets. It has been built with the goal of being able to be run in HPC environments, although the configurations at this initial committ have not been included.
 
 ## Pipeline
 
