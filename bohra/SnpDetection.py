@@ -193,6 +193,7 @@ class RunSnpDetection(object):
                 self.acc_versions[a] =  f"{a} {self.version_pat.search(vers)}"
             else:
                 
+    
     def check_roary(self):
 
         if shutil.which('roary'):
