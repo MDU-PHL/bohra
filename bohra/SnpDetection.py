@@ -150,13 +150,13 @@ class RunSnpDetection(object):
         '''
         self.check_snippy_versions('iqtree')
 
-    def check_snippy_versions(self,sft):
+    def check_snippy_versions(self,software):
 
         try:
             sft = subprocess.run([software, '--version'], stdout=subprocess.PIPE)
             sft = sft.stdout.decode().strip()
-            self.log_messages('info', f"{sft} v.{self.version_pat.search(sft)} found.")
-            self.acc_versions[sft] = f"{sft} v.{self.version_pat.search(sft)}"
+            self.log_messages('info', f"{software} v.{self.version_pat.search(sft)} found.")
+            self.acc_versions[sft] = f"{software} v.{self.version_pat.search(sft)}"
         except FileNotFoundError:
             self.log_messages('warning', f"{sft} is not installed.")
             raise SystemExit
