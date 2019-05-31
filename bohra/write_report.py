@@ -1,7 +1,7 @@
 # This script will draw a tree from a newick using a recursive approach to extract positions of nodes (adapted for my needs from https://github.com/plotly/dash-phylogeny/blob/dev/app.py) and placement with svgwrite.
 
 
-import svgwrite, re, sys
+import svgwrite, re, sys, subprocess
 from svgwrite import cm, mm
 from Bio import Phylo
 import jinja2, pathlib, pandas, numpy, re
