@@ -1,7 +1,10 @@
 from setuptools import setup, find_packages
+import bohra
+
+VERSION = bohra.__version__
 
 setup (name = 'bohra',
-       version = '1.0.1',
+       version = VERSION,
        include_package_data = True,
        packages=['bohra'],
        description = 'A bioinformatics pipeline for analysing short read Illumina data microbiological public health.',
