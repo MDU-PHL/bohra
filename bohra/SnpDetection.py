@@ -125,7 +125,7 @@ class RunSnpDetection(object):
             snippy = snippy.stderr.decode().strip()
             self.snippy_version = self.version_pat.search(snippy)
             self.log_messages('info', f"Snippy {snippy} found. Good job!")
-            self.acc_versions['snippy'] = f"Snippy {snippy}"
+            
             return(self.version_pat.search(snippy))
         except FileNotFoundError:
             self.log_messages('warning', f"snippy is not installed.")
