@@ -664,7 +664,7 @@ rule write_html_report:
 		"shub://phgenomics-singularity/ete3@latest"
 	shell:
 		\"""
-		python3 {script_path}/write_report.py {wd_string} {resources} {pipeline} {job_id}
+		python3 {script_path}/write_report.py {wd_string} {resources} {pipeline} {job_id} {assembler}
 		\"""
 
 		
