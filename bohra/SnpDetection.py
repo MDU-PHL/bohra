@@ -196,7 +196,7 @@ class RunSnpDetection(object):
             self.check_iqtree()
             return(self.check_snippy())
         elif self.pipeline != 's':
-            self.check_assembler():
+            self.check_assembler()
             self.check_assemble_accesories()
         if self.pipeline == 'all':
             self.check_roary()
