@@ -1,5 +1,5 @@
 import pathlib
-import os, getpass
+import os, getpass, shutils
 import pandas
 import jinja2
 import sh
@@ -72,7 +72,9 @@ class RunSnpDetection(object):
         self.cpus = args.cpus
         self.assembler = args.assembler
         self.snippy_version = ''
-    
+        self.version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
+        self.acc_versions = {}
+
     def log_messages(self, type, message):
         '''
         Will log messages to the screen with CLEO and also add them to job.log
@@ -87,7 +89,7 @@ class RunSnpDetection(object):
             print(f"WARNING: {message}")
         if type == 'info':
             logging.info(message)
-            print(f"{message}")
+            # print(f"{message}")
     
     def force_overwrite(self):
         '''
@@ -120,8 +122,10 @@ class RunSnpDetection(object):
         try:
             snippy = subprocess.run(['snippy', '--version'], stderr=subprocess.PIPE)
             snippy = snippy.stderr.decode().strip()
-            self.log_messages('info', f"{snippy} found. Good job!")
-            return snippy
+            self.snippy_version = self.version_pat.search(snippy)
+            self.log_messages('info', f"Snippy {snippy} found. Good job!")
+            self.acc_versions['snippy'] = f"Snippy {snippy}"
+            return(self.version_pat.search(snippy))
         except FileNotFoundError:
             self.log_messages('warning', f"snippy is not installed.")
             raise SystemExit
@@ -130,39 +134,73 @@ class RunSnpDetection(object):
         '''
         check for snippy-core
         '''
-        try:
-            snippycore = subprocess.run(['snippy-core', '-v'], stdout=subprocess.PIPE)
-            snippycore = snippycore.stdout.decode().strip()
-            self.log_messages('info', f"{snippycore} found. Good job!")
-            return(snippycore)
-        except FileNotFoundError:
-            self.log_messages('warning', f"snippy-core is not installed.")
-            raise SystemExit
+        self.check_snippy_versions('snippy-core')
 
     def check_snpdists(self):
         '''
         check for snp-dists
         '''
-        try:
-            snpdists = subprocess.run(['snp-dists', '-v'], stdout=subprocess.PIPE)
-            snpdists = snpdists.stdout.decode().strip()
-            self.log_messages('info', f"{snpdists} found. Good job!")
-            return(snpdists)
-        except FileNotFoundError:
-            self.log_messages('warning', f"snp-dists is not installed.")
-            raise SystemExit
+        self.check_snippy_versions('snp-dists')
+
+
 
     def check_iqtree(self):
         '''
         check iqtree
         '''
+        self.check_snippy_versions('iqtree')
+
+    def check_snippy_versions(self,sft):
+
         try:
-            iqtree = subprocess.run(['iqtree', '--version'], stdout=subprocess.PIPE)
-            iqtree = iqtree.stdout.decode().strip('\n')[0]
-            self.log_messages('info', f"{iqtree} found. Good job!")
+            sft = subprocess.run([software, '--version'], stdout=subprocess.PIPE)
+            sft = sft.stdout.decode().strip()
+            self.log_messages('info', f"{sft} v.{self.version_pat.search(sft)} found.")
+            self.acc_versions[sft] = f"{sft} v.{self.version_pat.search(sft)}"
         except FileNotFoundError:
-            self.log_messages('warning', f"iqtree is not installed.")
+            self.log_messages('warning', f"{sft} is not installed.")
             raise SystemExit
+
+
+    def check_assembler(self):
+        '''
+        check version of assembler
+        :software: name of software (str)
+        '''
+        ret = 0
+        assembler_dict = {'shovill': 'shovill', 'skesa':'skesa','spades':'spades.py'}
+        try:
+            sft = subprocess.run(f"{assembler_dict[self.assembler]} --version", shell = True)
+            self.assembler_version = f"{assembler_dict[self.assembler]} v.{self.version_pat.search(sft)}"
+            self.log_messages('info', f"{self.assembler_version} found. Good job!")
+            self.acc_versions[assembler_dict[self.assembler]] =  f"{self.assembler_version}"
+        except subprocess.CalledProcessError as e:
+            ret = e.retuncode
+        if ret == 0:
+            return True
+        else:
+            return False
+
+    def check_assemble_accesories(self):
+
+        accessories = ['mlst', 'kraken2', 'abricate', 'prokka']
+        
+        for a in accessories:
+            if shutil.which(a):
+                self.log_messages('info', f"{a} is installed")
+                vers = subprocess.run([a, '--version'], stdout=subprocess.PIPE)
+                vers = vers.stdout.decode().strip('\n')
+                self.acc_versions[a] =  f"{a} {self.version_pat.search(vers)}"
+            else:
+                
+    def check_roary(self):
+
+        if shutil.which('roary'):
+            self.log_messages('info', f"Roary is installed")
+        else:
+            self.log_messages('warning', f"Roary is not installed, please check dependencies and try again.")
+            raise SystemExit
+
 
     def check_deps(self):
         '''
@@ -171,12 +209,20 @@ class RunSnpDetection(object):
         # TODO check all software tools used and is there a way to check database last update??
         # TODO check assemblers
         self.log_messages('info', f"Checking software dependencies")
-        snippy = self.check_snippy()
-        snippycore = self.check_snippycore()
-        snpdists = self.check_snpdists()
-        iqtree = self.check_iqtree
-        self.sftwrversion = pandas.DataFrame({'Tool': ['Snippy', ]})
-        return snippy
+        if self.pipeline != 'a':
+ 
+            self.check_snippycore()
+            self.check_snpdists()
+            self.check_iqtree()
+            return(self.check_snippy())
+        elif self.pipeline != 's':
+            if not self.check_assembler():
+                self.log_messages('warning', f"The chosen assembler {self.assembler} is not installed. Exiting")
+                raise SystemExit
+            self.check_assemble_accesories()
+        if self.pipeline == 'all':
+            self.check_roary()
+        
 
     def check_validation(self, validation_type):
 
@@ -191,39 +237,22 @@ class RunSnpDetection(object):
 
             return(validate)
     
-    def check_assembler(self, software):
-        '''
-        check version of assembler
-        :software: name of software (str)
-        '''
-        ret = 0
-        try:
-            sft = subprocess.run(f"{self.assembler} --version", shell = True)
-        except subprocess.CalledProcessError as e:
-            ret = e.retuncode
-        if ret == 0:
-            return True
-        else:
-            return False
-
+    
 
     def run_checks(self):
 
         self.check_setup_files()
         self.check_rerun()
+        self.check_deps()
         # check reference
         if self.pipeline != 'a':
-            self.snippy_version = self.check_deps()
             if self.ref == '':
                 self.log_messages('warning', f"You are trying call SNPs, a reference file is required. Please try again using '-r path to reference'")
                 raise SystemExit
             else:
                 self.ref = self.link_file(self.ref)
-        elif self.pipeline != 's':
-            if not self.check_assembler:
-                self.log_messages('warning', f"The chosen assembler {self.assembler} is not installed. Exiting")
-                raise SystemExit
         
+            
 
     def set_source_log(self):
         '''

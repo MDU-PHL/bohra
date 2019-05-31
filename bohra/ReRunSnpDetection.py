@@ -9,6 +9,8 @@ import datetime
 import numpy
 import itertools
 import subprocess
+import re
+from packaging import version
 from Bio import SeqIO, Phylo
 from bohra.SnpDetection import RunSnpDetection
 
@@ -62,7 +64,7 @@ class ReRunSnpDetection(RunSnpDetection):
         if self.pipeline != 'a':
             self.original_reference = df.ix[df.index[-1], 'Reference']
             self.original_mask = df.ix[df.index[-1], 'Mask']
-            self.original_snippy_version = df.ix[df.index[-1], 'snippy_version']
+            self.original_snippy_version = self.version_pat.search(df.ix[df.index[-1], 'snippy_version'])
         if self.pipeline != 's':
             self.assembler = df.ix[df.index[-1], 'Assembler']
         self.orignal_date = df.ix[df.index[-1], 'Date']
@@ -96,10 +98,9 @@ class ReRunSnpDetection(RunSnpDetection):
     def check_for_snippy(self):
         self.check_setup_files()
         self.current_snippy_version = self.check_deps()
-        c = self.current_snippy_version.split('.')
-        o = self.original_snippy_version.split('.')
-        if c[0] != o[0] and c[1] != o[0]:
+        if self.current_snippy_version.group("major", "minor") != self.original_snippy_version.group("major", "minor"):
             self.force = True
+            self.log_messages('info', f"You are using a different version of Snippy for this re-run, SNP calling will be repeated.")
 
 
     def update_source_log(self):

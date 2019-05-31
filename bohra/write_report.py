@@ -312,23 +312,12 @@ class Report:
         # fill template
         report_template = jinja2.Template(pathlib.Path(indexhtml).read_text())
         reporthtml.write_text(report_template.render(td = td, job_id = job_id))
-        # reporthtml.write_text(report_template.render(
-        #     seqtablehead = td['seqdata']['head'], seqtablebody = td['seqdata']['body'],seqdatafile=td['seqdata']['file'],
-        #     speciesidhead = td['species_identification']['head'], speciesidbody = td['species_identification']['body'],speciesidfile=td['species_identification']['file'],
-        #     mlsthead = td['mlst']['head'], mlstbody= td['mlst']['body'],mlstfile=td['mlst']['file'],
-        #     resistomehead = td['resistome']['head'], resistomebody = td['resistome']['body'],resistomefile = td['resistome']['file'],
-        #     assemblyhead = td['assembly']['head'], assemblybody=td['assembly']['body'],assemblyfile=td['assembly']['file'],
-        #     coregenomehead = td['coregenome']['head'], coregenomebody = td['coregenome']['body'],coregenomefile=td['coregenome']['file'],
-        #     snpdensityscript = td['snpdensity']['script'], snpdensitydiv = td['snpdensity']['div'],
-        #     corephylogenytree = td['coretree']['file'],treefile="core.treefile",
-        #     distancediv = td['pairwisedistance']['div'], distancescript = td['pairwisedistance']['script'],
-        #     distancehead=td['distances']['head'],distancebody = td['distances']['body'],distancefile=td['distances']['file'],
-        #     panhead=td['pangenome']['head'],panbody = td['pangenome']['body'], panfile=td['pangenome']['file']))
+       
         return(True)
 
 if __name__ == '__main__':
     report = Report()
     wd = f"{sys.argv[1]}"
     p = f"{sys.argv[3]}"
-    i = f"{sys.argv[3]"
+    i = f"{sys.argv[4]}"
     report.main(resources=f"{sys.argv[2]}", workdir=wd, pipeline = p, job_id = i)

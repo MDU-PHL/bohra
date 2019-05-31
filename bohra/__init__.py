@@ -1,0 +1,6 @@
+__author__ = "Kristy Horan"
+__license__ = "MIT"
+__version__ = "1.0.1"
+__maintainer__ = "Kristy Horan"
+__email__ = "kristyhoran15@gmail.com"
+__status__ = "Development"

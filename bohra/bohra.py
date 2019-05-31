@@ -71,6 +71,7 @@ def main():
         parser.print_help(sys.stderr)
     else:
         logging.basicConfig(filename='job.log',level=logging.INFO, format='[%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+        logger = logging.getLogger(__name__)
         args.func(args)
 	
 if __name__ == '__main__':
