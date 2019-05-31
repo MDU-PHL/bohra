@@ -355,7 +355,7 @@ class Report:
             td.extend(roary_td)
         # add data to sections
         versions_td = {'file': 'software_versions.tab', 'title': 'Tools', 'type': 'versions'}
-        td.extend(versions_td)
+        td.append(versions_td)
         print(td)
         for t in range(len(td)):
             if td[t]['type'] == 'table':
