@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 
-'''
+
+
+"""Bohra 
+.. moduleauthor:: Kristy Horan <kristyhoran15@gmail.com>
+
 Bohra exinct tree kangaroo that lived on the nullarbor
 
 Bohra is microbial genomics pipeline, designed predominantly for use in public health, but may also be useful in research settings. The pipeline takes as input a tab-delimited file with the isolate IDs followed by the path to READ1 and READ2, a reference for alignment and a unique identifier, where reads are illumina paired end reads (other platforms are not supported).
@@ -8,7 +12,8 @@ Bohra is microbial genomics pipeline, designed predominantly for use in public h
 The pipline is based on nullarbor (https://github.com/tseemann/nullarbor) and is designed to be run in high performance computing environment.
 
 Bohra is modular allowing the user to choose between calling SNPs and generating a phylogenetic tree, perform assemblies and detect AMR, perform typing etc; Or use the full pipeline to call SNPs, generate phylogenies, assemble, type and detect the pan-geneome. The output of Bohra is a html report that can be distributed, with downloadable tables and data.
-'''
+"""
+
 
 import logging
 import argparse

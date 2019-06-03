@@ -17,7 +17,7 @@ from bohra.write_report import Report
 
 class RunSnpDetection(object):
     '''
-    Setup working directory and run snippy
+    A class for Bohra pipeline object
     '''
     
     def __init__(self, args):
@@ -78,7 +78,7 @@ class RunSnpDetection(object):
 
     def log_messages(self, type, message):
         '''
-        Will log messages to the screen with CLEO and also add them to job.log
+        Will log messages to the screen and also add them to job.log
         input:
             :type: type of message info or warning
             :message: message to log
@@ -94,7 +94,7 @@ class RunSnpDetection(object):
     
     def force_overwrite(self):
         '''
-        will force pipeline to run in an existing folder
+        will force pipeline to run in an existing folder - removes isolate and source logs
         '''
         isolatelog = self.workdir / f"isolates.log"
         sourcelog = self.workdir / f"source.log"
@@ -152,6 +152,11 @@ class RunSnpDetection(object):
         self.check_installation('iqtree')
 
     def check_installation(self,software):
+        '''
+        Check that software is installed
+        input:
+            :software: the name of the software - must be command line name 
+        '''
 
         if shutil.which(software):
             self.log_messages('info', f"{software} is installed")
@@ -163,7 +168,6 @@ class RunSnpDetection(object):
     def check_assembler(self):
         '''
         check version of assembler
-        :software: name of software (str)
         '''
         ret = 0
         
@@ -171,13 +175,18 @@ class RunSnpDetection(object):
 
 
     def check_assemble_accesories(self):
-
+        '''
+        check the assembly accessories mlst, kraken, abricate and prokka
+        '''
         accessories = ['mlst', 'kraken2', 'abricate', 'prokka']
         
         for a in accessories:
             self.check_installation(a)
     
     def check_roary(self):
+        '''
+        check roary is installed
+        '''
 
         self.check_installation('roary')
 
@@ -190,35 +199,38 @@ class RunSnpDetection(object):
         # TODO check assemblers
         self.log_messages('info', f"Checking software dependencies")
         if self.pipeline != 'a':
- 
             self.check_snippycore()
             self.check_snpdists()
             self.check_iqtree()
             return(self.check_snippy())
-        elif self.pipeline != 's':
+        if self.pipeline != 's':
             self.check_assembler()
             self.check_assemble_accesories()
         if self.pipeline == 'all':
             self.check_roary()
         
 
-    def check_validation(self, validation_type):
+    # def check_validation(self, validation_type):
+    #     '''
+    #     Check if this is a validation run 
+    #     '''
+    #         if validation_type == 'both':
+    #             validate = ['snps', 'clusters']
+    #         else:
+    #             if validation_type in ['snps', 'clusters']:
+    #                 validate = validation_type.split(',')
+    #             else:
+    #                 self.log_messages('warning', f"{validation_type} is not a valid input. Correct options can be taken from {' '.join(['snps', 'clusters', 'both'])}. Please try again")
+    #                 raise SystemExit
 
-            if validation_type == 'both':
-                validate = ['snps', 'clusters']
-            else:
-                if validation_type in ['snps', 'clusters']:
-                    validate = validation_type.split(',')
-                else:
-                    self.log_messages('warning', f"{validation_type} is not a valid input. Correct options can be taken from {' '.join(['snps', 'clusters', 'both'])}. Please try again")
-                    raise SystemExit
-
-            return(validate)
+    #         return(validate)
     
     
 
     def run_checks(self):
-
+        '''
+        Run checks prior to start - checking all software is installed, if this is a rerun and the input files
+        '''
         self.check_setup_files()
         self.check_rerun()
         self.check_deps()
@@ -234,8 +246,8 @@ class RunSnpDetection(object):
 
     def set_source_log(self):
         '''
-        set the reference, mask and id for tracking and potential can be updated now - no need for update in rerun.
-        input: snippy version if the X.Y previous != X.Y current (if rerun) force to rerun snippy
+        set the reference, mask and id for tracking and potential.
+        
             
         '''   
         new_df = pandas.DataFrame({'JobID':self.job_id, 'Reference':f"{self.ref}",'Mask':self.mask, 
@@ -254,11 +266,7 @@ class RunSnpDetection(object):
 
     def check_rerun(self):
         '''
-        Determines if snippy.tab exists - as a determination of the job being a rerun of previous job
-        input:
-            :snippy_tab: file path to snippy_tab
-        output:
-            False if snippy.tab does not exists or warns user and exits if it does
+        CHeck if the job is a rerun of an existing job, if so print message informing user and exit
 
         '''
 
@@ -279,7 +287,8 @@ class RunSnpDetection(object):
         '''
         ensure files are present, if so continues if not quits with FileNotFoundError
         input:
-            paths to files for pipeline
+            :path: patht to files for pipeline
+            :v: if v == True print message, else just check
         output:
             returns True (or fails with FileNotFoundError)
         '''
@@ -339,12 +348,11 @@ class RunSnpDetection(object):
             if not read_target.exists():
                 read_target.symlink_to(read_source)
 
-    def link_file(self, path, type = 'reference'):
+    def link_file(self, path):
         '''
-        check if reference or tree exists and copy to workingdir
+        check if file exists and copy to workingdir
         input:
-            :workdir: path to working directory for pipeline or current directory
-            :ref: path to reference
+            :path: path to file
         if path does not exist then return false (calling function will request path). 
         if it does exist, then create symlink to the working dir 
         output:
@@ -371,8 +379,8 @@ class RunSnpDetection(object):
     def check_mask(self, mask, original_mask = False):
         '''
         input:
-            :workdir: a path object 
             :mask: path to mask file (str)
+            :original_mask: name of orignal mask to use in rerun
         output:
             :mask: path to mask  file in workingdir (str) and a boolean True == rerun snippy-core, tree and distance, False == no need to rerun snippy-core and tree
         '''
@@ -392,10 +400,6 @@ class RunSnpDetection(object):
             return original_mask
         else:
             return ''
-
-
-
-    
     
     def min_four_samples(self, tab):
         '''
@@ -428,8 +432,6 @@ class RunSnpDetection(object):
         check that the structure of the input file is correct, 3 columns, with a minimum of 4 isolates
         :input
             :tab: dataframe of the input file
-            :filename: name of file the dataframe was built from
-            :rerun: if rerun is false, then the limits on 4 isolates is not applied
         :output
             True if make it to the end without exiting with a TypeWarning the user of the reason file was rejected
         '''
@@ -455,6 +457,8 @@ class RunSnpDetection(object):
         '''
         check that the correct paths have been given
         if reads not present path_exists will cause a FileNotFound error and warn user
+        :input
+            :tab: dataframe of the input file
         '''
         for i in tab.itertuples():
             r1 = i[2]
@@ -470,11 +474,8 @@ class RunSnpDetection(object):
         add the isolates to a log file also adds in anoterh check that this is a rerun of an existing job
         input:
             :tab: dataframe of the isolates to add - same structure as original input file, but not needing to be > 4 isolate
-            :workdir: path to working directory
-            :day: day of the run for log (datetime.datetime  as string)
-            :filename: name of input file for checks
             :logfile: path to logfile
-            :rerun: if True then tab can be smaller than 4 isolates
+            
         '''        
         self.check_input_structure(tab=tab)
         self.check_reads_exists(tab=tab)
@@ -490,10 +491,7 @@ class RunSnpDetection(object):
         '''
         read the input file and check that it is the correct format
         input:
-            :workdir: str 
-            :job_id: str
-            :day: date (str)
-            :rerun: boolean (False - for use in check_input_srtucture)
+            
         output:
             a list of isolates that will be used in generation of job configfile.
         '''
@@ -559,16 +557,7 @@ class RunSnpDetection(object):
         '''
         generate job specific snakefile and config.yaml
         input:
-            :resources: path to templates (str)
-            :workdir: working directory (str) to be used as target directory
-            :reference: reference name
-            :threads: int
-            :id: str - job_id
-            :minaln: min align % (int)
-            :date: date_time (str)
-            :mask: path to mask (str)
-            day: date (str)
-            :gubbins: Y or N
+            :isolates: a list of isolates that need to be included
         '''
 
         self.log_messages('info',f"Setting up {self.job_id} specific workflow")
@@ -628,19 +617,11 @@ class RunSnpDetection(object):
             return False
 
 
-    def finish_workflow(self):
-        '''
-        final message at completion of workflow. If workflow goes to completion print 'thanks for coming message'
-        '''
-    
-        self.log_messages('info', f"Report can be found in {self.job_id}")
-        self.log_messages('info', f"Process specific log files can be found in process directories. Job settings can be found in source.log") 
-        self.log_messages('info', f"Have a nice day. Come back soon.") 
-        self.log_messages('info',f"{60 * '='}")
-
 
     def run_pipeline(self):
-        
+        '''
+        run pipeline, if workflow runs to completion print out a thank you message.
+        '''
         # if -f true force a restart
         if self.force:
             self.force_overwrite()
@@ -653,9 +634,11 @@ class RunSnpDetection(object):
         # setup the workflow files Snakefile and config file
         self.setup_workflow(isolates = isolates)
         # run the workflow
-        if self.run_workflow():
-            self.log_messages('info', f"Report can be found in {self.job_id}")
-            self.log_messages('info', f"Process specific log files can be found in process directories. Job settings can be found in source.log") 
+        if self.run_workflow() 
+            if not self.dryrun:
+                self.log_messages('info', f"Report can be found in {self.job_id}")
+                self.log_messages('info', f"Process specific log files can be found in process directories. Job settings can be found in source.log") 
+    
             self.log_messages('info', f"Have a nice day. Come back soon.") 
             self.log_messages('info',f"{60 * '='}")
 

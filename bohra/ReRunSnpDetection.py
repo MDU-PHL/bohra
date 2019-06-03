@@ -15,7 +15,9 @@ from Bio import SeqIO, Phylo
 from bohra.SnpDetection import RunSnpDetection
 
 class ReRunSnpDetection(RunSnpDetection):
-
+    '''
+    A class for a Bohra reurn objects - inherits RunSnpDetection
+    '''
 
     def __init__(self, args):
         # get date and time
@@ -38,11 +40,6 @@ class ReRunSnpDetection(RunSnpDetection):
             # check dependencies
             self.check_for_snippy()
             self.mask = self.check_mask(args.mask, original_mask = self.original_mask)
-                
-        # print(self.mask)
-        # min aln 
-        
-        # set threads
         # user
         self.user = getpass.getuser()
         # gubbins TODO add back in later!!
@@ -79,6 +76,9 @@ class ReRunSnpDetection(RunSnpDetection):
         
 
     def check_reference(self, new):
+        '''
+        Check that reference used in rerun is the same as the reference used in previous run. If not will need to force new SNP detection
+        '''
         # check if refs are the same if not set self.ref to new and change to force, else set ref to original
         if isinstance(new, str) and len(new) > 0 and len(self.original_reference) > 0:
             new_reference = pathlib.Path(f"{new}")
@@ -96,6 +96,9 @@ class ReRunSnpDetection(RunSnpDetection):
 
 
     def check_for_snippy(self):
+        '''
+        Check the version of Snippy, is different will need to force new SNP detection
+        '''
         self.check_setup_files()
         self.current_snippy_version = self.check_deps()
         if self.current_snippy_version.group("major", "minor") != self.original_snippy_version.group("major", "minor"):
@@ -131,7 +134,11 @@ class ReRunSnpDetection(RunSnpDetection):
     #         self.log_messages('info', f"No recombination filtering will be used.")
     #         return False
     # TODO change this delete to unlink from pathlib
+    
     def rerun_report(self):
+        '''
+        Remove report directory from previous run 
+        '''
         # os.chdir(self.workdir)
         p1 = pathlib.Path(self.workdir, self.job_id, 'report')
         p2 = pathlib.Path(self.workdir, self.job_id, f"report_{self.orignal_date}")
@@ -142,6 +149,9 @@ class ReRunSnpDetection(RunSnpDetection):
         subprocess.run(cmd, shell = True)
     
     def remove_core(self):
+        '''
+        Need to remove core_isolates.txt to get snakemake to redo snippy core step
+        '''
         corefiles = sorted(pathlib.Path(self.workdir, self.job_id).glob('core*'))
         if corefiles:
             for core in corefiles:
@@ -150,7 +160,9 @@ class ReRunSnpDetection(RunSnpDetection):
         
 
     def run_pipeline(self):
-
+        '''
+        Rerun the pipeline
+        '''
         # update source
         self.update_source_log()
         self.rerun_report()
@@ -160,8 +172,10 @@ class ReRunSnpDetection(RunSnpDetection):
         # setup the workflow files Snakefile and config file
         self.setup_workflow(isolates = isolates)
         # run the workflow
-        if self.run_workflow():
-            self.log_messages('info', f"Report can be found in {self.job_id}")
-            self.log_messages('info', f"Process specific log files can be found in process directories. Job settings can be found in source.log") 
+        if self.run_workflow() 
+            if not self.dryrun:
+                self.log_messages('info', f"Report can be found in {self.job_id}")
+                self.log_messages('info', f"Process specific log files can be found in process directories. Job settings can be found in source.log") 
+    
             self.log_messages('info', f"Have a nice day. Come back soon.") 
             self.log_messages('info',f"{60 * '='}")
