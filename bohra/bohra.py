@@ -1,4 +1,15 @@
 #!/usr/bin/env python3
+
+'''
+Bohra exinct tree kangaroo that lived on the nullarbor
+
+Bohra is microbial genomics pipeline, designed predominantly for use in public health, but may also be useful in research settings. The pipeline takes as input a tab-delimited file with the isolate IDs followed by the path to READ1 and READ2, a reference for alignment and a unique identifier, where reads are illumina paired end reads (other platforms are not supported).
+
+The pipline is based on nullarbor (https://github.com/tseemann/nullarbor) and is designed to be run in high performance computing environment.
+
+Bohra is modular allowing the user to choose between calling SNPs and generating a phylogenetic tree, perform assemblies and detect AMR, perform typing etc; Or use the full pipeline to call SNPs, generate phylogenies, assemble, type and detect the pan-geneome. The output of Bohra is a html report that can be distributed, with downloadable tables and data.
+'''
+
 import logging
 import argparse
 import pathlib
@@ -12,10 +23,16 @@ from bohra.ReRunSnpDetection import ReRunSnpDetection
 #logging.basicConfig(filename='job.log',level=logging.INFO, format='[%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
 def run_pipeline(args):
+    '''
+    Run the pipeline for the first time
+    '''
     R = RunSnpDetection(args)
     return(R.run_pipeline())
 
 def rerun_pipeline(args):
+    '''
+    Rerun the pipeline on a previous dataset, adding, removing isolates or changing reference or mask file
+    '''
     R = ReRunSnpDetection(args)
     return(R.run_pipeline())
 
@@ -66,7 +83,9 @@ def set_parsers():
     return(args)
 
 def main():
-
+    '''
+    Run Bohra
+    '''
     args = set_parsers()
     if vars(args) == {}:
         parser.print_help(sys.stderr)
@@ -77,4 +96,4 @@ def main():
 	
 if __name__ == '__main__':
     main()
-# Bohra exinct tree kangaroo that lived on the nullarbor
+
