@@ -73,7 +73,7 @@ class RunSnpDetection(object):
         self.cpus = args.cpus
         self.assembler = args.assembler
         self.snippy_version = ''
-        self.version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
+        # self.version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
         self.assembler_dict = {'shovill': 'shovill', 'skesa':'skesa','spades':'spades.py'}
 
     def log_messages(self, type, message):
@@ -120,10 +120,11 @@ class RunSnpDetection(object):
         '''
         check for snippy
         '''
+        version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
         try:
             snippy = subprocess.run(['snippy', '--version'], stderr=subprocess.PIPE)
             snippy = snippy.stderr.decode().strip()
-            self.snippy_version = self.version_pat.search(snippy)
+            self.snippy_version = version_pat.search(snippy)
             self.log_messages('info', f"Snippy {snippy} found. Good job!")
             
             return(self.version_pat.search(snippy))
