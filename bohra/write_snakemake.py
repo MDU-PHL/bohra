@@ -1,6 +1,9 @@
 
-
 class MakeWorkflow():
+	'''
+	A Class to write out the snakemkae file for each specific job
+
+	'''
 
 	# TODO add in logic for species and exp for validation and prefill path
 	def write_config_params(self, rerun = False):

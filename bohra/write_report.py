@@ -1,5 +1,3 @@
-# This script will draw a tree from a newick using a recursive approach to extract positions of nodes (adapted for my needs from https://github.com/plotly/dash-phylogeny/blob/dev/app.py) and placement with svgwrite.
-
 
 import svgwrite, re, sys, subprocess
 from svgwrite import cm, mm
@@ -13,8 +11,13 @@ from packaging import version
 # from ete3 import Tree, TreeStyle, NodeStyle, TextFace
 
 class Tree:
-
+    '''
+    This script will draw a tree from a newick using a recursive approach to extract positions of nodes (adapted for my needs from https://github.com/plotly/dash-phylogeny/blob/dev/app.py) and placement with svgwrite.
+    '''
     def read_treefile(self,filename):
+        '''
+        Open the treefile
+        '''
         tree = Phylo.read(filename, "newick")
         return tree 
 
@@ -152,9 +155,13 @@ class Tree:
 
 
 class Report:
-
+    '''
+    A class to generate the tables and figures for use in the report.html
+    '''
     def write_tables(self,reportdir, table):
-
+        '''
+        Write a table, given a tab delimited file generate a html string
+        '''
         path = reportdir / f"{table}"
         data = open(path).readlines()
         # for header
@@ -176,8 +183,14 @@ class Report:
             body = body + row
         return('\n'.join(tablehead),'\n'.join(body))
 
-    def get_table_data(self,reportdir, pipeline, td):
-        
+    def get_table_data(self,reportdir, td):
+        '''
+        input:
+            :reportdir: the directory where report files are kept
+            :td: the dictionary for data
+        output:
+            :td: an updated dictionary
+        '''
 
         for tabletype in range(len(td)):
             table = td[tabletype]['file']
@@ -186,6 +199,20 @@ class Report:
         return(td)
 
     def plot_histogram(self,series, xlabel, ylabel, bins, color = "#3973ac", width = 1000, plot_height = 200):
+        '''
+        generic method for generating a histogram from a dataframe using bokeh
+        input:
+            :series:the column of the dataframe to be used
+            :xlabel: label for x-axis
+            :ylabel: label for y-axis
+            :bins: the size of the histogram bins
+            :color: color of the bars
+            :width: width of the graph
+            :height: height of the graph
+        output:
+            :script: the javascript string for insert into html
+            :div: the html div for inster in html doc
+        '''
         # generate histogram
         hist, edges = numpy.histogram(series, density=True, bins=bins)
         # generate bokeh plot
@@ -203,6 +230,15 @@ class Report:
         return(script,div)
 
     def plot_snpdensity(self,reportdir):
+
+        '''
+        generate a snp-density accross the genome plot - using the core.tab file
+        input:
+            :reportdir: the directory where files are kept
+        out:
+            :snpdensityscript: the javascript string for insert into html
+            :snpdenstiydiv: the html div for inster in html doc
+        '''
 
         core = reportdir / 'core.tab'
         
@@ -225,6 +261,14 @@ class Report:
 
     def plot_distances(self,reportdir):
 
+        '''
+        generate a snp-density plot - using the distacnes.tab file
+        input:
+            :reportdir: the directory where files are kept
+        out:
+            :distancescript: the javascript string for insert into html
+            :distancesdiv: the html div for inster in html doc
+        '''
         distance = reportdir / 'distances.tab'
 
         df = pandas.read_csv(distance, sep = '\t')
@@ -245,6 +289,13 @@ class Report:
 
 
     def get_tree_image_path(self,reportdir):
+        '''
+        Generate a tree image from a newick
+        input:
+            :reportdir: the directory where report files are stored
+        output:
+            string reporesentation of the path to the tree image
+        '''
         # get tree
         nwk=f"{reportdir / 'core.treefile'}"
         out = f"{reportdir / 'core_tree.svg'}"
@@ -253,6 +304,14 @@ class Report:
         return(f"core_tree.svg")
 
     def get_software_versions(self, software):
+
+        '''
+        Given the name of the software, find the version
+        input:
+            :software: the name of the software
+        output:
+            a string in the form of 'Name_of_Sofware v.X.Y.Z'
+        '''
 
         version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
 
@@ -273,6 +332,13 @@ class Report:
         return(sft_version)
     
     def make_dict_versions(self, tools):
+        '''
+        Called by get_software_file to make a dictionary of tools used
+        input:
+            :tools: a list of tools
+        output:
+            a dictionary with tools and versions.
+        '''
         tool_dict = {}
         for t in tools:
                v = self.get_software_versions(t)
@@ -280,7 +346,13 @@ class Report:
         return(tool_dict)
 
     def get_software_file(self, reportdir, pipeline, assembler ):
-
+        '''
+        get the versions of software on the system at completion of the piepline
+        input:
+            :reportdir: the directory where report files are stored
+            :pipeline: the type of pipeline
+            :assembler: the assembler used in the pipeline
+        '''
         snippy_tools = ['snippy', 'snippy-core', 'snp-dists', 'iqtree']
         assembly_tools = ['mlst', 'kraken2', 'prokka', 'abricate', assembler]
         
@@ -307,6 +379,17 @@ class Report:
         
 
     def main(self,workdir, resources, job_id, assembler = 'shovill', gubbins = False, pipeline = 'sa'):
+        '''
+        main function of the report class ties it all together
+        input:
+            :workdir: job directory
+            :resources: the directory where templates are stored
+            :job_id: the id of the job (for html header)
+            :assembler: assembler used - for versions
+            :gubbins: not in use yet
+            :pipeline: the type of pipeline - default is sa = snippy and assembly
+        '''
+
         # set up paths variables
         
         # path to report data
@@ -354,10 +437,10 @@ class Report:
             td.extend(a_td)
             td.extend(s_td)
             td.extend(roary_td)
-        # add data to sections
+        # get versions of software
         versions_td = {'file': 'software_versions.tab', 'title': 'Tools', 'type': 'versions', 'link':'versions'}
         td.append(versions_td)
-        
+        # add data to sections
         for t in range(len(td)):
             
             if td[t]['type'] == 'table':
