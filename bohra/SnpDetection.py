@@ -127,7 +127,7 @@ class RunSnpDetection(object):
             self.snippy_version = version_pat.search(snippy)
             self.log_messages('info', f"Snippy {snippy} found. Good job!")
             
-            return(self.version_pat.search(snippy))
+            return(version_pat.search(snippy))
         except FileNotFoundError:
             self.log_messages('warning', f"snippy is not installed.")
             raise SystemExit
