@@ -50,19 +50,21 @@ class ReRunSnpDetection(RunSnpDetection):
         
         self.dryrun = args.dryrun
         self.keep = args.keep
-        self.version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
-            
+        # self.version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
+
     def get_source(self):
 
         '''
         open the source.log file and extract reference, mask, date, snippy_version
         '''
+
+        version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
         df = pandas.read_csv('source.log', sep = None, engine = 'python')
         self.pipeline = df.ix[df.index[-1], 'Pipeline']
         if self.pipeline != 'a':
             self.original_reference = df.ix[df.index[-1], 'Reference']
             self.original_mask = df.ix[df.index[-1], 'Mask']
-            self.original_snippy_version = self.version_pat.search(df.ix[df.index[-1], 'snippy_version'])
+            self.original_snippy_version = version_pat.search(df.ix[df.index[-1], 'snippy_version'])
         if self.pipeline != 's':
             self.assembler = df.ix[df.index[-1], 'Assembler']
         self.orignal_date = df.ix[df.index[-1], 'Date']
