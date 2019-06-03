@@ -634,7 +634,7 @@ class RunSnpDetection(object):
         # setup the workflow files Snakefile and config file
         self.setup_workflow(isolates = isolates)
         # run the workflow
-        if self.run_workflow() 
+        if self.run_workflow(): 
             if not self.dryrun:
                 self.log_messages('info', f"Report can be found in {self.job_id}")
                 self.log_messages('info', f"Process specific log files can be found in process directories. Job settings can be found in source.log") 
