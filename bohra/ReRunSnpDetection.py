@@ -50,7 +50,8 @@ class ReRunSnpDetection(RunSnpDetection):
         
         self.dryrun = args.dryrun
         self.keep = args.keep
-    
+        self.version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
+            
     def get_source(self):
 
         '''
