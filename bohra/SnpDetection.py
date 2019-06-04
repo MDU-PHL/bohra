@@ -72,7 +72,7 @@ class RunSnpDetection(object):
         self.pipeline = args.pipeline
         self.cpus = args.cpus
         if int(self.cpus) < 72:
-            self.jobs =  int(self.cpus / 8)
+            self.jobs =  int(int(self.cpus) / 8)
         else:
             self.jobs = 4
         self.assembler = args.assembler
