@@ -52,7 +52,7 @@ class ReRunSnpDetection(RunSnpDetection):
         self.keep = args.keep
         # self.version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
         self.assembler_dict = {'shovill': 'shovill', 'skesa':'skesa','spades':'spades.py'}
-        
+
     def get_source(self):
 
         '''
@@ -117,11 +117,7 @@ class ReRunSnpDetection(RunSnpDetection):
         df = pandas.read_csv('source.log', sep = None, engine = 'python')
         data =pandas.DataFrame({'JobID':self.job_id, 'Reference':self.ref,'Mask':self.mask, 'Pipeline': self.pipeline, 'CPUS': self.cpus,'MinAln':self.minaln,'Gubbins': self.gubbins, 'Date':self.day, 'User':self.user,'snippy_version':self.current_snippy_version ,'input_file':f"{self.input_file}",'prefillpath': self.prefillpath,'Assembler':self.assembler},index=[0])
 
-        # new_df = pandas.DataFrame({'JobID':self.job_id, 'Reference':f"{self.ref}",'Mask':self.mask, 
-        #                             'MinAln':self.minaln, 
-        #                             'Gubbins': self.gubbins, 'Date':self.day, 'User':self.user, 'snippy_version':snippy_version, 'input_file':f"{self.input_file}"},
-        #                             index=[0], )
-        # print(data)
+        
         df = df.append(data)
         # print(source_log_df)
         df.to_csv('source.log', index=False, sep = '\t')

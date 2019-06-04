@@ -71,6 +71,10 @@ class RunSnpDetection(object):
         self.dryrun = args.dryrun
         self.pipeline = args.pipeline
         self.cpus = args.cpus
+        if self.cpus < 72:
+            self.jobs =  int(self.cpus / 8)
+        else:
+            self.jobs = 4
         self.assembler = args.assembler
         self.snippy_version = ''
         # self.version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
@@ -609,7 +613,7 @@ class RunSnpDetection(object):
         if self.dryrun:
             cmd = f"snakemake -np -s {snake_name} 2>&1 | tee -a job.log"
         else:
-            cmd = f"snakemake -s {snake_name} --cores {self.cpus} {force} 2>&1 | tee -a job.log"
+            cmd = f"snakemake -s {snake_name} -j {self.jobs} {force} 2>&1 | tee -a job.log"
             # cmd = f"snakemake -s {snake_name} --cores {self.cpus} {force} "
         wkf = subprocess.run(cmd, shell = True)
         if wkf.returncode == 0:
