@@ -71,7 +71,7 @@ class RunSnpDetection(object):
         self.dryrun = args.dryrun
         self.pipeline = args.pipeline
         self.cpus = args.cpus
-        if int(self.cpus) < int(psutils.count_cpus()):
+        if int(self.cpus) < int(psutil.count_cpus()):
             self.jobs =  int(int(self.cpus) / 8)
         else:
             self.jobs = 1
