@@ -1,5 +1,5 @@
 import pathlib
-import os, getpass, shutil, re
+import os, getpass, shutil, re, psutil
 import pandas
 import jinja2
 import sh
@@ -71,10 +71,10 @@ class RunSnpDetection(object):
         self.dryrun = args.dryrun
         self.pipeline = args.pipeline
         self.cpus = args.cpus
-        if int(self.cpus) < 72:
+        if int(self.cpus) < int(psutils.count_cpus()):
             self.jobs =  int(int(self.cpus) / 8)
         else:
-            self.jobs = 4
+            self.jobs = 1
         self.assembler = args.assembler
         self.snippy_version = ''
         # self.version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
