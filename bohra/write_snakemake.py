@@ -198,7 +198,6 @@ rule snippy:
 	output:
 		'{{sample}}/snps.vcf',
 		'{{sample}}/snps.aligned.fa'
-	benchmark: "{{sample}}/snippy_benchmark.txt"
 	shell:
 		\"""
 		snippy --outdir {{wildcards.sample}} --ref {{REFERENCE}} --R1 {{input[0]}} --R2 {{input[1]}} --force 
