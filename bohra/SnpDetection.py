@@ -74,7 +74,6 @@ class RunSnpDetection(object):
         
         self.assembler = args.assembler
         self.snippy_version = ''
-        # self.version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
         self.assembler_dict = {'shovill': 'shovill', 'skesa':'skesa','spades':'spades.py'}
 
     def set_snakemake_jobs(self):
