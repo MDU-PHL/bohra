@@ -61,20 +61,20 @@ class ReRunSnpDetection(RunSnpDetection):
 
         version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
         df = pandas.read_csv('source.log', sep = None, engine = 'python')
-        self.pipeline = df.ix[df.index[-1], 'Pipeline']
+        self.pipeline = df.loc[df.index[-1], 'Pipeline']
         if self.pipeline != 'a':
-            self.original_reference = df.ix[df.index[-1], 'Reference']
-            self.original_mask = df.ix[df.index[-1], 'Mask']
-            self.original_snippy_version = version_pat.search(df.ix[df.index[-1], 'snippy_version'])
+            self.original_reference = df.loc[df.index[-1], 'Reference']
+            self.original_mask = df.loc[df.index[-1],'Mask'] if isinstance(df.loc[df.index[-1],'Mask'], str) else ''
+            self.original_snippy_version = version_pat.search(df.loc[df.index[-1], 'snippy_version'])
         if self.pipeline != 's':
-            self.assembler = df.ix[df.index[-1], 'Assembler']
-        self.orignal_date = df.ix[df.index[-1], 'Date']
-        self.input_file = pathlib.Path(f"{df.ix[df.index[-1], 'input_file']}")
+            self.assembler = df.loc[df.index[-1], 'Assembler']
+        self.orignal_date = df.loc[df.index[-1], 'Date']
+        self.input_file = pathlib.Path(f"{df.loc[df.index[-1], 'input_file']}")
         # print(self.input_file)
-        self.job_id = df.ix[df.index[-1], 'JobID']
-        self.cpus = df.ix[df.index[-1], 'CPUS']
-        self.prefillpath = df.ix[df.index[-1], 'prefillpath']
-        self.minaln = df.ix[df.index[-1], 'MinAln']
+        self.job_id = df.loc[df.index[-1], 'JobID']
+        self.cpus = df.loc[df.index[-1], 'CPUS']
+        self.prefillpath = df.loc[df.index[-1], 'prefillpath']
+        self.minaln = df.loc[df.index[-1], 'MinAln']
         
         # return reference, mask, snippy_version, date, input_file, pipeline
         
