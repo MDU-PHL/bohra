@@ -71,14 +71,20 @@ class RunSnpDetection(object):
         self.dryrun = args.dryrun
         self.pipeline = args.pipeline
         self.cpus = args.cpus
-        if int(self.cpus) < int(psutil.cpu_count()):
-            self.jobs =  int(int(self.cpus) / 8)
-        else:
-            self.jobs = 1
+        
         self.assembler = args.assembler
         self.snippy_version = ''
         # self.version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
         self.assembler_dict = {'shovill': 'shovill', 'skesa':'skesa','spades':'spades.py'}
+
+    def set_snakemake_jobs(self):
+        '''
+        set the number of jobs to run in parallel based on the number of cpus from args
+        '''
+        if int(self.cpus) < int(psutil.cpu_count()):
+            self.jobs =  int(int(self.cpus) / 8)
+        else:
+            self.jobs = 1
 
     def log_messages(self, type, message):
         '''
