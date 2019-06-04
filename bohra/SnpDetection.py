@@ -255,7 +255,7 @@ class RunSnpDetection(object):
         
             
         '''   
-        new_df = pandas.DataFrame({'JobID':self.job_id, 'Reference':f"{self.ref}",'Mask':self.mask, 
+        new_df = pandas.DataFrame({'JobID':self.job_id, 'Reference':f"{self.ref}",'Mask':f"{self.mask}", 
                                     'MinAln':self.minaln, 'Pipeline': self.pipeline, 'CPUS': self.cpus, 'Assembler':self.assembler,
                                     'Gubbins': self.gubbins, 'Date':self.day, 'User':self.user, 'snippy_version':self.snippy_version, 'input_file':f"{self.input_file}",'prefillpath': self.prefillpath}, 
                                     index=[0], )
