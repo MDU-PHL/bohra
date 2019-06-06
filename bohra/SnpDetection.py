@@ -402,7 +402,7 @@ class RunSnpDetection(object):
                     self.mask = original_mask
                     return original_mask
                 else:
-                    m = self.link_file(m, 'mask')
+                    m = self.link_file(m)
                     self.mask = m
                     return m
         elif len(mask) == 0 and original_mask:
