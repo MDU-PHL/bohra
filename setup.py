@@ -10,7 +10,7 @@ setup (name = 'bohra',
        description = 'A bioinformatics pipeline for analysing short read Illumina data microbiological public health.',
        author = 'Kristy Horan',
        url = 'https://github.com/MDU-PHL/bohra',
-       install_requires = ['jinja2','biopython>=1.70','pandas>=0.23.0', 'pathlib', 'numpy', 'svgwrite'],
+       install_requires = ['jinja2','biopython>=1.70','pandas>=0.23.0', 'pathlib', 'numpy', 'svgwrite', 'psutil'],
        python_requires='>=3.6',
        entry_points={
         "console_scripts": [
