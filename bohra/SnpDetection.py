@@ -82,7 +82,7 @@ class RunSnpDetection(object):
         set the number of jobs to run in parallel based on the number of cpus from args
         '''
         if int(self.cpus) < int(psutil.cpu_count()):
-            self.jobs =  int(int(self.cpus) / 8)
+            self.jobs =  self.cpus
         else:
             self.jobs = 1
 

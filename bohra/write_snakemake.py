@@ -198,9 +198,11 @@ rule snippy:
 	output:
 		'{{sample}}/snps.vcf',
 		'{{sample}}/snps.aligned.fa'
+	threads:
+		8
 	shell:
 		\"""
-		snippy --outdir {{wildcards.sample}} --ref {{REFERENCE}} --R1 {{input[0]}} --R2 {{input[1]}} --force 
+		snippy --outdir {{wildcards.sample}} --ref {{REFERENCE}} --R1 {{input[0]}} --R2 {{input[1]}} --force --cpus {{threads}}
 		\"""
 	""")
 
@@ -340,15 +342,15 @@ rule run_iqtree_{alntype}:
 	def write_assemblies(self, prefillpath = '', assembler = 'skesa'):
 		
 		if assembler == 'skesa':
-			assemble = f"skesa --fastq {{input[0]}},{{input[1]}} --vector_percent 1 --use_paired_ends --cores 4 > {{output}}"
+			assemble = f"skesa --fastq {{input[0]}},{{input[1]}} --vector_percent 1 --use_paired_ends --cores {{threads}} > {{output}}"
 		elif assembler == 'shovill':
 			assemble = f""""
-			shovill --outdir {{wildcards.sample}} --R1 {{input[0]}} --R2 {{input[1]}} --force --minlen 500
+			shovill --outdir {{wildcards.sample}} --R1 {{input[0]}} --R2 {{input[1]}} --force --minlen 500 --cpus {{threads}}
 			mv {{wildcards.sample}}/contigs.fa {{output}}
 """
 		elif assembler == 'spades':
 			assemble = f"""
-			spades.py -o {{wildcards.sample}} -1 {{input[0]}} -2 {{input[1]}}
+			spades.py -o {{wildcards.sample}} -1 {{input[0]}} -2 {{input[1]}} --threads {{threads}}
 			mv {{wildcards.sample}}/contigs.fasta {{output}}
 """
 		
@@ -359,7 +361,8 @@ rule assemble:
 		'READS/{{sample}}/R2.fq.gz'
 	output:
 		'{{sample}}/{{sample}}.fa'
-
+	threads:
+		16
 	shell:
 		\"""
 		ASSEMBLEPATH={prefillpath}/{{wildcards.sample}}
@@ -441,9 +444,11 @@ rule run_roary:
 		expand("prokka/{{sample}}/{{sample}}.gff", sample = SAMPLE)
 	output:
 		"roary/gene_presence_absence.csv", "roary/summary_statistics.txt"
+	threads:
+		36
 	shell:
 		\"""
-		roary -p 36 -f roary {{input}}
+		roary -p {{threads}} -f roary {{input}}
 		mv roary_*/* roary
 		rm -r roary_*
 		\"""
