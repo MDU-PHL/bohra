@@ -75,6 +75,7 @@ class RunSnpDetection(object):
         self.assembler = args.assembler
         self.snippy_version = ''
         self.assembler_dict = {'shovill': 'shovill', 'skesa':'skesa','spades':'spades.py'}
+        self.set_snakemake_jobs()
 
     def set_snakemake_jobs(self):
         '''
@@ -648,7 +649,10 @@ class RunSnpDetection(object):
             if not self.dryrun:
                 self.log_messages('info', f"Report can be found in {self.job_id}")
                 self.log_messages('info', f"Process specific log files can be found in process directories. Job settings can be found in source.log") 
-    
+            else:
+                if self.force:
+                    force = f"-F"
+                self.log_messages('info', f"snakemake -j {self.jobs} {force} 2>&1 | tee -a job.log")
             self.log_messages('info', f"Have a nice day. Come back soon.") 
             self.log_messages('info',f"{60 * '='}")
 
