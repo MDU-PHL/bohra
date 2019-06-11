@@ -359,6 +359,25 @@ class RunSnpDetection(object):
             if not read_target.exists():
                 read_target.symlink_to(read_source)
 
+    def unzip_files(self,path, unzipped):
+        '''
+        if a zipped reference is provided try to unzip and then return the unzipped pathname. If unable to unzip then supply message and exit
+        input:
+            :path: pathname  of file to unzip string
+            :unzipped: unzipped path
+        '''
+        
+        cmd = f"gzip -d -c {path} > {p.stem}"
+        try:
+            subprocess.run(cmd, shell = True)
+            return pathlib.Path(p.stem)
+        except:
+            self.log_messages('warning', f"{path} can not be unzipped. This may be due to file permissions, please prive path to either an uncompressed reference or a file you have permissions to.")
+            raise SystemExit            
+
+        
+
+
     def link_file(self, path):
         '''
         check if file exists and copy to workingdir
@@ -379,10 +398,14 @@ class RunSnpDetection(object):
                 if not target.exists():
                     logging.info(f"Linking {path.name} to {self.workdir.name}")
                     target.symlink_to(path)
+                    if path.suffix == '.gz':
+                        path = self.unzip_files(path.name, path.name.strip('.gz'))
+                    # TODO add in unzip option unzip 
                 
                 found = True
             else:
-                path = self.log_messages('warning', f"Path to {type} does not exist.")
+                self.log_messages('warning', f"Path to {path} does not exist. Please provide a valid path to a file and try again")
+                raise SystemExit
                 # path = pathlib.Path(path)
         
         return  path.name
@@ -645,7 +668,8 @@ class RunSnpDetection(object):
         # setup the workflow files Snakefile and config file
         self.setup_workflow(isolates = isolates)
         # run the workflow
-        if self.run_workflow(): 
+        if self.run_workflow():
+            # TODO add in cleanup function to remove snakemkae fluff 
             if not self.dryrun:
                 self.log_messages('info', f"Report can be found in {self.job_id}")
                 self.log_messages('info', f"Process specific log files can be found in process directories. Job settings can be found in source.log") 
