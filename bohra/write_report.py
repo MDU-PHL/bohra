@@ -130,27 +130,32 @@ class Tree:
         f = 10/maxlength # factor to multiply the
         # a drawing object
         # viewbox is calculated based on 1cm = 37.8 pixels
-        dwg = svgwrite.Drawing(filename=outpath, debug=True)
-        dwg.viewbox(minx=-37.8, miny=(minheight*37.8)-37.8, width=1024, height=((maxheight*37.8)))
+        svg_text = [f"<svg baseProfile=\"full\" height=\"100%\" version=\"1.1\" viewBox=\"-37.8,{(minheight * 37.8)-37.8},1024,{(maxheight * 37.8)}\" width=\"100%\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:ev=\"http://www.w3.org/2001/xml-events\" xmlns:xlink=\"http://www.w3.org/1999/xlink\"><defs />"]
+        # dwg = svgwrite.Drawing(filename=outpath, debug=True)
+        # dwg.viewbox(minx=-37.8, miny=(minheight*37.8)-37.8, width=1024, height=((maxheight*37.8)))
         # set horizontal lines
-        branches = dwg.add(dwg.g(id='hline', stroke='black'))
+        # branches = dwg.add(dwg.g(id='hline', stroke='black'))
         # set vertical lines
-        vlines = dwg.add(dwg.g(id='vline', stroke='black'))
-        # add tips/nodes
-        tips = dwg.add(dwg.g(id='shapes', fill="#3973ac"))
-        # add labels
-        labels = dwg.add(dwg.g(font_size=8))
+        # vlines = dwg.add(dwg.g(id='vline', stroke='black'))
+        # # add tips/nodes
+        # tips = dwg.add(dwg.g(id='shapes', fill="#3973ac"))
+        # # add labels
+        # labels = dwg.add(dwg.g(font_size=8))
         for t in tree_coords:
             if t['type'] == 'horizontal':
-                branches.add(dwg.line(start=((t['x0']*f)*cm, t['y0']*cm), end=((t['x1']*f)*cm, t['y1']*cm)))
-                
+                # branches.add(dwg.line(start=((t['x0']*f)*cm, t['y0']*cm), end=((t['x1']*f)*cm, t['y1']*cm)))
+                svg_text.append(f"<line x1=\"{(t['x0']*f)*cm}\" x2=\"{(t['x1']*f)*cm}\" y1=\"{t['y0']*cm}\" y2=\"{t['y1']*cm}\" stroke=\"black\"/>")
                 if t['nodename'] in terms:
-                    labels.add(dwg.text(t['nodename'], ((((t['x1']*f) + 0.1)*cm, (t['y1']*cm))),style = 'font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"'))
-                    circleA = dwg.circle(center=((t['x1']*f)*cm, t['y1']*cm), r='0.05cm')
-                    tips.add(circleA)
+                    svg_text.append(f"<text class = \"{t['nodename']}\" x=\"{((t['x1']*f) + 0.1)*cm}\" y=\"{t['y1']*cm}\">{t['nodename']}</text>")
+                    # labels.add(dwg.text(t['nodename'], ((((t['x1']*f) + 0.1)*cm, (t['y1']*cm))),style = 'font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"'))
+                    # circleA = dwg.circle(center=((t['x1']*f)*cm, t['y1']*cm), r='0.05cm')
+                    svg_text.append(f"<circle cx=\"{(t['x1']*f)*cm}\" cy=\"{t['y1']*cm}\" r=\"0.05cm\" />")
+                    # tips.add(circleA)
             elif t['type'] == 'vertical':
-                vlines.add(dwg.line(start = ((t['x0']*f)*cm, t['y0']*cm), end = ((t['x1']*f)*cm, t['y1']*cm)))
-        dwg.save()
+                # vlines.add(dwg.line(start = ((t['x0']*f)*cm, t['y0']*cm), end = ((t['x1']*f)*cm, t['y1']*cm)))
+                svg_text.append(f"<line x1=\"{(t['x0']*f)*cm}\" x2=\"{(t['x1']*f)*cm}\" y1=\"{t['y0']*cm}\" y2=\"{t['y1']*cm}\" stroke = \"black\"/>")
+        # dwg.save()
+        return('\n'.join(svg_text))
 
 
 
@@ -162,6 +167,8 @@ class Report:
         '''
         Write a table, given a tab delimited file generate a html string
         '''
+        # TODO add class isolate id to <tr>
+        # TODO add class distances-isolate to tr if matrix and head-isolate to head td
         path = reportdir / f"{table}"
         data = open(path).readlines()
         # for header
@@ -176,7 +183,7 @@ class Report:
         # for body seqtablebody
         body = []
         for i in range(1,len(data)):
-            row = [f"<tr>"]
+            row = [f"<tr>"] # TODO add class isolate id to <tr>
             for d in data[i].split('\t'):
                 row.append(f"<td align=\"center\">{d}</td>")
             row.append(f"</tr>")
@@ -240,6 +247,7 @@ class Report:
             :snpdenstiydiv: the html div for inster in html doc
         '''
 
+        # open fai file
         core = reportdir / 'core.tab'
         
         df = pandas.read_csv(core, sep = '\t')
@@ -247,7 +255,7 @@ class Report:
         names = list(df.columns[3:len(df.columns)])
         # if the there is no snp in the isolate (ie same as ref then mak na - then easy to drop)
         for i in names:
-                df[i]=numpy.where(df['REF'] == df[i], numpy.nan, df[i] )
+                df[i]=numpy.where(df['REF'] == df[i], numpy.nan, df[i])
         # collect positions to get allow for histogram and dropna (no snp)
         melted_df = pandas.melt(df, id_vars=['POS'], value_vars=names)
         melted_df = melted_df.dropna()
@@ -288,7 +296,7 @@ class Report:
         return(distancescript, distancediv)
 
 
-    def get_tree_image_path(self,reportdir):
+    def get_tree_image(self,reportdir):
         '''
         Generate a tree image from a newick
         input:
@@ -300,8 +308,8 @@ class Report:
         nwk=f"{reportdir / 'core.treefile'}"
         out = f"{reportdir / 'core_tree.svg'}"
         tree = Tree()
-        tree.main(treepath=nwk, outpath=out)
-        return(f"core_tree.svg")
+        
+        return(tree.main(treepath=nwk, outpath=out))
 
     def get_software_versions(self, software):
 
@@ -408,11 +416,11 @@ class Report:
         
         td = [{'file':'seqdata.tab', 'title':'Sequence Data', 'link': 'sequencedata', 'type' : 'table'}]
         
-        
+        # TODO edit links to be title lower case separated by a -
         core_genome_td = {'file': 'core_genome.tab', 'title': 'Core Genome', 'link':'coregenome', 'type':'table'}
         snp_density_td = {'title': 'SNP density', 'link':'snpdensity', 'type':'graph'}
         core_phylogeny_td = {'title': 'Core Phylogeny', 'link':'corephylogeny', 'file': 'core.treefile', 'type': 'tree'}
-        snp_distance_td = {'file': 'distances.tab', 'title':'SNP distance matrix', 'type':'matrix', 'link':'distances'}
+        snp_distance_td = {'file': 'distances.tab', 'title':'SNP distances', 'type':'matrix', 'link':'distances'}
         # list of snp tasks
         s_td = [core_genome_td,snp_density_td,core_phylogeny_td, snp_distance_td]
         species_id_td = {'file':'species_identification.tab', 'title': 'Species Identification', 'type': 'table', 'link':'speciesid'}
@@ -442,11 +450,11 @@ class Report:
         td.append(versions_td)
         # add data to sections
         for t in range(len(td)):
-            
+            # TODO if table add a modal modal + link and link will be title lowercase with hyphen
             if td[t]['type'] == 'table':
                 td[t]['head'], td[t]['body'] = self.write_tables(reportdir=reportdir, table=td[t]['file'])
             if td[t]['type'] == 'tree':
-                td[t]['image'] = self.get_tree_image_path(reportdir = reportdir)
+                td[t]['image'] = self.get_tree_image(reportdir = reportdir)
             if td[t]['type'] == 'pan':
                 td[t]['head'], td[t]['body'] = self.write_tables(reportdir=reportdir, table=td[t]['file'])
             if td[t]['link'] == 'distances':
@@ -459,8 +467,9 @@ class Report:
         
         # fill template
         report_template = jinja2.Template(pathlib.Path(indexhtml).read_text())
-        reporthtml.write_text(report_template.render(td = td, job_id = job_id))
-       
+        reporthtml.write_text(report_template.render(td = td, job_id = job_id, pipeline = pipeline))
+    #    TODO pass a list of links for the javascript section called 'table'
+    # TODO pass the value of the graphs as separate variable 
         return(True)
 
 if __name__ == '__main__':
