@@ -504,23 +504,28 @@ class Report:
             td.extend(s_td)
             tables =['core-genome', 'snp-distances', 'sequence-data']
             modaltables =['core-genome',  'sequence-data']
+            display = f"display:inline;"
         elif pipeline == 'a':
             td.extend(a_td)
             tables =['mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
             modaltables = tables
+            display = f"display:none;"
         elif pipeline == 'sa':
             a_td.extend(s_td)
             td.extend(a_td)
             tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
             modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data', 'species-identification']
-            
+            display = f"display:inline;"
             # td.extend(s_td)
         else:
             # a_ll = td.extend()
             td.extend(a_td)
             td.extend(s_td)
             td.extend(roary_td)
-            tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data']
+            tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
+            modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data', 'species-identification']
+            display = f"display:inline;"
+
         # get versions of software
         versions_td = {'file': 'software_versions.tab', 'title': 'Tools', 'type': 'versions', 'link':'versions'}
         td.append(versions_td)
@@ -535,6 +540,7 @@ class Report:
                 td[t]['image'] = self.get_tree_image(reportdir = reportdir)
             if td[t]['type'] == 'pan':
                 td[t]['head'], td[t]['body'] = self.write_tables(reportdir=reportdir, table=td[t]['file'])
+
             if td[t]['link'] == 'snp-distances':
                 td[t]['head'], td[t]['body'] = self.write_tables(reportdir=reportdir, table=td[t]['file'])
                 snpdistances = self.plot_distances(reportdir=reportdir)
@@ -549,7 +555,7 @@ class Report:
         # fill template
         date = datetime.datetime.today().strftime("%d/%m/%y")
         report_template = jinja2.Template(pathlib.Path(indexhtml).read_text())
-        reporthtml.write_text(report_template.render(tables = tables,td = td, job_id = job_id, pipeline = pipeline, snpdistances=snpdistances, snpdensity = snpdensity, modaltables = modaltables, date = date))
+        reporthtml.write_text(report_template.render(display = display,tables = tables,td = td, job_id = job_id, pipeline = pipeline, snpdistances=snpdistances, snpdensity = snpdensity, modaltables = modaltables, date = date))
     #    TODO pass a list of links for the javascript section called 'table'
     # TODO pass the value of the graphs as separate variable 
         return(True)

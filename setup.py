@@ -18,5 +18,6 @@ setup (name = 'bohra',
         ],},
         setup_requires=['pytest-runner'],
         tests_require = ['pytest'],
-        test_suite = 'test'
+        test_suite = 'test',
+        include_package_data=True
 )

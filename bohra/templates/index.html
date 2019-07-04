@@ -168,7 +168,7 @@
 
 <!-- div for summary table and phylogenetic tree -->
 <div class= "container-fluid">
-    <div class=row>
+    <div class=row style="{{display}}">
     
       <div id="tablediv" class = "col-md-5">
           <h2 style= "color: #3973ac;">Summary Table</h2>
@@ -267,6 +267,27 @@
       <!-- end of table -->
       </div>
     </div>
+    {% elif t.type == 'pan' %}
+    <!-- these tables are hidden until needed - then placed in the current table div above -->
+    <div class="table-responsive details">
+      <!-- buttons for dowload -->
+      <div id = "{{t.link}}">
+        <h3>{{t.title}}</h3>  
+        <table class="table table-striped table-bordered table-sortable detail-table">
+          <thead>
+            <tr><!-- header of table -->
+              {{t.head}}
+            </tr>
+          </thead>
+          <tbody>
+            {{t.body}}
+          </tbody>
+                    <!-- end of table body -->
+        </table>
+      <!-- end of table -->
+      </div>
+    </div>
+    {{t.image}}
     {% endif %}
     {% endfor %}
   </div>
