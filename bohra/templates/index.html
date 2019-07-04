@@ -120,12 +120,18 @@
                           <th>% Used</th>
                     </tr>
                   </thead>
+                  <tbody class='modal-body-summary-table'>
+
+                  </tbody>
               </table>
             {% for t in td %}
             {% if t.type == 'table' %}
             <h3 style= "color: #3973ac;">{{ t.title }}</h3>
                 <table id="" class="table table-striped table-bordered  modal-{{t.link}}">
                   <thead>{{ t.head }}</thead>
+                  <tbody class='modal-body-{{t.link}}'>
+                    
+                  </tbody>
                 </table>
             {% endif %}
             {% endfor %}          
@@ -167,14 +173,16 @@
           <h2 style= "color: #3973ac;">Summary Table</h2>
           <hr>
         {% for t in td %}
+        {% if t.type == 'summary' %}
           <table id="" class="table table-striped table-bordered table-sortable summary-table">
-              {% if t.type == 'summary' %}
+              
               <thead>
                 <tr>{{t.head}}</tr>
               </thead>
               <tbody>{{t.body}}</tbody>
                   <!-- end of table body -->
           </table>
+        {% endif %}
         {% endfor %}
       </div>
       
@@ -187,7 +195,7 @@
           <button type="button" class="btn btn-sm btn-outline-secondary zoom-button" id = "help" data-toggle="modal" data-target="#myModal3" data-placement="top" title="Select"><span data-feather="info"> Select isolates </button>      
         </div>
         {% for t in td %}
-        {% elif t.type == 'tree'}
+        {% if t.type == 'tree' %}
           {{ t.image }}
         {% endif %}
         {% endfor %}
@@ -201,7 +209,11 @@
     <!-- buttons to select data for display -->
     <div id="detail-selection-buttons">
     {% for t in td %}
+    {% if t.type == 'table' %}
       <button type="button" class="btn btn-primary btn-lg btn-outline-primary detail-button" >{{t.title}}</button>
+    {% elif t.type == 'matrix' %}
+      <button type="button" class="btn btn-primary btn-lg btn-outline-primary detail-button" >{{t.title}}</button>
+    {% endif %}
     {% endfor %}
     </div>
 
@@ -214,6 +226,7 @@
     <br>
 
     {% for t in td %}
+    {% if t.type == 'table' %}
     <!-- these tables are hidden until needed - then placed in the current table div above -->
     <div class="table-responsive details">
       <!-- buttons for dowload -->
@@ -221,7 +234,7 @@
         <h3>{{t.title}}</h3>  
         <table class="table table-striped table-bordered table-sortable detail-table">
           <thead>
-            <tr class="distances-header"><!-- header of table -->
+            <tr><!-- header of table -->
               {{t.head}}
             </tr>
           </thead>
@@ -233,6 +246,27 @@
       <!-- end of table -->
       </div>
     </div>
+    {% elif t.type == 'matrix' %}
+    <!-- these tables are hidden until needed - then placed in the current table div above -->
+    <div class="table-responsive details">
+      <!-- buttons for dowload -->
+      <div id = "{{t.link}}">
+        <h3>{{t.title}}</h3>  
+        <table class="table table-striped table-bordered table-sortable detail-table">
+          <thead>
+            <tr><!-- header of table -->
+              {{t.head}}
+            </tr>
+          </thead>
+          <tbody>
+            {{t.body}}
+          </tbody>
+                    <!-- end of table body -->
+        </table>
+      <!-- end of table -->
+      </div>
+    </div>
+    {% endif %}
     {% endfor %}
     
         
@@ -240,7 +274,7 @@
 <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
 <!-- <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script> -->
 <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
-
+{% block script %}
 <script>
 $(document).ready( function () {
 // highlioght tree tip based on row in table
@@ -255,14 +289,14 @@ $( "tr" ).click(function() {
 // modal of isolate specific data
 $("text.tiplab").click(function(){
     var isolateid = $(this).text();
-    var tables = {{table | safe}}; // jinja2 passing a list of tables
+    var modaltables = {{modaltables | tojson}}; // jinja2 passing a list of tables
     console.log(isolateid);
 //     need to set .modal-table to row with isolate id $('model-content').html(tablerow)
     $('.modal-title').html(isolateid + ' details');
     $('tr.' + isolateid).clone().appendTo('.modal-summary-table');
     // for each table in analysis generate a specific table
-    $.each(tables, function(index, table){
-      $('tr.' + isolateid + '-' + table).clone().appendTo('.modal-' + table);
+    $.each(modaltables, function(index, table){
+      $('tr.' + isolateid + '-' + table).clone().appendTo('.modal-body-' + table);
     });      
     $("#myModal").modal();
   });
@@ -273,17 +307,17 @@ $("button.help").click(function(){
 // remove lines from table
 $(function(){  
         $('#myModal').on('hidden.bs.modal', function (e) {
-        var tables = {{table | safe}}; // jinja2 passing a list of tables
+        var modaltables = {{modaltables | tojson}}; // jinja2 passing a list of tables
         console.log("Modal hidden");
-        $('.modal-summary-table').html("");
-        $.each(tables, function(index, table){
-          $('.modal-' + table).html("");
+        $('.modal-body-summary-table').html("");
+        $.each(modaltables, function(index, table){
+          $('.modal-body-' + table).html("");
         });
         
         });
 });
 $('table.summary-table').DataTable( {
-      lengthMenu: [[50, 100, -1], [50, 100, "All"]],
+      lengthMenu: [[20, 100, -1], [20, 100, "All"]],
       //scrollY: '50vh',
       scrollCollapse: true,
       paging: false,
@@ -291,7 +325,7 @@ $('table.summary-table').DataTable( {
 //       order: [[ -1, "Isolate" ]],
     } );
 $('table.detail-table').DataTable( {
-        lengthMenu: [[50, 100, -1], [50, 100, "All"]],
+        lengthMenu: [[20, 100, -1], [20, 100, "All"]],
         //scrollY: '50vh',
         scrollCollapse: true,
         paging: false,
@@ -311,7 +345,7 @@ $('button.detail-button').click(function(){
           
         if (section == 'snp-distances'){
           // for snp-distances
-            var x = {{snpdistances | safe}};
+            var x = {{snpdistances | tojson}};
             var max_x = Math.max(x);
             var bin_size = max_x / 100;
             var trace = {
@@ -336,10 +370,11 @@ $('button.detail-button').click(function(){
             Plotly.newPlot('snp-distances-graph', data, layout);
             // put selecte into current table
             var selected = $('#' + section).html();
-            $('#current-table').html(selected);       
+            $('#current-table').html(selected);  
+            $('#snp-density-graph').html("");     
         } else if (section == 'core-genome'){
           // put snp-density in here
-            var x = {{snpdensity | safe}};
+            var x = {{ snpdensity | tojson}};
             // var y = {{genomebreaks | safe}};
             var max_x = Math.max(x);
             var bin_size = max_x / 100;
@@ -366,7 +401,8 @@ $('button.detail-button').click(function(){
             Plotly.newPlot('snp-density-graph', data, layout);
             // put selecte into current table
             var selected = $('#' + section).html();
-            $('#current-table').html(selected);        
+            $('#current-table').html(selected);  
+            $('#snp-distances-graph').html("");      
         } else {
           var selected = $('#' + section).html();
           $('#current-table').html(selected);     
@@ -429,6 +465,7 @@ callback: function(elements) {
 }); 
 
 </script>
+{% endblock %}
 <script>
 feather.replace()
 </script>

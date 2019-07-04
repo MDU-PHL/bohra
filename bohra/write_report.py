@@ -146,7 +146,7 @@ class Tree:
                 # branches.add(dwg.line(start=((t['x0']*f)*cm, t['y0']*cm), end=((t['x1']*f)*cm, t['y1']*cm)))
                 svg_text.append(f"<line x1=\"{(t['x0']*f)*cm}\" x2=\"{(t['x1']*f)*cm}\" y1=\"{t['y0']*cm}\" y2=\"{t['y1']*cm}\" stroke=\"black\"/>")
                 if t['nodename'] in terms:
-                    svg_text.append(f"<text class = \"{t['nodename']}\" x=\"{((t['x1']*f) + 0.1)*cm}\" y=\"{t['y1']*cm}\">{t['nodename']}</text>")
+                    svg_text.append(f"<text class = \"tiplab\" x=\"{((t['x1']*f) + 0.1)*cm}\" y=\"{t['y1']*cm}\">{t['nodename']}</text>")
                     # labels.add(dwg.text(t['nodename'], ((((t['x1']*f) + 0.1)*cm, (t['y1']*cm))),style = 'font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"'))
                     # circleA = dwg.circle(center=((t['x1']*f)*cm, t['y1']*cm), r='0.05cm')
                     svg_text.append(f"<circle cx=\"{(t['x1']*f)*cm}\" cy=\"{t['y1']*cm}\" r=\"0.05cm\" />")
@@ -179,12 +179,33 @@ class Report:
             header = ['Isolate', 'Scheme', 'ST']
             for l in range(1,length):
                 header.append(f"Allele_{l}")
-        tablehead = [f"<th>{column}</th>" for column in header]
+        if 'distances.tab' in table:
+            tablehead = [f"<th class='{column}-head'>{column}</th>" for column in header]
+        else:
+            tablehead = [f"<th>{column}</th>" for column in header]
         # for body seqtablebody
         body = []
         for i in range(1,len(data)):
-            row = [f"<tr>"] # TODO add class isolate id to <tr>
-            for d in data[i].split('\t'):
+            raw = data[i].split('\t')
+            if 'summary_table.tab' in table:
+                row = [f"<tr class='{raw[0]}'>"]
+            elif 'distances.tab' in table:
+                row = [f"<tr class='distances-{raw[0]}'>"]
+            elif 'assembly.tab' in table:
+                row = [f"<tr class='{raw[0]}-assembly'>"]
+            elif 'species' in table:
+                row = [f"<tr class='{raw[0]}-species-identification'>"]
+            elif 'core_genome.tab' in table:
+                row = [f"<tr class='{raw[0]}-core-genome'>"]
+            elif 'mlst.tab' in table:
+                row = [f"<tr class='{raw[0]}-mlst'>"]
+            elif 'resistome.tab' in table:
+                row = [f"<tr class='{raw[0]}-resistome'>"]
+            elif 'seqdata.tab' in table:
+                row = [f"<tr class='{raw[0]}-sequence-data'>"]
+            else:
+                row = [f"<tr>"] # TODO add class isolate id to <tr>
+            for d in raw:
                 row.append(f"<td align=\"center\">{d}</td>")
             row.append(f"</tr>")
             body = body + row
@@ -261,11 +282,11 @@ class Report:
         melted_df = melted_df.dropna()
         melted_df = melted_df.sort_values(by= ['POS'])
         # generate histogram
-        snpdensityscript, snpdensitydiv = self.plot_histogram(series=melted_df['POS']/1000,xlabel="Genome Position (MB)", ylabel="SNPS",bins=10000)
+        # snpdensityscript, snpdensitydiv = self.plot_histogram(series=melted_df['POS']/1000,xlabel="Genome Position (MB)", ylabel="SNPS",bins=10000)
         
         
         # return dictionary
-        return(snpdensityscript,snpdensitydiv)
+        return(list(melted_df['POS']/1000))
 
     def plot_distances(self,reportdir):
 
@@ -290,10 +311,10 @@ class Report:
         melted_df = pandas.melt(df, id_vars=[col1], value_vars=names)
         melted_df = melted_df[melted_df[col1]!= melted_df['variable']]
         # generate histogram
-        distancescript, distancediv = self.plot_histogram(series=melted_df['value'], xlabel="SNP distances", ylabel="Frequency", bins=100)
+        # distancescript, distancediv = self.plot_histogram(series=melted_df['value'], xlabel="SNP distances", ylabel="Frequency", bins=100)
         # td['pairwisedistance'] = {'script':distancecript, 'div':distancediv}
         # return dictionary
-        return(distancescript, distancediv)
+        return(list(melted_df['value']))
 
 
     def get_tree_image(self,reportdir):
@@ -384,6 +405,51 @@ class Report:
         p = reportdir / 'software_versions.tab'
 
         p.write_text('\n'.join(versions))
+
+    def merge_dfs(self,start, added):
+        if start.empty:
+            start = added
+        else:
+            start = start.merge(added)
+        return(start)
+
+    def generate_summary(self, reportdir):
+        '''
+        function to generate a summary table
+        '''
+        tabs = [t for t in reportdir.iterdir() if f"{t.suffix}" == '.tab']
+        summary_df = pandas.DataFrame()
+        df_list = []
+        # print(tabs)
+        for tab in tabs:
+            # print(tab)
+            # print(df)
+            if 'species' in f"{tab}":
+                species = pandas.read_csv(tab, sep = '\t')
+                species = species[['Isolate', '#1 Match']]
+                summary_df = self.merge_dfs(summary_df, species)
+            elif 'seqdata' in f"{tab}":
+                seq = pandas.read_csv(tab, sep = '\t')
+                seq = seq[['Isolate', 'Depth']]
+                summary_df = self.merge_dfs(summary_df, seq)
+            elif 'assembly' in f"{tab}":
+                assembly = pandas.read_csv(tab, sep = '\t')
+                assembly = assembly[['Isolate', '# Contigs']]
+                summary_df = self.merge_dfs(summary_df, assembly)
+            elif 'mlst' in f"{tab}":
+                mlst = pandas.read_csv(tab, sep = '\t', skiprows=1, header=None)
+                mlst = mlst.rename(columns = {0:'Isolate', 2:'ST'})
+                mlst = mlst[['Isolate', 'ST']]
+                summary_df = self.merge_dfs(summary_df, mlst)
+            elif 'core_genome' in f"{tab}":
+                core = pandas.read_csv(tab, sep = '\t')
+                core = core[['Isolate', '% USED']]
+                summary_df = self.merge_dfs(summary_df, core)
+        # print(mlst)
+        # print(summary_df)
+        summary_df = summary_df.rename(columns={'#1 Match': 'Species'})
+        summary_file = reportdir / 'summary_table.tab'
+        summary_df.to_csv(summary_file, sep = '\t', index = False)
         
 
     def main(self,workdir, resources, job_id, assembler = 'shovill', gubbins = False, pipeline = 'sa'):
@@ -411,19 +477,19 @@ class Report:
         csstarget.write_text(csstemplate.render())
         # save tool table
         self.get_software_file(reportdir = reportdir, pipeline = pipeline, assembler = assembler)
-
+        
         # table dictionary for each option
         
-        td = [{'file':'seqdata.tab', 'title':'Sequence Data', 'link': 'sequencedata', 'type' : 'table'}]
+        td = [{'file':'seqdata.tab', 'title':'Sequence Data', 'link': 'sequence-data', 'type' : 'table'}, {'file':'summary_table.tab','title':'Summary', 'link':'summary', 'type':'summary'}]
         
         # TODO edit links to be title lower case separated by a -
-        core_genome_td = {'file': 'core_genome.tab', 'title': 'Core Genome', 'link':'coregenome', 'type':'table'}
-        snp_density_td = {'title': 'SNP density', 'link':'snpdensity', 'type':'graph'}
+        core_genome_td = {'file': 'core_genome.tab', 'title': 'Core Genome', 'link':'core-genome', 'type':'table'}
+        snp_density_td = {'title': 'SNP density', 'link':'snp-density', 'type':'graph'}
         core_phylogeny_td = {'title': 'Core Phylogeny', 'link':'corephylogeny', 'file': 'core.treefile', 'type': 'tree'}
-        snp_distance_td = {'file': 'distances.tab', 'title':'SNP distances', 'type':'matrix', 'link':'distances'}
+        snp_distance_td = {'file': 'distances.tab', 'title':'SNP distances', 'type':'matrix', 'link':'snp-distances'}
         # list of snp tasks
         s_td = [core_genome_td,snp_density_td,core_phylogeny_td, snp_distance_td]
-        species_id_td = {'file':'species_identification.tab', 'title': 'Species Identification', 'type': 'table', 'link':'speciesid'}
+        species_id_td = {'file':'species_identification.tab', 'title': 'Species Identification', 'type': 'table', 'link':'species-identification'}
         mlst_td = {'file':'mlst.tab', 'title':'MLST', 'type':'table', 'link':'mlst'}
         resistome_td = {'file':'resistome.tab', 'title':'Resistome', 'type':'table', 'link':'resistome'}
         # list of assembly tasks
@@ -433,11 +499,17 @@ class Report:
         
         if pipeline == 's':
             td.extend(s_td)
+            tables =['core-genome', 'snp-distances', 'sequence-data']
+            modaltables =['core-genome',  'sequence-data']
         elif pipeline == 'a':
             td.extend(a_td)
+            tables =['mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
+            modaltables = tables
         elif pipeline == 'sa':
             a_td.extend(s_td)
             td.extend(a_td)
+            tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
+            modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data', 'species-identification']
             
             # td.extend(s_td)
         else:
@@ -445,9 +517,12 @@ class Report:
             td.extend(a_td)
             td.extend(s_td)
             td.extend(roary_td)
+            tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data']
         # get versions of software
         versions_td = {'file': 'software_versions.tab', 'title': 'Tools', 'type': 'versions', 'link':'versions'}
         td.append(versions_td)
+        snpdistances = ''
+        snpdensity = ''
         # add data to sections
         for t in range(len(td)):
             # TODO if table add a modal modal + link and link will be title lowercase with hyphen
@@ -457,17 +532,20 @@ class Report:
                 td[t]['image'] = self.get_tree_image(reportdir = reportdir)
             if td[t]['type'] == 'pan':
                 td[t]['head'], td[t]['body'] = self.write_tables(reportdir=reportdir, table=td[t]['file'])
-            if td[t]['link'] == 'distances':
+            if td[t]['link'] == 'snp-distances':
                 td[t]['head'], td[t]['body'] = self.write_tables(reportdir=reportdir, table=td[t]['file'])
-                td[t]['script'], td[t]['div'] = self.plot_distances(reportdir=reportdir)
-            if td[t]['link'] == 'snpdensity':
-                td[t]['script'], td[t]['div'] = self.plot_snpdensity(reportdir= reportdir)
+                snpdistances = self.plot_distances(reportdir=reportdir)
+            if td[t]['link'] == 'snp-density':
+                snpdensity= self.plot_snpdensity(reportdir= reportdir)
             if td[t]['type'] == 'versions':
                 td[t]['head'], td[t]['body'] = self.write_tables(reportdir=reportdir, table=td[t]['file'])
+            if td[t]['type'] == 'summary':
+                self.generate_summary(reportdir = reportdir)
+                td[t]['head'], td[t]['body'] = self.write_tables(reportdir = reportdir, table = td[t]['file'])
         
         # fill template
         report_template = jinja2.Template(pathlib.Path(indexhtml).read_text())
-        reporthtml.write_text(report_template.render(td = td, job_id = job_id, pipeline = pipeline))
+        reporthtml.write_text(report_template.render(tables = tables,td = td, job_id = job_id, pipeline = pipeline, snpdistances=snpdistances, snpdensity = snpdensity, modaltables = modaltables))
     #    TODO pass a list of links for the javascript section called 'table'
     # TODO pass the value of the graphs as separate variable 
         return(True)
