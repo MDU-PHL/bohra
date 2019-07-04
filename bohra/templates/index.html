@@ -165,8 +165,9 @@
       </div>
     </div>
 
-{% if pipeline != 'a' %}
+
 <!-- div for summary table and phylogenetic tree -->
+<div class= "container-fluid">
     <div class=row>
     
       <div id="tablediv" class = "col-md-5">
@@ -201,9 +202,9 @@
         {% endfor %}
       </div>
     </div>
-    {% endif %}
+  </div>
   <!-- full width for detail tables and graphs-->
-  <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"></div>
+  <div class="container-fluid">
     <!-- button row -->
     <h2 id="detail-tables" style= "color: #3973ac;">Details</h2>
     <!-- buttons to select data for display -->
@@ -268,7 +269,7 @@
     </div>
     {% endif %}
     {% endfor %}
-    
+  </div>
         
 <!-- Datatables (to sort tables) -->
 <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
@@ -469,15 +470,5 @@ callback: function(elements) {
 <script>
 feather.replace()
 </script>
-
-
-      
-
-       
-  
-  
-  
-  
-  
-  </body>
-  </html>
+</body>
+</html>

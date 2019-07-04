@@ -148,7 +148,7 @@ class Tree:
                 # branches.add(dwg.line(start=((t['x0']*f)*cm, t['y0']*cm), end=((t['x1']*f)*cm, t['y1']*cm)))
                 svg_text.append(f"<line x1=\"{(t['x0']*f)*cm}\" x2=\"{(t['x1']*f)*cm}\" y1=\"{t['y0']*cm}\" y2=\"{t['y1']*cm}\" stroke=\"black\"/>")
                 if t['nodename'] in terms:
-                    svg_text.append(f"<text class = \"tiplab\" x=\"{((t['x1']*f) + 0.1)*cm}\" y=\"{t['y1']*cm}\">{t['nodename']}</text>")
+                    svg_text.append(f"<text class = \"tiplab {t['nodename']}\" x=\"{((t['x1']*f) + 0.1)*cm}\" y=\"{t['y1']*cm}\">{t['nodename']}</text>")
                     # labels.add(dwg.text(t['nodename'], ((((t['x1']*f) + 0.1)*cm, (t['y1']*cm))),style = 'font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"'))
                     # circleA = dwg.circle(center=((t['x1']*f)*cm, t['y1']*cm), r='0.05cm')
                     svg_text.append(f"<circle cx=\"{(t['x1']*f)*cm}\" cy=\"{t['y1']*cm}\" r=\"0.05cm\" />")
@@ -157,7 +157,7 @@ class Tree:
                 # vlines.add(dwg.line(start = ((t['x0']*f)*cm, t['y0']*cm), end = ((t['x1']*f)*cm, t['y1']*cm)))
                 svg_text.append(f"<line x1=\"{(t['x0']*f)*cm}\" x2=\"{(t['x1']*f)*cm}\" y1=\"{t['y0']*cm}\" y2=\"{t['y1']*cm}\" stroke = \"black\"/>")
         # dwg.save()
-        svg_text.append('</svg')
+        # svg_text.append('</svg')
         return('\n'.join(svg_text))
 
 
@@ -191,7 +191,7 @@ class Report:
         for i in range(1,len(data)):
             raw = data[i].split('\t')
             if 'summary_table.tab' in table:
-                row = [f"<tr class='{raw[0]}'>"]
+                row = [f"<tr class='{raw[0]} tiplab'>"]
             elif 'distances.tab' in table:
                 row = [f"<tr class='distances-{raw[0]}'>"]
             elif 'assembly.tab' in table:
@@ -547,7 +547,7 @@ class Report:
                 td[t]['head'], td[t]['body'] = self.write_tables(reportdir = reportdir, table = td[t]['file'])
         
         # fill template
-        date = datetime.datetime.today().strftime("%d_%m_%y")
+        date = datetime.datetime.today().strftime("%d/%m/%y")
         report_template = jinja2.Template(pathlib.Path(indexhtml).read_text())
         reporthtml.write_text(report_template.render(tables = tables,td = td, job_id = job_id, pipeline = pipeline, snpdistances=snpdistances, snpdensity = snpdensity, modaltables = modaltables, date = date))
     #    TODO pass a list of links for the javascript section called 'table'
