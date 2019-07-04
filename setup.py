@@ -1,13 +1,26 @@
 from setuptools import setup, find_packages
 import bohra
 
+
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 VERSION = bohra.__version__
 
 setup (name = 'bohra',
        version = VERSION,
+       classifiers = [
+         "Programming Language :: Python :: 3",
+         "Operating System :: OS Independent",
+         "Development Status :: 4 - Beta ",
+         "Intended Audience :: Science/Research",
+         "Topic :: Scientific/Engineering :: Bio-Informatics  Copy classifier"
+         ]
        include_package_data = True,
        packages=['bohra'],
        description = 'A bioinformatics pipeline for analysing short read Illumina data microbiological public health.',
+       long_description = long_description,
+       long_description_content_type="text/markdown",
        author = 'Kristy Horan',
        url = 'https://github.com/MDU-PHL/bohra',
        install_requires = ['jinja2','biopython>=1.70','pandas>=0.23.0', 'pathlib', 'numpy', 'svgwrite', 'psutil'],
@@ -18,6 +31,5 @@ setup (name = 'bohra',
         ],},
         setup_requires=['pytest-runner'],
         tests_require = ['pytest'],
-        test_suite = 'test',
-        include_package_data=True
+        test_suite = 'test'
 )
