@@ -165,7 +165,7 @@
       </div>
     </div>
 
-
+{% if pipeline != 'a' %}
 <!-- div for summary table and phylogenetic tree -->
     <div class=row>
     
@@ -201,7 +201,7 @@
         {% endfor %}
       </div>
     </div>
-
+    {% endif %}
   <!-- full width for detail tables and graphs-->
   <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom"></div>
     <!-- button row -->

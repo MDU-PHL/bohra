@@ -129,10 +129,7 @@ class Tree:
                 if t['y1'] > float(maxheight):
                     maxheight = t['y1']
         f = 10/maxlength # factor to multiply the
-        print(f)
-        print(maxlength)
-        print(minheight)
-        print(maxheight)
+        
         # a drawing object
         # viewbox is calculated based on 1cm = 37.8 pixels
         svg_text = [f"<svg baseProfile=\"full\" version=\"1.1\" viewBox=\"-37.8,0,{f},{(maxheight * 37.8)}\" width=\"100%\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:ev=\"http://www.w3.org/2001/xml-events\" xmlns:xlink=\"http://www.w3.org/1999/xlink\"><defs />"]
@@ -160,6 +157,7 @@ class Tree:
                 # vlines.add(dwg.line(start = ((t['x0']*f)*cm, t['y0']*cm), end = ((t['x1']*f)*cm, t['y1']*cm)))
                 svg_text.append(f"<line x1=\"{(t['x0']*f)*cm}\" x2=\"{(t['x1']*f)*cm}\" y1=\"{t['y0']*cm}\" y2=\"{t['y1']*cm}\" stroke = \"black\"/>")
         # dwg.save()
+        svg_text.append('</svg')
         return('\n'.join(svg_text))
 
 
