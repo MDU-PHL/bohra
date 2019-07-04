@@ -6,6 +6,7 @@ import jinja2, pathlib, pandas, numpy, re
 from bokeh.plotting import figure, show, output_file
 from bokeh.embed import components
 from packaging import version
+import datetime
 # from bokeh.io import export_png
 # import PyQt5
 # from ete3 import Tree, TreeStyle, NodeStyle, TextFace
@@ -35,7 +36,7 @@ class Tree:
             xcoords = tree.depths(unit_branch_lengths=True)
         return xcoords
 
-    def get_y_coordinates(self,tree, dist=.5):
+    def get_y_coordinates(self,tree, dist=1):
         """
         returns  dict {clade: y-coord}
         The y-coordinates are  (float) multiple of integers (i*dist below)
@@ -128,9 +129,13 @@ class Tree:
                 if t['y1'] > float(maxheight):
                     maxheight = t['y1']
         f = 10/maxlength # factor to multiply the
+        print(f)
+        print(maxlength)
+        print(minheight)
+        print(maxheight)
         # a drawing object
         # viewbox is calculated based on 1cm = 37.8 pixels
-        svg_text = [f"<svg baseProfile=\"full\" height=\"100%\" version=\"1.1\" viewBox=\"-37.8,{(minheight * 37.8)-37.8},1024,{(maxheight * 37.8)}\" width=\"100%\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:ev=\"http://www.w3.org/2001/xml-events\" xmlns:xlink=\"http://www.w3.org/1999/xlink\"><defs />"]
+        svg_text = [f"<svg baseProfile=\"full\" version=\"1.1\" viewBox=\"-37.8,0,{f},{(maxheight * 37.8)}\" width=\"100%\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:ev=\"http://www.w3.org/2001/xml-events\" xmlns:xlink=\"http://www.w3.org/1999/xlink\"><defs />"]
         # dwg = svgwrite.Drawing(filename=outpath, debug=True)
         # dwg.viewbox(minx=-37.8, miny=(minheight*37.8)-37.8, width=1024, height=((maxheight*37.8)))
         # set horizontal lines
@@ -544,8 +549,9 @@ class Report:
                 td[t]['head'], td[t]['body'] = self.write_tables(reportdir = reportdir, table = td[t]['file'])
         
         # fill template
+        date = datetime.datetime.today().strftime("%d_%m_%y")
         report_template = jinja2.Template(pathlib.Path(indexhtml).read_text())
-        reporthtml.write_text(report_template.render(tables = tables,td = td, job_id = job_id, pipeline = pipeline, snpdistances=snpdistances, snpdensity = snpdensity, modaltables = modaltables))
+        reporthtml.write_text(report_template.render(tables = tables,td = td, job_id = job_id, pipeline = pipeline, snpdistances=snpdistances, snpdensity = snpdensity, modaltables = modaltables, date = date))
     #    TODO pass a list of links for the javascript section called 'table'
     # TODO pass the value of the graphs as separate variable 
         return(True)
