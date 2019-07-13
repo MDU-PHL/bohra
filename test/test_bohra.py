@@ -2,8 +2,8 @@ import sys, pathlib, pandas, pytest, numpy
 
 from unittest.mock import patch
 
-from SnpDetection import RunSnpDetection
-from ReRunSnpDetection import ReRunSnpDetection
+from .bohra.SnpDetection import RunSnpDetection
+from .bohra.ReRunSnpDetection import ReRunSnpDetection
 
 
 
