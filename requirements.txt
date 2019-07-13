@@ -1,0 +1,7 @@
+jinja2
+biopython>=1.70
+pandas>=0.23.0
+pathlib
+numpy
+svgwrite
+psutil
