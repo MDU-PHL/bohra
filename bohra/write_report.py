@@ -144,6 +144,8 @@ class Tree:
                     # circleA = dwg.circle(center=((t['x1']*f)*cm, t['y1']*cm), r='0.05cm')
                     svg_text.append(f"<circle cx=\"{(t['x1']*f)*cm}\" cy=\"{t['y1']*cm}\" r=\"0.05cm\" />")
                     # tips.add(circleA)
+                else:
+                    svg_text.append(f"<text class = \"branch-support\" x=\"{((t['x1']*f) + 0.1)*cm}\" y=\"{t['y1']*cm}\" style=\"font-size:small; color:#3973ac; display:none;\">{t['nodename']}</text>")
             elif t['type'] == 'vertical':
                 # vlines.add(dwg.line(start = ((t['x0']*f)*cm, t['y0']*cm), end = ((t['x1']*f)*cm, t['y1']*cm)))
                 svg_text.append(f"<line x1=\"{(t['x0']*f)*cm}\" x2=\"{(t['x1']*f)*cm}\" y1=\"{t['y0']*cm}\" y2=\"{t['y1']*cm}\" stroke = \"black\"/>")

@@ -175,7 +175,9 @@
       </div>
     </div>
 
-
+<div id="help-button" style = "float:right;">
+  <button type="button" class="btn btn-sm btn-outline-secondary zoom-button" id = "help" data-toggle="modal" data-target="#myModal3" data-placement="top" title="Select"> Helpful tips </button>      
+</div>
 <!-- div for summary table and phylogenetic tree -->
 <div class= "container-fluid">
     <div class=row style="{{display}}">
@@ -202,9 +204,10 @@
         <h2 style= "color: #3973ac;">Phylogeny</h2>
         <hr>
         <!-- button div -->
-        <div id="help-button">
-          <button type="button" class="btn btn-sm btn-outline-secondary zoom-button" id = "help" data-toggle="modal" data-target="#myModal3" data-placement="top" title="Select"><span data-feather="info"> Select isolates </button>      
+        <div id="brnch-sprt">
+          <button type="button" class="btn btn-sm btn-outline-secondary" id = "sprt" ><span data-feather="info"> toggle branch suppor </button>      
         </div>
+        
         {% for t in td %}
         {% if t.type == 'tree' %}
           {{ t.image }}
@@ -309,6 +312,10 @@
 {% block script %}
 <script>
 $(document).ready( function () {
+// 
+$("#sprt").click(function() {
+   $('.branch-support').toggle();
+});
 // highlioght tree tip based on row in table
 $( "tr" ).click(function() {
         var isolaterow = $(this).find('td'); // this will access the clicked row.
