@@ -93,6 +93,16 @@
           background-color:  #3973ac;
           color: aliceblue;
         }
+        .page-link {
+          color:#3973ac;
+          
+        }
+        .page-item.active .page-link{
+          background-color:  #3973ac;
+          border-color:#3973ac;
+          color: aliceblue;
+        }
+        
       </style> 
   </head>
   <body>
@@ -170,7 +180,7 @@
 <div class= "container-fluid">
     <div class=row style="{{display}}">
     
-      <div id="tablediv" class = "col-md-5">
+      <div id="tablediv" class = "col-md-6">
           <h2 style= "color: #3973ac;">Summary Table</h2>
           <hr>
         {% for t in td %}
@@ -187,7 +197,7 @@
         {% endfor %}
       </div>
       
-      <div id="treediv" class = "col-md-5">
+      <div id="treediv" class = "col-md-6">
             <!-- <p>{{message}}</p> -->
         <h2 style= "color: #3973ac;">Phylogeny</h2>
         <hr>
@@ -306,7 +316,7 @@ $( "tr" ).click(function() {
         var isolateid = isolaterow.eq(0).text(); // get the first cell (isolate id)
         console.log(isolateid);
         //   $( "tr.tiplab" + isolateid ).toggleClass( "activeisolate" );
-          $( "text." + isolateid ).toggleClass( "activeisolate" ); // change class of text here based on isolateid
+          $( "svg text." + isolateid ).toggleClass( "activeisolate" ); // change class of text here based on isolateid
 });    
 // modal of isolate specific data
 $("text.tiplab").click(function(){
@@ -339,18 +349,18 @@ $(function(){
         });
 });
 $('table.summary-table').DataTable( {
-      lengthMenu: [[20, 100, -1], [20, 100, "All"]],
+      lengthMenu: [[10, 20, 40, 60, 80, 100 -1], [110, 20, 40, 60, 80, 100, "All"]],
       //scrollY: '50vh',
       scrollCollapse: true,
-      paging: false,
+      paging: true,
       scrollX: true,
 //       order: [[ -1, "Isolate" ]],
     } );
 $('table.detail-table').DataTable( {
-        lengthMenu: [[20, 100, -1], [20, 100, "All"]],
+        lengthMenu: [[10, 20, 40, 60, 80, 100 -1], [110, 20, 40, 60, 80, 100, "All"]],
         //scrollY: '50vh',
         scrollCollapse: true,
-        paging: false,
+        paging: true,
         // scrollX: true,
         //       order: [[ -1, "Isolate" ]],
         } );

@@ -36,7 +36,7 @@ class Tree:
             xcoords = tree.depths(unit_branch_lengths=True)
         return xcoords
 
-    def get_y_coordinates(self,tree, dist=1):
+    def get_y_coordinates(self,tree, dist=.8):
         """
         returns  dict {clade: y-coord}
         The y-coordinates are  (float) multiple of integers (i*dist below)
@@ -132,17 +132,8 @@ class Tree:
         
         # a drawing object
         # viewbox is calculated based on 1cm = 37.8 pixels
-        svg_text = [f"<svg baseProfile=\"full\" version=\"1.1\" viewBox=\"-37.8,0,{f},{(maxheight * 37.8)}\" width=\"100%\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:ev=\"http://www.w3.org/2001/xml-events\" xmlns:xlink=\"http://www.w3.org/1999/xlink\"><defs />"]
-        # dwg = svgwrite.Drawing(filename=outpath, debug=True)
-        # dwg.viewbox(minx=-37.8, miny=(minheight*37.8)-37.8, width=1024, height=((maxheight*37.8)))
-        # set horizontal lines
-        # branches = dwg.add(dwg.g(id='hline', stroke='black'))
-        # set vertical lines
-        # vlines = dwg.add(dwg.g(id='vline', stroke='black'))
-        # # add tips/nodes
-        # tips = dwg.add(dwg.g(id='shapes', fill="#3973ac"))
-        # # add labels
-        # labels = dwg.add(dwg.g(font_size=8))
+        svg_text = [f"<svg baseProfile=\"full\" version=\"1.1\" viewBox=\"-37.8,0,700,500" ><defs />"]
+        
         for t in tree_coords:
             if t['type'] == 'horizontal':
                 # branches.add(dwg.line(start=((t['x0']*f)*cm, t['y0']*cm), end=((t['x1']*f)*cm, t['y1']*cm)))

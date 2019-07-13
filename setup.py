@@ -14,7 +14,7 @@ setup (name = 'bohra',
          "Operating System :: OS Independent",
          "Development Status :: 4 - Beta ",
          "Intended Audience :: Science/Research",
-         "Topic :: Scientific/Engineering :: Bio-Informatics  Copy classifier"
+         "Topic :: Scientific/Engineering :: Bio-Informatics"
          ]
        include_package_data = True,
        packages=['bohra'],
