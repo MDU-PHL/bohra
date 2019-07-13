@@ -5,3 +5,4 @@ pathlib
 numpy
 svgwrite
 psutil
+pytest
