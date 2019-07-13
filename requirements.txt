@@ -7,3 +7,5 @@ svgwrite
 psutil
 pytest
 sh
+packaging
+datetime

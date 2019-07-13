@@ -3,8 +3,6 @@ import svgwrite, re, sys, subprocess
 from svgwrite import cm, mm
 from Bio import Phylo
 import jinja2, pathlib, pandas, numpy, re
-from bokeh.plotting import figure, show, output_file
-from bokeh.embed import components
 from packaging import version
 import datetime
 # from bokeh.io import export_png
