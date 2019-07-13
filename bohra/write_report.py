@@ -132,7 +132,7 @@ class Tree:
         
         # a drawing object
         # viewbox is calculated based on 1cm = 37.8 pixels
-        svg_text = [f"<svg baseProfile=\"full\" version=\"1.1\" viewBox=\"-37.8,0,700,500" ><defs />"]
+        svg_text = [f"<svg baseProfile=\"full\" version=\"1.1\" viewBox=\"-37.8,0,700,500\" ><defs />\""]
         
         for t in tree_coords:
             if t['type'] == 'horizontal':
@@ -144,7 +144,7 @@ class Tree:
                     # circleA = dwg.circle(center=((t['x1']*f)*cm, t['y1']*cm), r='0.05cm')
                     svg_text.append(f"<circle cx=\"{(t['x1']*f)*cm}\" cy=\"{t['y1']*cm}\" r=\"0.05cm\" />")
                     # tips.add(circleA)
-                else:
+                elif (t['nodename'] not in terms) and (t['nodename'] != 'None'):
                     svg_text.append(f"<text class = \"branch-support\" x=\"{((t['x1']*f) + 0.1)*cm}\" y=\"{t['y1']*cm}\" style=\"font-size:small; color:#3973ac; display:none;\">{t['nodename']}</text>")
             elif t['type'] == 'vertical':
                 # vlines.add(dwg.line(start = ((t['x0']*f)*cm, t['y0']*cm), end = ((t['x1']*f)*cm, t['y1']*cm)))
@@ -508,7 +508,7 @@ class Report:
             td.extend(a_td)
             tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
             modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data', 'species-identification']
-            display = f"display:inline;"
+            display = f""
             # td.extend(s_td)
         else:
             # a_ll = td.extend()
@@ -517,7 +517,7 @@ class Report:
             td.extend(roary_td)
             tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
             modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data', 'species-identification']
-            display = f"display:inline;"
+            display = f""
 
         # get versions of software
         versions_td = {'file': 'software_versions.tab', 'title': 'Tools', 'type': 'versions', 'link':'versions'}
