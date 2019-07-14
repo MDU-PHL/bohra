@@ -1,3 +1,4 @@
+[![CircleCI](https://circleci.com/gh/MDU-PHL/bohra.svg?style=svg)](https://circleci.com/gh/MDU-PHL/bohra)
 # Bohra 
 
 A pipeline for analysis of Illumina short reads for public health microbiology.
