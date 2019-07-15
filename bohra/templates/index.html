@@ -210,12 +210,14 @@
         <div id="brnch-sprt">
           <button type="button" class="btn btn-sm btn-outline-secondary" id = "sprt" ><span data-feather="info"> toggle branch suppor </button>      
         </div>
-        
+        <div id = "svg_div" style="overflow-y:scroll; height: 700px;">    
         {% for t in td %}
         {% if t.type == 'tree' %}
           {{ t.image }}
         {% endif %}
         {% endfor %}
+        </div>
+        
       </div>
     </div>
   </div>

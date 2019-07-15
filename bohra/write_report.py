@@ -127,10 +127,9 @@ class Tree:
                 if t['y1'] > float(maxheight):
                     maxheight = t['y1']
         f = 10/maxlength # factor to multiply the
-        
         # a drawing object
         # viewbox is calculated based on 1cm = 37.8 pixels
-        svg_text = [f"<svg baseProfile=\"full\" version=\"1.1\" viewBox=\"-37.8,0,700,500\" ><defs />\""]
+        svg_text = [f"<svg baseProfile=\"full\" version=\"1.1\" viewBox=\"-37.8,{(minheight*37.8)-37.8},1000,{(maxheight*37.8)-37.8}\" ><defs />\""]
         
         for t in tree_coords:
             if t['type'] == 'horizontal':
