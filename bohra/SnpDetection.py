@@ -372,7 +372,7 @@ class RunSnpDetection(object):
             subprocess.run(cmd, shell = True)
             return pathlib.Path(p.stem)
         except:
-            self.log_messages('warning', f"{path} can not be unzipped. This may be due to file permissions, please prive path to either an uncompressed reference or a file you have permissions to.")
+            self.log_messages('warning', f"{path} can not be unzipped. This may be due to file permissions, please provide path to either an uncompressed reference or a file you have permissions to.")
             raise SystemExit            
 
         
@@ -495,12 +495,14 @@ class RunSnpDetection(object):
             :tab: dataframe of the input file
         '''
         for i in tab.itertuples():
-            r1 = i[2]
-            r2 = i[3]
-            self.path_exists(pathlib.Path(r1), v = False)
-            self.link_reads(pathlib.Path(r1), isolate_id=f"{i[1].strip()}", r_pair='R1.fq.gz')
-            self.path_exists(pathlib.Path(r2), v = False)
-            self.link_reads(pathlib.Path(r2), isolate_id=f"{i[1].strip()}", r_pair='R2.fq.gz')
+            
+            if not '#' in i[1]:
+                r1 = i[2]
+                r2 = i[3]
+                self.path_exists(pathlib.Path(r1), v = False)
+                self.link_reads(pathlib.Path(r1), isolate_id=f"{i[1].strip()}", r_pair='R1.fq.gz')
+                self.path_exists(pathlib.Path(r2), v = False)
+                self.link_reads(pathlib.Path(r2), isolate_id=f"{i[1].strip()}", r_pair='R2.fq.gz')
         return True
 
     def set_isolate_log(self, tab, logfile, validation = False):
