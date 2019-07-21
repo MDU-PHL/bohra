@@ -14,7 +14,8 @@ setup (name = 'bohra',
          "Operating System :: OS Independent",
          "Development Status :: 4 - Beta ",
          "Intended Audience :: Science/Research",
-         "Topic :: Scientific/Engineering :: Bio-Informatics"
+         "Topic :: Scientific/Engineering :: Bio-Informatics",
+         "License :: OSI Approved :: GNU General Public License v3 (GPLv3)"
          ]
        include_package_data = True,
        packages=['bohra'],
