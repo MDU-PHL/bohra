@@ -20,5 +20,6 @@ def deploy(ctx, bump):
     ctx.run("python3 setup.py sdist bdist_wheel")
     ctx.run("twine check dist/*")
     ctx.run("twine upload dist/*")
-    ctx.run("git push --tags")
+    ctx.run("git push origin --tags")
+    ctx.run("git push kristy --tags")
 

@@ -1,4 +1,16 @@
 [![CircleCI](https://circleci.com/gh/MDU-PHL/bohra.svg?style=svg&circle-token=530799cb0764519fc65966ab48bac7e0d02f3688)](https://circleci.com/gh/MDU-PHL/bohra)
+[![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/)
+
+@ResidentMario
+Owner
+ResidentMario commented on Feb 2, 2018
+
+Ah, right, I forgot you could specify arbitrary characters that way. I went ahead and added a 3.4+ badge, thanks.
+@kristyhoran
+
+Attach files by dragging & dropping, selecting or pasting them.
+
+
 # Bohra 
 
 A pipeline for analysis of Illumina short reads for public health microbiology.
