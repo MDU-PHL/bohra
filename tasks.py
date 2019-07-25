@@ -6,7 +6,7 @@ import invoke
 
 
 @invoke.task
-def deploy(ctx, bump):
+def deploy(ctx):
     """
     Automate deployment
     rm -rf build/* dist/*
