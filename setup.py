@@ -25,7 +25,7 @@ setup (name = 'bohra',
        long_description_content_type="text/markdown",
        author = 'Kristy Horan',
        url = 'https://github.com/kristyhoran/bohra',
-       install_requires = ['jinja2','biopython>=1.70','pandas>=0.23.0', 'numpy', 'svgwrite', 'psutil'],
+       install_requires = ['datetime', 'pytest', 'jinja2','biopython>=1.70','pandas>=0.23.0', 'numpy', 'svgwrite', 'psutil','sh','packaging', 'snakemake>=5.4.0'],
        python_requires='>=3.6',
        entry_points={
         "console_scripts": [
