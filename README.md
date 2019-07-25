@@ -60,13 +60,6 @@ If you are installing on a server in your local directory use
 ```
 pip3 install bohra --user
 ```
-
-Don't forget to add your local installation to your path. For example this should work.
-
-```
-export PATH=~/.local/bin:=$PATH
-```
-
 Bohra can be run in two modes `run` for an initial analysis and `rerun` for a re-analysis. A `.html` report is generated allowing for the visualisation of tree and examination of the dataset to provide insights that may be useful in interpretation of the results.
 
 ### Set up
