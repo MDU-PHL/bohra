@@ -1,7 +1,7 @@
 [![CircleCI](https://circleci.com/gh/MDU-PHL/bohra.svg?style=svg&circle-token=530799cb0764519fc65966ab48bac7e0d02f3688)](https://circleci.com/gh/MDU-PHL/bohra)
 [![Python 3.6](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/downloads/release/python-360/)
 
-![Bohra](https://github.com/kristyhoran/bohra/bohra_logo-01.png)
+![Bohra](https://github.com/kristyhoran/bohra/bohra_logo_2.svg)
 
 # Bohra 
 
