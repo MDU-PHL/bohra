@@ -478,7 +478,7 @@ class Report:
         # TODO edit links to be title lower case separated by a -
         core_genome_td = {'file': 'core_genome.tab', 'title': 'Core Genome', 'link':'core-genome', 'type':'table'}
         snp_density_td = {'title': 'SNP density', 'link':'snp-density', 'type':'graph'}
-        core_phylogeny_td = {'title': 'Core Phylogeny', 'link':'corephylogeny', 'file': 'core.treefile', 'type': 'tree'}
+        core_phylogeny_td = {'title': 'Phylogeny', 'link':'phylogeny', 'file': 'core.treefile', 'type': 'tree'}
         snp_distance_td = {'file': 'distances.tab', 'title':'SNP distances', 'type':'matrix', 'link':'snp-distances'}
         # list of snp tasks
         s_td = [core_genome_td,snp_density_td,core_phylogeny_td, snp_distance_td]
