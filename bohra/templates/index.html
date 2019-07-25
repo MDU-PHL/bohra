@@ -190,10 +190,10 @@
       {% for t in td %}
       {% if t.type == 'summary' %}
       <!-- <h2 style= "color: #3973ac; float:left;" class='summary-table-header'>Summary Table</h2> -->
-      <button type="button" class="btn btn-primary btn-xlg btn-outline-primary summary-table-button" ><h2>{{t.title}}</h2></button>
+      <button type="button" class="btn btn-primary btn-xlg btn-outline-primary summary-table-button" ><h3>{{t.title}}</h3></button>
       {% elif t.type == 'tree' %}
       <!-- <h2 style= "color: #3973ac; float:right;" class='phylogeny-table-header'>Phylogeny</h2> -->
-      <button type="button" class="btn btn-primary btn-xlg btn-outline-primary phylogeny-button" ><h2>{{t.title}}</h2></button>
+      <button type="button" class="btn btn-primary btn-xlg btn-outline-primary phylogeny-button" ><h3>{{t.title}}</h3></button>
       {% endif %}
       {% endfor %}
       <div id="tablediv">
