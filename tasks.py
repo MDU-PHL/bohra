@@ -16,7 +16,7 @@ def deploy(ctx, bump):
     git push --tags
     """
     ctx.run("rm -rf build/* dist/*")
-    ctx.run("bumpversion {bump} --verbose")
+    # ctx.run("bumpversion {bump} --verbose")
     ctx.run("python3 setup.py sdist bdist_wheel")
     ctx.run("twine check dist/*")
     ctx.run("twine upload dist/*")
