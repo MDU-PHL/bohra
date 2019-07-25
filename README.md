@@ -53,13 +53,12 @@ Bohra requires >=python3.6 and is dependent on snakemake
 At the moment bohra can only be installed via github - other options will follow
 
 ```
-pip3 install snakemake
-pip3 install git+https://github.com/MDU-PHL/bohra
+pip3 install bohra
 ```
 If you are installing on a server in your local directory use
 
 ```
-pip3 install git+https://github.com/MDU-PHL/bohra --user
+pip3 install bohra --user
 ```
 
 Don't forget to add your local installation to your path. For example this should work.
@@ -68,17 +67,44 @@ Don't forget to add your local installation to your path. For example this shoul
 export PATH=~/.local/bin:=$PATH
 ```
 
-### Initial run
+Bohra can be run in two modes `run` for an initial analysis and `rerun` for a re-analysis. A `.html` report is generated allowing for the visualisation of tree and examination of the dataset to provide insights that may be useful in interpretation of the results.
 
+### Set up
 
+**Input file**
+
+The input file needs to be a tab-delimited file with three columns IsolateID, path to R1 and path to R2. 
 ```
+Isolate-ID    /path/to/reads/R1.fq.gz    /path/to/reads/R2.fq.gz
+```
+
+**Reference**
+
+The choice of reference is important for the accuracy of SNP detection and therefore the investigation of genomic relatedness. Appropriate references should be chosen following the guidelines below.
+1. A closed reference from the same ST (where applicable) or a gold-standard reference (as may be used in M. tuberculosis).
+2. A pacbio or nanopore assembly from MDU that is of the same type as the query dataset
+3. A high quality de novo assembly of either an isolate in the dataset or an isolate of the same ST or type.
+
+**Mask**
+
+Phage masking is important for to prevent the inflation of SNPs that can be introduced by horizontal transfer as opposed to vertical transfer. For closed genomes or those that are publicly available `phaster-query.pl` can be used to identify regions for masking. If a denovo assembly is used the website `phaster.ca` can be used. Regions for masking should be provided in `.bed` format.
+
+
+
+### Run
+
+**Minimal command**
+
+`bohra run -r path/to/reference -i path/to/inputfile -j unique_id -m path/to/maskfile (optional)`
+
+```bohra run -h
 usage: bohra run [-h] [--input_file INPUT_FILE] [--job_id JOB_ID]
-                    [--reference REFERENCE] [--mask MASK]
-                    [--pipeline {sa,s,a,all}]
-                    [--assembler {shovill,skesa,spades}] [--cpus CPUS]
-                    [--minaln MINALN] [--prefillpath PREFILLPATH] [--mdu MDU]
-                    [--workdir WORKDIR] [--resources RESOURCES] [--force]
-                    [--dryrun] [--gubbins]
+                 [--reference REFERENCE] [--mask MASK]
+                 [--pipeline {sa,s,a,all}]
+                 [--assembler {shovill,skesa,spades}] [--cpus CPUS]
+                 [--minaln MINALN] [--prefillpath PREFILLPATH] [--mdu MDU]
+                 [--workdir WORKDIR] [--resources RESOURCES] [--force]
+                 [--dryrun] [--gubbins]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -101,7 +127,7 @@ optional arguments:
                         perform SNPS, ASSEMBLIES and ROARY for pan-genome
                         analysis (default: sa)
   --assembler {shovill,skesa,spades}, -a {shovill,skesa,spades}
-                        Assembler to use. (default: skesa)
+                        Assembler to use. (default: shovill)
   --cpus CPUS, -c CPUS  Number of CPU cores to run, will define how many rules
                         are run at a time (default: 36)
   --minaln MINALN, -ma MINALN
@@ -113,10 +139,10 @@ optional arguments:
   --mdu MDU             If running on MDU data (default: True)
   --workdir WORKDIR, -w WORKDIR
                         Working directory, default is current directory
-                        (default: /home/khhor/dev/bohra)
+                        (default: /home/khhor)
   --resources RESOURCES, -s RESOURCES
                         Directory where templates are stored (default:
-                        templates)
+                        /home/khhor/dev/bohra/bohra/templates)
   --force, -f           Add if you would like to force a complete restart of
                         the pipeline. All previous logs will be lost.
                         (default: False)
@@ -125,27 +151,24 @@ optional arguments:
   --gubbins, -g         If you would like to run gubbins. NOT IN USE YET -
                         PLEASE DO NOT USE (default: False)
 ```
-**Minimal run**
 
-`bohra run -r path_to_ref -i path_to_input -j job_id`
+### Rerun
 
-### Subsequent run
+A rerun may be performed if changes to the reference and/or mask file are needed. In addition, if isolates need to be removed or added to the analysis. 
+The following behaviour on a rerun should be expected;
+* New reference will result in calling of snps in all isolates of the analysis
+* If the reference is unchanged SNPs will only be called on new isolates
+* Determination of core alignment, distances and generation of trees will occur for every rerun
 
-Once a run has been completed you can rerun bohra
-1. Add or remove isolates
-* Add - add a new tab-delimited line
-* Remove - Prepend a `#` to the lines you wish to remove
+`-r` and `-m` are only required if these are to be different to the previous run. If not Bohra will detect and use the previous reference and mask files. Also changes to the isolates included should be made to the input file used in the original run. New isolates can be added to the bottom of the input file and prefixing an isolate with `#` will remove it from the analysis.
 
-2. Change the reference 
-* If changing the reference re-alignment and variant calling will be performed
+**Minimal command**
 
-3. Change the mask file
+`bohra rerun`
 
-```
-
-usage: bohra rerun [-h] [--reference REFERENCE] [--mask MASK] [--cpus CPUS]
-                      [--workdir WORKDIR] [--resources RESOURCES] [--dryrun]
-                      [--gubbins] [--keep]
+```usage: bohra rerun [-h] [--reference REFERENCE] [--mask MASK] [--cpus CPUS]
+                   [--workdir WORKDIR] [--resources RESOURCES] [--dryrun]
+                   [--gubbins] [--keep]
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -156,37 +179,13 @@ optional arguments:
                         are run at a time (default: 36)
   --workdir WORKDIR, -w WORKDIR
                         Working directory, default is current directory
-                        (default: /home/khhor/dev/bohra)
+                        (default: /home/khhor)
   --resources RESOURCES, -s RESOURCES
                         Directory where templates are stored (default:
-                        templates)
+                        /home/khhor/dev/bohra/bohra/templates)
   --dryrun, -n          If you would like to see a dry run of commands to be
                         executed. (default: False)
   --gubbins, -g         If you would like to run gubbins. NOT IN USE YET -
                         PLEASE DO NOT USE (default: False)
-  --keep, -k            Keep report from previous run (default: False)
-```
+  --keep, -k            Keep report from previous run (default: False)```
 
-**Rerun with different combination of isolates**
-
-
-`bohra rerun`
-
-**Rerun with different reference/mask**
-
-
-`bohra rerun -r pathtonewref -m pathtonewmask`
-
-## Output
-
-Bohra outputs a directory with a `report.html` and all data required for visualisation in a web browser. 
-
-## Etymology
-
-Bohra is an exinct tree dwelling kangaroo whose fossils have been found in the Nullarbor, before the Nullarbor was treeless. Since this pipeline implements [Snippy](https://github.com/tseemann/snippy), named for another famous Australian kangaroo ('Skippy') and designed based on [Nullarbor](https://github.com/tseemann/nullarbor) Bohra is an exceedingly appropriate name. 
-
-## More to follow!!
-
-* Expand readme
-* Polish log files
-* Add clean functions
