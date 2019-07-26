@@ -35,6 +35,6 @@ def gitpush(ctx, message):
     """
     ctx.run("git add -A")
     ctx.run("git commit -m {message}")
-    ctx.run("git push origin --tags")
-    ctx.run("git push kristy --tags")
+    ctx.run("git push origin")
+    ctx.run("git push kristy")
 
