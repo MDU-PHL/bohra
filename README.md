@@ -17,6 +17,9 @@ Bohra is restricted to Illumina read sets. It has been built with the goal of be
 
 ## Pipeline
 
+Bohra takes raw sequencing reads and produces a standalone html file for simple distribution of reports.
+![Image](https://github.com/MDU-PHL/bohra/blob/master/workflow.png)
+
 Bohra can be run in three modes
 1. SNPs and Phylogeny
 * Clean reads
