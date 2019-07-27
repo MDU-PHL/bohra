@@ -423,7 +423,7 @@ class Report:
                 summary_df = self.merge_dfs(summary_df, species)
             elif 'seqdata' in f"{tab}":
                 seq = pandas.read_csv(tab, sep = '\t')
-                seq = seq[['Isolate', 'Depth']]
+                seq = seq[['Isolate', 'Estimated depth']]
                 summary_df = self.merge_dfs(summary_df, seq)
             elif 'assembly' in f"{tab}":
                 assembly = pandas.read_csv(tab, sep = '\t')

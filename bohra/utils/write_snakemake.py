@@ -188,13 +188,14 @@ rule combine_seqdata:
 		for sd in sdfiles:
 			p = pathlib.Path(sd)
 			df = pandas.read_csv(sd, sep = "\t")
-			df[['Isolate']] = f\"{{p.parts[0]}}\"
+			print(df)
+			df['Isolate'] = f\"{{p.parts[0]}}\"
 			
 			if seqdata.empty:
 				seqdata = df
 			else:
-				seqdata = seqdata.append(dft)
-		seqdata['Quality'] = numpy.where(seqdata['Depth'] >= 40, 'PASS','FAIL')
+				seqdata = seqdata.append(df)
+		seqdata['Quality'] = numpy.where(seqdata['Estimated depth'] >= 40, 'PASS','FAIL')
 		seqdata.to_csv(f"{{output}}", sep = '\t', index = False)
 		
 
@@ -565,8 +566,8 @@ rule combine_assembly_metrics:
 
 		# calculate mean + 2SD and use as cutoff for quality of contigs and fix column names
 		dfass = pandas.read_csv(pathlib.Path(f"assembly.tab"), sep = '\\t')
-		cut = dfass['no'].mean() + (2* dfass['no'].std())
-		dfass['Quality'] = numpy.where(dfass['no'] <= cut, 'PASS','FAIL')
+		cut = dfass['# Contigs'].mean() + (2* dfass['# Contigs'].std())
+		dfass['Quality'] = numpy.where(dfass['# Contigs'] <= cut, 'PASS','FAIL')
 		dfass = dfass.rename(columns={{'rRNA':'# rRNA', 'CDS':'# CDS'}})
 		dfass.to_csv(f"report/assembly.tab", sep= '\\t', index=False)
 """
