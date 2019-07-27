@@ -86,7 +86,7 @@ rule seqdata:
 		"{{sample}}/seqdata.tab"
 	shell:
 		\"""
-		seqtk fqchk {input[0]} {input[1]} > {output}
+		seqtk fqchk {{input[0]}} {{input[1]}} > {{output}}
 		\"""
 """)
 
@@ -152,7 +152,7 @@ rule estimate_coverage:
 		\"READS/{{sample}}/R1.fq.gz\",
 		\"READS/{{sample}}/R2.fq.gz\"
 	output:
-		{{sample}}/mash.txt
+		\"{{sample}}/mash.txt\"
 	shell:
 		\"""
 		mash sketch -r {{input[0]}} {{input[1]}} -m 3 -k 31 -o mash  &> {{output}}
@@ -188,7 +188,7 @@ rule combine_seqdata:
 		for sd in sdfiles:
 			p = pathlib.Path(sd)
 			df = pandas.read_csv(sd, sep = "\t")
-			df[['Isolate]] = f"{{p.parts[0]}}"
+			df[['Isolate']] = f\"{{p.parts[0]}}\"
 			
 			if seqdata.empty:
 				seqdata = df
