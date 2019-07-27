@@ -11,8 +11,8 @@ import itertools
 import subprocess
 from Bio import SeqIO, Phylo
 from packaging import version
-from bohra.write_snakemake import MakeWorkflow
-from bohra.write_report import Report
+from bohra.utils.write_snakemake import MakeWorkflow
+# from bohra.utils.write_report import Report
 
 
 class RunSnpDetection(object):
@@ -546,7 +546,7 @@ class RunSnpDetection(object):
         # get a list of isolates
         return(list(set(isolates))) 
         
-    def write_pipeline_job(self, maskstring,  script_path = f"{pathlib.Path(__file__).parent}", resource_path = f"{pathlib.Path(__file__).parent / 'templates'}"):
+    def write_pipeline_job(self, maskstring,  script_path = f"{pathlib.Path(__file__).parent} / utils", resource_path = f"{pathlib.Path(__file__).parent / 'templates'}"):
         '''
         write out the pipeline string for transfer to job specific pipeline
         '''
@@ -560,12 +560,12 @@ class RunSnpDetection(object):
         self.log_messages('message', f"writing the pipeline for {self.job_id}")
         
         # pipeline always has seqdata in 
-        pipelinelist = [p.write_all(self.pipeline), p.write_seqdata(prefillpath = self.prefillpath),p.write_combine_seqdata()]
+        pipelinelist = [p.write_all(self.pipeline), p.write_seqdata(), p.write_estimate_coverage(),p.write_generate_yield(script_path),p.write_combine_seqdata()]
 
         # for just snps contains snippy, snippy-core, dists and tree
         snps_pipeline = [p.write_snippy(), p.write_qc_snippy_initial(), p.write_snippy_core(mask = maskstring), p.write_snp_dists(), p.write_tree(script_path=script_path, alntype='core')]
         # for just assemblies
-        assembly_pipeline = [p.write_assemblies(prefillpath = self.prefillpath), p.write_resistome(), p.write_mlst(),p.write_kraken(prefillpath = self.prefillpath), p.write_combine(), p.write_assembly_stats(), p.write_prokka(), p.write_gff_summary(), p.write_combine_kraken()]
+        assembly_pipeline = [p.write_assemblies(prefillpath = self.prefillpath), p.write_resistome(), p.write_mlst(),p.write_kraken(prefillpath = self.prefillpath), p.write_combine(), p.write_assembly_stats(script_path), p.write_prokka(), p.write_gff_summary(), p.write_combine_kraken()]
         # for roary
         roary_pipeline = [p.write_roary(), p.write_pan_graph()]
 

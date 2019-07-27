@@ -86,12 +86,7 @@ rule seqdata:
 		"{{sample}}/seqdata.tab"
 	shell:
 		\"""
-		YIELDPATH={prefillpath}/{{wildcards.sample}}/yield.tab
-		if [ -f $YIELDPATH ]; then
-			cp $YIELDPATH {{output}}
-		else
-			fq --quiet --ref {{REFERENCE}} {{input[0]}} {{input[1]}} > {{output}}
-		fi
+		seqtk fqchk {input[0]} {input[1]} > {output}
 		\"""
 """)
 
@@ -150,12 +145,40 @@ rule combine_kraken:
 		id_table.to_csv(f"{{output}}", sep = "\t", index = False)
 		subprocess.run(f"sed -i 's/%[0-9]/%/g' {{output}}", shell=True)
 """)
+	def write_estimate_coverage(self):
+		return(f"""
+rule estimate_coverage:
+	input:
+		\"READS/{{sample}}/R1.fq.gz\",
+		\"READS/{{sample}}/R2.fq.gz\"
+	output:
+		{{sample}}/mash.txt
+	shell:
+		\"""
+		mash sketch -r {{input[0]}} {{input[1]}} -m 3 -k 31 -o mash  &> {{output}}
+		\"""
+""")
+	def write_generate_yield(self, script_path):
+		return(f"""
+rule generate_yield:
+	input:
+		\"{{sample}}/mash.txt\",
+		\"{{sample}}/seqdata.tab\"
+	output:
+		\"{{sample}}/yield.tab"
+	shell:
+		\"""
+		python3 {script_path}/generate_yield.py {{input[0]}} {{input[1]}} {{output}}
+		\"""
+
+""")
 
 	def write_combine_seqdata(self):
+		
 		return(f"""
 rule combine_seqdata:
 	input:
-		expand("{{sample}}/seqdata.tab", sample = SAMPLE)
+		expand("{{sample}}/yield.tab", sample = SAMPLE)
 	output:
 		"seqdata.tab"
 	run:
@@ -163,26 +186,15 @@ rule combine_seqdata:
 		sdfiles = f"{{input}}".split()
 		seqdata = pandas.DataFrame()
 		for sd in sdfiles:
-
 			p = pathlib.Path(sd)
 			df = pandas.read_csv(sd, sep = "\t")
-			df.columns = ['Isolate', f"{{p.parts[0]}}"]
-			#print(df)
-			dft = df.transpose()
-			dft.columns = dft.iloc[0]
-			dft = dft.drop(['Isolate'])
-			#print(dft)
-			#print(dft.index)
-			depth = dft['Depth'].str.strip('x')
-			print(depth)
-			dft['Depth'] = int(depth)
+			df[['Isolate]] = f"{{p.parts[0]}}"
+			
 			if seqdata.empty:
-				seqdata = dft
+				seqdata = df
 			else:
 				seqdata = seqdata.append(dft)
 		seqdata['Quality'] = numpy.where(seqdata['Depth'] >= 40, 'PASS','FAIL')
-		seqdata = seqdata.reset_index()
-		seqdata = seqdata.rename(columns={{seqdata.columns[0]: 'Isolate'}})
 		seqdata.to_csv(f"{{output}}", sep = '\t', index = False)
 		
 
@@ -467,7 +479,7 @@ rule pan_figure:
 		\"""
 """)
 
-	def write_assembly_stats(self):
+	def write_assembly_stats(self, script_path):
 		return(f"""
 rule assembly_statistics:
 	input:
@@ -476,7 +488,7 @@ rule assembly_statistics:
 		"denovo.tab"
 	shell:
 		\"""
-		fa --t --each --minsize=500 {{input}} | sed 's@.*/@@' | sed 's/\.fa//g' > {{output}}
+		 python3 {script_path}/assembly_stat.py {{input}} -m 500 > {{output}}
 		\"""
 	
 """)
@@ -555,7 +567,7 @@ rule combine_assembly_metrics:
 		dfass = pandas.read_csv(pathlib.Path(f"assembly.tab"), sep = '\\t')
 		cut = dfass['no'].mean() + (2* dfass['no'].std())
 		dfass['Quality'] = numpy.where(dfass['no'] <= cut, 'PASS','FAIL')
-		dfass = dfass.rename(columns={{'no':'# Contigs','Ns':'# Ns', 'gaps':'# Gaps', 'min':'Min Contig size', 'avg':'Avg Contig size', 'max':'Max Contig size', 'rRNA':'# rRNA', 'CDS':'# CDS'}})
+		dfass = dfass.rename(columns={{'rRNA':'# rRNA', 'CDS':'# CDS'}})
 		dfass.to_csv(f"report/assembly.tab", sep= '\\t', index=False)
 """
 		cmdstring = f"""cp seqdata.tab report/seqdata.tab
@@ -668,8 +680,7 @@ rule write_html_report:
 		{input_string}
 	output:
 		'report/report.html'
-	singularity:
-		"shub://phgenomics-singularity/ete3@latest"
+	
 	shell:
 		\"""
 		python3 {script_path}/write_report.py {wd_string} {resources} {pipeline} {job_id} {assembler}
