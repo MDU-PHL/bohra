@@ -45,4 +45,5 @@ class Yield:
 
 if __name__ == '__main__':
     y = Yield()
+    
     y.main(pathtoseqtkdata=sys.argv[1], pathtomashdata = sys.argv[2], outputpath = sys.argv[3])

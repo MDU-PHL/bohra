@@ -546,7 +546,7 @@ class RunSnpDetection(object):
         # get a list of isolates
         return(list(set(isolates))) 
         
-    def write_pipeline_job(self, maskstring,  script_path = f"{pathlib.Path(__file__).parent} / utils", resource_path = f"{pathlib.Path(__file__).parent / 'templates'}"):
+    def write_pipeline_job(self, maskstring,  script_path = f"{pathlib.Path(__file__).parent / 'utils'}", resource_path = f"{pathlib.Path(__file__).parent / 'templates'}"):
         '''
         write out the pipeline string for transfer to job specific pipeline
         '''
