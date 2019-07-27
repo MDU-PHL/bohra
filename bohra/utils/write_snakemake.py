@@ -168,7 +168,7 @@ rule generate_yield:
 		\"{{sample}}/yield.tab"
 	shell:
 		\"""
-		python3 {script_path}/generate_yield.py {{input[0]}} {{input[1]}} {{output}}
+		python3 {script_path}/generate_yield.py {{input[1]}} {{input[0]}} {{output}}
 		\"""
 
 """)
