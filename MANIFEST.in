@@ -1,3 +1,4 @@
 include bohra/test/*
+include bohra/utils/*
 include bohra/templates/*
-include bohra/iqtree_generator.sh
+
