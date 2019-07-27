@@ -15,7 +15,7 @@ def get_data(output):
     summary_dict.update(dict(zip(header, line_one)))
     header.insert(0, 'position')
     summary_dict['Reads'] = dict(zip(header, [float(v) for v in record.findall(output[3])]))['bases']
-    summary_dict['GC content'] = summary_dict['C'] + summary_dict['G']
+    summary_dict['GC content'] = round((summary_dict['C'] + summary_dict['G'], 2))
     median_position = (summary_dict['Reads'] + 1) / 2
     for line in output[4:]:
         parsed_record = dict(zip(header, [float(v) for v in record.findall(line)]))
@@ -37,7 +37,7 @@ def main(pathtoseqtkdata, pathtomashdata, outputpath):
     df = pandas.DataFrame(data = seqtkdata, index = [0])
     df = df[['Reads','bases','GC content','min_len', 'avg_len', 'max_len','avgQ']]
     mash = pathlib.Path(f"{pathtomashdata}").open().readlines()
-    df['Estimated depth'] = get_coverage(mash)
+    df['Estimated depth'] = round(get_coverage(mash), 2)
     df = df.rename(columns={'bases':'Yield', 'min_len': 'Min len', 'avg_len': 'Avg len', 'max_len':'Max len', 'avgQ': 'Avg Qual'})
     df.to_csv(pathlib.Path(f"{outputpath}"), index = False, sep = '\t')
 
