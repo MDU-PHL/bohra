@@ -12,12 +12,18 @@
     <!-- Optional theme -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap-theme.min.css" rel="stylesheet">
     
+
+    <link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/buttons/1.5.6/css/buttons.dataTables.min.css" rel="stylesheet">
+
     <!-- LOCAL STYLE -->
     <!-- <link href="job.css" rel="stylesheet"> -->
 
     <!-- Graphing library -->
     
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
@@ -277,9 +283,9 @@
     </div>
     {% elif t.type == 'matrix' %}
     <!-- these tables are hidden until needed - then placed in the current table div above -->
-    <div class="table-responsive">
+    <div class="table-responsive" >
       <!-- buttons for dowload -->
-      <div id = "{{t.link}}">
+      <div id = "{{t.link}}" style="display:none;">
         <h3>{{t.title}}</h3>  
         <table class="table table-striped table-bordered table-sortable detail-table">
           <thead>
@@ -297,9 +303,9 @@
     </div>
     {% elif t.type == 'pan' %}
     <!-- these tables are hidden until needed - then placed in the current table div above -->
-    <div class="table-responsive details">
+    <div class="table-responsive" >
       <!-- buttons for dowload -->
-      <div id = "{{t.link}}">
+      <div id = "{{t.link}}" style = "display: :none;">
         <h3>{{t.title}}</h3>  
         <table class="table table-striped table-bordered table-sortable detail-table">
           <thead>
@@ -313,9 +319,10 @@
                     <!-- end of table body -->
         </table>
       <!-- end of table -->
+      {{t.image}}  
       </div>
     </div>
-    {{t.image}}
+    
 
     
   
@@ -328,6 +335,16 @@
 <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
 <!-- <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script> -->
 <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+
+<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.6/js/dataTables.buttons.min.js"></script>
+<script src= "https://cdn.datatables.net/buttons/1.5.6/js/buttons.flash.min.js"></script>
+<script src= "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.print.min.js"></script>
+
+
+
 {% block script %}
 <script>
 $(document).ready( function () {
@@ -431,13 +448,20 @@ $('button.detail-button').click(function(){
         // use the id of the button to find the class of the table to be inserted
        
         var section = $(this).text().replace(/\s+/g, '-').toLowerCase();
-        console.log(section);     
-        var modaltables = ["core-genome", "mlst", "assembly", "resistome", "sequence-data", "species-identification"]; // jinja2 passing a list of tables
+        var modaltables = {{tables | tojson}}; // jinja2 passing a list of tables
+        
         $.each(modaltables, function( index, value ){
-        console.log(value);
-        $('#' + value).hide();
+          if (section == value){
+            console.log('showing #' + value);
+            $('#' + value).show(); 
+          } else {
+            console.log('hiding #' + value);
+            $('#' + value).hide();
+        }
          });
-  
+        
+        var section = $(this).text().replace(/\s+/g, '-').toLowerCase();
+        console.log(section);
         
         if (section == 'snp-distances'){
           // for snp-distances
@@ -465,8 +489,9 @@ $('button.detail-button').click(function(){
             var data = [trace];
             Plotly.newPlot('snp-distances-graph', data, layout);
             // put selecte into current table
-            var selected = $('#' + section).html();
-            $('#' + section).show();
+            //var selected = $('#' + section).html();
+            console.log('showing #' + section);
+            //$('#snp-distances').show();
             $('#snp-density-graph').html("");     
         } else if (section == 'core-genome'){
           // put snp-density in here
@@ -497,11 +522,11 @@ $('button.detail-button').click(function(){
             Plotly.newPlot('snp-density-graph', data, layout);
             // put selecte into current table
             var selected = $('#' + section).html();
-            $('#' + section).show();  
+            //$('#' + section).show();  
             $('#snp-distances-graph').html("");      
         } else {
           var selected = $('#' + section).html();
-          $('#' + section).show();  
+          //$('#' + section).show();  
           $('#snp-distances-graph').html("");
           $('#snp-density-graph').html("");
         }

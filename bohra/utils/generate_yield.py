@@ -15,7 +15,7 @@ def get_data(output):
     summary_dict.update(dict(zip(header, line_one)))
     header.insert(0, 'position')
     summary_dict['Reads'] = dict(zip(header, [float(v) for v in record.findall(output[3])]))['bases']
-    summary_dict['GC content'] = round((summary_dict['C'] + summary_dict['G'], 2))
+    summary_dict['GC content'] = round((summary_dict['C'] + summary_dict['G']),2)
     median_position = (summary_dict['Reads'] + 1) / 2
     for line in output[4:]:
         parsed_record = dict(zip(header, [float(v) for v in record.findall(line)]))
@@ -45,5 +45,5 @@ def main(pathtoseqtkdata, pathtomashdata, outputpath):
 
 if __name__ == '__main__':
     
-    print(sys.argv[1], sys.argv[2], sys.argv[3])
+    # print(sys.argv[1], sys.argv[2], sys.argv[3])
     main(f"{sys.argv[1]}", f"{sys.argv[2]}", f"{sys.argv[3]}")
