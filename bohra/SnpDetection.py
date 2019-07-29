@@ -347,10 +347,9 @@ class RunSnpDetection(object):
         if not R.exists():
             R.mkdir()
         
-        # check that source is path
-        if isinstance(read_source, str):
-            read_source = pathlib.Path(read_source).absolute()
-        # check that source exists
+        if f"{read_source}"[0] != '/':
+            read_source = self.workdir / read_source
+        
         if read_source.exists():
             I = R / f"{isolate_id}" # the directory where reads will be stored for the isolate
             if not I.exists():
