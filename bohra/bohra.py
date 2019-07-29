@@ -42,7 +42,7 @@ def rerun_pipeline(args):
     return(R.run_pipeline())
 
 
-def set_parsers():
+def main():
     # setup the parser
   
     parser = argparse.ArgumentParser(description='Bohra - a bacterial genomics pipeline',formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -94,5 +94,5 @@ def set_parsers():
         args.func(args)
 	
 if __name__ == '__main__':
-    set_parsers()
+    main()
 
