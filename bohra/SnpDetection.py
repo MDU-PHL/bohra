@@ -349,7 +349,7 @@ class RunSnpDetection(object):
         
         # check that source is path
         if isinstance(read_source, str):
-            read_source = pathlib.Path(read_source)
+            read_source = pathlib.Path(read_source).absolute()
         # check that source exists
         if read_source.exists():
             I = R / f"{isolate_id}" # the directory where reads will be stored for the isolate
@@ -358,6 +358,9 @@ class RunSnpDetection(object):
             read_target = I / f"{r_pair}"
             if not read_target.exists():
                 read_target.symlink_to(read_source)
+        else:
+            self.log_messages('warning', f"{read_source} does not seem to a valid path. Please check your input and try again.")
+            raise SystemExit()
 
     def unzip_files(self,path, unzipped):
         '''
