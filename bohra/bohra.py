@@ -85,12 +85,6 @@ def set_parsers():
     
     parser_sub_rerun.set_defaults(func = rerun_pipeline)
     args = parser.parse_args()
-    return(args)
-
-def main():
-    '''
-    Run Bohra
-    '''
     args = set_parsers()
     if vars(args) == {}:
         parser.print_help(sys.stderr)
@@ -100,5 +94,5 @@ def main():
         args.func(args)
 	
 if __name__ == '__main__':
-    main()
+    set_parsers()
 
