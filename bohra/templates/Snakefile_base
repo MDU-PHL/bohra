@@ -1,6 +1,6 @@
 {{workdir}}
 {{configfile}}
-
+# localrules
 SAMPLE = config['isolates'].split()
 
 # SAMPLE, = glob_wildcards('READS/{sample}/R1.fq.gz')

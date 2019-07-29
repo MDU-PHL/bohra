@@ -5,15 +5,16 @@
 
 # Bohra 
 
-A pipeline for analysis of Illumina short reads for public health microbiology.
+Bohra is microbial genomics pipeline, designed predominantly for use in public health, but may also be useful in research settings. The pipeline takes as input a tab-delimited file with the isolate IDs followed by the path to READ1 and READ2, a reference for alignment and a unique identifier, where reads are illumina paired end reads (other platforms are not supported).
 
 ### Motivation
 
-Bohra was inspired by Nullarbor (https://github.com/tseemann/nullarbor) to be used in public health microbiology labs for analysis of short reads from microbiological samples.  
+Bohra was inspired by Nullarbor (https://github.com/tseemann/nullarbor) to be used in public health microbiology labs for analysis of short reads from microbiological samples. The pipeline is written in [Snakemake](https://snakemake.readthedocs.io/en/stable/). 
 
-### Limitations
+### Etiology
 
-Bohra is restricted to Illumina read sets. It has been built with the goal of being able to be run in HPC environments, although the configurations at this initial committ have not been included.
+Bohra the name of an exinct species of tree kangaroo that lived on the nullarbor. The name was chosen to reflect the fact that it will be predominantly used to build *trees*, relies on *snippy* (named for a very famous kangaroo) and was inspired by *nullarbor*. 
+
 
 ## Pipeline
 
@@ -51,18 +52,18 @@ Bohra can be run in three modes
 
 #### Dependencies
 
-Bohra requires >=python3.6 and is dependent on snakemake
-
-At the moment bohra can only be installed via github - other options will follow
-
+Bohra requires >=python3.6 
 ```
 pip3 install bohra
 ```
-If you are installing on a server in your local directory use
+A conda recipe for bohra will follow shortly! But for now you will need to have the following dependencies installed on your system
 
-```
-pip3 install bohra --user
-```
+* [Snippy](https://github.com/tseemann/snippy)
+* [Shovill (skesa and spades.py)](https://github.com/tseemann/shovill)
+* [Roary](https://sanger-pathogens.github.io/Roary/)
+* [Prokka](https://github.com/tseemann/prokka)
+
+
 Bohra can be run in two modes `run` for an initial analysis and `rerun` for a re-analysis. A `.html` report is generated allowing for the visualisation of tree and examination of the dataset to provide insights that may be useful in interpretation of the results.
 
 ### Set up

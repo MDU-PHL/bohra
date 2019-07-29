@@ -142,7 +142,7 @@ class Tree:
                     svg_text.append(f"<circle cx=\"{(t['x1']*f)*cm}\" cy=\"{t['y1']*cm}\" r=\"0.05cm\" />")
                     # tips.add(circleA)
                 elif (t['nodename'] not in terms) and (t['nodename'] != 'None'):
-                    svg_text.append(f"<text class = \"branch-support\" x=\"{((t['x1']*f) + 0.1)*cm}\" y=\"{t['y1']*cm}\" style=\"font-size:small; color:#3973ac; display:none;\">{t['nodename']}</text>")
+                    svg_text.append(f"<text class = \"branch-support\" x=\"{((t['x1']*f) + 0.1)*cm}\" y=\"{t['y1']*cm}\" style=\"font-size:smaller; color:#3973ac; display:none;\">{t['nodename']}</text>")
             elif t['type'] == 'vertical':
                 # vlines.add(dwg.line(start = ((t['x0']*f)*cm, t['y0']*cm), end = ((t['x1']*f)*cm, t['y1']*cm)))
                 svg_text.append(f"<line x1=\"{(t['x0']*f)*cm}\" x2=\"{(t['x1']*f)*cm}\" y1=\"{t['y0']*cm}\" y2=\"{t['y1']*cm}\" stroke = \"black\"/>")
@@ -494,18 +494,18 @@ class Report:
         # print(td)
         if pipeline == 's':
             td.extend(s_td)
-            tables =['core-genome', 'snp-distances', 'sequence-data']
+            tables =['core-genome', 'snp-distances', 'sequence-data', 'versions']
             modaltables =['core-genome',  'sequence-data']
             display = f"display:inline;"
         elif pipeline == 'a':
             td.extend(a_td)
-            tables =['mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
+            tables =['mlst', 'assembly', 'resistome', 'sequence-data','species-identification', 'versions']
             modaltables = tables
             display = f"display:none;"
         elif pipeline == 'sa':
             a_td.extend(s_td)
             td.extend(a_td)
-            tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
+            tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data','species-identification', 'versions'], 
             modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data', 'species-identification']
             display = f""
             # td.extend(s_td)
@@ -517,7 +517,7 @@ class Report:
             print(s_td)
             td.extend(roary_td)
             print(roary_td)
-            tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data','species-identification', 'pan-genome']
+            tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data','species-identification', 'pan-genome', 'versions']
             modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data', 'species-identification']
             display = f""
 
