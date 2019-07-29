@@ -85,7 +85,7 @@ def main():
     
     parser_sub_rerun.set_defaults(func = rerun_pipeline)
     args = parser.parse_args()
-    args = set_parsers()
+    
     if vars(args) == {}:
         parser.print_help(sys.stderr)
     else:
