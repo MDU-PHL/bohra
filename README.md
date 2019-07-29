@@ -67,6 +67,7 @@ A conda recipe for bohra will follow shortly! But for now you will need to have 
 * [mlst](https://github.com/tseemann/mlst)
 * [iqtree](http://www.iqtree.org/)
 * [seqtk](https://github.com/lh3/seqtk)
+* [snp-dists](https://github.com/tseemann/snp-dists)
 
 Bohra can be run in two modes `run` for an initial analysis and `rerun` for a re-analysis. A `.html` report is generated allowing for the visualisation of tree and examination of the dataset to provide insights that may be useful in interpretation of the results.
 
