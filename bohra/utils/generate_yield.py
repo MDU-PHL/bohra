@@ -39,9 +39,11 @@ def main(pathtoseqtkdata, pathtomashdata, outputpath):
     mash = pathlib.Path(f"{pathtomashdata}").open().readlines()
     df['Estimated depth'] = round(get_coverage(mash), 2)
     df = df.rename(columns={'bases':'Yield', 'min_len': 'Min len', 'avg_len': 'Avg len', 'max_len':'Max len', 'avgQ': 'Avg Qual'})
+    print(df.head())
+    df = df[['Reads','Yield','GC content','Min len','Avg len','Max len','Avg Qual','Estimated depth']]
     df.to_csv(pathlib.Path(f"{outputpath}"), index = False, sep = '\t')
 
-
+  
 
 if __name__ == '__main__':
     

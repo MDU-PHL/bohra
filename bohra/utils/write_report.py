@@ -488,8 +488,10 @@ class Report:
         # list of assembly tasks
         assembly_stat_td = {'file': 'assembly.tab', 'title':'Assembly', 'type':'table', 'link':'assembly'}
         a_td = [assembly_stat_td, species_id_td, mlst_td, resistome_td]
-        roary_td = {'file':'summary_statistics.txt', 'title':'Pan Genome', 'type': 'pan', 'image': 'pan_genome.svg', 'link':'pangenome'}
-        
+        roary_td = [{'file':'summary_statistics.txt', 'title':'Pan Genome', 'type': 'pan', 'image': f"{pathlib.Path('pan_genome.svg').open().read()}", 'link':'pan-genome'}]
+        # print(roary_td)
+        # print(pipeline)
+        # print(td)
         if pipeline == 's':
             td.extend(s_td)
             tables =['core-genome', 'snp-distances', 'sequence-data']
@@ -507,13 +509,16 @@ class Report:
             modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data', 'species-identification']
             display = f""
             # td.extend(s_td)
-        else:
+        elif pipeline == 'all':
             # a_ll = td.extend()
             td.extend(a_td)
+            print(a_td)
             td.extend(s_td)
+            print(s_td)
             td.extend(roary_td)
-            tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data','species-identification', 'pangenome']
-            modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data', 'species-identification', 'pangenome']
+            print(roary_td)
+            tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data','species-identification', 'pan-genome']
+            modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data', 'species-identification']
             display = f""
 
         # get versions of software
@@ -522,7 +527,9 @@ class Report:
         snpdistances = ''
         snpdensity = ''
         # add data to sections
+        # print(td)
         for t in range(len(td)):
+            # print(t)
             # TODO if table add a modal modal + link and link will be title lowercase with hyphen
             if td[t]['type'] == 'table':
                 td[t]['head'], td[t]['body'] = self.write_tables(reportdir=reportdir, table=td[t]['file'])

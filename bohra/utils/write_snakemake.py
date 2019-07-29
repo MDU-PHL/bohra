@@ -64,8 +64,8 @@ REFERENCE = config['reference']
 """,
 			'sa': f"""{base},{astring},{sstring},{report_string}
 """,
-			'all': f"""
-{base},{astring},{sstring},{rstring},{report_string}
+			'all': f"""{base},{astring},{sstring},{rstring},{report_string}
+
 """
 		}
 
@@ -196,6 +196,7 @@ rule combine_seqdata:
 			else:
 				seqdata = seqdata.append(df)
 		seqdata['Quality'] = numpy.where(seqdata['Estimated depth'] >= 40, 'PASS','FAIL')
+		seqdata = seqdata[['Isolate','Reads','Yield','GC content','Min len','Avg len','Max len','Avg Qual','Estimated depth', 'Quality']]
 		seqdata.to_csv(f"{{output}}", sep = '\t', index = False)
 		
 
@@ -670,8 +671,8 @@ rule collate_report:
 		elif pipeline == 'a':
 			input_string = f"{seq}, {a}"
 		elif pipeline == 'sa':
-						input_string = f"{seq}, {a}, {s}"
-		elif pipeline == 'full':
+			input_string = f"{seq}, {a}, {s}"
+		elif pipeline == 'all':
 			input_string = f"{seq}, {a}, {s}, {r}"
 		wd_string = f"{workdir / job_id}"
 		return(f"""
@@ -686,10 +687,6 @@ rule write_html_report:
 		\"""
 		python3 {script_path}/write_report.py {wd_string} {resources} {pipeline} {job_id} {assembler}
 		\"""
-
-		
-		
-
 """)
 	
 	def write_gubbins(self, gubbins,job):
