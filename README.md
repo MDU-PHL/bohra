@@ -62,7 +62,10 @@ A conda recipe for bohra will follow shortly! But for now you will need to have 
 * [Shovill (skesa and spades.py)](https://github.com/tseemann/shovill)
 * [Roary](https://sanger-pathogens.github.io/Roary/)
 * [Prokka](https://github.com/tseemann/prokka)
-
+* [kraken2](https://ccb.jhu.edu/software/kraken/)
+* [abricate](https://github.com/tseemann/abricate)
+* [mlst](https://github.com/tseemann/mlst)
+* [iqtree](http://www.iqtree.org/)
 
 Bohra can be run in two modes `run` for an initial analysis and `rerun` for a re-analysis. A `.html` report is generated allowing for the visualisation of tree and examination of the dataset to provide insights that may be useful in interpretation of the results.
 
