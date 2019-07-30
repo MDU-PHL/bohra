@@ -361,18 +361,25 @@ class RunSnpDetection(object):
             self.log_messages('warning', f"{read_source} does not seem to a valid path. Please check your input and try again.")
             raise SystemExit()
 
-    def unzip_files(self,path, unzipped):
+    def unzip_files(self,path, suffix):
         '''
         if a zipped reference is provided try to unzip and then return the unzipped pathname. If unable to unzip then supply message and exit
         input:
             :path: pathname  of file to unzip string
             :unzipped: unzipped path
         '''
-        
-        cmd = f"gzip -d -c {path} > {p.stem}"
+        target = self.workdir / path.name.strip(suffix)
+        if suffix == '.zip':
+            cmd = f"unzip {path} -d {target}"
+        elif suffix == 'gz':   
+            cmd = f"gzip -d -c {path} > {target}"
+        else:
+            self.log_messages('warning', f"{path} can not be unzipped. This may be due to file permissions, please provide path to either an uncompressed reference or a file you have permissions to.")
+            raise SystemExit
+
         try:
             subprocess.run(cmd, shell = True)
-            return pathlib.Path(p.stem)
+            return target.name
         except:
             self.log_messages('warning', f"{path} can not be unzipped. This may be due to file permissions, please provide path to either an uncompressed reference or a file you have permissions to.")
             raise SystemExit            
@@ -390,25 +397,28 @@ class RunSnpDetection(object):
         output:
             returns path.name (str)   
         '''
-        found = False
-        while not found: 
+        
             
-            if path.exists():
+        if path.exists():
+            if f"{path.suffix}" in ['.gz','zip']:
+                    self.reference = self.unzip_files(path)
+                    if not self.reference.exists():
+                        self.log_messages('warning', f"{path} does not exist. Please try again.")
+            else:
                 target = self.workdir / path.name
                 # use rename to copy reference to working directory
                 # if the reference is not already in the working directory symlink it to working dir
                 if not target.exists():
                     logging.info(f"Linking {path.name} to {self.workdir.name}")
                     target.symlink_to(path)
-                    if path.suffix == '.gz':
-                        path = self.unzip_files(path.name, path.name.strip('.gz'))
+                    
                     # TODO add in unzip option unzip 
-                
-                found = True
-            else:
-                self.log_messages('warning', f"Path to {path} does not exist. Please provide a valid path to a file and try again")
-                raise SystemExit
-                # path = pathlib.Path(path)
+                    found = True
+                    
+        else:
+            self.log_messages('warning', f"Path to {path} does not exist or is not a valid file type (.gbk, .fa, .fasta, .gbk.gz, .fa.gz, .fasta.gz). Please provide a valid path to a file and try again")
+            raise SystemExit
+            # path = pathlib.Path(path)
         
         return  path.name
 
