@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # http://www.iqtree.org/doc/Command-Reference
-# courtesy of Torsten Seeman. Modified here to account for snp-detector file structure
+# courtesy of Torsten Seemann. Modified here to account for snp-detector file structure
 #-fconst
 #Specify a list of comma-separated integer numbers. The number of
 #entries should be equal to the number of states in the model (e.g.  4 for
