@@ -579,7 +579,7 @@ class RunSnpDetection(object):
         # for just assemblies
         assembly_pipeline = [p.write_assemblies(prefillpath = self.prefillpath), p.write_resistome(), p.write_mlst(),p.write_kraken(prefillpath = self.prefillpath), p.write_combine(), p.write_assembly_stats(script_path), p.write_prokka(), p.write_gff_summary(), p.write_combine_kraken()]
         # for roary
-        roary_pipeline = [p.write_roary(), p.write_pan_graph()]
+        roary_pipeline = [p.write_roary(), p.write_pan_graph(script_path = script_path)]
 
         # pipeline can always ends with report
         report_pipeline = [p.write_report_collation(pipeline = self.pipeline), p.write_html(pipeline = self.pipeline,workdir = self.workdir, resources = resource_path, job_id = self.job_id, script_path = script_path, assembler = self.assembler_dict[self.assembler])]

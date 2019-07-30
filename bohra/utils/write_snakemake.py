@@ -468,7 +468,7 @@ rule run_roary:
 		\"""
 """)
 
-	def write_pan_graph(self):
+	def write_pan_graph(self, script_path):
 		return(f"""
 rule pan_figure:
 	input:
@@ -477,7 +477,7 @@ rule pan_figure:
 		"pan_genome.svg"
 	shell:
 		\"""
-		roary2svg.pl {{input}} > {{output}}
+		perl {script_path} roary2svg.pl {{input}} > {{output}}
 		\"""
 """)
 
