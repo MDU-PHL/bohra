@@ -488,7 +488,7 @@ class Report:
         # list of assembly tasks
         assembly_stat_td = {'file': 'assembly.tab', 'title':'Assembly', 'type':'table', 'link':'assembly'}
         a_td = [assembly_stat_td, species_id_td, mlst_td, resistome_td]
-        roary_td = [{'file':'summary_statistics.txt', 'title':'Pan Genome', 'type': 'pan', 'image': f"{pathlib.Path('pan_genome.svg').open().read()}", 'link':'pan-genome'}]
+        
         # print(roary_td)
         # print(pipeline)
         # print(td)
@@ -511,6 +511,7 @@ class Report:
             # td.extend(s_td)
         elif pipeline == 'all':
             # a_ll = td.extend()
+            roary_td = [{'file':'summary_statistics.txt', 'title':'Pan Genome', 'type': 'pan', 'image': f"{pathlib.Path('pan_genome.svg').open().read()}", 'link':'pan-genome'}]
             td.extend(a_td)
             print(a_td)
             td.extend(s_td)
