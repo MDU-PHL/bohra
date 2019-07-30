@@ -62,7 +62,7 @@ def main():
     parser_sub_run.add_argument('--minaln','-ma',help='Minimum percent alignment', default=0)
     parser_sub_run.add_argument('--prefillpath','-pf',help='Path to existing assemblies - in the form path_to_somewhere/isolatename/contigs.fa')
     parser_sub_run.add_argument('--mdu', default=True, help='If running on MDU data')
-    parser_sub_run.add_argument('--workdir','-w', default = f"{pathlib.Path.cwd().absolute()}", help='Working directory, default is current directory')
+    parser_sub_run.add_argument('--workdir','-w', default = f"{pathlib.Path.cwd().absolute()}", help='The directory where Bohra will be run, default is current directory')
     parser_sub_run.add_argument('--resources','-s', default = f"{pathlib.Path(__file__).parent / 'templates'}", help='Directory where templates are stored')
     parser_sub_run.add_argument('--force','-f', action="store_true", help = "Add if you would like to force a complete restart of the pipeline. All previous logs will be lost.")
     parser_sub_run.add_argument('--dryrun','-n', action="store_true", help = "If you would like to see a dry run of commands to be executed.")
