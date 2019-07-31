@@ -4,7 +4,7 @@
 """
 __author__ = "Kristy Horan"
 __license__ = "GPL"
-__version__ = "1.0.6"
+__version__ = "1.0.7"
 __maintainer__ = "Kristy Horan"
 __email__ = "kristyhoran15@gmail.com"
 __status__ = "Development"
