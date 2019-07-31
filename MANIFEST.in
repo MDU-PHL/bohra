@@ -1,4 +1,4 @@
-include test/*
+include bohra/test/*
 include bohra/utils/*
 include bohra/templates/*
 

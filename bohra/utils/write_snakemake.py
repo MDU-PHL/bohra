@@ -351,7 +351,7 @@ rule run_iqtree_{alntype}:
 		
 	""")
 
-
+	
 
 	def write_assemblies(self, prefillpath = '', assembler = 'skesa'):
 		
