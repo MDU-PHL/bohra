@@ -103,7 +103,7 @@ def test_path_exists():
         test that path_exists returns True
         '''
         with patch.object(RunSnpDetection, "__init__", lambda x: None):
-                p = pathlib.Path('test', 'test_file.txt')
+                p = pathlib.Path('bohra','tests', 'test_file.txt')
                 detect_obj = RunSnpDetection()
                 assert detect_obj.path_exists(p)
 
