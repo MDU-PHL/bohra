@@ -33,5 +33,5 @@ setup (name = 'bohra',
         ],},
         setup_requires=['pytest-runner'],
         tests_require = ['pytest'],
-        test_suite = 'tests'
+        # test_suite = 'bohra.tests'
 )
