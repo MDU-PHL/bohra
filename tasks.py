@@ -26,7 +26,7 @@ def deploy(ctx):
 @invoke.task
 def gitpush(ctx, message):
     """
-    Automate push
+    Automate push for minor changes including typos and reversions
     """
     message = ' '.join(message.split('_'))
     ctx.run("git add -A")
@@ -38,11 +38,13 @@ def gitpush(ctx, message):
 def gittag(ctx, message):
     """
     Automate push and tagging
-    
-    git push --tags
+    for any change that will change behaviour
     """
     message = ' '.join(message.split('_'))
     ctx.run("git add -A")
     ctx.run(f"git commit -m '{message}'")
+    ctx.run(f"git -a {tag} -m {message}")
     ctx.run("git push origin --tags")
     ctx.run("git push kristy --tags")
+
+    

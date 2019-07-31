@@ -1,7 +1,3 @@
-#!/usr/bin/env python3
-
-
-
 """Bohra 
 .. moduleauthor:: Kristy Horan <kristyhoran15@gmail.com>
 
