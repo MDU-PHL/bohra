@@ -35,7 +35,7 @@ def gitpush(ctx, message):
     ctx.run("git push kristy")
 
 @invoke.task
-def gittag(ctx, message):
+def gittag(ctx,tag, message):
     """
     Automate push and tagging
     for any change that will change behaviour
