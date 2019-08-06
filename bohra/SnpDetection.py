@@ -205,29 +205,24 @@ class RunSnpDetection(object):
         '''
         check the size of a file
         '''
-        s = path().st_size
-        if s > 0:
-            return True
-        else:
-            return False
+        s = path.stat().st_size
+        return s
 
     def check_kraken2DB(self):
         '''
         ensure that DB is present and not emtpy
         '''
-
+        self.log_messages('info', 'Searching for kraken2 DB')
         if "KRAKEN2_DEFAULT_DB" in os.environ:
-            k2db = pathlib.Path(f"{os.environ["KRAKEN2_DEFAULT_DB"]}")
+            k2db = pathlib.Path(os.environ["KRAKEN2_DEFAULT_DB"])
             if k2db.is_dir():
-                kmerfiles = sorted(k2db.glob('*.kmer_distrib'))
-                dbfiles = sorted(k2db.glob('*.k2d'))
-                if len(kmerfiles) == len(dbfiles) == 3:
-                    s = []
-                    for k in range(3):
-                        s.append(self.check_size_file( k2db / kmerfiles[k] ))
-                        s.append(self.check_size_file( k2db / dbfiles[k] ))
-                    if 0 not in s:
-                        self.run_kraken = True
+                self.log_messages('info', 'Found kraken2 DB, checking that files are not empty')
+                kmerfiles = sorted(k2db.glob('*'))
+                s = []
+                for k in range(len(kmerfiles)):
+                    s.append(self.check_size_file(k2db / kmerfiles[k]))
+                if 0 not in s:
+                    self.run_kraken = True
         self.log_messages('message',f"Congratulations your kraken database is present") if self.run_kraken else self.log_messages('warning', f"Your kraken DB is not installed in the expected path. Speciation will not be performed. If you would like to perform speciation in future please re-read bohra installation instructions.")
             
 
@@ -238,18 +233,14 @@ class RunSnpDetection(object):
         # TODO check all software tools used and is there a way to check database last update??
         # TODO check assemblers
         self.log_messages('info', f"Checking software dependencies")
-        if self.pipeline != 'a':
-            self.check_snippycore()
-            self.check_snpdists()
-            self.check_iqtree()
-            return(self.check_snippy())
-        if self.pipeline != 's':
-            self.check_assembler()
-            self.check_assemble_accesories()
-            self.check_kraken2DB()
-        if self.pipeline == 'all':
-            self.check_roary()
-        
+        self.check_snippycore()
+        self.check_snpdists()
+        self.check_iqtree()
+        self.check_assembler()
+        self.check_assemble_accesories()
+        self.check_kraken2DB()
+        self.check_roary()
+        return(self.check_snippy())
 
     # def check_validation(self, validation_type):
     #     '''
@@ -399,9 +390,10 @@ class RunSnpDetection(object):
             :unzipped: unzipped path
         '''
         target = self.workdir / path.name.strip(suffix)
+        
         if suffix == '.zip':
             cmd = f"unzip {path} -d {target}"
-        elif suffix == 'gz':   
+        elif suffix == '.gz':   
             cmd = f"gzip -d -c {path} > {target}"
         else:
             self.log_messages('warning', f"{path} can not be unzipped. This may be due to file permissions, please provide path to either an uncompressed reference or a file you have permissions to.")
@@ -431,8 +423,8 @@ class RunSnpDetection(object):
             
         if path.exists():
             if f"{path.suffix}" in ['.gz','zip']:
-                    self.reference = self.unzip_files(path, f"{path.suffix}")
-                    if not self.reference.exists():
+                    path = pathlib.Path(self.unzip_files(path, f"{path.suffix}"))
+                    if not path.exists():
                         self.log_messages('warning', f"{path} does not exist. Please try again.")
             else:
                 target = self.workdir / path.name
@@ -600,14 +592,14 @@ class RunSnpDetection(object):
 
         p = MakeWorkflow()
         self.log_messages('message', f"writing the pipeline for {self.job_id}")
-        
+        print(self.run_kraken)
         # pipeline always has seqdata in 
-        pipelinelist = [p.write_all(self.pipeline), p.write_seqdata(), p.write_estimate_coverage(),p.write_generate_yield(script_path),p.write_combine_seqdata()]
+        pipelinelist = [p.write_all(run_kraken = self.run_kraken,pipeline = self.pipeline), p.write_seqdata(), p.write_estimate_coverage(),p.write_generate_yield(script_path),p.write_combine_seqdata()]
 
         # for just snps contains snippy, snippy-core, dists and tree
         snps_pipeline = [p.write_snippy(), p.write_qc_snippy_initial(), p.write_snippy_core(mask = maskstring), p.write_snp_dists(), p.write_tree(script_path=script_path, alntype='core')]
         # for just assemblies
-        assembly_pipeline = [p.write_assemblies(prefillpath = self.prefillpath), p.write_resistome(), p.write_mlst(),p.write_kraken(prefillpath = self.prefillpath, run_kraken = self.run_kraken), p.write_combine(), p.write_assembly_stats(script_path), p.write_prokka(), p.write_gff_summary(), p.write_combine_kraken()]
+        assembly_pipeline = [p.write_assemblies(prefillpath = self.prefillpath), p.write_resistome(), p.write_mlst(),p.write_kraken(prefillpath = self.prefillpath, run_kraken = self.run_kraken), p.write_combine(), p.write_assembly_stats(script_path), p.write_prokka(), p.write_gff_summary(), p.write_combine_kraken(run_kraken = self.run_kraken)]
         # for roary
         roary_pipeline = [p.write_roary(), p.write_pan_graph(script_path = script_path)]
 
@@ -705,12 +697,16 @@ class RunSnpDetection(object):
             self.force_overwrite()
         # check the pipeline setup 
         self.run_checks()
+        
         # update source data in source.log
         self.set_source_log()
+        
         # open the input file and check it is in the minimal correct format 
         isolates = self.set_workflow_input()
+        
         # setup the workflow files Snakefile and config file
         self.setup_workflow(isolates = isolates)
+        
         # run the workflow
         if self.run_workflow():
             # TODO add in cleanup function to remove snakemkae fluff 

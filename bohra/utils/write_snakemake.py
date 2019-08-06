@@ -18,7 +18,7 @@ REFERENCE = config['reference']
 """)
 
 	
-	def write_all(self, pipeline = 'sa', run_kraken):
+	def write_all(self, run_kraken, pipeline = 'sa'):
 		base = f"""	expand(\"{{sample}}/seqdata.tab\", sample = SAMPLE),
 		\"report/seqdata.tab\""""
 		kstring = f"""
@@ -92,7 +92,7 @@ rule seqdata:
 		\"""
 """)
 
-	def write_kraken(self, prefillpath = '', run_kraken):
+	def write_kraken(self, run_kraken, prefillpath = ''):
 		if run_kraken:
 			return(f"""
 rule kraken:
@@ -108,35 +108,34 @@ rule kraken:
 		if [ -f $KRAKENPATH ]; then
 			cp $KRAKENPATH {{output}}
 		else
-			{cmd}
+			kraken2 --paired {{input[0]}} {{input[1]}} --memory-mapping --minimum-base-quality 13 --report {{output}}
 		fi
 		\"""
 		
 """)
 
 
-	def write_combine_kraken(self):
+	def write_combine_kraken(self, run_kraken):
 		if run_kraken:
 			return(f"""
 rule combine_kraken:
 	input: 
-		expand("{{sample}}/kraken.tab", sample = SAMPLE)
+		expand(\"{{sample}}/kraken.tab\", sample = SAMPLE)
 	output:
-		"species_identification.tab"
+		\"species_identification.tab\"
 	run:
 		import pandas, pathlib, subprocess
-		kfiles = f"{{input}}".split()
+		kfiles = f\"{{input}}\".split()
 		id_table = pandas.DataFrame()
 		for k in kfiles:
 			kraken = pathlib.Path(k)
-			df = pandas.read_csv(kraken, sep = "\t", header =None)
-			df = df.rename(columns = {{0:'percentage', 1:'frag1', 2:'frag2',3:'code',4:'taxon',5:'name'}}))
+			df = pandas.read_csv(kraken, sep = \"\\t\", header =None, names = ['percentage', 'frag1', 'frag2','code','taxon','name'])
 			df['percentage'] = df['percentage'].apply(lambda x:float(x.strip('%')) if isinstance(x, str) == True else float(x)) #remove % from columns
 			df = df.sort_values(by = ['percentage'], ascending = False)
 			df = df[df['code'].isin(['U','S'])]     
 			df = df.reset_index(drop = True) 
 			tempdf = pandas.DataFrame()
-			d = {{'Isolate': f"{{kraken.parts[0]}}",    
+			d = {{'Isolate': f\"{{kraken.parts[0]}}\",    
 					'#1 Match': df.ix[0,'name'].strip(), '%1': df.ix[0,'percentage'],
 					'#2 Match': df.ix[1,'name'].strip(), '%2': df.ix[1,'percentage'],       
 					'#3 Match': df.ix[2,'name'].strip(), '%3': df.ix[2,'percentage'] ,
@@ -148,7 +147,7 @@ rule combine_kraken:
 					id_table = tempdf
 			else:
 					id_table = id_table.append(tempdf)
-		id_table.to_csv(f"{{output}}", sep = "\t", index = False)
+		id_table.to_csv(f\"{{output}}\", sep = \"\\t\", index = False)
 		subprocess.run(f"sed -i 's/%[0-9]/%/g' {{output}}", shell=True)
 """)
 		else:
@@ -205,7 +204,7 @@ rule combine_seqdata:
 				seqdata = seqdata.append(df)
 		seqdata['Quality'] = numpy.where(seqdata['Estimated depth'] >= 40, 'PASS','FAIL')
 		seqdata = seqdata[['Isolate','Reads','Yield','GC content','Min len','Avg len','Max len','Avg Qual','Estimated depth', 'Quality']]
-		seqdata.to_csv(f"{{output}}", sep = '\t', index = False)
+		seqdata.to_csv(f"{{output}}", sep = '\\t', index = False)
 		
 
 """)
@@ -329,7 +328,7 @@ rule calculate_iqtree_command_{alntype}:
 		'run_iqtree_{alntype}.sh'
 	run:
 		from Bio import SeqIO
-		import pathlib
+		import pathlib, subprocess
 		ref = pathlib.Path(REFERENCE)
 		name = ref.stem
 		if '.fa' not in REFERENCE:
@@ -339,7 +338,9 @@ rule calculate_iqtree_command_{alntype}:
 		else:
 			ref = f"{{ref}}"
 		
-		shell("bash {script_path}/iqtree_generator.sh {{ref}} {{input[0]}} {alntype} 20 > {{output}}")
+		subprcoess.run(\"bash {script_path}/iqtree_generator.sh {{ref}} {{input[0]}} {alntype} 20 > {{output}}\", shell = True)
+
+		subprocess.run(f\"samtools faidx {{ref}}\", shell = True)
 
 rule run_iqtree_{alntype}:
 	input:
@@ -359,6 +360,7 @@ rule run_iqtree_{alntype}:
 		
 	""")
 
+	
 	
 
 	def write_assemblies(self, prefillpath = '', assembler = 'skesa'):
@@ -594,15 +596,14 @@ cp resistome.tab report/resistome.tab
 		rcmd = f"""cp pan_genome.svg report/pan_genome.svg
 cp roary/summary_statistics.txt report/summary_statistics.txt
 """
-		cmd = f"""
-"""
+		
 		r_dict = {
 			's' : f"""
 		{run_string}
 		{coretxt}
 		cmd = f\"""
 {cmdstring}{scmd}
-		\"""
+\"""
 		subprocess.run(cmd, shell = True)
 """,
 			'a' : f"""
@@ -610,7 +611,7 @@ cp roary/summary_statistics.txt report/summary_statistics.txt
 		{assemblystatstring}
 		cmd = f\"""
 {cmdstring}{acmd}
-		\"""
+\"""
 		subprocess.run(cmd, shell = True)
 """,
 			'sa' : f"""
@@ -619,7 +620,7 @@ cp roary/summary_statistics.txt report/summary_statistics.txt
 		{assemblystatstring}
 		cmd = f\"""
 {cmdstring}{scmd}{acmd}
-		\"""
+\"""
 		subprocess.run(cmd, shell = True)
 """,
 			'all' : f"""

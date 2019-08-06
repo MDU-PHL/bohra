@@ -528,8 +528,8 @@ class Report:
             display = f""
         
         if run_kraken and pipeline!='s':
-            tables = tables.append('species-identification')
-            modaltables = modaltables.append('species-identification')
+            tables.append('species-identification')
+            modaltables.append('species-identification')
         tables.append('versions')
         # get versions of software
         versions_td = {'file': 'software_versions.tab', 'title': 'Tools', 'type': 'versions', 'link':'versions'}
