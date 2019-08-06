@@ -690,6 +690,8 @@ class RunSnpDetection(object):
             else:
                 if self.force:
                     force = f"-F"
+                else:
+                    force = f""
                 self.log_messages('info', f"snakemake -j {self.jobs} {force} 2>&1 | tee -a job.log")
             self.log_messages('info', f"Have a nice day. Come back soon.") 
             self.log_messages('info',f"{60 * '='}")
