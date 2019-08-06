@@ -461,7 +461,8 @@ class Report:
         '''
 
         # set up paths variables
-        
+        p = pathlib.Path('.')
+        print(sorted(p.glob('*.fa*')))
         # path to report data
         reportdir = pathlib.Path(workdir,'report')
         reporthtml = reportdir / 'report.html'
@@ -510,7 +511,7 @@ class Report:
         elif pipeline == 'sa':
             a_td.extend(s_td)
             td.extend(a_td)
-            tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data'], 
+            tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data']
             modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data']
             display = f""
             # td.extend(s_td)
@@ -518,15 +519,11 @@ class Report:
             # a_ll = td.extend()
             roary_td = [{'file':'summary_statistics.txt', 'title':'Pan Genome', 'type': 'pan', 'image': f"{pathlib.Path('pan_genome.svg').open().read()}", 'link':'pan-genome'}]
             td.extend(a_td)
-            print(a_td)
             td.extend(s_td)
-            print(s_td)
             td.extend(roary_td)
-            print(roary_td)
             tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data', 'pan-genome']
             modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data']
             display = f""
-        
         if run_kraken and pipeline!='s':
             tables.append('species-identification')
             modaltables.append('species-identification')

@@ -15,6 +15,7 @@ now = config['now']
 REFERENCE = config['reference']
 
 
+
 """)
 
 	
@@ -26,6 +27,8 @@ REFERENCE = config['reference']
 		\"report/species_identification.tab\",
 		\"species_identification.tab\""""
 		sstring = f"""
+		\"ref.fa\",
+		\"ref.fa.fai\",
 		expand(\"{{sample}}/snps.vcf\", sample = SAMPLE),
  		expand(\"{{sample}}/snps.aligned.fa\", sample = SAMPLE),
 		\"core.vcf\", 
@@ -317,15 +320,14 @@ rule run_snpdists:
 		\"""
 	""")
 
-
-	def write_tree(self, script_path, alntype):
+	def write_convert_and_index(self):
 		return(f"""
-rule calculate_iqtree_command_{alntype}:
+rule index_reference:
 	input:
-		'{alntype}.aln',
 		REFERENCE
 	output:
-		'run_iqtree_{alntype}.sh'
+		\"ref.fa\",
+		\"ref.fa.fai\"
 	run:
 		from Bio import SeqIO
 		import pathlib, subprocess
@@ -333,14 +335,24 @@ rule calculate_iqtree_command_{alntype}:
 		name = ref.stem
 		if '.fa' not in REFERENCE:
 			print(f"converting {{REFERENCE}}")
-			SeqIO.convert(f"{{input[1]}}", 'genbank', f"{{name}}.fa", 'fasta')
-			ref = f"{{name}}.fa"
+			SeqIO.convert(f"{{input[1]}}", 'genbank', {{output[0]}}, 'fasta')
 		else:
-			ref = f"{{ref}}"
-		
-		subprcoess.run(\"bash {script_path}/iqtree_generator.sh {{ref}} {{input[0]}} {alntype} 20 > {{output}}\", shell = True)
+			subprocess.run(\"ln -sf {{REFERENCE}} {{output[0]}}\", shell = True)
+		subprocess.run(\"samtools faidx {{output[0]}}\", shell =True)
+""")
 
-		subprocess.run(f\"samtools faidx {{ref}}\", shell = True)
+	def write_tree(self, script_path, alntype):
+		return(f"""
+rule calculate_iqtree_command_{alntype}:
+	input:
+		'{alntype}.aln',
+		\"ref.fa\"
+	output:
+		'run_iqtree_{alntype}.sh'
+	shell:
+		\"bash {script_path}/iqtree_generator.sh {{input[1]}} {{input[0]}} {alntype} 20 > {{output}}\"
+
+	
 
 rule run_iqtree_{alntype}:
 	input:

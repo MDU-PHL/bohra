@@ -597,7 +597,7 @@ class RunSnpDetection(object):
         pipelinelist = [p.write_all(run_kraken = self.run_kraken,pipeline = self.pipeline), p.write_seqdata(), p.write_estimate_coverage(),p.write_generate_yield(script_path),p.write_combine_seqdata()]
 
         # for just snps contains snippy, snippy-core, dists and tree
-        snps_pipeline = [p.write_snippy(), p.write_qc_snippy_initial(), p.write_snippy_core(mask = maskstring), p.write_snp_dists(), p.write_tree(script_path=script_path, alntype='core')]
+        snps_pipeline = [p.write_snippy(), p.write_qc_snippy_initial(), p.write_snippy_core(mask = maskstring), p.write_snp_dists(), p.write_convert_and_index(), p.write_tree(script_path=script_path, alntype='core')]
         # for just assemblies
         assembly_pipeline = [p.write_assemblies(prefillpath = self.prefillpath), p.write_resistome(), p.write_mlst(),p.write_kraken(prefillpath = self.prefillpath, run_kraken = self.run_kraken), p.write_combine(), p.write_assembly_stats(script_path), p.write_prokka(), p.write_gff_summary(), p.write_combine_kraken(run_kraken = self.run_kraken)]
         # for roary
