@@ -18,10 +18,13 @@ REFERENCE = config['reference']
 """)
 
 	
-	def write_all(self, pipeline = 'sa'):
+	def write_all(self, pipeline = 'sa', run_kraken):
 		base = f"""	expand(\"{{sample}}/seqdata.tab\", sample = SAMPLE),
 		\"report/seqdata.tab\""""
-
+		kstring = f"""
+		expand(\"{{sample}}/kraken.tab\", sample = SAMPLE),
+		\"report/species_identification.tab\",
+		\"species_identification.tab\""""
 		sstring = f"""
 		expand(\"{{sample}}/snps.vcf\", sample = SAMPLE),
  		expand(\"{{sample}}/snps.aligned.fa\", sample = SAMPLE),
@@ -35,19 +38,18 @@ REFERENCE = config['reference']
 
 		astring = f"""
 		expand(\"{{sample}}/{{sample}}.fa\", sample = SAMPLE),
-		expand(\"{{sample}}/kraken.tab\", sample = SAMPLE),
 		expand(\"{{sample}}/resistome.tab\", sample = SAMPLE),
 		expand(\"prokka/{{sample}}/{{sample}}.gff\", sample = SAMPLE),
 		expand(\"prokka/{{sample}}/{{sample}}.txt\", sample = SAMPLE),
 		\"mlst.tab\", 
-		\"species_identification.tab\",
 		\"denovo.tab\", 
 		\"assembly.tab\", 
 		\"resistome.tab\",
 		\"report/assembly.tab\",
 		\"report/mlst.tab\", 
-		\"report/species_identification.tab\", 
 		\"report/resistome.tab\""""
+		
+		astring = f"{astring},{kstring}" if run_kraken else astring
 
 		rstring= f"""
 		\"roary/gene_presence_absence.csv\", 
@@ -92,11 +94,7 @@ rule seqdata:
 
 	def write_kraken(self, prefillpath = '', run_kraken):
 		if run_kraken:
-			cmd = f"kraken2 --paired {{input[0]}} {{input[1]}} --memory-mapping --minimum-base-quality 13 --report {{output}}"
-		else:
-			cmd = f"echo Kraken2 not run - DB missing > {{output}}"
-
-		return(f"""
+			return(f"""
 rule kraken:
 	input:
 		'READS/{{sample}}/R1.fq.gz',
@@ -132,27 +130,19 @@ rule combine_kraken:
 		for k in kfiles:
 			kraken = pathlib.Path(k)
 			df = pandas.read_csv(kraken, sep = "\t", header =None)
-			if len(df.columns == 6):
-				df = df.rename(columns = {{0:'percentage', 1:'frag1', 2:'frag2',3:'code',4:'taxon',5:'name'}}))
-				df['percentage'] = df['percentage'].apply(lambda x:float(x.strip('%')) if isinstance(x, str) == True else float(x)) #remove % from columns
-				df = df.sort_values(by = ['percentage'], ascending = False)
-				df = df[df['code'].isin(['U','S'])]     
-				df = df.reset_index(drop = True) 
-				tempdf = pandas.DataFrame()
-				d = {{'Isolate': f"{{kraken.parts[0]}}",    
-						'#1 Match': df.ix[0,'name'].strip(), '%1': df.ix[0,'percentage'],
-						'#2 Match': df.ix[1,'name'].strip(), '%2': df.ix[1,'percentage'],       
-						'#3 Match': df.ix[2,'name'].strip(), '%3': df.ix[2,'percentage'] ,
-						'#4 Match': df.ix[3,'name'].strip(), '%4': df.ix[3,'percentage']
-						}}
-				
-			else:
-				d = {{'Isolate': f"{{kraken.parts[0]}}",    
-						'#1 Match': 'kraken not performed', '%1': '-',
-						'#2 Match': '-', '%2': '-',       
-						'#3 Match': '-', '%3': '-',
-						'#4 Match': '-', '%4': '-'
-						}}
+			df = df.rename(columns = {{0:'percentage', 1:'frag1', 2:'frag2',3:'code',4:'taxon',5:'name'}}))
+			df['percentage'] = df['percentage'].apply(lambda x:float(x.strip('%')) if isinstance(x, str) == True else float(x)) #remove % from columns
+			df = df.sort_values(by = ['percentage'], ascending = False)
+			df = df[df['code'].isin(['U','S'])]     
+			df = df.reset_index(drop = True) 
+			tempdf = pandas.DataFrame()
+			d = {{'Isolate': f"{{kraken.parts[0]}}",    
+					'#1 Match': df.ix[0,'name'].strip(), '%1': df.ix[0,'percentage'],
+					'#2 Match': df.ix[1,'name'].strip(), '%2': df.ix[1,'percentage'],       
+					'#3 Match': df.ix[2,'name'].strip(), '%3': df.ix[2,'percentage'] ,
+					'#4 Match': df.ix[3,'name'].strip(), '%4': df.ix[3,'percentage']
+					}}
+		
 			tempdf = pandas.DataFrame(data = d, index= [0])
 			if id_table.empty:
 					id_table = tempdf

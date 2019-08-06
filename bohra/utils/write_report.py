@@ -500,7 +500,7 @@ class Report:
         elif pipeline == 'a':
             td.extend(a_td)
             tables =['mlst', 'assembly', 'resistome', 'sequence-data','species-identification', 'versions']
-            modaltables = tables
+            modaltables = ['mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
             display = f"display:none;"
         elif pipeline == 'sa':
             a_td.extend(s_td)
