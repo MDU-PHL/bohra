@@ -90,7 +90,12 @@ rule seqdata:
 		\"""
 """)
 
-	def write_kraken(self, prefillpath = ''):
+	def write_kraken(self, prefillpath = '', run_kraken):
+		if run_kraken:
+			cmd = f"kraken2 --paired {{input[0]}} {{input[1]}} --memory-mapping --minimum-base-quality 13 --report {{output}}"
+		else:
+			cmd = f"echo Kraken2 not run - DB missing > {{output}}"
+
 		return(f"""
 rule kraken:
 	input:
@@ -105,14 +110,16 @@ rule kraken:
 		if [ -f $KRAKENPATH ]; then
 			cp $KRAKENPATH {{output}}
 		else
-			kraken2 --paired {{input[0]}} {{input[1]}} --memory-mapping --minimum-base-quality 13 --report {{output}} 
+			{cmd}
 		fi
 		\"""
 		
 """)
 
+
 	def write_combine_kraken(self):
-		return(f"""
+		if run_kraken:
+			return(f"""
 rule combine_kraken:
 	input: 
 		expand("{{sample}}/kraken.tab", sample = SAMPLE)
@@ -124,19 +131,28 @@ rule combine_kraken:
 		id_table = pandas.DataFrame()
 		for k in kfiles:
 			kraken = pathlib.Path(k)
-			
-			df = pandas.read_csv(kraken, sep = "\t", header =None, names =  ['percentage', 'frag1', 'frag2','code','taxon','name'])
-			df['percentage'] = df['percentage'].apply(lambda x:float(x.strip('%')) if isinstance(x, str) == True else float(x)) #remove % from columns
-			df = df.sort_values(by = ['percentage'], ascending = False)
-			df = df[df['code'].isin(['U','S'])]     
-			df = df.reset_index(drop = True) 
-			tempdf = pandas.DataFrame()
-			d = {{'Isolate': f"{{kraken.parts[0]}}",    
-					'#1 Match': df.ix[0,'name'].strip(), '%1': df.ix[0,'percentage'],
-					'#2 Match': df.ix[1,'name'].strip(), '%2': df.ix[1,'percentage'],       
-					'#3 Match': df.ix[2,'name'].strip(), '%3': df.ix[2,'percentage'] ,
-					'#4 Match': df.ix[3,'name'].strip(), '%4': df.ix[3,'percentage']
-					}}
+			df = pandas.read_csv(kraken, sep = "\t", header =None)
+			if len(df.columns == 6):
+				df = df.rename(columns = {{0:'percentage', 1:'frag1', 2:'frag2',3:'code',4:'taxon',5:'name'}}))
+				df['percentage'] = df['percentage'].apply(lambda x:float(x.strip('%')) if isinstance(x, str) == True else float(x)) #remove % from columns
+				df = df.sort_values(by = ['percentage'], ascending = False)
+				df = df[df['code'].isin(['U','S'])]     
+				df = df.reset_index(drop = True) 
+				tempdf = pandas.DataFrame()
+				d = {{'Isolate': f"{{kraken.parts[0]}}",    
+						'#1 Match': df.ix[0,'name'].strip(), '%1': df.ix[0,'percentage'],
+						'#2 Match': df.ix[1,'name'].strip(), '%2': df.ix[1,'percentage'],       
+						'#3 Match': df.ix[2,'name'].strip(), '%3': df.ix[2,'percentage'] ,
+						'#4 Match': df.ix[3,'name'].strip(), '%4': df.ix[3,'percentage']
+						}}
+				
+			else:
+				d = {{'Isolate': f"{{kraken.parts[0]}}",    
+						'#1 Match': 'kraken not performed', '%1': '-',
+						'#2 Match': '-', '%2': '-',       
+						'#3 Match': '-', '%3': '-',
+						'#4 Match': '-', '%4': '-'
+						}}
 			tempdf = pandas.DataFrame(data = d, index= [0])
 			if id_table.empty:
 					id_table = tempdf
@@ -145,6 +161,8 @@ rule combine_kraken:
 		id_table.to_csv(f"{{output}}", sep = "\t", index = False)
 		subprocess.run(f"sed -i 's/%[0-9]/%/g' {{output}}", shell=True)
 """)
+		else:
+			return('')
 	def write_estimate_coverage(self):
 		return(f"""
 rule estimate_coverage:
@@ -187,7 +205,7 @@ rule combine_seqdata:
 		seqdata = pandas.DataFrame()
 		for sd in sdfiles:
 			p = pathlib.Path(sd)
-			df = pandas.read_csv(sd, sep = "\t")
+			df = pandas.read_csv(sd, sep = "\\t")
 			print(df)
 			df['Isolate'] = f\"{{p.parts[0]}}\"
 			

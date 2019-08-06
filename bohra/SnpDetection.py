@@ -71,7 +71,7 @@ class RunSnpDetection(object):
         self.dryrun = args.dryrun
         self.pipeline = args.pipeline
         self.cpus = args.cpus
-        
+        self.run_kraken = False
         self.assembler = args.assembler
         self.snippy_version = ''
         self.assembler_dict = {'shovill': 'shovill', 'skesa':'skesa','spades':'spades.py'}
@@ -201,6 +201,35 @@ class RunSnpDetection(object):
 
         self.check_installation('roary')
 
+    def check_size_file(self, path):
+        '''
+        check the size of a file
+        '''
+        s = path().st_size
+        if s > 0:
+            return True
+        else:
+            return False
+
+    def check_kraken2DB(self):
+        '''
+        ensure that DB is present and not emtpy
+        '''
+
+        if "KRAKEN2_DEFAULT_DB" in os.environ:
+            k2db = pathlib.Path(f"{os.environ["KRAKEN2_DEFAULT_DB"]}")
+            if k2db.is_dir():
+                kmerfiles = sorted(k2db.glob('*.kmer_distrib'))
+                dbfiles = sorted(k2db.glob('*.k2d'))
+                if len(kmerfiles) == len(dbfiles) == 3:
+                    s = []
+                    for k in range(3):
+                        s.append(self.check_size_file( k2db / kmerfiles[k] ))
+                        s.append(self.check_size_file( k2db / dbfiles[k] ))
+                    if 0 not in s:
+                        self.run_kraken = True
+        self.log_messages('message',f"Congratulations your kraken database is present") if self.run_kraken else self.log_messages('warning', f"Your kraken DB is not installed in the expected path. Speciation will not be performed. If you would like to perform speciation in future please re-read bohra installation instructions.")
+            
 
     def check_deps(self):
         '''
@@ -217,6 +246,7 @@ class RunSnpDetection(object):
         if self.pipeline != 's':
             self.check_assembler()
             self.check_assemble_accesories()
+            self.check_kraken2DB()
         if self.pipeline == 'all':
             self.check_roary()
         
@@ -577,7 +607,7 @@ class RunSnpDetection(object):
         # for just snps contains snippy, snippy-core, dists and tree
         snps_pipeline = [p.write_snippy(), p.write_qc_snippy_initial(), p.write_snippy_core(mask = maskstring), p.write_snp_dists(), p.write_tree(script_path=script_path, alntype='core')]
         # for just assemblies
-        assembly_pipeline = [p.write_assemblies(prefillpath = self.prefillpath), p.write_resistome(), p.write_mlst(),p.write_kraken(prefillpath = self.prefillpath), p.write_combine(), p.write_assembly_stats(script_path), p.write_prokka(), p.write_gff_summary(), p.write_combine_kraken()]
+        assembly_pipeline = [p.write_assemblies(prefillpath = self.prefillpath), p.write_resistome(), p.write_mlst(),p.write_kraken(prefillpath = self.prefillpath, run_kraken = self.run_kraken), p.write_combine(), p.write_assembly_stats(script_path), p.write_prokka(), p.write_gff_summary(), p.write_combine_kraken(run_kraken = self.run_kraken)]
         # for roary
         roary_pipeline = [p.write_roary(), p.write_pan_graph(script_path = script_path)]
 

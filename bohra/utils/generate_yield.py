@@ -4,7 +4,7 @@ import pandas, re, pathlib, sys
 
 
 def get_data(output):
-#    print(seqtkdata[0])
+#    print(seqtkdata[0]
     summary_pat = re.compile(r'(\w+):\s(\d+\.?\d?\d?);')
     distinct_values = re.compile(r';\s(\d+)\s\w+')
     record = re.compile(r'(\d+\.?\d?\d?)')
@@ -33,6 +33,7 @@ def get_coverage(mashdata):
 
 def main(pathtoseqtkdata, pathtomashdata, outputpath):
     output = pathlib.Path(f"{pathtoseqtkdata}").open().readlines()
+    print(output)
     seqtkdata = get_data(output)
     df = pandas.DataFrame(data = seqtkdata, index = [0])
     df = df[['Reads','bases','GC content','min_len', 'avg_len', 'max_len','avgQ']]
