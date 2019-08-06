@@ -48,7 +48,7 @@ REFERENCE = config['reference']
 		\"report/assembly.tab\",
 		\"report/mlst.tab\", 
 		\"report/resistome.tab\""""
-		
+
 		astring = f"{astring},{kstring}" if run_kraken else astring
 
 		rstring= f"""
@@ -539,7 +539,7 @@ rule combine_assembly_metrics:
 
 
 """)
-	def io_collation(self):
+	def io_collation(self, run_kraken):
 		i = f"'seqdata.tab'"
 		o = f"'report/seqdata.tab'"
 		# snps input string
@@ -547,16 +547,16 @@ rule combine_assembly_metrics:
 		# snps output string
 		so = f"'report/core_genome.tab', 'report/core.treefile','report/distances.tab','report/core.tab'"
 		# assembly input string
-		ai = f"'assembly.tab', 'mlst.tab', 'species_identification.tab', 'resistome.tab'"
+		ai = f"'assembly.tab', 'mlst.tab', 'species_identification.tab', 'resistome.tab'" if run_kraken else f"'assembly.tab', 'mlst.tab', 'resistome.tab'"
 		# assembly output string
-		ao = f"'report/assembly.tab', 'report/mlst.tab', 'report/species_identification.tab', 'report/resistome.tab'"
+		ao = f"'report/assembly.tab', 'report/mlst.tab', 'report/species_identification.tab', 'report/resistome.tab'" if run_kraken else f"'report/assembly.tab', 'report/mlst.tab',  'report/resistome.tab'" 
 		# roary input
 		ri = f"'pan_genome.svg', 'roary/summary_statistics.txt'"
 		# roary output 
 		ro = f"'report/pan_genome.svg', 'report/summary_statistics.txt'"
 		# input string based on pipeline value
 		return(i,o,si,so,ai,ao,ri,ro)
-	def run_setup(self):
+	def run_setup(self, run_kraken):
 		
 		run_string = f"""
 		import pandas, pathlib, subprocess, numpy
@@ -585,11 +585,12 @@ rule combine_assembly_metrics:
 		scmd = f"""cp core.treefile report/core.treefile
 cp distances.tab report/distances.tab
 cp core.tab report/core.tab
-"""
+"""		
+		kcmd = f"cp species_identification.tab report/species_identification.tab"
 		acmd = f"""cp mlst.tab report/mlst.tab
-cp species_identification.tab report/species_identification.tab
 cp resistome.tab report/resistome.tab
 """
+		acmd = f"{acmd}{kcmd}" if run_kraken else acmd
 		rcmd = f"""cp pan_genome.svg report/pan_genome.svg
 cp roary/summary_statistics.txt report/summary_statistics.txt
 """
@@ -633,9 +634,9 @@ cp roary/summary_statistics.txt report/summary_statistics.txt
 		return(r_dict)
 
 
-	def write_report_collation(self, pipeline = 'sa'):
+	def write_report_collation(self,run_kraken, pipeline = 'sa'):
 		# input string always starts with seqdata and output string always starts with seqdata
-		i,o,si,so,ai,ao,ri,ro = self.io_collation()
+		i,o,si,so,ai,ao,ri,ro = self.io_collation(run_kraken = run_kraken)
 		
 		io_dict = {
 			's' : {
@@ -655,7 +656,7 @@ cp roary/summary_statistics.txt report/summary_statistics.txt
 				'output':f"{o}, {ao}, {so}, {ro}"
 			}
 		}
-		r_dict = self.run_setup()
+		r_dict = self.run_setup(run_kraken = run_kraken)
 		input_string = io_dict[pipeline]['input']
 		output_string = io_dict[pipeline]['output']
 		run_string = r_dict[pipeline]
@@ -669,10 +670,10 @@ rule collate_report:
 		{run_string}
 """)
 
-	def write_html(self, workdir, resources, job_id, script_path,assembler, pipeline = 'sa'):
+	def write_html(self, workdir, resources, job_id, script_path,assembler, run_kraken, pipeline = 'sa'):
 		seq = f"'report/seqdata.tab'"
 		s = f"'report/core_genome.tab', 'report/core.treefile', 'report/distances.tab'"
-		a = f"'report/assembly.tab','report/mlst.tab', 'report/species_identification.tab','report/resistome.tab'"
+		a = f"'report/assembly.tab','report/mlst.tab', 'report/species_identification.tab','report/resistome.tab'" if run_kraken else f"'report/assembly.tab','report/mlst.tab', 'report/resistome.tab'"
 		r = f"'report/pan_genome.svg', 'report/summary_statistics.txt'"
 		if pipeline == 's':
 			input_string = f"{seq},{s}"
@@ -693,7 +694,7 @@ rule write_html_report:
 	
 	shell:
 		\"""
-		python3 {script_path}/write_report.py {wd_string} {resources} {pipeline} {job_id} {assembler}
+		python3 {script_path}/write_report.py {wd_string} {resources} {pipeline} {job_id} {assembler} {run_kraken}
 		\"""
 """)
 	

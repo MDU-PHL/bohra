@@ -204,6 +204,8 @@ class Report:
             body = body + row
         return('\n'.join(tablehead),'\n'.join(body))
 
+    
+
     def get_table_data(self,reportdir, td):
         '''
         input:
@@ -421,6 +423,7 @@ class Report:
                 species = pandas.read_csv(tab, sep = '\t')
                 species = species[['Isolate', '#1 Match']]
                 summary_df = self.merge_dfs(summary_df, species)
+                summary_df = summary_df.rename(columns={'#1 Match': 'Species'})
             elif 'seqdata' in f"{tab}":
                 seq = pandas.read_csv(tab, sep = '\t')
                 seq = seq[['Isolate', 'Estimated depth']]
@@ -440,12 +443,12 @@ class Report:
                 summary_df = self.merge_dfs(summary_df, core)
         # print(mlst)
         # print(summary_df)
-        summary_df = summary_df.rename(columns={'#1 Match': 'Species'})
+        
         summary_file = reportdir / 'summary_table.tab'
         summary_df.to_csv(summary_file, sep = '\t', index = False)
         
 
-    def main(self,workdir, resources, job_id, assembler = 'shovill', gubbins = False, pipeline = 'sa'):
+    def main(self,workdir, resources, job_id, run_kraken=True, assembler = 'shovill', gubbins = False, pipeline = 'sa'):
         '''
         main function of the report class ties it all together
         input:
@@ -488,25 +491,27 @@ class Report:
         # list of assembly tasks
         assembly_stat_td = {'file': 'assembly.tab', 'title':'Assembly', 'type':'table', 'link':'assembly'}
         a_td = [assembly_stat_td, species_id_td, mlst_td, resistome_td]
-        
+        if run_kraken:
+            a_td.append(species_id_td)
         # print(roary_td)
         # print(pipeline)
         # print(td)
+        
         if pipeline == 's':
             td.extend(s_td)
-            tables =['core-genome', 'snp-distances', 'sequence-data', 'versions']
+            tables =['core-genome', 'snp-distances', 'sequence-data']
             modaltables =['core-genome',  'sequence-data']
             display = f"display:inline;"
         elif pipeline == 'a':
             td.extend(a_td)
-            tables =['mlst', 'assembly', 'resistome', 'sequence-data','species-identification', 'versions']
-            modaltables = ['mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
+            tables =['mlst', 'assembly', 'resistome', 'sequence-data']
+            modaltables = ['mlst', 'assembly', 'resistome', 'sequence-data']
             display = f"display:none;"
         elif pipeline == 'sa':
             a_td.extend(s_td)
             td.extend(a_td)
-            tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data','species-identification', 'versions'], 
-            modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data', 'species-identification']
+            tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data'], 
+            modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data']
             display = f""
             # td.extend(s_td)
         elif pipeline == 'all':
@@ -518,10 +523,14 @@ class Report:
             print(s_td)
             td.extend(roary_td)
             print(roary_td)
-            tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data','species-identification', 'pan-genome', 'versions']
-            modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data', 'species-identification']
+            tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data', 'pan-genome']
+            modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data']
             display = f""
-
+        
+        if run_kraken and pipeline!='s':
+            tables = tables.append('species-identification')
+            modaltables = modaltables.append('species-identification')
+        tables.append('versions')
         # get versions of software
         versions_td = {'file': 'software_versions.tab', 'title': 'Tools', 'type': 'versions', 'link':'versions'}
         td.append(versions_td)
@@ -564,4 +573,5 @@ if __name__ == '__main__':
     p = f"{sys.argv[3]}"
     i = f"{sys.argv[4]}"
     a = f"{sys.argv[5]}"
-    report.main(resources=f"{sys.argv[2]}", workdir=wd, pipeline = p, job_id = i, assembler=a)
+    k = f"{sys.argv[6]}"
+    report.main(resources=f"{sys.argv[2]}", workdir=wd, pipeline = p, job_id = i, assembler=a, run_kraken = k)
