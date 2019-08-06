@@ -337,8 +337,8 @@ rule index_reference:
 			print(f"converting {{REFERENCE}}")
 			SeqIO.convert(f"{{input[1]}}", 'genbank', {{output[0]}}, 'fasta')
 		else:
-			subprocess.run(\"ln -sf {{REFERENCE}} {{output[0]}}\", shell = True)
-		subprocess.run(\"samtools faidx {{output[0]}}\", shell =True)
+			subprocess.run(f\"ln -sf {{REFERENCE}} {{output[0]}}\", shell = True)
+		subprocess.run(f\"samtools faidx {{output[0]}}\", shell =True)
 """)
 
 	def write_tree(self, script_path, alntype):

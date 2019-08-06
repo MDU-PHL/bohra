@@ -68,7 +68,7 @@ class RunSnpDetection(object):
         else:
             self.prefillpath = ''
         self.force = args.force
-        self.dryrun = args.dryrun
+        self.dryrun = args.dry_run
         self.pipeline = args.pipeline
         self.cpus = args.cpus
         self.run_kraken = False
