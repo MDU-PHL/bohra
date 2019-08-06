@@ -401,7 +401,7 @@ class RunSnpDetection(object):
             
         if path.exists():
             if f"{path.suffix}" in ['.gz','zip']:
-                    self.reference = self.unzip_files(path)
+                    self.reference = self.unzip_files(path, f"{path.suffix}")
                     if not self.reference.exists():
                         self.log_messages('warning', f"{path} does not exist. Please try again.")
             else:
