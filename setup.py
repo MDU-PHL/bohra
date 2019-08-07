@@ -2,8 +2,8 @@ from setuptools import setup, find_packages
 import bohra
 
 
-if __name__ == '__main__':
-    setup()
+
+setup()
 
     
 # with open("README.md", "r") as fh:
