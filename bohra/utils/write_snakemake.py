@@ -331,14 +331,17 @@ rule index_reference:
 	run:
 		from Bio import SeqIO
 		import pathlib, subprocess
-		ref = pathlib.Path(REFERENCE)
-		name = ref.stem
+		ref = f\"{{output[0]}}\"
+		idx = f\"{{output[1]}}\"
+		print(type(ref))
+		print(type(idx))
 		if '.fa' not in REFERENCE:
 			print(f"converting {{REFERENCE}}")
-			SeqIO.convert(f"{{input[1]}}", 'genbank', {{output[0]}}, 'fasta')
+			SeqIO.convert(f"{{input[0]}}", 'genbank', ref, 'fasta')
+			print(f"converted {{REFERENCE}}")
 		else:
-			subprocess.run(f\"ln -sf {{REFERENCE}} {{output[0]}}\", shell = True)
-		subprocess.run(f\"samtools faidx {{output[0]}}\", shell =True)
+			subprocess.run(f\"ln -sf {{REFERENCE}} {{ref}}\", shell = True)
+		subprocess.run(f\"samtools faidx {{ref}}\", shell =True)
 """)
 
 	def write_tree(self, script_path, alntype):
