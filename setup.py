@@ -3,7 +3,7 @@ import bohra
 
 
 if __name__ == '__main__':
-    setuptools.setup()
+    setup()
 
     
 # with open("README.md", "r") as fh:
