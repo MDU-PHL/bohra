@@ -30,7 +30,7 @@ class ReRunSnpDetection(RunSnpDetection):
         # path to reference => if args.reference is a string, check that it matches existing
         # set force based on args.. this will be set to true if ref is different and/or snippy version 
         self.force = False
-        
+        self.assembler_dict = {'shovill': 'shovill', 'skesa':'skesa','spades':'spades.py'}
         # get original data 
         self.get_source()
         # Reference mask and snippy
@@ -48,7 +48,7 @@ class ReRunSnpDetection(RunSnpDetection):
         else:
             self.gubbins = args.gubbins
         
-        self.dryrun = args.dryrun
+        self.dryrun = args.dry_run
         self.keep = args.keep
         
         self.assembler_dict = {'shovill': 'shovill', 'skesa':'skesa','spades':'spades.py'}
