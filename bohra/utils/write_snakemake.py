@@ -337,7 +337,7 @@ rule index_reference:
 		print(type(idx))
 		if '.fa' not in REFERENCE:
 			print(f"converting {{REFERENCE}}")
-			SeqIO.convert(f"{{input[0]}}", 'genbank', ref, 'fasta')
+			SeqIO.convert(f"{{input[0]}}", 'genbank', ref	, 'fasta')
 			print(f"converted {{REFERENCE}}")
 		else:
 			subprocess.run(f\"ln -sf {{REFERENCE}} {{ref}}\", shell = True)

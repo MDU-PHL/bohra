@@ -503,6 +503,7 @@ $('button.detail-button').click(function(){
         } else if (section == 'core-genome'){
           // put snp-density in here
             var x = {{ snpdensity | tojson}};
+            
             // var y = {{genomebreaks | safe}};
             var max_x = Math.max(x);
             var bin_size = max_x / 100;

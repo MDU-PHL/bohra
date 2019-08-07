@@ -129,7 +129,7 @@ class Tree:
         f = 10/maxlength # factor to multiply the
         # a drawing object
         # viewbox is calculated based on 1cm = 37.8 pixels
-        svg_text = [f"<svg baseProfile=\"full\" version=\"1.1\" viewBox=\"-37.8,{(minheight*37.8)-37.8},1000,{(maxheight*37.8)-37.8}\" ><defs />\""]
+        svg_text = [f"<svg baseProfile=\"full\" version=\"1.1\" viewBox=\"-37.8,{(minheight*37.8)-37.8},1000,{(maxheight*37.8)+37.8}\" ><defs />\""]
         
         for t in tree_coords:
             if t['type'] == 'horizontal':
@@ -252,7 +252,7 @@ class Report:
         # show(p)
         return(script,div)
 
-    def plot_snpdensity(self,reportdir):
+    def plot_snpdensity(self,reportdir, workdir):
 
         '''
         generate a snp-density accross the genome plot - using the core.tab file
@@ -262,26 +262,44 @@ class Report:
             :snpdensityscript: the javascript string for insert into html
             :snpdenstiydiv: the html div for inster in html doc
         '''
+        # helper functions for getting the data into the right format.
+        def adjust_offset(row, d):
+            return(int(d[row['CHR']]) + int(row['POS']))
 
-        # open fai file
-        core = reportdir / 'core.tab'
+        def generate_dict(idx_file):
+            d = {}
+            pos = 0
+            offset = 0
+            with open(f"{idx_file}") as f:
+                for line in f:
+                    l = line.split()
+                    d[l[0]] = offset
+                    offset = offset + int(l[1])
+            return(d)
         
+        # open fai file and generate the dictionary
+        idx = pathlib.Path(workdir ,'ref.fa.fai')
+        d = generate_dict(idx)
+        # get the core file
+        core = reportdir / 'core.tab'
         df = pandas.read_csv(core, sep = '\t')
         # get a list of isolate names
         names = list(df.columns[3:len(df.columns)])
         # if the there is no snp in the isolate (ie same as ref then mak na - then easy to drop)
         for i in names:
                 df[i]=numpy.where(df['REF'] == df[i], numpy.nan, df[i])
+        # generate the offset value
+        df['POS_OFFSET'] = df[['CHR', 'POS']].apply(lambda x:adjust_offset(x,d), axis = 1)
         # collect positions to get allow for histogram and dropna (no snp)
-        melted_df = pandas.melt(df, id_vars=['POS'], value_vars=names)
+        melted_df = pandas.melt(df, id_vars=['POS_OFFSET'], value_vars=names)
         melted_df = melted_df.dropna()
-        melted_df = melted_df.sort_values(by= ['POS'])
+        melted_df = melted_df.sort_values(by= ['POS_OFFSET'])
         # generate histogram
         # snpdensityscript, snpdensitydiv = self.plot_histogram(series=melted_df['POS']/1000,xlabel="Genome Position (MB)", ylabel="SNPS",bins=10000)
-        
+        contig_breaks = [d[value] for value in d]
         
         # return dictionary
-        return(list(melted_df['POS']/1000))
+        return(list(melted_df['POS_OFFSET']/1000))
 
     def plot_distances(self,reportdir):
 
@@ -549,7 +567,7 @@ class Report:
                 td[t]['head'], td[t]['body'] = self.write_tables(reportdir=reportdir, table=td[t]['file'])
                 snpdistances = self.plot_distances(reportdir=reportdir)
             if td[t]['link'] == 'snp-density':
-                snpdensity= self.plot_snpdensity(reportdir= reportdir)
+                snpdensity= self.plot_snpdensity(reportdir= reportdir, workdir=workdir)
             if td[t]['type'] == 'versions':
                 td[t]['head'], td[t]['body'] = self.write_tables(reportdir=reportdir, table=td[t]['file'])
             if td[t]['type'] == 'summary':
@@ -559,7 +577,7 @@ class Report:
         # fill template
         date = datetime.datetime.today().strftime("%d/%m/%y")
         report_template = jinja2.Template(pathlib.Path(indexhtml).read_text())
-        reporthtml.write_text(report_template.render(display = display,tables = tables,td = td, job_id = job_id, pipeline = pipeline, snpdistances=snpdistances, snpdensity = snpdensity, modaltables = modaltables, date = date))
+        reporthtml.write_text(report_template.render( display = display,tables = tables,td = td, job_id = job_id, pipeline = pipeline, snpdistances=snpdistances, snpdensity = snpdensity, modaltables = modaltables, date = date))
     #    TODO pass a list of links for the javascript section called 'table'
     # TODO pass the value of the graphs as separate variable 
         return(True)
