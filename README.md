@@ -283,6 +283,7 @@ snakemake -j 10 --cluster-config cluster.json --cluster "sbatch -A {cluster.acco
 ```
 where `--cluster-config` refers to the `cluster.json` file, and `{cluster.XXX}` refers to the value in the `cluster.json` file. 
 It is important to remember that any setting reffered to in the `run_snakemake.sh` script MUST appear in the `__default__` section of `cluster.json` at a minimum. The settings outlined here are examples and may need to be modified for your setup. Finally, the command that follows `--cluster` will also need to be modified depending upon your queuing system.
+In addition, the value that follows `-j`, when running Bohra in `--cluster` mode indicates the number of jobs to launch at a time, rather than the total amount of resources.
 
 
 
