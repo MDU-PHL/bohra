@@ -49,9 +49,15 @@ class RunSnpDetection(object):
         # other variables
         # min aln 
         self.minaln = args.minaln
-        # set threads
-        
+        # cluster settings
+        self.cluster = args.cluster
         # user
+        if self.cluster:
+            self.json = args.json
+            self.run_snake = args.run_snake
+            self.check_cluster_reqs()
+            self.set_cluster_log()
+
         self.user = getpass.getuser()
         # gubbins TODO add back in later!!
         # if not args.gubbins:
@@ -76,6 +82,28 @@ class RunSnpDetection(object):
         self.snippy_version = ''
         self.assembler_dict = {'shovill': 'shovill', 'skesa':'skesa','spades':'spades.py'}
         self.set_snakemake_jobs()
+
+    
+    def check_cluster_reqs(self):
+        '''
+        check that the cluster.json and run snakemake files are present for running in a HPC environment
+        '''
+        if self.json == '':
+            self.log_messages('warning', f"The cluster.json file can not be empty. Please provide a valid file.")
+            raise SystemExit
+        if self.run_snake == '':
+            self.log_messages('warning', f"The run_snakemake.sh file can not be empty. Please provide a valid file.")
+            raise SystemExit
+        self.json = pathlib.Path(self.json)
+        self.run_snake = pathlib.Path(self.run_snake)
+
+        if self.json.exists() and self.run_snake.exists():
+            self.json = pathlib.Path(self.link_file(self.json))
+            self.run_snake = pathlib.Path(self.link_file(self.run_snake))
+        else:
+            self.log_messages('warning', f"Please check the paths to {self.json} and {self.run_snake}. You must provide valid paths.")
+            raise SystemExit
+
 
     def set_snakemake_jobs(self):
         '''
@@ -274,7 +302,20 @@ class RunSnpDetection(object):
             else:
                 self.ref = self.link_file(self.ref)
         
-            
+    def set_cluster_log(self):
+        '''
+        save the details of cluster configurations
+        '''
+        new_df = pandas.DataFrame({'cluster_json': f"{self.json}", 'run_snake': f"{self.run_snake}",'Date':self.day}, index = [0])
+        cluster_log = self.workdir / 'cluster.log'
+        if cluster_log.exists():
+            cluster_df = pandas.read_csv(cluster_log, '\t')
+           cluster_df = source_df.append(new_df)
+        else:
+            cluster_df = new_df
+        
+        cluster_df.to_csv(cluster_log , index=False, sep = '\t')
+
 
     def set_source_log(self):
         '''
@@ -284,9 +325,9 @@ class RunSnpDetection(object):
         '''   
         new_df = pandas.DataFrame({'JobID':self.job_id, 'Reference':f"{self.ref}",'Mask':f"{self.mask}", 
                                     'MinAln':self.minaln, 'Pipeline': self.pipeline, 'CPUS': self.cpus, 'Assembler':self.assembler,
-                                    'Gubbins': self.gubbins, 'Date':self.day, 'User':self.user, 'snippy_version':self.snippy_version, 'input_file':f"{self.input_file}",'prefillpath': self.prefillpath}, 
+                                    'Gubbins': self.gubbins, 'Date':self.day, 'User':self.user, 'snippy_version':self.snippy_version, 'input_file':f"{self.input_file}",'prefillpath': self.prefillpath, 'cluster': self.cluster}, 
                                     index=[0], )
-
+        
         source_path = self.workdir / 'source.log'
         if source_path.exists():
             source_df = pandas.read_csv(source_path, '\t')
@@ -592,7 +633,7 @@ class RunSnpDetection(object):
 
         p = MakeWorkflow()
         self.log_messages('message', f"writing the pipeline for {self.job_id}")
-        print(self.run_kraken)
+        
         # pipeline always has seqdata in 
         pipelinelist = [p.write_all(run_kraken = self.run_kraken,pipeline = self.pipeline), p.write_seqdata(), p.write_estimate_coverage(),p.write_generate_yield(script_path),p.write_combine_seqdata()]
 
@@ -675,11 +716,18 @@ class RunSnpDetection(object):
         else:
             force = f""
         os.chdir(self.workdir)
+        
         if self.dryrun:
-            cmd = f"snakemake -np -s {snake_name} 2>&1 | tee -a job.log"
+            dry = '-np'
         else:
-            cmd = f"snakemake -s {snake_name} -j {self.jobs} {force} 2>&1 | tee -a job.log"
+            dry = ''
+
+        if self.cluster:
+            cmd = f"bash {self.run_snake} 2>&1 | tee -a job.log"       
+        else:
+            cmd = f"snakemake {dry} -s {snake_name} 2>&1 | tee -a job.log"
             # cmd = f"snakemake -s {snake_name} --cores {self.cpus} {force} "
+        
         wkf = subprocess.run(cmd, shell = True)
         if wkf.returncode == 0:
             return True

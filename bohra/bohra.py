@@ -62,6 +62,10 @@ def main():
     parser_sub_run.add_argument('--resources','-s', default = f"{pathlib.Path(__file__).parent / 'templates'}", help='Directory where templates are stored')
     parser_sub_run.add_argument('--force','-f', action="store_true", help = "Add if you would like to force a complete restart of the pipeline. All previous logs will be lost.")
     parser_sub_run.add_argument('--dry-run','-n', action="store_true", help = "If you would like to see a dry run of commands to be executed.")
+    parser_sub_run.add_argument('--cluster','-clst', action="store_true", help = "If you are running Bohra on a cluster. Note if set you will need to provide a cluster.json file and a run_snakemake.sh, you can see examples on the documentation page.")
+    parser_sub_run.add_argument('--json',help='Path to cluster.json - required if --cluster is set', default='')
+    parser_sub_run.add_argument('--rs',help='Path to run_snakemake.sh - required if --cluster is set', default='')
+
     parser_sub_run.add_argument('--gubbins','-g', action="store_true", help = "If you would like to run gubbins. NOT IN USE YET - PLEASE DO NOT USE")
     # parser for rerun
     
