@@ -378,7 +378,7 @@ rule run_iqtree_{alntype}:
 	
 	
 
-	def write_assemblies(self, prefillpath = '', assembler = 'skesa'):
+	def write_assemblies(self, prefillpath = '', assembler = 'shovill'):
 		
 		if assembler == 'skesa':
 			assemble = f"skesa --fastq {{input[0]}},{{input[1]}} --vector_percent 1 --use_paired_ends --cores {{threads}} > {{output}}"
