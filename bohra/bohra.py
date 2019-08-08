@@ -64,7 +64,7 @@ def main():
     parser_sub_run.add_argument('--dry-run','-n', action="store_true", help = "If you would like to see a dry run of commands to be executed.")
     parser_sub_run.add_argument('--cluster','-clst', action="store_true", help = "If you are running Bohra on a cluster. Note if set you will need to provide a cluster.json file and a run_snakemake.sh, you can see examples on the documentation page.")
     parser_sub_run.add_argument('--json',help='Path to cluster.json - required if --cluster is set', default='')
-    parser_sub_run.add_argument('--rs',help='Path to run_snakemake.sh - required if --cluster is set', default='')
+    parser_sub_run.add_argument('--run-snake',help='Path to run_snakemake.sh - required if --cluster is set', default='')
 
     parser_sub_run.add_argument('--gubbins','-g', action="store_true", help = "If you would like to run gubbins. NOT IN USE YET - PLEASE DO NOT USE")
     # parser for rerun
@@ -79,7 +79,9 @@ def main():
     parser_sub_rerun.add_argument('--dry-run','-n', action="store_true", help = "If you would like to see a dry run of commands to be executed.")
     parser_sub_rerun.add_argument('--gubbins','-g', action="store_true", help = "If you would like to run gubbins. NOT IN USE YET - PLEASE DO NOT USE")
     parser_sub_rerun.add_argument('--keep', '-k', action= 'store_true', help="Keep report from previous run")
-    
+    parser_sub_run.add_argument('--cluster','-clst', action="store_true", help = "If you are running Bohra on a cluster. Note if set you will need to provide a cluster.json file and a run_snakemake.sh, you can see examples on the documentation page.")
+    parser_sub_run.add_argument('--json',help='Path to cluster.json - if not included will default to version provided in previous run', default='')
+    parser_sub_run.add_argument('--run-snake',help='Path to run_snakemake.sh if not included will default to version provided in previous run', default='')
     
     parser_sub_run.set_defaults(func=run_pipeline)
     
