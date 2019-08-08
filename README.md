@@ -69,6 +69,19 @@ A conda recipe for bohra will follow shortly! But for now you will need to have 
 * [seqtk](https://github.com/lh3/seqtk)
 * [snp-dists](https://github.com/tseemann/snp-dists)
 
+*IMPORTANT*
+In addition to installing kraken ensure that you have a kraken2 database. Minikraken can obtained as follows
+```
+wget ftp://ftp.ccb.jhu.edu/pub/data/kraken2_dbs/minikraken2_v2_8GB_201904_UPDATE.tgz
+tar -C $HOME -zxvf minikraken2_v2_8GB_201904_UPDATE.tgz
+```
+This will download and unzip the kraken2 DB. Other kraken2 DB are also available, you can find more information [here](https://ccb.jhu.edu/software/kraken2/index.shtml?t=downloads)
+
+Once you have the DB downloaded you will have to create an environment variable called `KRAKEN2_DEFAULT_DB`. This can be done by adding the following to your `$HOME/.bashrc`
+```
+export KRAKEN_DEFAULT_DB=$HOME/minikraken2_v2_8GB_201904_UPDATE
+```
+
 Bohra can be run in two modes `run` for an initial analysis and `rerun` for a re-analysis. A `.html` report is generated allowing for the visualisation of tree and examination of the dataset to provide insights that may be useful in interpretation of the results.
 
 ### Set up
@@ -152,6 +165,12 @@ optional arguments:
                         executed. (default: False)
   --gubbins, -g         If you would like to run gubbins. NOT IN USE YET -
                         PLEASE DO NOT USE (default: False)
+  --cluster, -clst      If you are running Bohra on a cluster. Note if set you 
+                        will need to provide a cluster.json file and a 
+                        run_snakemake.sh, you can see examples on the 
+                        documentation page.
+  --json                Path to cluster.json - required if --cluster is set
+  --run-snake           Path to run_snakemake.sh - required if --cluster is set
 ```
 
 ### Rerun
@@ -189,5 +208,81 @@ optional arguments:
                         executed. (default: False)
   --gubbins, -g         If you would like to run gubbins. NOT IN USE YET -
                         PLEASE DO NOT USE (default: False)
-  --keep, -k            Keep report from previous run (default: False)```
+  --keep, -k            Keep report from previous run (default: False)
+  --cluster, -clst      If you are running Bohra on a cluster. Note if set you 
+                        will need to provide a cluster.json file and a 
+                        run_snakemake.sh, you can see examples on the 
+                        documentation page.
+  --json                Path to cluster.json - if not included will default
+                        to version provided in previous run
+  --run-snake           Path to run_snakemake.sh if not included will default 
+                        to version provided in previous run
+  ```
+
+### Running Bohra in a HPC environment
+Bohra can be run in a HPC environment. To do this some knowledge and experience in such environments is assumed. You will need to provide a file called `cluster.json`. This file will contain rule specifc and default settings for running the pipeline. An example is shown below, in addition you can see further documentation [here](https://snakemake.readthedocs.io/en/stable/snakefiles/configuration.html#cluster-configuration).
+
+*cluster.json*
+```
+{
+    "__default__" :
+    {
+        "account" : "punim0581",
+        "time" : "0-0:5:00",
+        "cpus-per-task": 2,
+        "partition" : "cloud",
+        "mem" : "2G",
+        "ntasks" : 4,
+        "job" : "{rule}"
+    },
+    "snippy" :
+    {
+        
+        "cpus-per-task" : 4,
+        "time" : "0-0:5:00",
+        "mem" : "8G" 
+    },
+    "assemble":
+    {
+        "cpus-per-task" : 4,
+        "time" : "0-0:20:00",
+        "mem" : "32G"
+
+    },
+    "kraken" :
+    {
+        "cpus-per-task" : 4,
+        "time" : "0-0:20:00",
+        "mem"  : "32G"
+    },
+    "run_iqtree_core" :
+    {
+        "time": "0-0:20:00"
+    },
+    "roary" : 
+    {
+        "cpus-per-task" : 36,
+        "time" : "0-0:25:00",
+        "mem": "8G"
+    },
+    "run_prokka" :
+    {
+        "cpus-per-task" : 8,
+        "time" : "0-0:10:00"
+    },
+    "run_snippy_core" :
+    {
+        "time" : "0-0:15:00"
+    }
+}
+```
+You will also need to supply a bash script to launch the job. It should be in the following format
+*run_snakemake.sh*
+```
+snakemake -j 10 --cluster-config cluster.json --cluster "sbatch -A {cluster.account} -t {cluster.time} -c {cluster.cpus-per-task} --mem {cluster.mem} -J {cluster.job}" --rerun-incomplete --latency-wait 1200
+```
+where `--cluster-config` refers to the `cluster.json` file, and `{cluster.XXX}` refers to the value in the `cluster.json` file. 
+It is important to remember that any setting reffered to in the `run_snakemake.sh` script MUST appear in the `__default__` section of `cluster.json` at a minimum. The settings outlined here are examples and may need to be modified for your setup. Finally, the command that follows `--cluster` will also need to be modified depending upon your queuing system.
+
+
 
