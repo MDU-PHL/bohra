@@ -264,7 +264,10 @@ class Report:
         '''
         # helper functions for getting the data into the right format.
         def adjust_offset(row, d):
-            return(int(d[row['CHR']]) + int(row['POS']))
+            if row['CHR'] in d:
+                return(int(d[row['CHR']]) + int(row['POS']))
+            else:
+                return(int(row['POS']))
 
         def generate_dict(idx_file):
             d = {}
