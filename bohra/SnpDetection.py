@@ -310,7 +310,7 @@ class RunSnpDetection(object):
         cluster_log = self.workdir / 'cluster.log'
         if cluster_log.exists():
             cluster_df = pandas.read_csv(cluster_log, '\t')
-           cluster_df = source_df.append(new_df)
+            cluster_df = source_df.append(new_df)
         else:
             cluster_df = new_df
         
