@@ -50,13 +50,31 @@ Bohra can be run in three modes
 
 ### Installation
 
-#### Dependencies
+Bohra requires >=python3.7
 
-Bohra requires >=python3.6 
+#### Conda (Recomended)
+
+Installing bohra with conda will ensure that all dependencies are present. See below for instructions on how to configure the databases for kraken2.
+
+Set up conda - documentation for conda installation can be found (here)[https://conda.io/en/latest/miniconda.html]
+```
+conda config --add channels defaults
+conda config --add channels bioconda
+conda config --add channels conda-forge
+```
+It is recomended that you set up a `bohra` environment
+```
+conda create -n <bohra_env_name> bohra
+```
+To use bohra
+```
+conda activate <bohra_env_name>
+```
+#### PyPi
+If installing with `pip` you will need to ensure other dependencies are also installed.
 ```
 pip3 install bohra
 ```
-A conda recipe for bohra will follow shortly! But for now you will need to have the following dependencies installed on your system
 
 * [Snippy](https://github.com/tseemann/snippy)
 * [Shovill (skesa and spades.py)](https://github.com/tseemann/shovill)
@@ -68,6 +86,8 @@ A conda recipe for bohra will follow shortly! But for now you will need to have 
 * [iqtree](http://www.iqtree.org/)
 * [seqtk](https://github.com/lh3/seqtk)
 * [snp-dists](https://github.com/tseemann/snp-dists)
+
+
 
 *IMPORTANT*
 In addition to installing kraken ensure that you have a kraken2 database. Minikraken can obtained as follows
