@@ -56,7 +56,7 @@ Bohra requires >=python3.7
 
 Installing bohra with conda will ensure that all dependencies are present. See below for instructions on how to configure the databases for kraken2.
 
-Set up conda - documentation for conda installation can be found (here)[https://conda.io/en/latest/miniconda.html]
+Set up conda - documentation for conda installation can be found [here](https://conda.io/en/latest/miniconda.html)
 ```
 conda config --add channels defaults
 conda config --add channels bioconda
@@ -235,12 +235,11 @@ optional arguments:
                         documentation page.
   --json                Path to cluster.json - if not included will default
                         to version provided in previous run
-  --run-snake           Path to run_snakemake.sh if not included will default 
-                        to version provided in previous run
+  --queue               The queueing system in use - qsub or sbatch
   ```
 
 ### Running Bohra in a HPC environment
-Bohra can be run in a HPC environment. To do this some knowledge and experience in such environments is assumed. You will need to provide a file called `cluster.json`. This file will contain rule specifc and default settings for running the pipeline. An template is shown below (it is recommended that you sue this template, settings have been established using a slurm queueing system), in addition you can see further documentation [here](https://snakemake.readthedocs.io/en/stable/snakefiles/configuration.html#cluster-configuration).
+Bohra can be run in a HPC environment (currently only sbatch and qsub are supported). To do this some knowledge and experience in such environments is assumed. You will need to provide a file called `cluster.json`. This file will contain rule specifc and default settings for running the pipeline. An template is shown below (it is recommended that you use this template, settings have been established using a slurm queueing system), in addition you can see further documentation [here](https://snakemake.readthedocs.io/en/stable/snakefiles/configuration.html#cluster-configuration).
 
 *cluster.json*
 ```
