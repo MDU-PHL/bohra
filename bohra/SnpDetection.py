@@ -661,7 +661,7 @@ class RunSnpDetection(object):
         '''
         Using the json file provided determine the args to be used in command
         '''
-        
+        print(queue_args)
         try:
             with open(self.json) as f:
                 json_file = json.load(f)
