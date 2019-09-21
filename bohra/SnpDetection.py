@@ -303,7 +303,7 @@ class RunSnpDetection(object):
         cluster_log = self.workdir / 'cluster.log'
         if cluster_log.exists():
             cluster_df = pandas.read_csv(cluster_log, '\t')
-            cluster_df = source_df.append(new_df)
+            cluster_df = cluster_df.append(new_df)
         else:
             cluster_df = new_df
         
@@ -667,13 +667,13 @@ class RunSnpDetection(object):
                 json_file = json.load(f)
             if '__default__' in json_file:
                 defs = json_file['__default__']
-                arg_list = [defs[i] for i in defs]
+                arg_list = [i for i in defs]
                 arg_cluster = []
                 for a in arg_list:
                     if a in queue_args and self.queue == 'sbatch':
                         arg_cluster.append(f"{queue[a]} {{cluster.{a}}}")
                     elif a in queue_args and self.queue == 'qsub':
-                        string = f"{queue[a]} {{cluster.{a}}}" if a not in ['time', 'cpus-per-task', 'mem'] else f"{queue[a]}{{cluster.{a}}}"
+                        string = f"{queue_args[a]} {{cluster.{a}}}" if a not in ['time', 'cpus-per-task', 'mem'] else f"{queue_args[a]}{{cluster.{a}}}"
                         arg_cluster.append(string)
                     else:
                         self.log_messages('warning', f'{a} is not a valid option. Please read docs and try again')
@@ -686,7 +686,7 @@ class RunSnpDetection(object):
     def cluster_cmd(self):
 
         if self.queue == 'sbatch':
-            queue_args = {'account':'-A' ,'cpus-per-task':'-c',  'time': '--time', 'partition':'--partition', 'mem':'--mem', 'job':'--job'}
+            queue_args = {'account':'-A' ,'cpus-per-task':'-c',  'time': '--time', 'partition':'--partition', 'mem':'--mem', 'job':'-J'}
             queue_cmd = f'sbatch'
         elif self.queue == 'qsub':
             queue_args = {'account':'-P' ,'cpus-per-task': '-l ncpus=',  'time': '-l walltime=', 'partition':'-q', 'mem':'-l mem=', 'job':'-N'}
@@ -695,7 +695,7 @@ class RunSnpDetection(object):
             self.log_messages('warning', f'{self.queue} is not supported please select sbatch or qsub. Alternatively contact developer for further advice.')
         queue_string = self.json_setup(queue_args = queue_args)
 
-        return f"snakemake -j 999 --cluster-config {self.json} --cluster '{queue_cmd} {queue_args}'"
+        return f"snakemake -j 999 --cluster-config {self.json} --cluster '{queue_cmd} {queue_string}'"
 
         
 
