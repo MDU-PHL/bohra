@@ -240,38 +240,38 @@ optional arguments:
   ```
 
 ### Running Bohra in a HPC environment
-Bohra can be run in a HPC environment. To do this some knowledge and experience in such environments is assumed. You will need to provide a file called `cluster.json`. This file will contain rule specifc and default settings for running the pipeline. An example is shown below, in addition you can see further documentation [here](https://snakemake.readthedocs.io/en/stable/snakefiles/configuration.html#cluster-configuration).
+Bohra can be run in a HPC environment. To do this some knowledge and experience in such environments is assumed. You will need to provide a file called `cluster.json`. This file will contain rule specifc and default settings for running the pipeline. An template is shown below (it is recommended that you sue this template, settings have been established using a slurm queueing system), in addition you can see further documentation [here](https://snakemake.readthedocs.io/en/stable/snakefiles/configuration.html#cluster-configuration).
 
 *cluster.json*
 ```
 {
     "__default__" :
     {
-        "account" : "punim0581",
+        "account" : "AccountName",
         "time" : "0-0:5:00",
-        "cpus-per-task": 2,
+        "cpus-per-task": "2",
         "partition" : "cloud",
         "mem" : "2G",
-        "ntasks" : 4,
+        "ntasks" : "4",
         "job" : "{rule}"
     },
     "snippy" :
     {
         
-        "cpus-per-task" : 4,
+        "cpus-per-task" : "4",
         "time" : "0-0:5:00",
         "mem" : "8G" 
     },
     "assemble":
     {
-        "cpus-per-task" : 4,
+        "cpus-per-task" : "4",
         "time" : "0-0:20:00",
         "mem" : "32G"
 
     },
     "kraken" :
     {
-        "cpus-per-task" : 4,
+        "cpus-per-task" : "8",
         "time" : "0-0:20:00",
         "mem"  : "32G"
     },
@@ -281,13 +281,13 @@ Bohra can be run in a HPC environment. To do this some knowledge and experience 
     },
     "roary" : 
     {
-        "cpus-per-task" : 36,
+        "cpus-per-task" : "36",
         "time" : "0-0:25:00",
         "mem": "8G"
     },
     "run_prokka" :
     {
-        "cpus-per-task" : 8,
+        "cpus-per-task" : "8",
         "time" : "0-0:10:00"
     },
     "run_snippy_core" :
@@ -296,14 +296,6 @@ Bohra can be run in a HPC environment. To do this some knowledge and experience 
     }
 }
 ```
-You will also need to supply a bash script to launch the job. It should be in the following format
-*run_snakemake.sh*
-```
-snakemake -j 10 --cluster-config cluster.json --cluster "sbatch -A {cluster.account} -t {cluster.time} -c {cluster.cpus-per-task} --mem {cluster.mem} -J {cluster.job}" --rerun-incomplete --latency-wait 1200
-```
-where `--cluster-config` refers to the `cluster.json` file, and `{cluster.XXX}` refers to the value in the `cluster.json` file. 
-It is important to remember that any setting reffered to in the `run_snakemake.sh` script MUST appear in the `__default__` section of `cluster.json` at a minimum. The settings outlined here are examples and may need to be modified for your setup. Finally, the command that follows `--cluster` will also need to be modified depending upon your queuing system.
-In addition, the value that follows `-j`, when running Bohra in `--cluster` mode indicates the number of jobs to launch at a time, rather than the total amount of resources.
 
 
 
