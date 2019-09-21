@@ -673,7 +673,7 @@ class RunSnpDetection(object):
                     if a in queue_args and self.queue == 'sbatch':
                         arg_cluster.append(f"{queue[a]} {{cluster.{a}}}")
                     elif a in queue_args and self.queue == 'qsub':
-                        string = f"{queue[a]} {{cluster.{a}}}" if a not in ['time', 'cpus-per-task', 'mem'] f"{queue[a]}{{cluster.{a}}}"
+                        string = f"{queue[a]} {{cluster.{a}}}" if a not in ['time', 'cpus-per-task', 'mem'] else f"{queue[a]}{{cluster.{a}}}"
                         arg_cluster.append(string)
                     else:
                         self.log_messages('warning', f'{a} is not a valid option. Please read docs and try again')
