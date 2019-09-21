@@ -760,7 +760,7 @@ class RunSnpDetection(object):
             dry = ''
 
         if self.cluster:
-            cmd = f"{self.cluster_cmd()} -s {snake_name}"
+            cmd = f"{self.cluster_cmd()} -s {snake_name} --latency-wait 1200"
         else:
             cmd = f"snakemake {dry} -s {snake_name} 2>&1 | tee -a job.log"
             # cmd = f"snakemake -s {snake_name} --cores {self.cpus} {force} "
