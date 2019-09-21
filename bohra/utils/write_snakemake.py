@@ -111,7 +111,7 @@ rule kraken:
 		if [ -f $KRAKENPATH ]; then
 			cp $KRAKENPATH {{output}}
 		else
-			kraken2 --paired {{input[0]}} {{input[1]}} --memory-mapping --minimum-base-quality 13 --report {{output}}
+			kraken2 --paired {{input[0]}} {{input[1]}} --minimum-base-quality 13 --report {{output}}
 		fi
 		\"""
 		
@@ -383,7 +383,7 @@ rule run_iqtree_{alntype}:
 		if assembler == 'skesa':
 			assemble = f"skesa --fastq {{input[0]}},{{input[1]}} --vector_percent 1 --use_paired_ends --cores {{threads}} > {{output}}"
 		elif assembler == 'shovill':
-			assemble = f""""
+			assemble = f"""
 			shovill --outdir {{wildcards.sample}} --R1 {{input[0]}} --R2 {{input[1]}} --force --minlen 500 --cpus {{threads}}
 			mv {{wildcards.sample}}/contigs.fa {{output}}
 """

@@ -57,14 +57,15 @@ def main():
     parser_sub_run.add_argument('--cpus','-c',help='Number of CPU cores to run, will define how many rules are run at a time', default=36)
     parser_sub_run.add_argument('--minaln','-ma',help='Minimum percent alignment', default=0)
     parser_sub_run.add_argument('--prefillpath','-pf',help='Path to existing assemblies - in the form path_to_somewhere/isolatename/contigs.fa')
-    parser_sub_run.add_argument('--mdu', default=True, help='If running on MDU data')
+    parser_sub_run.add_argument('--mdu', action = "store_true", help='If running on MDU data')
     parser_sub_run.add_argument('--workdir','-w', default = f"{pathlib.Path.cwd().absolute()}", help='The directory where Bohra will be run, default is current directory')
     parser_sub_run.add_argument('--resources','-s', default = f"{pathlib.Path(__file__).parent / 'templates'}", help='Directory where templates are stored')
     parser_sub_run.add_argument('--force','-f', action="store_true", help = "Add if you would like to force a complete restart of the pipeline. All previous logs will be lost.")
     parser_sub_run.add_argument('--dry-run','-n', action="store_true", help = "If you would like to see a dry run of commands to be executed.")
-    parser_sub_run.add_argument('--cluster', action="store_true", help = "If you are running Bohra on a cluster. Note if set you will need to provide a cluster.json file and a run_snakemake.sh, you can see examples on the documentation page.")
+    parser_sub_run.add_argument('--cluster', action="store_true", help = "If you are running Bohra on a cluster.")
     parser_sub_run.add_argument('--json',help='Path to cluster.json - required if --cluster is set', default='')
-    parser_sub_run.add_argument('--run-snake',help='Path to run_snakemake.sh - required if --cluster is set', default='')
+    parser_sub_run.add_argument('--queue',help='Type of queue (sbatch or qsub currently supported) - required if --cluster is set.', default='')
+    
 
     parser_sub_run.add_argument('--gubbins','-g', action="store_true", help = "If you would like to run gubbins. NOT IN USE YET - PLEASE DO NOT USE")
     # parser for rerun
@@ -81,7 +82,7 @@ def main():
     parser_sub_rerun.add_argument('--keep', '-k', action= 'store_true', help="Keep report from previous run")
     parser_sub_rerun.add_argument('--cluster', action="store_true", help = "If you are running Bohra on a cluster. Note if set you will need to provide a cluster.json file and a run_snakemake.sh, you can see examples on the documentation page.")
     parser_sub_rerun.add_argument('--json',help='Path to cluster.json - if not included will default to version provided in previous run', default='')
-    parser_sub_rerun.add_argument('--run-snake',help='Path to run_snakemake.sh if not included will default to version provided in previous run', default='')
+    parser_sub_rerun.add_argument('--queue',help='Type of queue (sbatch or qsub currently supported) - if not included will default to previous run', default='')
     
     parser_sub_run.set_defaults(func=run_pipeline)
     

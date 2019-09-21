@@ -9,6 +9,7 @@ import datetime
 import numpy
 import itertools
 import subprocess
+import json
 from Bio import SeqIO, Phylo
 from packaging import version
 from bohra.utils.write_snakemake import MakeWorkflow
@@ -54,7 +55,7 @@ class RunSnpDetection(object):
         # user
         if self.cluster:
             self.json = args.json
-            self.run_snake = args.run_snake
+            self.queue = args.queue
             self.check_cluster_reqs()
             self.set_cluster_log()
 
@@ -66,11 +67,11 @@ class RunSnpDetection(object):
         #     self.gubbins = args.gubbins
         
         self.gubbins = numpy.nan
-
+        self.mdu = args.mdu
         if isinstance(args.prefillpath, str):
             self.prefillpath = args.prefillpath
-        elif args.mdu:
-            self.prefillpath = '/home/seq/MDU/QC'
+        elif self.mdu:
+            self.prefillpath = pathlib.Path('home', 'seq', 'MDU', 'QC')
         else:
             self.prefillpath = ''
         self.force = args.force
@@ -88,22 +89,14 @@ class RunSnpDetection(object):
         '''
         check that the cluster.json and run snakemake files are present for running in a HPC environment
         '''
-        if self.json == '':
+        if self.json == '' and not self.mdu:
             self.log_messages('warning', f"The cluster.json file can not be empty. Please provide a valid file.")
             raise SystemExit
-        if self.run_snake == '':
-            self.log_messages('warning', f"The run_snakemake.sh file can not be empty. Please provide a valid file.")
-            raise SystemExit
+        
         self.json = pathlib.Path(self.json)
-        self.run_snake = pathlib.Path(self.run_snake)
-
-        if self.json.exists() and self.run_snake.exists():
-            self.json = pathlib.Path(self.link_file(self.json))
-            self.run_snake = pathlib.Path(self.link_file(self.run_snake))
-        else:
+        if not self.json.exists():
             self.log_messages('warning', f"Please check the paths to {self.json} and {self.run_snake}. You must provide valid paths.")
             raise SystemExit
-
 
     def set_snakemake_jobs(self):
         '''
@@ -306,7 +299,7 @@ class RunSnpDetection(object):
         '''
         save the details of cluster configurations
         '''
-        new_df = pandas.DataFrame({'cluster_json': f"{self.json}", 'run_snake': f"{self.run_snake}",'Date':self.day}, index = [0])
+        new_df = pandas.DataFrame({'cluster_json': f"{self.json}",'Date':self.day}, index = [0])
         cluster_log = self.workdir / 'cluster.log'
         if cluster_log.exists():
             cluster_df = pandas.read_csv(cluster_log, '\t')
@@ -664,6 +657,50 @@ class RunSnpDetection(object):
         return(wd, config_params, '\n'.join(pipelinelist))
 
 
+    def json_setup(self, queue_args):
+        '''
+        Using the json file provided determine the args to be used in command
+        '''
+        
+        try:
+            with open(self.json) as f:
+                json_file = json.load(f)
+            if '__default__' in json_file:
+                defs = json_file['__default__']
+                arg_list = [defs[i] for i in defs]
+                arg_cluster = []
+                for a in arg_list:
+                    if a in queue_args and self.queue == 'sbatch':
+                        arg_cluster.append(f"{queue[a]} {{cluster.{a}}}")
+                    elif a in queue_args and self.queue == 'qsub':
+                        string = f"{queue[a]} {{cluster.{a}}}" if a not in ['time', 'cpus-per-task', 'mem'] f"{queue[a]}{{cluster.{a}}}"
+                        arg_cluster.append(string)
+                    else:
+                        self.log_messages('warning', f'{a} is not a valid option. Please read docs and try again')
+                        raise SystemExit
+                return ' '.join(arg_cluster)
+        except json.decoder.JSONDecodeError:
+            self.log_messages('warning', f'There is something wrong with your {self.json} file. Possible reasons for this error are incorrect use of single quotes. Check json format documentation and try again.')
+
+
+    def cluster_cmd(self):
+
+        if self.queue == 'sbatch':
+            queue_args = {'account':'-A' ,'cpus-per-task':'-c',  'time': '--time', 'partition':'--partition', 'mem':'--mem', 'job':'--job'}
+            queue_cmd = f'sbatch'
+        elif self.queue == 'qsub':
+            queue_args = {'account':'-P' ,'cpus-per-task': '-l ncpus=',  'time': '-l walltime=', 'partition':'-q', 'mem':'-l mem=', 'job':'-N'}
+            queue_cmd = f'qsub'
+        else:
+            self.log_messages('warning', f'{self.queue} is not supported please select sbatch or qsub. Alternatively contact developer for further advice.')
+        queue_string = self.json_setup(queue_args = queue_args)
+
+        return f"snakemake -j 999 --cluster-config {self.json} --cluster '{queue_cmd} {queue_args}'"
+
+        
+
+
+    
     def setup_workflow(self, isolates, config_name = 'config.yaml', snake_name = 'Snakefile'):
         '''
         generate job specific snakefile and config.yaml
@@ -723,7 +760,7 @@ class RunSnpDetection(object):
             dry = ''
 
         if self.cluster:
-            cmd = f"bash {self.run_snake} 2>&1 | tee -a job.log"       
+            cmd = f"{self.cluster_cmd()} -s {snake_name}"
         else:
             cmd = f"snakemake {dry} -s {snake_name} 2>&1 | tee -a job.log"
             # cmd = f"snakemake -s {snake_name} --cores {self.cpus} {force} "
