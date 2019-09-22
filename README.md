@@ -241,6 +241,11 @@ optional arguments:
 ### Running Bohra in a HPC environment
 Bohra can be run in a HPC environment (currently only sbatch and qsub are supported). To do this some knowledge and experience in such environments is assumed. You will need to provide a file called `cluster.json`. This file will contain rule specifc and default settings for running the pipeline. An template is shown below (it is recommended that you use this template, settings have been established using a slurm queueing system), in addition you can see further documentation [here](https://snakemake.readthedocs.io/en/stable/snakefiles/configuration.html#cluster-configuration).
 
+*example command*
+```
+bohra run -r <reference> -i <input_tab> -j <jobname> --cluster --json cluster.json --queue sbatch
+```
+
 *cluster.json*
 ```
 {

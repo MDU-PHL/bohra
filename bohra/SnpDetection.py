@@ -671,7 +671,7 @@ class RunSnpDetection(object):
                 arg_cluster = []
                 for a in arg_list:
                     if a in queue_args and self.queue == 'sbatch':
-                        arg_cluster.append(f"{queue[a]} {{cluster.{a}}}")
+                        arg_cluster.append(f"{queue_args[a]} {{cluster.{a}}}")
                     elif a in queue_args and self.queue == 'qsub':
                         string = f"{queue_args[a]} {{cluster.{a}}}" if a not in ['time', 'cpus-per-task', 'mem'] else f"{queue_args[a]}{{cluster.{a}}}"
                         arg_cluster.append(string)
