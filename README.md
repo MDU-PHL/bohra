@@ -246,6 +246,10 @@ Bohra can be run in a HPC environment (currently only sbatch and qsub are suppor
 bohra run -r <reference> -i <input_tab> -j <jobname> --cluster --json cluster.json --queue sbatch
 ```
 
+```
+bohra rerun --cluster --queue sbatch
+```
+
 *cluster.json*
 ```
 {

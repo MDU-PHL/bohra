@@ -50,7 +50,6 @@ class ReRunSnpDetection(RunSnpDetection):
         # cluster
         self.cluster = args.cluster
         if self.cluster:
-            self.run_snake = args.run_snake
             self.json = args.json
             self.get_cluster_reqs()
             
@@ -68,16 +67,16 @@ class ReRunSnpDetection(RunSnpDetection):
         '''
 
         cluster_log = self.workdir / 'cluster.log'
-        if self.json == '' or self.run_snake == '':
+        if self.json == '':
             if cluster_log.exists():
                 df = pandas.read_csv(cluster_log, sep = '\t')
                 self.json = pathlib.Path(df.loc[df.index[-1], 'cluster_json'])
-                self.run_snake = pathlib.Path(df.loc[df.index[-1], 'run_snake'])
+                
         else:
             self.json = pathlib.Path(self.link_file(self.json))
-            self.run_snake = pathlib.Path(self.link_file(self.run_snake))      
-        if not self.json.exists() or not self.run_snake.exists():
-            self.log_messages('warning', 'It appears that your cluster.json and run_snakemake do not exists. Please add a valid path and try again')
+            
+        if not self.json.exists():
+            self.log_messages('warning', 'It appears that your cluster.json does not exists. Please add a valid path and try again')
             raise SystemExit
         
         

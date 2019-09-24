@@ -675,7 +675,7 @@ class RunSnpDetection(object):
                     elif a in queue_args and self.queue == 'qsub':
                         string = f"{queue_args[a]} {{cluster.{a}}}" if a not in ['time', 'cpus-per-task', 'mem'] else f"{queue_args[a]}{{cluster.{a}}}"
                         arg_cluster.append(string)
-                    else:
+                    else:s
                         self.log_messages('warning', f'{a} is not a valid option. Please read docs and try again')
                         raise SystemExit
                 return ' '.join(arg_cluster)
