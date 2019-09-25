@@ -603,7 +603,8 @@ rule combine_assembly_metrics:
 cp distances.tab report/distances.tab
 cp core.tab report/core.tab
 """		
-		kcmd = f"cp species_identification.tab report/species_identification.tab"
+		kcmd = f"""cp species_identification.tab report/species_identification.tab
+"""
 		acmd = f"""cp mlst.tab report/mlst.tab
 cp resistome.tab report/resistome.tab
 """
