@@ -502,7 +502,7 @@ rule pan_figure:
 		"pan_genome.svg"
 	shell:
 		\"""
-		perl {script_path} roary2svg.pl {{input}} > {{output}}
+		perl {script_path}/roary2svg.pl {{input}} > {{output}}
 		\"""
 """)
 
