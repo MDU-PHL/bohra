@@ -95,7 +95,7 @@ class RunSnpDetection(object):
         
         self.json = pathlib.Path(self.json)
         if not self.json.exists():
-            self.log_messages('warning', f"Please check the paths to {self.json} and {self.run_snake}. You must provide valid paths.")
+            self.log_messages('warning', f"Please check the paths to {self.json}. You must provide valid paths.")
             raise SystemExit
 
     def set_snakemake_jobs(self):
@@ -762,7 +762,7 @@ class RunSnpDetection(object):
         if self.cluster:
             cmd = f"{self.cluster_cmd()} -s {snake_name} --latency-wait 1200"
         else:
-            cmd = f"snakemake {dry} -s {snake_name} 2>&1 | tee -a job.log"
+            cmd = f"snakemake {dry} -s {snake_name} --cores {self.cpus} 2>&1 | tee -a job.log"
             # cmd = f"snakemake -s {snake_name} --cores {self.cpus} {force} "
         
         wkf = subprocess.run(cmd, shell = True)
