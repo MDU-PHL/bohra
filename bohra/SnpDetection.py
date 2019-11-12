@@ -254,14 +254,18 @@ class RunSnpDetection(object):
         # TODO check all software tools used and is there a way to check database last update??
         # TODO check assemblers
         self.log_messages('info', f"Checking software dependencies")
-        self.check_snippycore()
-        self.check_snpdists()
-        self.check_iqtree()
-        self.check_assembler()
-        self.check_assemble_accesories()
-        self.check_kraken2DB()
-        self.check_roary()
-        return(self.check_snippy())
+        if self.pipeline != "a":
+            self.check_snippycore()
+            self.check_snpdists()
+            self.check_iqtree()
+            return(self.check_snippy())
+        elif self.pipeline != "s":
+            self.check_assembler()
+            self.check_assemble_accesories()
+            self.check_kraken2DB()
+            self.check_roary()
+
+            return True
 
     # def check_validation(self, validation_type):
     #     '''
