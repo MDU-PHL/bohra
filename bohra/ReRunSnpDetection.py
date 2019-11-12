@@ -30,7 +30,7 @@ class ReRunSnpDetection(RunSnpDetection):
         # path to reference => if args.reference is a string, check that it matches existing
         # set force based on args.. this will be set to true if ref is different and/or snippy version 
         self.force = False
-        self.assembler_dict = {'shovill': 'shovill', 'skesa':'skesa','spades':'spades.py'}
+        self.assembler = ""
         # get original data 
         self.get_source()
         # Reference mask and snippy
@@ -57,7 +57,7 @@ class ReRunSnpDetection(RunSnpDetection):
         self.keep = args.keep
         
         self.assembler_dict = {'shovill': 'shovill', 'skesa':'skesa','spades':'spades.py'}
-        self.assembler = ""
+        
         self.run_kraken = False
         self.cpus = args.cpus
         self.set_snakemake_jobs()
@@ -97,7 +97,7 @@ class ReRunSnpDetection(RunSnpDetection):
             self.original_mask = df.loc[df.index[-1],'Mask'] if isinstance(df.loc[df.index[-1],'Mask'], str) else ''
             self.original_snippy_version = version_pat.search(df.loc[df.index[-1], 'snippy_version'])
         if self.pipeline != 's':
-            self.assembler = df.loc[df.index[-1], 'Assembler']
+            self.assembler = df['Assembler'].unique()[0]
         self.orignal_date = df.loc[df.index[-1], 'Date']
         self.input_file = pathlib.Path(f"{df.loc[df.index[-1], 'input_file']}")
         # print(self.input_file)

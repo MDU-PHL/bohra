@@ -421,7 +421,7 @@ rule assemble:
 	""") 
 	
 		else:
-			return ""# TODO Will need to add in assembly options here
+			return " "# TODO Will need to add in assembly options here
 
 	def write_mlst(self):
 		return(f"""
