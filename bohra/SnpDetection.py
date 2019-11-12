@@ -635,14 +635,14 @@ class RunSnpDetection(object):
         pipelinelist = [p.write_all(run_kraken = self.run_kraken,pipeline = self.pipeline), p.write_seqdata(), p.write_estimate_coverage(),p.write_generate_yield(script_path),p.write_combine_seqdata()]
 
         # for just snps contains snippy, snippy-core, dists and tree
-        snps_pipeline = [p.write_snippy(), p.write_qc_snippy_initial(), p.write_snippy_core(mask = maskstring), p.write_snp_dists(), p.write_convert_and_index(), p.write_tree(script_path=script_path, alntype='core')]
+        snps_pipeline = [p.write_snippy(), p.write_qc_snippy_initial(), p.write_snippy_core(mask = maskstring), p.write_snp_dists(), p.write_convert_and_index(), p.write_tree(script_path=script_path, alntype='core')] if self.pipeline in ["s","sa", "all"] else []
         # for just assemblies
-        assembly_pipeline = [p.write_assemblies(prefillpath = self.prefillpath, assembler = self.assembler), p.write_resistome(), p.write_mlst(),p.write_kraken(prefillpath = self.prefillpath, run_kraken = self.run_kraken), p.write_combine(), p.write_assembly_stats(script_path), p.write_prokka(), p.write_gff_summary(), p.write_combine_kraken(run_kraken = self.run_kraken)]
+        assembly_pipeline = [p.write_assemblies(prefillpath = self.prefillpath, assembler = self.assembler), p.write_resistome(), p.write_mlst(),p.write_kraken(prefillpath = self.prefillpath, run_kraken = self.run_kraken), p.write_combine(), p.write_assembly_stats(script_path), p.write_prokka(), p.write_gff_summary(), p.write_combine_kraken(run_kraken = self.run_kraken)] if self.pipeline in ["a", "sa", "all"] else []
         # for roary
-        roary_pipeline = [p.write_roary(), p.write_pan_graph(script_path = script_path)]
+        roary_pipeline =  [p.write_roary(), p.write_pan_graph(script_path = script_path)] if self.pipeline == "all" else []
 
         # pipeline can always ends with report
-        report_pipeline = [p.write_report_collation(pipeline = self.pipeline, run_kraken = self.run_kraken), p.write_html(run_kraken = self.run_kraken, pipeline = self.pipeline,workdir = self.workdir, resources = resource_path, job_id = self.job_id, script_path = script_path, assembler = self.assembler_dict[self.assembler])]
+        report_pipeline = [p.write_report_collation(pipeline = self.pipeline, run_kraken = self.run_kraken), p.write_html(run_kraken = self.run_kraken, pipeline = self.pipeline,workdir = self.workdir, resources = resource_path, job_id = self.job_id, script_path = script_path, assembler = "None" if self.assembler == "" else self.assembler_dict[self.assembler])]
         
         if self.pipeline == 's':
             pipelinelist.extend(snps_pipeline)

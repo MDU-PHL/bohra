@@ -58,6 +58,7 @@ class ReRunSnpDetection(RunSnpDetection):
         
         self.assembler_dict = {'shovill': 'shovill', 'skesa':'skesa','spades':'spades.py'}
         self.assembler = ""
+        self.run_kraken = False
         self.cpus = args.cpus
         self.set_snakemake_jobs()
 

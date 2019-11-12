@@ -116,6 +116,8 @@ rule kraken:
 		\"""
 		
 """)
+		else:
+			return(" ")
 
 
 	def write_combine_kraken(self, run_kraken):
@@ -154,7 +156,7 @@ rule combine_kraken:
 		subprocess.run(f"sed -i 's/%[0-9]/%/g' {{output}}", shell=True)
 """)
 		else:
-			return('')
+			return(' ')
 	def write_estimate_coverage(self):
 		return(f"""
 rule estimate_coverage:
@@ -392,8 +394,11 @@ rule run_iqtree_{alntype}:
 			spades.py -o {{wildcards.sample}} -1 {{input[0]}} -2 {{input[1]}} --threads {{threads}}
 			mv {{wildcards.sample}}/contigs.fasta {{output}}
 """
+		else:
+			assemble = ""
 		
-		return(f"""
+		if assemble != "":
+			return(f"""
 rule assemble:
 	input:
 		'READS/{{sample}}/R1.fq.gz',
@@ -413,7 +418,10 @@ rule assemble:
 			{assemble}
 		fi		
 		\"""
-	""") # TODO Will need to add in assembly options here
+	""") 
+	
+		else:
+			return ""# TODO Will need to add in assembly options here
 
 	def write_mlst(self):
 		return(f"""
