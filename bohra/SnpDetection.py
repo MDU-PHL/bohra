@@ -678,7 +678,7 @@ class RunSnpDetection(object):
         '''
         Using the json file provided determine the args to be used in command
         '''
-        print(queue_args)
+        # print(queue_args)
         try:
             with open(self.json) as f:
                 json_file = json.load(f)
@@ -702,6 +702,8 @@ class RunSnpDetection(object):
 
     def cluster_cmd(self):
 
+        queue_args = ""
+        print(self.queue)
         if self.queue == 'sbatch':
             queue_args = {'account':'-A' ,'cpus-per-task':'-c',  'time': '--time', 'partition':'--partition', 'mem':'--mem', 'job':'-J'}
             queue_cmd = f'sbatch'
@@ -710,6 +712,8 @@ class RunSnpDetection(object):
             queue_cmd = f'qsub'
         else:
             self.log_messages('warning', f'{self.queue} is not supported please select sbatch or qsub. Alternatively contact developer for further advice.')
+            raise SystemExit
+    
         queue_string = self.json_setup(queue_args = queue_args)
 
         return f"snakemake -j 999 --cluster-config {self.json} --cluster '{queue_cmd} {queue_string}'"
@@ -777,9 +781,9 @@ class RunSnpDetection(object):
             dry = ''
 
         if self.cluster:
-            cmd = f"{self.cluster_cmd()} -s {snake_name} --latency-wait 1200"
+            cmd = f"{self.cluster_cmd()} -s {snake_name} {force} --latency-wait 1200"
         else:
-            cmd = f"snakemake {dry} -s {snake_name} --cores {self.cpus} 2>&1 | tee -a job.log"
+            cmd = f"snakemake {dry} -s {snake_name} --cores {self.cpus} {force} 2>&1 | tee -a job.log"
             # cmd = f"snakemake -s {snake_name} --cores {self.cpus} {force} "
         
         wkf = subprocess.run(cmd, shell = True)
