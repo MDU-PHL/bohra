@@ -74,7 +74,7 @@ class ReRunSnpDetection(RunSnpDetection):
             if cluster_log.exists(): #reset settings to reflect 
                 df = pandas.read_csv(cluster_log, sep = '\t')
                 self.json = pathlib.Path(df.loc[df.index[-1], 'cluster_json'])
-                self.queue = pathlib.Path(df.loc[df.index[-1], 'queue'])
+                self.queue = f"{df.loc[df.index[-1], 'queue']}"
                 self.cluster = True
         else:
             self.check_cluster_reqs() # check that settings are appropriate

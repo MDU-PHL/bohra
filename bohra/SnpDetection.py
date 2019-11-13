@@ -703,7 +703,7 @@ class RunSnpDetection(object):
     def cluster_cmd(self):
 
         queue_args = ""
-        print(self.queue)
+        
         if self.queue == 'sbatch':
             queue_args = {'account':'-A' ,'cpus-per-task':'-c',  'time': '--time', 'partition':'--partition', 'mem':'--mem', 'job':'-J'}
             queue_cmd = f'sbatch'
