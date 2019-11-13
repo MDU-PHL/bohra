@@ -512,12 +512,8 @@ class Report:
         resistome_td = {'file':'resistome.tab', 'title':'Resistome', 'type':'table', 'link':'resistome'}
         # list of assembly tasks
         assembly_stat_td = {'file': 'assembly.tab', 'title':'Assembly', 'type':'table', 'link':'assembly'}
-        a_td = [assembly_stat_td, species_id_td, mlst_td, resistome_td]
-        if run_kraken:
-            a_td.append(species_id_td)
-        # print(roary_td)
-        # print(pipeline)
-        # print(td)
+        a_td = [assembly_stat_td, species_id_td, mlst_td, resistome_td] if run_kraken == True else [assembly_stat_td, mlst_td, resistome_td]
+    
         
         if pipeline == 's':
             td.extend(s_td)
@@ -545,7 +541,7 @@ class Report:
             tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data', 'pan-genome']
             modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data']
             display = f""
-        if run_kraken and pipeline!='s':
+        elif run_kraken and pipeline!='s':
             tables.append('species-identification')
             modaltables.append('species-identification')
         tables.append('versions')

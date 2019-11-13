@@ -33,7 +33,7 @@ def gitpush(ctx, message):
     ctx.run(f"git commit -m '{message}'")
     ctx.run("git push origin")
     ctx.run("git push kristy")
-
+    
 @invoke.task
 def gittag(ctx):
     """

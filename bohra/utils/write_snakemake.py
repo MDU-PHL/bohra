@@ -433,7 +433,7 @@ rule mlst:
 	
 	shell:
 		\"""
-		mlst --nopath {{input}} | sed 's/\.fa//g' | sed '1iIsolate\tScheme\tST\tAlleles' > {{output}}
+		mlst --nopath {{input}} | sed 's/\.fa//g' | sed '1iIsolate\\tScheme\\tST\\tAlleles' > {{output}}
 		\"""
 
 	""")
