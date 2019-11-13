@@ -84,6 +84,16 @@ class RunSnpDetection(object):
         self.assembler_dict = {'shovill': 'shovill', 'skesa':'skesa','spades':'spades.py'}
         self.set_snakemake_jobs()
 
+    def check_queue(self, queue):
+        '''
+        ensure that if running on a cluster queue is set, otherwise quit cleanly
+        '''
+        if queue in ['sbatch', 'qsub']:
+            return queue
+        else:
+            self.log_messages(f"You are running bohra on a cluster? The queue setting is required, please choose either sbatch or qsub and try again")
+            raise SystemExit
+
     
     def check_cluster_reqs(self):
         '''
@@ -92,12 +102,14 @@ class RunSnpDetection(object):
         if self.json == '' and not self.mdu:
             self.log_messages('warning', f"The cluster.json file can not be empty. Please provide a valid file.")
             raise SystemExit
-        
+        # check json
         self.json = pathlib.Path(self.json)
         if not self.json.exists():
             self.log_messages('warning', f"Please check the paths to {self.json}. You must provide valid paths.")
             raise SystemExit
-
+        # check queue
+        self.queue = self.check_queue(self.queue)
+        
     def set_snakemake_jobs(self):
         '''
         set the number of jobs to run in parallel based on the number of cpus from args
@@ -303,8 +315,9 @@ class RunSnpDetection(object):
         '''
         save the details of cluster configurations
         '''
-        new_df = pandas.DataFrame({'cluster_json': f"{self.json}",'Date':self.day}, index = [0])
+        new_df = pandas.DataFrame({'cluster_json': f"{self.json}",'Date':self.day, 'queue': f"{self.queue}"}, index = [0])
         cluster_log = self.workdir / 'cluster.log'
+
         if cluster_log.exists():
             cluster_df = pandas.read_csv(cluster_log, '\t')
             cluster_df = cluster_df.append(new_df)

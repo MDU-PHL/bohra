@@ -47,12 +47,14 @@ class ReRunSnpDetection(RunSnpDetection):
             self.gubbins = numpy.nan
         else:
             self.gubbins = args.gubbins
-        # cluster
+        # cluster settings default to command line, 
         self.cluster = args.cluster
-        if self.cluster:
-            self.json = args.json
-            self.get_cluster_reqs()
-            
+        self.json = args.json
+        self.queue = args.queue
+        # but check to reset if present
+        self.get_cluster_reqs()
+        # check for cluster settings
+
         self.dryrun = args.dry_run
         self.keep = args.keep
         
@@ -68,17 +70,14 @@ class ReRunSnpDetection(RunSnpDetection):
         '''
 
         cluster_log = self.workdir / 'cluster.log'
-        if self.json == '':
-            if cluster_log.exists():
+        if self.cluster == False: #if there is no cluster setting double check if there is an exisitng log 
+            if cluster_log.exists(): #reset settings to reflect 
                 df = pandas.read_csv(cluster_log, sep = '\t')
                 self.json = pathlib.Path(df.loc[df.index[-1], 'cluster_json'])
-                
+                self.queue = pathlib.Path(df.loc[df.index[-1], 'queue'])
+                self.cluster = True
         else:
-            self.json = pathlib.Path(self.link_file(self.json))
-            
-        if not self.json.exists():
-            self.log_messages('warning', 'It appears that your cluster.json does not exists. Please add a valid path and try again')
-            raise SystemExit
+            self.check_cluster_reqs() # check that settings are appropriate
         
         
 

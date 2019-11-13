@@ -513,7 +513,7 @@ class Report:
         # list of assembly tasks
         assembly_stat_td = {'file': 'assembly.tab', 'title':'Assembly', 'type':'table', 'link':'assembly'}
         a_td = [assembly_stat_td, species_id_td, mlst_td, resistome_td] if run_kraken == True else [assembly_stat_td, mlst_td, resistome_td]
-    
+        
         
         if pipeline == 's':
             td.extend(s_td)
