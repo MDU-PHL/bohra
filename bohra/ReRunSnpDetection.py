@@ -13,7 +13,7 @@ import re
 from packaging import version
 from Bio import SeqIO, Phylo
 from bohra.SnpDetection import RunSnpDetection
-
+from bohra.bohra_logger import logger
 class ReRunSnpDetection(RunSnpDetection):
     '''
     A class for a Bohra reurn objects - inherits RunSnpDetection
@@ -68,7 +68,7 @@ class ReRunSnpDetection(RunSnpDetection):
         '''
         check if new cluster configs are being used if not default to stored
         '''
-
+        logger.info(f"Retrieving cluster settings.")
         cluster_log = self.workdir / 'cluster.log'
         if self.cluster == False: #if there is no cluster setting double check if there is an exisitng log 
             if cluster_log.exists(): #reset settings to reflect 
@@ -87,7 +87,7 @@ class ReRunSnpDetection(RunSnpDetection):
         '''
         open the source.log file and extract reference, mask, date, snippy_version
         '''
-
+        logger.info(f"Retrieving settings and software versions.")
         version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
         df = pandas.read_csv('source.log', sep = None, engine = 'python')
         self.pipeline = df.loc[df.index[-1], 'Pipeline']
@@ -113,6 +113,7 @@ class ReRunSnpDetection(RunSnpDetection):
         Check that reference used in rerun is the same as the reference used in previous run. If not will need to force new SNP detection
         '''
         # check if refs are the same if not set self.ref to new and change to force, else set ref to original
+        logger.info(f"Checking reference.")
         if isinstance(new, str) and len(new) > 0 and len(self.original_reference) > 0:
             new_reference = pathlib.Path(f"{new}")
             if f"{new_reference.name}" == self.original_reference:
@@ -121,11 +122,12 @@ class ReRunSnpDetection(RunSnpDetection):
             else:
                 self.ref = self.link_file(path = new_reference)
                 self.force = True
-                self.log_messages('message', f"You have chosen a different reference from the previous run. Snippy will be forced to run again from the beginning.")
+                logger.info(f"You have chosen a different reference from the previous run. Snippy will be forced to run again from the beginning.")
         elif isinstance(new, str) and len(new) == 0 and len(self.original_reference) > 0:
             self.ref = pathlib.Path(self.original_reference)
         else:
-            self.log_messages('message', 'There appears to be something wrong with the reference. You will need to run Bohra using the run command.')
+            logger.warning('There appears to be something wrong with the reference. You will need to run Bohra using the run command.')
+            raise SystemExit
 
 
     def check_for_snippy(self):
@@ -133,16 +135,19 @@ class ReRunSnpDetection(RunSnpDetection):
         Check the version of Snippy, is different will need to force new SNP detection
         '''
         self.check_setup_files()
+
         self.current_snippy_version = self.check_deps()
+        logger.info(f"Comapring snippy versions.")
         if self.current_snippy_version.group("major", "minor") != self.original_snippy_version.group("major", "minor"):
             self.force = True
-            self.log_messages('info', f"You are using a different version of Snippy for this re-run, SNP calling will be repeated.")
+            logger.info(f"You are using a different version of Snippy for this re-run, SNP calling will be repeated.")
 
 
     def update_source_log(self):
         '''
         update source.log if user changes parameters
         '''
+        logger.info(f"Updating {self.job_id} records.")
         df = pandas.read_csv('source.log', sep = None, engine = 'python')
         data =pandas.DataFrame({'JobID':self.job_id, 'Reference':self.ref,'Mask':self.mask, 'Pipeline': self.pipeline, 'CPUS': self.cpus,'MinAln':self.minaln,'Gubbins': self.gubbins, 'Date':self.day, 'User':self.user,'snippy_version':self.current_snippy_version ,'input_file':f"{self.input_file}",'prefillpath': self.prefillpath,'Assembler':self.assembler},index=[0])
         df = df.append(data)
@@ -166,11 +171,14 @@ class ReRunSnpDetection(RunSnpDetection):
         Remove report directory from previous run 
         '''
         # os.chdir(self.workdir)
+        
         p1 = pathlib.Path(self.workdir, self.job_id, 'report')
         p2 = pathlib.Path(self.workdir, self.job_id, f"report_{self.orignal_date}")
         if self.keep:
+            logger.info(f"Archiving previous report files")
             cmd = f"mv {p1} {p2}"
         else:
+            logger.info("Removing previous report files.")
             cmd = f"if [ -d {p1} ];then rm -r {p1}; fi"
         subprocess.run(cmd, shell = True)
     
@@ -178,6 +186,7 @@ class ReRunSnpDetection(RunSnpDetection):
         '''
         Need to remove core_isolates.txt to get snakemake to redo snippy core step
         '''
+        logger.info(f"Removing previous snippy-core output.")
         corefiles = sorted(pathlib.Path(self.workdir, self.job_id).glob('core*'))
         if corefiles:
             for core in corefiles:
@@ -200,8 +209,7 @@ class ReRunSnpDetection(RunSnpDetection):
         # run the workflow
         if self.run_workflow(): 
             if not self.dryrun:
-                self.log_messages('info', f"Report can be found in {self.job_id}")
-                self.log_messages('info', f"Process specific log files can be found in process directories. Job settings can be found in source.log") 
+                logger.info(f"Report can be found in {self.job_id}")
+                logger.info(f"Process specific log files can be found in process directories. Job settings can be found in source.log") 
     
-            self.log_messages('info', f"Have a nice day. Come back soon.") 
-            self.log_messages('info',f"{60 * '='}")
+            logger.info(f"Have a nice day. Come back soon.") 

@@ -597,6 +597,7 @@ class RunSnpDetection(object):
         :input
             :tab: dataframe of the input file
         '''
+        logger.info(f"Checking that all the read files exist.")
         for i in tab.itertuples():
             
             if not '#' in i[1]:
@@ -618,7 +619,7 @@ class RunSnpDetection(object):
         '''        
         self.check_input_structure(tab=tab)
         self.check_reads_exists(tab=tab)
-        
+        logger.info(f"Recording the isolates used in job: {self.job_id} on {self.day}")
         lf = pandas.DataFrame({'Isolate': [i for i in list(tab.iloc[ : , 0]) if '#' not in i ], 'Status': f"INCLUDED", 'Date': self.day})
         lf['Status'] = numpy.where(lf['Isolate'].str.contains('#'), f"REMOVED", lf['Status'])
         isolates = lf[lf['Status'].isin(['INCLUDED', 'ADDED'])]['Isolate']
@@ -647,12 +648,14 @@ class RunSnpDetection(object):
         isolates = self.set_isolate_log(tab = tab, logfile = logfile, validation = validation)
         
         # get a list of isolates
+        logger.info(f"This job : {self.job_id} contains {len(list(set(isolates)))}")
         return(list(set(isolates))) 
         
     def write_pipeline_job(self, maskstring,  script_path = f"{pathlib.Path(__file__).parent / 'utils'}", resource_path = f"{pathlib.Path(__file__).parent / 'templates'}"):
         '''
         write out the pipeline string for transfer to job specific pipeline
         '''
+        
         wd = self.workdir / self.job_id
         
         c = MakeWorkflow()
@@ -660,7 +663,7 @@ class RunSnpDetection(object):
         # config_params = config_params.write_config_params()
 
         p = MakeWorkflow()
-        self.log_messages('message', f"writing the pipeline for {self.job_id}")
+        logger.info(f"writing the pipeline for {self.job_id}")
         
         # pipeline always has seqdata in 
         pipelinelist = [p.write_all(run_kraken = self.run_kraken,pipeline = self.pipeline), p.write_seqdata(), p.write_estimate_coverage(),p.write_generate_yield(script_path),p.write_combine_seqdata()]
@@ -697,6 +700,7 @@ class RunSnpDetection(object):
         Using the json file provided determine the args to be used in command
         '''
         # print(queue_args)
+        logger.info(f"Getting settings from {self.json}")
         try:
             with open(self.json) as f:
                 json_file = json.load(f)
@@ -715,13 +719,13 @@ class RunSnpDetection(object):
                         raise SystemExit
                 return ' '.join(arg_cluster)
         except json.decoder.JSONDecodeError:
-            self.log_messages('warning', f'There is something wrong with your {self.json} file. Possible reasons for this error are incorrect use of single quotes. Check json format documentation and try again.')
+            logger.warning(f'There is something wrong with your {self.json} file. Possible reasons for this error are incorrect use of single quotes. Check json format documentation and try again.')
 
 
     def cluster_cmd(self):
 
         queue_args = ""
-        
+        logger.info(f"Setting up cluster settings for {self.job_id} using {self.json}")
         if self.queue == 'sbatch':
             queue_args = {'account':'-A' ,'cpus-per-task':'-c',  'time': '--time', 'partition':'--partition', 'mem':'--mem', 'job':'-J'}
             queue_cmd = f'sbatch'
@@ -729,7 +733,7 @@ class RunSnpDetection(object):
             queue_args = {'account':'-P' ,'cpus-per-task': '-l ncpus=',  'time': '-l walltime=', 'partition':'-q', 'mem':'-l mem=', 'job':'-N'}
             queue_cmd = f'qsub'
         else:
-            self.log_messages('warning', f'{self.queue} is not supported please select sbatch or qsub. Alternatively contact developer for further advice.')
+            logging.warning(f'{self.queue} is not supported please select sbatch or qsub. Alternatively contact developer for further advice.')
             raise SystemExit
     
         queue_string = self.json_setup(queue_args = queue_args)
@@ -747,7 +751,7 @@ class RunSnpDetection(object):
             :isolates: a list of isolates that need to be included
         '''
 
-        self.log_messages('info',f"Setting up {self.job_id} specific workflow")
+        logger.info(f"Setting up {self.job_id} specific workflow")
         
 
         if self.gubbins == True:
@@ -762,15 +766,15 @@ class RunSnpDetection(object):
             maskstring = f"--mask {self.workdir / self.mask}"
         else:
             maskstring = ''
-                
+        logger.info(f"Writing config file for job : {self.job_id}")
         # read the config file which is written with jinja2 placeholders (like django template language)
         config_template = jinja2.Template(pathlib.Path(self.resources, 'config_snippy.yaml').read_text())
         config = self.workdir / f"{self.job_id}"/ f"{config_name}"
         
         config.write_text(config_template.render(reference = f"{pathlib.Path(self.workdir, self.ref)}", cpus = self.cpus, name = self.job_id,  minperc = self.minaln,now = self.now, maskstring = maskstring, day = self.day, isolates = ' '.join(isolates)))
         
-        self.log_messages('info',f"Config file successfully created")
-
+        logger.info(f"Config file successfully created")
+        logger.info(f"Writing Snakefile for job : {self.job_id}")
         snk_template = jinja2.Template(pathlib.Path(self.resources, 'Snakefile_base').read_text())
         snk = self.workdir / snake_name
 
@@ -778,14 +782,14 @@ class RunSnpDetection(object):
         wd, config_params, pipelinestring = self.write_pipeline_job(maskstring = maskstring)
         snk.write_text(snk_template.render(configfile = f"configfile: '{config_name}'",config_params = config_params, pipeline = pipelinestring, workdir=f"workdir: '{wd}'", gubbins_input = gubbins_string)) 
         
-        self.log_messages('info',f"Snakefile successfully created")
+        logger.info(f"Snakefile successfully created")
 
  
     def run_workflow(self,snake_name = 'Snakefile'):
         '''
         run snp_detection
         set the current directory to working dir for correct running of pipeline
-        if the pipeline wroks, return True else False
+        if the pipeline works, return True else False
         '''
         if self.force:
             force = f"-F"
@@ -801,9 +805,9 @@ class RunSnpDetection(object):
         if self.cluster:
             cmd = f"{self.cluster_cmd()} -s {snake_name} {force} --latency-wait 1200"
         else:
-            cmd = f"snakemake {dry} -s {snake_name} --cores {self.cpus} {force} 2>&1 | tee -a job.log"
+            cmd = f"snakemake {dry} -s {snake_name} --cores {self.cpus} {force} 2>&1 | tee -a bohra.log"
             # cmd = f"snakemake -s {snake_name} --cores {self.cpus} {force} "
-        
+        logger.info(f"Running job : {self.job_id} with {cmd} this may take some time. We appreciate your patience.")
         wkf = subprocess.run(cmd, shell = True)
         if wkf.returncode == 0:
             return True
@@ -835,14 +839,14 @@ class RunSnpDetection(object):
         if self.run_workflow():
             # TODO add in cleanup function to remove snakemkae fluff 
             if not self.dryrun:
-                self.log_messages('info', f"Report can be found in {self.job_id}")
-                self.log_messages('info', f"Process specific log files can be found in process directories. Job settings can be found in source.log") 
+                logger.info(f"Report can be found in {self.job_id}")
+                logger.info(f"Process specific log files can be found in process directories. Job settings can be found in source.log") 
             else:
                 if self.force:
                     force = f"-F"
                 else:
                     force = f""
-                self.log_messages('info', f"snakemake -j {self.jobs} {force} 2>&1 | tee -a job.log")
-            self.log_messages('info', f"Have a nice day. Come back soon.") 
-            self.log_messages('info',f"{60 * '='}")
+                logger.info(f"snakemake -j {self.jobs} {force} 2>&1 | tee -a bohra.log")
+            logger.info(f"Have a nice day. Come back soon.") 
+            
 
