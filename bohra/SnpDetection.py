@@ -13,6 +13,7 @@ import json
 from Bio import SeqIO, Phylo
 from packaging import version
 from bohra.utils.write_snakemake import MakeWorkflow
+from bohra.bohra_logger import logger
 # from bohra.utils.write_report import Report
 
 
@@ -58,7 +59,7 @@ class RunSnpDetection(object):
             self.queue = args.queue
             self.check_cluster_reqs()
             self.set_cluster_log()
-
+        
         self.user = getpass.getuser()
         # gubbins TODO add back in later!!
         # if not args.gubbins:
@@ -78,6 +79,8 @@ class RunSnpDetection(object):
         self.dryrun = args.dry_run
         self.pipeline = args.pipeline
         self.cpus = args.cpus
+        # kraken db settings
+        self.kraken_db = args.kraken_db
         self.run_kraken = False
         self.assembler = args.assembler
         self.snippy_version = ''
@@ -91,7 +94,7 @@ class RunSnpDetection(object):
         if queue in ['sbatch', 'qsub']:
             return queue
         else:
-            self.log_messages(f"You are running bohra on a cluster? The queue setting is required, please choose either sbatch or qsub and try again")
+            logger.warning(f"You are running bohra on a cluster? The queue setting is required, please choose either sbatch or qsub and try again")
             raise SystemExit
 
     
@@ -100,12 +103,12 @@ class RunSnpDetection(object):
         check that the cluster.json and run snakemake files are present for running in a HPC environment
         '''
         if self.json == '' and not self.mdu:
-            self.log_messages('warning', f"The cluster.json file can not be empty. Please provide a valid file.")
+            logger.warning(f"The cluster.json file can not be empty. Please provide a valid file.")
             raise SystemExit
         # check json
         self.json = pathlib.Path(self.json)
         if not self.json.exists():
-            self.log_messages('warning', f"Please check the paths to {self.json}. You must provide valid paths.")
+            logger.warning(f"Please check the paths to {self.json}. You must provide valid paths.")
             raise SystemExit
         # check queue
         self.queue = self.check_queue(self.queue)
@@ -118,30 +121,16 @@ class RunSnpDetection(object):
             self.jobs =  self.cpus
         else:
             self.jobs = 1
-
-    def log_messages(self, type, message):
-        '''
-        Will log messages to the screen and also add them to job.log
-        input:
-            :type: type of message info or warning
-            :message: message to log
-
-        '''
-
-        if type == 'warning':
-            logging.warning(message)
-            print(f"WARNING: {message}")
-        if type == 'info':
-            logging.info(message)
-            # print(f"{message}")
     
     def force_overwrite(self):
         '''
         will force pipeline to run in an existing folder - removes isolate and source logs
         '''
+        logger.info(f"You have selected to force overwrite an existing job.")
         isolatelog = self.workdir / f"isolates.log"
         sourcelog = self.workdir / f"source.log"
         # joblog = self.workdir / f"job.log"
+        logger.info(f"Removing history.")
         if isolatelog.exists():
             isolatelog.unlink()
         if sourcelog.exists():
@@ -155,24 +144,28 @@ class RunSnpDetection(object):
         '''
         check that the working directory, resources directory and the input file exist
         '''
+        logger.info(f"Checking that all required input files exist.")
+        logger.info(f"Checking that {self.workdir} exists.")
         self.path_exists(self.workdir, v = False) 
+        logger.info(f"Checking that {self.resources} exists.")
         self.path_exists(self.resources, v = False)
+        logger.info(f"Checking that {self.input_file} exists.")
         self.path_exists(self.input_file)
     
     def check_snippy(self):
         '''
         check for snippy
         '''
+        logger.info(f"Checking that snippy is installed and recording version.")
         version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
         try:
             snippy = subprocess.run(['snippy', '--version'], stderr=subprocess.PIPE)
             snippy = snippy.stderr.decode().strip()
             self.snippy_version = version_pat.search(snippy)
-            self.log_messages('info', f"Snippy {snippy} found. Good job!")
-            
+            logger.info('info', f"Snippy {snippy} found. Good job!")
             return(version_pat.search(snippy))
         except FileNotFoundError:
-            self.log_messages('warning', f"snippy is not installed.")
+            logger.info(f"snippy is not installed.")
             raise SystemExit
     
     def check_snippycore(self):
@@ -203,9 +196,9 @@ class RunSnpDetection(object):
         '''
 
         if shutil.which(software):
-            self.log_messages('info', f"{software} is installed")
+            logger.info(f"{software} is installed")
         else:
-            self.log_messages('warning', f"{software} is not installed, please check dependencies and try again.")
+            logger.warning('warning', f"{software} is not installed, please check dependencies and try again.")
             raise SystemExit
 
 
@@ -241,22 +234,39 @@ class RunSnpDetection(object):
         s = path.stat().st_size
         return s
 
-    def check_kraken2DB(self):
+    def check_kraken2_files(self, k2db):
         '''
-        ensure that DB is present and not emtpy
+        ensure that kraken2 DB is not empty
         '''
-        self.log_messages('info', 'Searching for kraken2 DB')
-        if "KRAKEN2_DEFAULT_DB" in os.environ:
-            k2db = pathlib.Path(os.environ["KRAKEN2_DEFAULT_DB"])
-            if k2db.is_dir():
-                self.log_messages('info', 'Found kraken2 DB, checking that files are not empty')
+        if k2db.is_dir():
+                logger.info('Found kraken2 DB, checking that files are not empty')
                 kmerfiles = sorted(k2db.glob('*'))
                 s = []
                 for k in range(len(kmerfiles)):
                     s.append(self.check_size_file(k2db / kmerfiles[k]))
                 if 0 not in s:
                     self.run_kraken = True
-        self.log_messages('message',f"Congratulations your kraken database is present") if self.run_kraken else self.log_messages('warning', f"Your kraken DB is not installed in the expected path. Speciation will not be performed. If you would like to perform speciation in future please re-read bohra installation instructions.")
+        
+
+    def check_kraken2DB(self):
+        '''
+        ensure that DB is present and not emtpy
+        '''
+        logger.info('Searching for a custom kraken2 DB')
+        if self.kraken_db != "KRAKEN2_DEFAULT_DB":
+            if pathlib.Path(self.kraken_db).exists():
+                logger.info(f"{self.kraken_db} has been found. Checking that directory is not empty")
+                self.check_kraken2_files(k2db = self.kraken_db)
+            else:
+                logger.warning(f"It seems that your settings for the kraken DB are incorrect. Bohra will check for the presence of a default kraken2 DB.")
+        elif "KRAKEN2_DEFAULT_DB" in os.environ:
+            k2db = pathlib.Path(os.environ["KRAKEN2_DEFAULT_DB"])
+            if self.check_kraken2_files(k2db = self.kraken_db):
+                self.kraken_db = f"{k2db}"
+        if self.run_kraken:
+            logger.info(f"Congratulations your kraken database is present")  
+        else:
+            logger.warning(f"Your kraken DB is not installed in the expected path. Speciation will not be performed. If you would like to perform speciation in future please re-read bohra installation instructions.")
             
 
     def check_deps(self):
@@ -265,7 +275,7 @@ class RunSnpDetection(object):
         '''
         # TODO check all software tools used and is there a way to check database last update??
         # TODO check assemblers
-        self.log_messages('info', f"Checking software dependencies")
+        logger.info(f"Checking software dependencies")
         if self.pipeline != "a":
             self.check_snippycore()
             self.check_snpdists()
@@ -306,7 +316,7 @@ class RunSnpDetection(object):
         # check reference
         if self.pipeline != 'a':
             if self.ref == '':
-                self.log_messages('warning', f"You are trying call SNPs, a reference file is required. Please try again using '-r path to reference'")
+                logger.warning(f"You are trying call SNPs, a reference file is required. Please try again using '-r path to reference'")
                 raise SystemExit
             else:
                 self.ref = self.link_file(self.ref)
@@ -315,6 +325,7 @@ class RunSnpDetection(object):
         '''
         save the details of cluster configurations
         '''
+        logger.info(f"Recording details of your cluster settings.")
         new_df = pandas.DataFrame({'cluster_json': f"{self.json}",'Date':self.day, 'queue': f"{self.queue}"}, index = [0])
         cluster_log = self.workdir / 'cluster.log'
 
@@ -333,6 +344,7 @@ class RunSnpDetection(object):
         
             
         '''   
+        logger.infor(f"Recording your settings for job: {self.job_id}")
         new_df = pandas.DataFrame({'JobID':self.job_id, 'Reference':f"{self.ref}",'Mask':f"{self.mask}", 
                                     'MinAln':self.minaln, 'Pipeline': self.pipeline, 'CPUS': self.cpus, 'Assembler':self.assembler,
                                     'Gubbins': self.gubbins, 'Date':self.day, 'User':self.user, 'snippy_version':self.snippy_version, 'input_file':f"{self.input_file}",'prefillpath': self.prefillpath, 'cluster': self.cluster}, 
@@ -358,9 +370,9 @@ class RunSnpDetection(object):
         if isinstance(source_path, str):
             source_path = pathlib.Path(source_path)
         if source_path.exists():
-            self.log_messages('warning',f"This may be a re-run of an existing job. Please try again using rerun instead of detect OR use -f to force an overwrite of the existing job.")
-            self.log_messages('warning',f"Exiting....")
-            self.log_messages('info',f"{60 * '='}")
+            logger.warning(f"This may be a re-run of an existing job. Please try again using rerun instead of run OR use -f to force an overwrite of the existing job.")
+            logger.warning(f"Exiting....")
+            
             raise SystemExit()
         else:
             return False
@@ -377,11 +389,11 @@ class RunSnpDetection(object):
         '''
         
         if not path.exists():
-            self.log_messages('warning', f"The {path.name} does not exist.")
+            logger.warning(f"The {path.name} does not exist.")
             raise FileNotFoundError(f"{path.name}")
         else:
             if v == True:
-                self.log_messages('info', f"Found {path.name}.")
+                logger.info(f"Found {path.name}.")
 
             return True
 
@@ -397,12 +409,12 @@ class RunSnpDetection(object):
         
         if isinstance(name, str):
             if len(name) == 0:
-                self.log_messages('warning', 'Job id ca not be empty, please set -j job_id to try again')
+                logger.warning('Job id ca not be empty, please set -j job_id to try again')
                 raise SystemExit()
             else:
                 return name
         else:
-            self.log_messages('warning', 'Job id ca not be empty, please set -j job_id to try again')
+            logger.warning('Job id ca not be empty, please set -j job_id to try again')
             raise SystemExit()
 
     def link_reads(self, read_source, isolate_id, r_pair):
@@ -411,6 +423,7 @@ class RunSnpDetection(object):
 
         '''
         # check that job directory exists
+        # logger.info(f"Checking that reads are present.")
         J = pathlib.Path(self.workdir, self.job_id)
         if not J.exists():
             J.mkdir()
@@ -430,7 +443,7 @@ class RunSnpDetection(object):
             if not read_target.exists():
                 read_target.symlink_to(read_source)
         else:
-            self.log_messages('warning', f"{read_source} does not seem to a valid path. Please check your input and try again.")
+            logger.warning(f"{read_source} does not seem to a valid path. Please check your input and try again.")
             raise SystemExit()
 
     def unzip_files(self,path, suffix):
@@ -440,6 +453,7 @@ class RunSnpDetection(object):
             :path: pathname  of file to unzip string
             :unzipped: unzipped path
         '''
+        logger.info(f"Checking if reference needs to be unzipped")
         target = self.workdir / path.name.strip(suffix)
         
         if suffix == '.zip':
@@ -447,14 +461,15 @@ class RunSnpDetection(object):
         elif suffix == '.gz':   
             cmd = f"gzip -d -c {path} > {target}"
         else:
-            self.log_messages('warning', f"{path} can not be unzipped. This may be due to file permissions, please provide path to either an uncompressed reference or a file you have permissions to.")
+            logger.warning(f"{path} can not be unzipped. This may be due to file permissions, please provide path to either an uncompressed reference or a file you have permissions to.")
             raise SystemExit
 
         try:
+            logger.info(f"Trying to unzip reference.")
             subprocess.run(cmd, shell = True)
             return target.name
         except:
-            self.log_messages('warning', f"{path} can not be unzipped. This may be due to file permissions, please provide path to either an uncompressed reference or a file you have permissions to.")
+            logger.warning(f"{path} can not be unzipped. This may be due to file permissions, please provide path to either an uncompressed reference or a file you have permissions to.")
             raise SystemExit            
 
         
@@ -471,25 +486,24 @@ class RunSnpDetection(object):
             returns path.name (str)   
         '''
         
-            
+        logger.info(f"Getting input files.") 
         if path.exists():
             if f"{path.suffix}" in ['.gz','zip']:
                     path = pathlib.Path(self.unzip_files(path, f"{path.suffix}"))
                     if not path.exists():
-                        self.log_messages('warning', f"{path} does not exist. Please try again.")
+                        logger.warning(f"{path} does not exist. Please try again.")
+                        raise SystemExit
             else:
                 target = self.workdir / path.name
                 # use rename to copy reference to working directory
                 # if the reference is not already in the working directory symlink it to working dir
                 if not target.exists():
-                    logging.info(f"Linking {path.name} to {self.workdir.name}")
+                    logger.info(f"Linking {path.name} to {self.workdir.name}")
                     target.symlink_to(path)
-                    
-                    # TODO add in unzip option unzip 
                     found = True
                     
         else:
-            self.log_messages('warning', f"Path to {path} does not exist or is not a valid file type (.gbk, .fa, .fasta, .gbk.gz, .fa.gz, .fasta.gz). Please provide a valid path to a file and try again")
+            logger.warning(f"Path to {path} does not exist or is not a valid file type (.gbk, .fa, .fasta, .gbk.gz, .fa.gz, .fasta.gz). Please provide a valid path to a file and try again")
             raise SystemExit
             # path = pathlib.Path(path)
         
@@ -506,14 +520,15 @@ class RunSnpDetection(object):
         
         # if there is a file path added the generate a symlink
         if len(mask) > 0:
-                m = pathlib.Path(mask)
-                if f"{m.name}" == original_mask:
-                    self.mask = original_mask
-                    return original_mask
-                else:
-                    m = self.link_file(m)
-                    self.mask = m
-                    return m
+            logger.info(f"Checking that mask file exists.")
+            m = pathlib.Path(mask)
+            if f"{m.name}" == original_mask:
+                self.mask = original_mask
+                return original_mask
+            else:
+                m = self.link_file(m)
+                self.mask = m
+                return m
         elif len(mask) == 0 and original_mask:
             self.mask = original_mask
             return original_mask
@@ -525,6 +540,7 @@ class RunSnpDetection(object):
         Ensure that there are a minimum of four samples
         returns True if four or more samples
         '''
+        logger.info(f"Checking that there are a minimum of 4 isolates.")
         return tab.shape[0] < 4
 
     def three_cols(self, tab):
@@ -533,6 +549,7 @@ class RunSnpDetection(object):
         returns True if 3 columns False otherwise
         
         '''
+        logger.info(f"Checking that input file is the correct structure.")
         if tab.shape[1] == 3:
             return True
         else:
@@ -543,6 +560,7 @@ class RunSnpDetection(object):
         Ensure that all fields contain data - no NA's
         returns True if there are no nan, False otherwise
         '''
+        logger.info("Checking that there is no empyt fields in the input file.")
         return tab.isnull().sum().sum() == 0
     
 
@@ -558,16 +576,16 @@ class RunSnpDetection(object):
         # not the right information (not three columns)
         
         if not self.three_cols(tab):
-            self.log_messages('warning',f"{self.input_file} does not appear to be in the correct configuration")
+            logging.warning(f"{self.input_file} does not appear to be in the correct configuration")
             raise TypeError(f"{self.input_file} has incorrect number of columns")
         # if there are not enough isolates (>4)
         
         if self.min_four_samples(tab):
-            self.log_messages('warning', f"{self.input_file} does not contain enough isolates. The minimum is 4.")
+            logger.warning(f"{self.input_file} does not contain enough isolates. The minimum is 4.")
             raise TypeError(f"{self.input_file} has incorrect number of isolates")
         # if any na present indicates that not the full info has been provided
         if not self.all_data_filled(tab):
-            self.log_messages('warning',f"{self.input_file} appears to be missing some inforamtion.")
+            logger.warning('warning',f"{self.input_file} appears to be missing some inforamtion.")
             raise TypeError(f"{self.input_file} appears to be missing some inforamtion.")
         
         return True

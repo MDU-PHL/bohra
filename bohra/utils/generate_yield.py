@@ -7,8 +7,11 @@ def get_data(output):
 #    print(seqtkdata[0]
     summary_pat = re.compile(r'(\w+):\s(\d+\.?\d?\d?);')
     distinct_values = re.compile(r';\s(\d+)\s\w+')
+    # print(distinct_values)
+    print(output[1])
     record = re.compile(r'(\d+\.?\d?\d?)')
     summary_dict = dict((k, float(v)) for k, v in summary_pat.findall(output[0]))
+    # print(distinct_values.findall(output[0]))
     summary_dict['distinct_error_codes'] = int(distinct_values.findall(output[0])[0])
     header = output[1].replace('%', '').replace('#', '').replace("POS\t", "").split("\t")
     line_one = [float(v) for v in record.findall(output[2])]

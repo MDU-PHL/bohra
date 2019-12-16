@@ -107,7 +107,7 @@ rule kraken:
 
 	shell:
 		\"""
-		KRAKENPATH={prefillpath}/{{wildcards.sample}}/kraken2.tab
+		KRAKENPATH=/{prefillpath}/{{wildcards.sample}}/kraken2.tab
 		if [ -f $KRAKENPATH ]; then
 			cp $KRAKENPATH {{output}}
 		else
@@ -409,7 +409,7 @@ rule assemble:
 		16
 	shell:
 		\"""
-		ASSEMBLEPATH={prefillpath}/{{wildcards.sample}}
+		ASSEMBLEPATH=/{prefillpath}/{{wildcards.sample}}
 		if [ -f $ASSEMBLEPATH/contigs.fa ]; then
 			cp $ASSEMBLEPATH/contigs.fa {{output}}
 
