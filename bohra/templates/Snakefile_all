@@ -34,7 +34,7 @@ rule all:
 		"report/distances.tab",
 		"report/core.tab",
 		"report/report.html",
-        "roary/gene_presence_absence.csv\", 
+        "roary/gene_presence_absence.csv", 
 		"pan_genome.svg", 
 		"report/pan_genome.svg",
 		"report/summary_statistics.txt",{% endraw %}
@@ -346,29 +346,30 @@ rule run_prokka:
 		"""
 
 rule run_roary:
-	input:
-		expand("prokka/{sample}/{sample}.gff", sample = SAMPLE)
-	output:
-		"roary/gene_presence_absence.csv", "roary/summary_statistics.txt"
-	threads:
-		36
-    singularity:{% endraw %}"{{singularity_dir}}/roary"{% raw %}
-	shell:
-		"""
-		roary -p {threads} -f roary {input}
-		mv roary_*/* roary
-		rm -r roary_*
-		"""
+    input:
+        expand("prokka/{sample}/{sample}.gff", sample = SAMPLE)
+    output:
+        "roary/gene_presence_absence.csv", "roary/summary_statistics.txt"
+    threads:
+        36
+    singularity:
+        "{% endraw %}{{singularity_dir}}/roary"{% raw %}
+    shell:
+        """
+        roary -p {threads} -f roary {input}
+        mv roary_*/* roary
+        rm -r roary_*
+        """
 
 rule pan_figure:
-	input:
-		"roary/gene_presence_absence.csv"
-	output:
-		"pan_genome.svg"
-	shell:
-		"""
-		perl {% endraw %}{{script_path}}/{% raw %}roary2svg.pl {input} > {output}
-		"""
+    input:
+        "roary/gene_presence_absence.csv"
+    output:
+        "pan_genome.svg"
+    shell:
+        """
+        perl {% endraw %}{{script_path}}/{% raw %}roary2svg.pl {input} > {output}
+        """
 
 rule combine_assembly_metrics:
 	input:
@@ -460,6 +461,6 @@ rule write_html_report:
 	
 	shell:
 		"""
-		python3 {{script_path}}/write_report.py {{workdir}} {{script_path}}/templates all {{job_id}} {{assembler}} {{run_kraken}}
+		python3 {{script_path}}/write_report.py {{workdir}} {{template_path}} all {{job_id}} {{assembler}} {{run_kraken}}
 		"""
 

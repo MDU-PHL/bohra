@@ -430,6 +430,6 @@ rule write_html_report:
 	
 	shell:
 		"""
-		python3 {{script_path}}/write_report.py {{workdir}} {{script_path}}/templates sa {{job_id}} {{assembler}} {{run_kraken}}
+		python3 {{script_path}}/write_report.py {{workdir}} {{template_path}} sa {{job_id}} {{assembler}} {{run_kraken}}
 		"""
 

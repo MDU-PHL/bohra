@@ -293,21 +293,7 @@ class RunSnpDetection(object):
 
             return True
 
-    # def check_validation(self, validation_type):
-    #     '''
-    #     Check if this is a validation run 
-    #     '''
-    #         if validation_type == 'both':
-    #             validate = ['snps', 'clusters']
-    #         else:
-    #             if validation_type in ['snps', 'clusters']:
-    #                 validate = validation_type.split(',')
-    #             else:
-    #                 self.log_messages('warning', f"{validation_type} is not a valid input. Correct options can be taken from {' '.join(['snps', 'clusters', 'both'])}. Please try again")
-    #                 raise SystemExit
 
-    #         return(validate)
-    
     
 
     def run_checks(self):
@@ -348,10 +334,13 @@ class RunSnpDetection(object):
         
             
         '''   
+        # TODO add in options for using singularity containers
+        # path if using containers.
+        snippy_v = f'singularity_{self.date}' if self.use_singularity else self.snippy_version
         logger.info(f"Recording your settings for job: {self.job_id}")
         new_df = pandas.DataFrame({'JobID':self.job_id, 'Reference':f"{self.ref}",'Mask':f"{self.mask}", 
                                     'MinAln':self.minaln, 'Pipeline': self.pipeline, 'CPUS': self.cpus, 'Assembler':self.assembler,
-                                    'Gubbins': self.gubbins, 'Date':self.day, 'User':self.user, 'snippy_version':self.snippy_version, 'input_file':f"{self.input_file}",'prefillpath': self.prefillpath, 'cluster': self.cluster}, 
+                                    'Gubbins': self.gubbins, 'Date':self.day, 'User':self.user, 'snippy_version':snippy_v, 'input_file':f"{self.input_file}",'prefillpath': self.prefillpath, 'cluster': self.cluster}, 
                                     index=[0], )
         
         source_path = self.workdir / 'source.log'
@@ -648,10 +637,9 @@ class RunSnpDetection(object):
         
         tab = pandas.read_csv(self.input_file, sep = None, engine = 'python', header = None)
         
-        # self.log_messages('info', f"input file has been opened as a dataframe")
+        
         isolates = self.set_isolate_log(tab = tab, logfile = logfile, validation = validation)
         
-        # get a list of isolates
         logger.info(f"This job : {self.job_id} contains {len(list(set(isolates)))}")
         return(list(set(isolates))) 
         
@@ -677,13 +665,10 @@ class RunSnpDetection(object):
             'job_id' : self.job_id,
             'assembler' : self.assembler,
             'run_kraken' : self.run_kraken,
-            'maskstring': maskstring
+            'maskstring': maskstring, 
+            'template_path':resource_path
         }
-        # c = MakeWorkflow()
-        # config_params = c.write_config_params()
-        # # config_params = config_params.write_config_params()
-
-        # p = MakeWorkflow()
+        
         logger.info(f"Writing Snakefile for job : {self.job_id}")
         snk_template = jinja2.Template(pathlib.Path(self.resources, pipeline_setup[self.pipeline]).read_text())
         snk = self.workdir / 'Snakefile'
@@ -691,33 +676,7 @@ class RunSnpDetection(object):
         snk.write_text(snk_template.render(vars_for_file)) 
         
         logger.info(f"Snakefile successfully created")
-        # pipeline always has seqdata in 
-        # pipelinelist = [p.write_all(run_kraken = self.run_kraken,pipeline = self.pipeline), p.write_seqdata(), p.write_estimate_coverage(),p.write_generate_yield(script_path),p.write_combine_seqdata()]
-
-        # # for just snps contains snippy, snippy-core, dists and tree
-        # snps_pipeline = [p.write_snippy(), p.write_qc_snippy_initial(), p.write_snippy_core(mask = maskstring), p.write_snp_dists(), p.write_convert_and_index(), p.write_tree(script_path=script_path, alntype='core')] if self.pipeline in ["s","sa", "all"] else []
-        # # for just assemblies
-        # #         # for roary
-        # assembly_pipeline = [p.write_assemblies(prefillpath = self.prefillpath, assembler = self.assembler), p.write_resistome(), p.write_mlst(),p.write_kraken(prefillpath = self.prefillpath, run_kraken = self.run_kraken), p.write_combine(), p.write_assembly_stats(script_path), p.write_prokka(), p.write_gff_summary(), p.write_combine_kraken(run_kraken = self.run_kraken)] if self.pipeline in ["a", "sa", "all"] else []
-        # roary_pipeline =  [p.write_roary(), p.write_pan_graph(script_path = script_path)] if self.pipeline == "all" else []
-
-        # # pipeline can always ends with report
-        # report_pipeline = [p.write_report_collation(pipeline = self.pipeline, run_kraken = self.run_kraken), p.write_html(run_kraken = self.run_kraken, pipeline = self.pipeline,workdir = self.workdir, resources = resource_path, job_id = self.job_id, script_path = script_path, assembler = "None" if self.assembler == "" else self.assembler_dict[self.assembler])]
         
-        # if self.pipeline == 's':
-        #     pipelinelist.extend(snps_pipeline)
-        # elif self.pipeline == 'a':
-        #     pipelinelist.extend(assembly_pipeline)
-        # elif self.pipeline == 'sa':
-        #     pipelinelist.extend(snps_pipeline)
-        #     pipelinelist.extend(assembly_pipeline)
-        # elif self.pipeline == 'all':
-        #     pipelinelist.extend(snps_pipeline)
-        #     pipelinelist.extend(assembly_pipeline)
-        #     pipelinelist.extend(roary_pipeline)
-        # pipelinelist.extend(report_pipeline)
-
-
         
 
     def json_setup(self, queue_args):
@@ -801,15 +760,7 @@ class RunSnpDetection(object):
         logger.info(f"Config file successfully created")
 
         self.write_pipeline_job(maskstring = maskstring)
-        # logger.info(f"Writing Snakefile for job : {self.job_id}")
-        # snk_template = jinja2.Template(pathlib.Path(self.resources, 'Snakefile_base').read_text())
-        # snk = self.workdir / snake_name
-
-        # # write out custom parts of pipeline
-        # # wd, config_params, pipelinestring = self.write_pipeline_job(maskstring = maskstring)
-        # snk.write_text(snk_template.render(configfile = f"configfile: '{config_name}'",config_params = config_params, pipeline = pipelinestring, workdir=f"workdir: '{wd}'", gubbins_input = gubbins_string)) 
         
-        # logger.info(f"Snakefile successfully created")
 
  
     def run_workflow(self,snake_name = 'Snakefile'):

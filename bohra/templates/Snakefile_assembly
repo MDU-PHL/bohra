@@ -63,7 +63,7 @@ rule generate_yield:
 		"{sample}/yield.tab"
 	shell:
 		"""
-		python3 {% endraw %}{{script_path}}/utils/generate_yield.py{% raw %} {input[1]} {input[0]} {output}
+		python3 {% endraw %}{{script_path}}/generate_yield.py{% raw %} {input[1]} {input[0]} {output}
 		"""
 
 
@@ -247,12 +247,12 @@ cp resistome.tab report/resistome.tab
 
 rule write_html_report:
 	input:
-		'report/seqdata.tab', 'report/assembly.tab','report/mlst.tab', 'report/resistome.tab', 'report/core_genome.tab', 'report/core.treefile', 'report/distances.tab',{{species_report}}
+		'report/seqdata.tab', 'report/assembly.tab','report/mlst.tab', 'report/resistome.tab',{{species_report}}
 	output:
 		'report/report.html'
 	
 	shell:
 		"""
-		python3 {{script_path}}/write_report.py {{workdir}} {{script_path}}/templates a {{job_id}} {{assembler}} {{run_kraken}}
+		python3 {{script_path}}/write_report.py {{workdir}} {{template_path}} a {{job_id}} {{assembler}} {{run_kraken}}
 		"""
 
