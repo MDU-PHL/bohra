@@ -337,12 +337,12 @@ class RunSnpDetection(object):
         # TODO add in options for using singularity containers
         # path if using containers.
         snippy_v = f'singularity_{self.day}' if self.use_singularity else self.snippy_version
-        print(snippy_v)
+        kraken = self.kraken_db if self.run_kraken else ''
         s = True if self.use_singularity else False
         logger.info(f"Recording your settings for job: {self.job_id}")
         new_df = pandas.DataFrame({'JobID':self.job_id, 'Reference':f"{self.ref}",'Mask':f"{self.mask}", 
                                     'MinAln':self.minaln, 'Pipeline': self.pipeline, 'CPUS': self.cpus, 'Assembler':self.assembler,
-                                    'Date':self.day, 'User':self.user, 'snippy_version':snippy_v, 'input_file':f"{self.input_file}",'prefillpath': self.prefillpath, 'cluster': self.cluster,'singularity': s}, 
+                                    'Date':self.day, 'User':self.user, 'snippy_version':snippy_v, 'input_file':f"{self.input_file}",'prefillpath': self.prefillpath, 'cluster': self.cluster,'singularity': s, 'kraken_db':kraken}, 
                                     index=[0], )
         
         source_path = self.workdir / 'source.log'
@@ -356,7 +356,7 @@ class RunSnpDetection(object):
 
     def check_rerun(self):
         '''
-        CHeck if the job is a rerun of an existing job, if so print message informing user and exit
+        Check if the job is a rerun of an existing job, if so print message informing user and exit
 
         '''
 
@@ -665,7 +665,7 @@ class RunSnpDetection(object):
             'prefill_path' : self.prefillpath,
             'singularity_dir' : self.singularity_path, 
             'job_id' : self.job_id,
-            'assembler' : self.assembler,
+            'assembler' : self.assembler if self.pipeline != 's' else 'no_assembler',
             'run_kraken' : self.run_kraken,
             'maskstring': maskstring, 
             'template_path':resource_path
