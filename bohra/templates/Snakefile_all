@@ -33,7 +33,11 @@ rule all:
 		"report/core.treefile", 
 		"report/distances.tab",
 		"report/core.tab",
-		"report/report.html",{% endraw %}
+		"report/report.html",
+        "roary/gene_presence_absence.csv\", 
+		"pan_genome.svg", 
+		"report/pan_genome.svg",
+		"report/summary_statistics.txt",{% endraw %}
 		{{kraken_output}}
 
 {{kraken_rule}}
@@ -341,6 +345,30 @@ rule run_prokka:
 		prokka --outdir prokka/{wildcards.sample} --prefix {wildcards.sample} --mincontiglen 500 --notrna --fast --force {input}
 		"""
 
+rule run_roary:
+	input:
+		expand("prokka/{sample}/{sample}.gff", sample = SAMPLE)
+	output:
+		"roary/gene_presence_absence.csv", "roary/summary_statistics.txt"
+	threads:
+		36
+    singularity:{% endraw %}"{{singularity_dir}}/roary"{% raw %}
+	shell:
+		"""
+		roary -p {threads} -f roary {input}
+		mv roary_*/* roary
+		rm -r roary_*
+		"""
+
+rule pan_figure:
+	input:
+		"roary/gene_presence_absence.csv"
+	output:
+		"pan_genome.svg"
+	shell:
+		"""
+		perl {% endraw %}{{script_path}}/{% raw %}roary2svg.pl {input} > {output}
+		"""
 
 rule combine_assembly_metrics:
 	input:
@@ -380,9 +408,9 @@ rule combine_assembly_metrics:
 
 rule collate_report:
 	input:{% endraw %}
-		'seqdata.tab', 'assembly.tab', 'mlst.tab', 'resistome.tab', 'core.txt', 'core.treefile', 'core.tab', 'distances.tab', 'core.tab', {{species_summary}}
+		'seqdata.tab', 'assembly.tab', 'mlst.tab', 'resistome.tab', 'core.txt', 'core.treefile', 'core.tab', 'distances.tab', 'core.tab', 'pan_genome.svg','roary/summary_statistics.txt',{{species_summary}}
 	output:
-		'report/seqdata.tab', 'report/assembly.tab', 'report/mlst.tab',  'report/resistome.tab', 'report/core_genome.tab', 'report/core.treefile','report/distances.tab','report/core.tab', {{species_report}}{% raw %}
+		'report/seqdata.tab', 'report/assembly.tab', 'report/mlst.tab',  'report/resistome.tab', 'report/core_genome.tab', 'report/core.treefile','report/distances.tab','report/core.tab','report/pan_genome.svg', 'report/summary_statistics.txt' {{species_report}}{% raw %}
 	run:
 		
 		
@@ -414,6 +442,8 @@ cp distances.tab report/distances.tab
 cp core.tab report/core.tab
 cp mlst.tab report/mlst.tab
 cp resistome.tab report/resistome.tab
+cp pan_genome.svg report/pan_genome.svg
+cp roary/summary_statistics.txt report/summary_statistics.txt
 {% endraw %}{{copy_species_id}}
 
 """
@@ -424,12 +454,12 @@ cp resistome.tab report/resistome.tab
 
 rule write_html_report:
 	input:
-		'report/seqdata.tab', 'report/assembly.tab','report/mlst.tab', 'report/resistome.tab', 'report/core_genome.tab', 'report/core.treefile', 'report/distances.tab',{{species_report}}
+		'report/seqdata.tab', 'report/assembly.tab','report/mlst.tab', 'report/resistome.tab', 'report/core_genome.tab', 'report/core.treefile', 'report/distances.tab','report/pan_genome.svg', 'report/summary_statistics.txt' ,{{species_report}}
 	output:
 		'report/report.html'
 	
 	shell:
 		"""
-		python3 {{script_path}}/write_report.py {{workdir}} {{script_path}}/templates sa {{job_id}} {{assembler}} {{run_kraken}}
+		python3 {{script_path}}/write_report.py {{workdir}} {{script_path}}/templates all {{job_id}} {{assembler}} {{run_kraken}}
 		"""
 

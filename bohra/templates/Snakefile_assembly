@@ -35,7 +35,7 @@ rule seqdata:
 		'READS/{sample}/R2.fq.gz'
 	output:
 		"{sample}/seqdata.tab"
-	singularity:{% endraw %}"{{singularity_dir}}/seqtk.simg"{% raw %}
+	singularity:{% endraw %}"{{singularity_dir}}/seqtk"{% raw %}
 	shell:
 		"""
 		seqtk fqchk {input[0]} {input[1]} > {output}
@@ -48,7 +48,7 @@ rule estimate_coverage:
 		"READS/{sample}/R2.fq.gz"
 	output:
 		"{sample}/mash.txt"
-	singularity:{% endraw %}"{{singularity_dir}}/mash.simg"{% raw %}
+	singularity:{% endraw %}"{{singularity_dir}}/mash_kmc"{% raw %}
 	shell:
 		"""
 		mash sketch -r {input[0]} {input[1]} -m 3 -k 31 -o mash  &> {output}
@@ -100,7 +100,7 @@ rule assemble:
 		'{sample}/{sample}.fa'
 	threads:
 		8
-	singularity:{% endraw %}"{{singularity_dir}}/assemblers.simg"{% raw %}
+	singularity:{% endraw %}"{{singularity_dir}}/assemblers"{% raw %}
 	shell:
 		"""
 		ASSEMBLEPATH=/{% endraw %}{{prefill_path}}{% raw %}/{wildcards.sample}
@@ -122,7 +122,7 @@ rule resistome:
 		'{sample}/{sample}.fa'
 	output:
 		'{sample}/resistome.tab'
-	singularity:{% endraw %}"{{singularity_dir}}/abricate.simg"{% raw %}
+	singularity:{% endraw %}"{{singularity_dir}}/abricate"{% raw %}
 	shell:
 		"""
 		abricate --nopath {input} > {output}
@@ -135,7 +135,7 @@ rule mlst:
 		expand('{sample}/{sample}.fa', sample = SAMPLE)
 	output:
 		'mlst.tab'
-	singularity:{% endraw %}"{{singularity_dir}}/mlst.simg"{% raw %}
+	singularity:{% endraw %}"{{singularity_dir}}/mlst"{% raw %}
 	shell:
 		"""
 		mlst --nopath {input} | sed 's/\.fa//g' | sed '1iIsolate\tScheme\tST\tAlleles' > {output}
@@ -151,7 +151,7 @@ rule combine_results:
 	output:
 		'resistome.tab'
 		
-	singularity:{% endraw %}"{{singularity_dir}}/abricate.simg"{% raw %}
+	singularity:{% endraw %}"{{singularity_dir}}/abricate"{% raw %}
 	shell:
 		"""
 		abricate --summary {input} | sed 's/\/resistome.tab//g' | sed 's/\#FILE/Isolate/g' > {output[0]}
@@ -166,7 +166,7 @@ rule assembly_statistics:
 		"denovo.tab"
 	shell:
 		"""
-		 python3 {% endraw %}{{script_path}}/utils/assembly_stat.py{% raw %} {input} -m 500 > {output}
+		 python3 {% endraw %}{{script_path}}/assembly_stat.py{% raw %} {input} -m 500 > {output}
 		"""
 	
 
@@ -176,7 +176,7 @@ rule run_prokka:
 		"{sample}/{sample}.fa"
 	output:
 		"prokka/{sample}/{sample}.gff","prokka/{sample}/{sample}.txt"
-	singularity:{% endraw %}"{{singularity_dir}}/prokka.simg"{% raw %}
+	singularity:{% endraw %}"{{singularity_dir}}/prokka"{% raw %}
 	shell:
 		"""
 		prokka --outdir prokka/{wildcards.sample} --prefix {wildcards.sample} --mincontiglen 500 --notrna --fast --force {input}
@@ -253,6 +253,6 @@ rule write_html_report:
 	
 	shell:
 		"""
-		python3 {{script_path}}/utils/write_report.py {{workdir}} {{script_path}}/templates a {{job_id}} {{assembler}} {{run_kraken}}
+		python3 {{script_path}}/write_report.py {{workdir}} {{script_path}}/templates a {{job_id}} {{assembler}} {{run_kraken}}
 		"""
 

@@ -35,7 +35,7 @@ rule seqdata:
 		'READS/{sample}/R2.fq.gz'
 	output:
 		"{sample}/seqdata.tab"
-	singularity:{% endraw %}"{{singularity_dir}}/seqtk.simg"{% raw %}
+	singularity:{% endraw %}"{{singularity_dir}}/seqtk"{% raw %}
 	shell:
 		"""
 		seqtk fqchk {input[0]} {input[1]} > {output}
@@ -48,7 +48,7 @@ rule estimate_coverage:
 		"READS/{sample}/R2.fq.gz"
 	output:
 		"{sample}/mash.txt"
-	singularity:{% endraw %}"{{singularity_dir}}/mash.simg"{% raw %}
+	singularity:{% endraw %}"{{singularity_dir}}/mash_kmc"{% raw %}
 	shell:
 		"""
 		mash sketch -r {input[0]} {input[1]} -m 3 -k 31 -o mash  &> {output}
@@ -63,7 +63,7 @@ rule generate_yield:
 		"{sample}/yield.tab"
 	shell:
 		"""
-		python3 {% endraw %}{{script_path}}/utils/generate_yield.py{% raw %} {input[1]} {input[0]} {output}
+		python3 {% endraw %}{{script_path}}/generate_yield.py{% raw %} {input[1]} {input[0]} {output}
 		"""
 
 
@@ -100,7 +100,7 @@ rule snippy:
 		'{sample}/snps.aligned.fa'
 	threads:
 		8
-	singularity:{% endraw %}"{{singularity_dir}}/snippy.simg"{% raw %}
+	singularity:{% endraw %}"{{singularity_dir}}/snippy"{% raw %}
 	shell:
 		"""
 		snippy --outdir {wildcards.sample} --ref {REFERENCE} --R1 {input[0]} --R2 {input[1]} --force --cpus {threads}
@@ -169,10 +169,10 @@ rule run_snippy_core:
 		'core.aln', 
 		'core.full.aln',
 		'core.tab'
-	singularity:{% endraw %}"{{singularity_dir}}/snippy.simg"{% raw %}
+	singularity:{% endraw %}"{{singularity_dir}}/snippy"{% raw %}
 	shell:
 		"""
-		snippy-core --ref {REFERENCE}  $(cat core_isolates.txt)
+		snippy-core {% endraw %}{{mask_string}}{% raw %} --ref {REFERENCE}  $(cat core_isolates.txt)
 		
 		"""
 	
@@ -182,7 +182,7 @@ rule run_snpdists:
 		'core.aln' 
 	output:
 		'distances.tab' 
-	singularity:{% endraw %}"{{singularity_dir}}/snippy.simg"{% raw %}
+	singularity:{% endraw %}"{{singularity_dir}}/snippy"{% raw %}
 	shell:
 		"""
 		snp-dists {input} > {output}
@@ -218,7 +218,7 @@ rule calculate_iqtree_command_core:
 	output:
 		'run_iqtree_core.sh'
 	shell:
-		"bash {% endraw %}{{script_path}}/utils/iqtree_generator.sh{% raw %} {input[1]} {input[0]} core 20 > {output}"
+		"bash {% endraw %}{{script_path}}/iqtree_generator.sh{% raw %} {input[1]} {input[0]} core 20 > {output}"
 
 	
 
@@ -230,7 +230,7 @@ rule run_iqtree_core:
 		'core.iqtree',
 		'core.treefile',
 		
-	singularity:{% endraw %}"{{singularity_dir}}/iqtree.simg"{% raw %}
+	singularity:{% endraw %}"{{singularity_dir}}/iqtree"{% raw %}
 	shell:
 		"""	
 		bash run_iqtree_core.sh
@@ -275,6 +275,6 @@ rule write_html_report:
 	
 	shell:
 		"""
-		python3 {{script_path}}/utils/write_report.py {{workdir}} {{script_path}}/templates s {{job_id}} {{assembler}} {{run_kraken}}
+		python3 {{script_path}}/write_report.py {{workdir}} {{script_path}}/templates s {{job_id}} {{assembler}} {{run_kraken}}
 		"""
 

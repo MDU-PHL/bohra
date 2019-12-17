@@ -85,6 +85,8 @@ class RunSnpDetection(object):
         self.assembler = args.assembler
         self.snippy_version = ''
         self.assembler_dict = {'shovill': 'shovill', 'skesa':'skesa','spades':'spades.py'}
+        self.use_singularity = args.use_singularity
+        self.singularity_path = args.singularity_path
         self.set_snakemake_jobs()
 
     def check_queue(self, queue):
@@ -660,42 +662,63 @@ class RunSnpDetection(object):
         
         wd = self.workdir / self.job_id
         
-        c = MakeWorkflow()
-        config_params = c.write_config_params()
-        # config_params = config_params.write_config_params()
-
-        p = MakeWorkflow()
-        logger.info(f"writing the pipeline for {self.job_id}")
         
+        pipeline_setup = {
+            's':'Snakefile_snippy',
+            'sa':'Snakefile_default_',
+            'a':'Snakefile_assembly',
+            'all': 'Snakefile_all'
+        }
+        vars_for_file = {
+            'workdir': f"{wd}",
+            'script_path' : script_path,
+            'prefill_path' : self.prefillpath,
+            'singularity_dir' : self.singularity_path, 
+            'job_id' : self.job_id,
+            'assembler' : self.assembler,
+            'run_kraken' : self.run_kraken,
+            'maskstring': maskstring
+        }
+        # c = MakeWorkflow()
+        # config_params = c.write_config_params()
+        # # config_params = config_params.write_config_params()
+
+        # p = MakeWorkflow()
+        logger.info(f"Writing Snakefile for job : {self.job_id}")
+        snk_template = jinja2.Template(pathlib.Path(self.resources, pipeline_setup[self.pipeline]).read_text())
+        snk = self.workdir / 'Snakefile'
+
+        snk.write_text(snk_template.render(vars_for_file)) 
+        
+        logger.info(f"Snakefile successfully created")
         # pipeline always has seqdata in 
-        pipelinelist = [p.write_all(run_kraken = self.run_kraken,pipeline = self.pipeline), p.write_seqdata(), p.write_estimate_coverage(),p.write_generate_yield(script_path),p.write_combine_seqdata()]
+        # pipelinelist = [p.write_all(run_kraken = self.run_kraken,pipeline = self.pipeline), p.write_seqdata(), p.write_estimate_coverage(),p.write_generate_yield(script_path),p.write_combine_seqdata()]
 
-        # for just snps contains snippy, snippy-core, dists and tree
-        snps_pipeline = [p.write_snippy(), p.write_qc_snippy_initial(), p.write_snippy_core(mask = maskstring), p.write_snp_dists(), p.write_convert_and_index(), p.write_tree(script_path=script_path, alntype='core')] if self.pipeline in ["s","sa", "all"] else []
-        # for just assemblies
-        #         # for roary
-        assembly_pipeline = [p.write_assemblies(prefillpath = self.prefillpath, assembler = self.assembler), p.write_resistome(), p.write_mlst(),p.write_kraken(prefillpath = self.prefillpath, run_kraken = self.run_kraken), p.write_combine(), p.write_assembly_stats(script_path), p.write_prokka(), p.write_gff_summary(), p.write_combine_kraken(run_kraken = self.run_kraken)] if self.pipeline in ["a", "sa", "all"] else []
-        roary_pipeline =  [p.write_roary(), p.write_pan_graph(script_path = script_path)] if self.pipeline == "all" else []
+        # # for just snps contains snippy, snippy-core, dists and tree
+        # snps_pipeline = [p.write_snippy(), p.write_qc_snippy_initial(), p.write_snippy_core(mask = maskstring), p.write_snp_dists(), p.write_convert_and_index(), p.write_tree(script_path=script_path, alntype='core')] if self.pipeline in ["s","sa", "all"] else []
+        # # for just assemblies
+        # #         # for roary
+        # assembly_pipeline = [p.write_assemblies(prefillpath = self.prefillpath, assembler = self.assembler), p.write_resistome(), p.write_mlst(),p.write_kraken(prefillpath = self.prefillpath, run_kraken = self.run_kraken), p.write_combine(), p.write_assembly_stats(script_path), p.write_prokka(), p.write_gff_summary(), p.write_combine_kraken(run_kraken = self.run_kraken)] if self.pipeline in ["a", "sa", "all"] else []
+        # roary_pipeline =  [p.write_roary(), p.write_pan_graph(script_path = script_path)] if self.pipeline == "all" else []
 
-        # pipeline can always ends with report
-        report_pipeline = [p.write_report_collation(pipeline = self.pipeline, run_kraken = self.run_kraken), p.write_html(run_kraken = self.run_kraken, pipeline = self.pipeline,workdir = self.workdir, resources = resource_path, job_id = self.job_id, script_path = script_path, assembler = "None" if self.assembler == "" else self.assembler_dict[self.assembler])]
+        # # pipeline can always ends with report
+        # report_pipeline = [p.write_report_collation(pipeline = self.pipeline, run_kraken = self.run_kraken), p.write_html(run_kraken = self.run_kraken, pipeline = self.pipeline,workdir = self.workdir, resources = resource_path, job_id = self.job_id, script_path = script_path, assembler = "None" if self.assembler == "" else self.assembler_dict[self.assembler])]
         
-        if self.pipeline == 's':
-            pipelinelist.extend(snps_pipeline)
-        elif self.pipeline == 'a':
-            pipelinelist.extend(assembly_pipeline)
-        elif self.pipeline == 'sa':
-            pipelinelist.extend(snps_pipeline)
-            pipelinelist.extend(assembly_pipeline)
-        elif self.pipeline == 'all':
-            pipelinelist.extend(snps_pipeline)
-            pipelinelist.extend(assembly_pipeline)
-            pipelinelist.extend(roary_pipeline)
-        pipelinelist.extend(report_pipeline)
+        # if self.pipeline == 's':
+        #     pipelinelist.extend(snps_pipeline)
+        # elif self.pipeline == 'a':
+        #     pipelinelist.extend(assembly_pipeline)
+        # elif self.pipeline == 'sa':
+        #     pipelinelist.extend(snps_pipeline)
+        #     pipelinelist.extend(assembly_pipeline)
+        # elif self.pipeline == 'all':
+        #     pipelinelist.extend(snps_pipeline)
+        #     pipelinelist.extend(assembly_pipeline)
+        #     pipelinelist.extend(roary_pipeline)
+        # pipelinelist.extend(report_pipeline)
 
 
-        return(wd, config_params, '\n'.join(pipelinelist))
-
+        
 
     def json_setup(self, queue_args):
         '''
@@ -776,15 +799,17 @@ class RunSnpDetection(object):
         config.write_text(config_template.render(reference = f"{pathlib.Path(self.workdir, self.ref)}", cpus = self.cpus, name = self.job_id,  minperc = self.minaln,now = self.now, maskstring = maskstring, day = self.day, isolates = ' '.join(isolates)))
         
         logger.info(f"Config file successfully created")
-        logger.info(f"Writing Snakefile for job : {self.job_id}")
-        snk_template = jinja2.Template(pathlib.Path(self.resources, 'Snakefile_base').read_text())
-        snk = self.workdir / snake_name
 
-        # write out custom parts of pipeline
-        wd, config_params, pipelinestring = self.write_pipeline_job(maskstring = maskstring)
-        snk.write_text(snk_template.render(configfile = f"configfile: '{config_name}'",config_params = config_params, pipeline = pipelinestring, workdir=f"workdir: '{wd}'", gubbins_input = gubbins_string)) 
+        self.write_pipeline_job(maskstring = maskstring)
+        # logger.info(f"Writing Snakefile for job : {self.job_id}")
+        # snk_template = jinja2.Template(pathlib.Path(self.resources, 'Snakefile_base').read_text())
+        # snk = self.workdir / snake_name
+
+        # # write out custom parts of pipeline
+        # # wd, config_params, pipelinestring = self.write_pipeline_job(maskstring = maskstring)
+        # snk.write_text(snk_template.render(configfile = f"configfile: '{config_name}'",config_params = config_params, pipeline = pipelinestring, workdir=f"workdir: '{wd}'", gubbins_input = gubbins_string)) 
         
-        logger.info(f"Snakefile successfully created")
+        # logger.info(f"Snakefile successfully created")
 
  
     def run_workflow(self,snake_name = 'Snakefile'):
@@ -793,6 +818,11 @@ class RunSnpDetection(object):
         set the current directory to working dir for correct running of pipeline
         if the pipeline works, return True else False
         '''
+        if self.use_singularity:
+            singularity_string = f"--use-singularity --singularity-args '--bind /home'"
+        else:
+            singularity_string = ''
+
         if self.force:
             force = f"-F"
         else:
@@ -805,9 +835,9 @@ class RunSnpDetection(object):
             dry = ''
 
         if self.cluster:
-            cmd = f"{self.cluster_cmd()} -s {snake_name} {force} --latency-wait 1200"
+            cmd = f"{self.cluster_cmd()} -s {snake_name} {force} {singularity_string} --latency-wait 1200"
         else:
-            cmd = f"snakemake {dry} -s {snake_name} --cores {self.cpus} {force} 2>&1 | tee -a bohra.log"
+            cmd = f"snakemake {dry} -s {snake_name} --cores {self.cpus} {force} {singularity_string} 2>&1 | tee -a bohra.log"
             # cmd = f"snakemake -s {snake_name} --cores {self.cpus} {force} "
         logger.info(f"Running job : {self.job_id} with {cmd} this may take some time. We appreciate your patience.")
         wkf = subprocess.run(cmd, shell = True)
@@ -826,7 +856,10 @@ class RunSnpDetection(object):
         if self.force:
             self.force_overwrite()
         # check the pipeline setup 
-        self.run_checks()
+        if self.use_singularity:
+            logger.info(f"You have chosen to run bohra with singularity containers. Good luck")
+        else:
+            self.run_checks()
         
         # update source data in source.log
         self.set_source_log()

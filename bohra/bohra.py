@@ -50,7 +50,7 @@ def main():
     
     # options for running
     parser_sub_run.add_argument('--input_file','-i',help='Input file = tab-delimited with 3 columns <isolatename>  <path_to_read1> <path_to_read2>', default='')
-    parser_sub_run.add_argument('-S', '-use-singularity', action='store_true', help = 'Set if you would like to use singularity containers to run bohra.')
+    parser_sub_run.add_argument('-S', '--use_singularity', action='store_true', help = 'Set if you would like to use singularity containers to run bohra.')
     parser_sub_run.add_argument('--singularity_path', default='shub://phgenomics-singularity', help='The path to singularity containers. If you want to use locally stored contianers please pull from shub://phgenomics-singularity (snippy.simg, prokka.simg, seqtk.simg, mash_kmc.simg, assemblers.simg, roary.simg). IMPORTANT bohra is designed to run with these containers... if you wish to use custom containers please contact developer or proceed at your own risk.')
     parser_sub_run.add_argument('--job_id','-j',help='Job ID, will be the name of the output directory', default='')
     parser_sub_run.add_argument('--reference','-r',help='Path to reference (.gbk or .fa)', default = '')
