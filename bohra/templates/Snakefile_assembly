@@ -1,0 +1,258 @@
+workdir: '{{workdir}}'
+configfile: 'config.yaml'
+localrules: all, generate_yield, combine_seqdata, combine_assembly_metrics,assembly_statistics,collate_report,write_html_report
+
+SAMPLE = config['isolates'].split()
+
+min_aln = int(config['min_perc'])
+REFERENCE = config['reference']
+
+rule all:
+	input:{% raw %}
+		expand("{sample}/seqdata.tab", sample = SAMPLE),
+		"report/seqdata.tab",
+		expand("{sample}/{sample}.fa", sample = SAMPLE),
+		expand("{sample}/resistome.tab", sample = SAMPLE),
+		expand("prokka/{sample}/{sample}.gff", sample = SAMPLE),
+		expand("prokka/{sample}/{sample}.txt", sample = SAMPLE),
+		"mlst.tab", 
+		"denovo.tab", 
+		"assembly.tab", 
+		"resistome.tab",
+		"report/assembly.tab",
+		"report/mlst.tab", 
+		"report/resistome.tab",
+		"report/report.html",{% endraw %}
+		{{kraken_output}}
+
+{{kraken_rule}}
+{{kraken_summary}}
+{% raw %}
+
+rule seqdata:
+	input:
+		'READS/{sample}/R1.fq.gz',
+		'READS/{sample}/R2.fq.gz'
+	output:
+		"{sample}/seqdata.tab"
+	singularity:{% endraw %}"{{singularity_dir}}/seqtk.simg"{% raw %}
+	shell:
+		"""
+		seqtk fqchk {input[0]} {input[1]} > {output}
+		"""
+
+
+rule estimate_coverage:
+	input:
+		"READS/{sample}/R1.fq.gz",
+		"READS/{sample}/R2.fq.gz"
+	output:
+		"{sample}/mash.txt"
+	singularity:{% endraw %}"{{singularity_dir}}/mash.simg"{% raw %}
+	shell:
+		"""
+		mash sketch -r {input[0]} {input[1]} -m 3 -k 31 -o mash  &> {output}
+		"""
+
+
+rule generate_yield:
+	input:
+		"{sample}/mash.txt",
+		"{sample}/seqdata.tab"
+	output:
+		"{sample}/yield.tab"
+	shell:
+		"""
+		python3 {% endraw %}{{script_path}}/utils/generate_yield.py{% raw %} {input[1]} {input[0]} {output}
+		"""
+
+
+
+rule combine_seqdata:
+	input:
+		expand("{sample}/yield.tab", sample = SAMPLE)
+	output:
+		"seqdata.tab"
+	run:
+		import pathlib, pandas, numpy
+		sdfiles = f"{input}".split()
+		seqdata = pandas.DataFrame()
+		for sd in sdfiles:
+			p = pathlib.Path(sd)
+			df = pandas.read_csv(sd, sep = "\t")
+			print(df)
+			df['Isolate'] = f"{p.parts[0]}"
+			
+			if seqdata.empty:
+				seqdata = df
+			else:
+				seqdata = seqdata.append(df)
+		seqdata['Quality'] = numpy.where(seqdata['Estimated depth'] >= 40, 'PASS','FAIL')
+		seqdata = seqdata[['Isolate','Reads','Yield','GC content','Min len','Avg len','Max len','Avg Qual','Estimated depth', 'Quality']]
+		seqdata.to_csv(f"{output}", sep = '\t', index = False)
+
+
+rule assemble:
+	input:
+		'READS/{sample}/R1.fq.gz',
+		'READS/{sample}/R2.fq.gz'
+	output:
+		'{sample}/{sample}.fa'
+	threads:
+		8
+	singularity:{% endraw %}"{{singularity_dir}}/assemblers.simg"{% raw %}
+	shell:
+		"""
+		ASSEMBLEPATH=/{% endraw %}{{prefill_path}}{% raw %}/{wildcards.sample}
+		if [ -f $ASSEMBLEPATH/contigs.fa ]; then
+			cp $ASSEMBLEPATH/contigs.fa {output}
+
+		else
+			echo No assembly found. Assembling {wildcards.sample} with shovill
+			
+			shovill --outdir {wildcards.sample} --R1 {input[0]} --R2 {input[1]} --force --minlen 500 --cpus {threads}
+			mv {wildcards.sample}/contigs.fa {output}
+
+		fi		
+		"""
+	
+
+rule resistome:
+	input:
+		'{sample}/{sample}.fa'
+	output:
+		'{sample}/resistome.tab'
+	singularity:{% endraw %}"{{singularity_dir}}/abricate.simg"{% raw %}
+	shell:
+		"""
+		abricate --nopath {input} > {output}
+		"""
+
+	
+
+rule mlst:
+	input:
+		expand('{sample}/{sample}.fa', sample = SAMPLE)
+	output:
+		'mlst.tab'
+	singularity:{% endraw %}"{{singularity_dir}}/mlst.simg"{% raw %}
+	shell:
+		"""
+		mlst --nopath {input} | sed 's/\.fa//g' | sed '1iIsolate\tScheme\tST\tAlleles' > {output}
+		"""
+
+	
+ 
+
+rule combine_results:
+	input:
+		expand('{sample}/resistome.tab', sample = SAMPLE)
+		
+	output:
+		'resistome.tab'
+		
+	singularity:{% endraw %}"{{singularity_dir}}/abricate.simg"{% raw %}
+	shell:
+		"""
+		abricate --summary {input} | sed 's/\/resistome.tab//g' | sed 's/\#FILE/Isolate/g' > {output[0]}
+		
+		"""
+	
+
+rule assembly_statistics:
+	input:
+		expand("{sample}/{sample}.fa", sample = SAMPLE)
+	output:
+		"denovo.tab"
+	shell:
+		"""
+		 python3 {% endraw %}{{script_path}}/utils/assembly_stat.py{% raw %} {input} -m 500 > {output}
+		"""
+	
+
+
+rule run_prokka:
+	input:
+		"{sample}/{sample}.fa"
+	output:
+		"prokka/{sample}/{sample}.gff","prokka/{sample}/{sample}.txt"
+	singularity:{% endraw %}"{{singularity_dir}}/prokka.simg"{% raw %}
+	shell:
+		"""
+		prokka --outdir prokka/{wildcards.sample} --prefix {wildcards.sample} --mincontiglen 500 --notrna --fast --force {input}
+		"""
+
+
+rule combine_assembly_metrics:
+	input:
+		prokka = expand("prokka/{sample}/{sample}.txt",sample = SAMPLE), 
+		assembly = "denovo.tab"
+	output:
+		"assembly.tab"
+	run:
+		import pandas, pathlib
+
+		prokka = f"{input.prokka}".split()
+		gff = pandas.DataFrame()
+		
+		for p in prokka:
+			g = pathlib.Path(p)
+			df = pandas.read_csv(g, sep = ':', header = None, names = ['cond', f"{g.parts[1]}"])
+			
+			if gff.empty:
+					gff = df
+			else:
+					gff = gff.merge(df, how = 'outer')
+		gff = gff[gff['cond'].isin(['CDS', 'rRNA'])]
+		gff = gff.T
+		gff.columns = gff.iloc[0]
+		gff = gff.iloc[1:]
+	
+		d = pathlib.Path(f"{input.assembly}")
+		df = pandas.read_csv(d, sep = '\t')
+	
+		assembly = df.merge(gff, left_on = ['Name'], right_on= gff.index)
+		assembly = assembly.rename(columns={'Name':'Isolate'})
+		assembly.to_csv(f"{output}", sep = '\t', index = False)
+
+
+
+ 
+
+rule collate_report:
+	input:{% endraw %}
+		'seqdata.tab', 'assembly.tab', 'mlst.tab', 'resistome.tab',  {{species_summary}}
+	output:
+		'report/seqdata.tab', 'report/assembly.tab', 'report/mlst.tab',  'report/resistome.tab', {{species_report}}{% raw %}
+	run:
+		
+		import pandas, pathlib, subprocess, numpy
+
+		# calculate mean + 2SD and use as cutoff for quality of contigs and fix column names
+		dfass = pandas.read_csv(pathlib.Path(f"assembly.tab"), sep = '\t')
+		cut = dfass['# Contigs'].mean() + (2* dfass['# Contigs'].std())
+		dfass['Quality'] = numpy.where(dfass['# Contigs'] <= cut, 'PASS','FAIL')
+		dfass = dfass.rename(columns={'rRNA':'# rRNA', 'CDS':'# CDS'})
+		dfass.to_csv(f"report/assembly.tab", sep= '\t', index=False)
+
+		cmd = f"""
+cp seqdata.tab report/seqdata.tab
+cp mlst.tab report/mlst.tab
+cp resistome.tab report/resistome.tab
+{% endraw %}{{copy_species_id}}
+
+"""
+		subprocess.run(cmd, shell = True)
+
+
+rule write_html_report:
+	input:
+		'report/seqdata.tab', 'report/assembly.tab','report/mlst.tab', 'report/resistome.tab', 'report/core_genome.tab', 'report/core.treefile', 'report/distances.tab',{{species_report}}
+	output:
+		'report/report.html'
+	
+	shell:
+		"""
+		python3 {{script_path}}/utils/write_report.py {{workdir}} {{script_path}}/templates a {{job_id}} {{assembler}} {{run_kraken}}
+		"""
+

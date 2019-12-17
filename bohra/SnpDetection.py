@@ -252,8 +252,9 @@ class RunSnpDetection(object):
         '''
         ensure that DB is present and not emtpy
         '''
-        logger.info('Searching for a custom kraken2 DB')
+        logger.info('Searching for kraken2 DB')
         if self.kraken_db != "KRAKEN2_DEFAULT_DB":
+            logger.info('You are attempting to use a custom kraken2 DB. This is pretty advanced, good luck!')
             if pathlib.Path(self.kraken_db).exists():
                 logger.info(f"{self.kraken_db} has been found. Checking that directory is not empty")
                 self.check_kraken2_files(k2db = self.kraken_db)
@@ -263,6 +264,7 @@ class RunSnpDetection(object):
             k2db = pathlib.Path(os.environ["KRAKEN2_DEFAULT_DB"])
             if self.check_kraken2_files(k2db = self.kraken_db):
                 self.kraken_db = f"{k2db}"
+        
         if self.run_kraken:
             logger.info(f"Congratulations your kraken database is present")  
         else:
@@ -344,7 +346,7 @@ class RunSnpDetection(object):
         
             
         '''   
-        logger.infor(f"Recording your settings for job: {self.job_id}")
+        logger.info(f"Recording your settings for job: {self.job_id}")
         new_df = pandas.DataFrame({'JobID':self.job_id, 'Reference':f"{self.ref}",'Mask':f"{self.mask}", 
                                     'MinAln':self.minaln, 'Pipeline': self.pipeline, 'CPUS': self.cpus, 'Assembler':self.assembler,
                                     'Gubbins': self.gubbins, 'Date':self.day, 'User':self.user, 'snippy_version':self.snippy_version, 'input_file':f"{self.input_file}",'prefillpath': self.prefillpath, 'cluster': self.cluster}, 
@@ -560,7 +562,7 @@ class RunSnpDetection(object):
         Ensure that all fields contain data - no NA's
         returns True if there are no nan, False otherwise
         '''
-        logger.info("Checking that there is no empyt fields in the input file.")
+        logger.info("Checking that there is no empty fields in the input file.")
         return tab.isnull().sum().sum() == 0
     
 

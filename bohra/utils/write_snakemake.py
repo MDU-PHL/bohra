@@ -335,8 +335,6 @@ rule index_reference:
 		import pathlib, subprocess
 		ref = f\"{{output[0]}}\"
 		idx = f\"{{output[1]}}\"
-		print(type(ref))
-		print(type(idx))
 		if '.fa' not in REFERENCE:
 			print(f"converting {{REFERENCE}}")
 			SeqIO.convert(f"{{input[0]}}", 'genbank', ref	, 'fasta')

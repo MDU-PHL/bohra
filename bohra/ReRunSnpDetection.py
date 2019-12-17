@@ -61,6 +61,7 @@ class ReRunSnpDetection(RunSnpDetection):
         self.assembler_dict = {'shovill': 'shovill', 'skesa':'skesa','spades':'spades.py'}
         
         self.run_kraken = False
+        self.kraken_db = args.kraken_db
         self.cpus = args.cpus
         self.set_snakemake_jobs()
 
@@ -198,11 +199,12 @@ class ReRunSnpDetection(RunSnpDetection):
         '''
         Rerun the pipeline
         '''
+        self.run_checks()
         # update source
         self.update_source_log()
         self.rerun_report()
         self.remove_core()
-
+        
         isolates = self.set_workflow_input()
         # setup the workflow files Snakefile and config file
         self.setup_workflow(isolates = isolates)
