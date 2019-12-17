@@ -31,6 +31,8 @@ class ReRunSnpDetection(RunSnpDetection):
         # set force based on args.. this will be set to true if ref is different and/or snippy version 
         self.force = False
         self.assembler = ""
+        self.use_singularity = args.use_singularity
+        self.singularity_path = args.singularity_path
         # get original data 
         self.get_source()
         # Reference mask and snippy
@@ -43,10 +45,10 @@ class ReRunSnpDetection(RunSnpDetection):
         # user
         self.user = getpass.getuser()
         # gubbins TODO add back in later!!
-        if not args.gubbins:
-            self.gubbins = numpy.nan
-        else:
-            self.gubbins = args.gubbins
+        # if not args.gubbins:
+        #     self.gubbins = numpy.nan
+        # else:
+        #     self.gubbins = args.gubbins
         # cluster settings default to command line, 
         self.cluster = args.cluster
         self.json = args.json
@@ -54,7 +56,8 @@ class ReRunSnpDetection(RunSnpDetection):
         # but check to reset if present
         self.get_cluster_reqs()
         # check for cluster settings
-
+        
+        
         self.dryrun = args.dry_run
         self.keep = args.keep
         
@@ -91,13 +94,21 @@ class ReRunSnpDetection(RunSnpDetection):
         logger.info(f"Retrieving settings and software versions.")
         version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
         df = pandas.read_csv('source.log', sep = None, engine = 'python')
+        
         self.pipeline = df.loc[df.index[-1], 'Pipeline']
+        logger.info(f"Previous pipeline was : {self.pipeline}")
+        self.use_singularity = df.loc[df.index[-1], 'singularity']
+        logger.info(f"Previous --use-singularity was set to : {self.use_singularity}")
         if self.pipeline != 'a':
             self.original_reference = df.loc[df.index[-1], 'Reference']
+            logger.info(f"Previous reference was : {self.original_reference}")
             self.original_mask = df.loc[df.index[-1],'Mask'] if isinstance(df.loc[df.index[-1],'Mask'], str) else ''
-            self.original_snippy_version = version_pat.search(df.loc[df.index[-1], 'snippy_version'])
+            logger.info(f"Previous mask was : {self.original_mask}")
+            self.original_snippy_version = version_pat.search(df.loc[df.index[-1], 'snippy_version']) if not self.use_singularity else df.loc[df.index[-1], 'snippy_version']
+            logger.info(f"Previous snippy_version was : {self.original_snippy_version}")
         if self.pipeline != 's':
             self.assembler = df['Assembler'].unique()[0]
+            logger.info(f"Previous assembler used was : {self.assembler}")
         self.orignal_date = df.loc[df.index[-1], 'Date']
         self.input_file = pathlib.Path(f"{df.loc[df.index[-1], 'input_file']}")
         # print(self.input_file)
@@ -136,12 +147,14 @@ class ReRunSnpDetection(RunSnpDetection):
         Check the version of Snippy, is different will need to force new SNP detection
         '''
         self.check_setup_files()
-
-        self.current_snippy_version = self.check_deps()
-        logger.info(f"Comapring snippy versions.")
-        if self.current_snippy_version.group("major", "minor") != self.original_snippy_version.group("major", "minor"):
-            self.force = True
-            logger.info(f"You are using a different version of Snippy for this re-run, SNP calling will be repeated.")
+        if self.use_singularity:
+            logger.info(f"You used singulairty containers to run bohra last time, therefore no need to compare snippy versions.")
+        else:
+            self.current_snippy_version = self.check_deps()
+            logger.info(f"Comapring snippy versions.")
+            if self.current_snippy_version.group("major", "minor") != self.original_snippy_version.group("major", "minor"):
+                self.force = True
+                logger.info(f"You are using a different version of Snippy for this re-run, SNP calling will be repeated.")
 
 
     def update_source_log(self):
@@ -150,7 +163,8 @@ class ReRunSnpDetection(RunSnpDetection):
         '''
         logger.info(f"Updating {self.job_id} records.")
         df = pandas.read_csv('source.log', sep = None, engine = 'python')
-        data =pandas.DataFrame({'JobID':self.job_id, 'Reference':self.ref,'Mask':self.mask, 'Pipeline': self.pipeline, 'CPUS': self.cpus,'MinAln':self.minaln,'Gubbins': self.gubbins, 'Date':self.day, 'User':self.user,'snippy_version':self.current_snippy_version ,'input_file':f"{self.input_file}",'prefillpath': self.prefillpath,'Assembler':self.assembler},index=[0])
+        snippy_v = f'singularity_{self.day}' if self.use_singularity else self.snippy_version
+        data =pandas.DataFrame({'JobID':self.job_id, 'Reference':self.ref,'Mask':self.mask, 'Pipeline': self.pipeline, 'CPUS': self.cpus,'MinAln':self.minaln,'Date':self.day, 'User':self.user,'snippy_version':snippy_v ,'input_file':f"{self.input_file}",'prefillpath': self.prefillpath,'Assembler':self.assembler},index=[0])
         df = df.append(data)
         df.to_csv('source.log', index=False, sep = '\t')
     
@@ -193,13 +207,42 @@ class ReRunSnpDetection(RunSnpDetection):
             for core in corefiles:
                 core.unlink()
         
-        
+    def check_singularity_directory(self):
+        '''
+        Check if the singularity directory is empty
+        ''' 
+        sing_storage_dir = self.workdir / self.job_id / '.snakemake' / 'singularity'
+        containers = sorted(sing_storage_dir.glob("*.si*"))
+        if len(containers) != 0:
+            logger.info(f"You already have singularity containers stored. These will be reused.")
+            return True
+        else:
+            logger.info(f"There are no singularity containers present. These will be pulled from {self.singularity_path}.")
+            return True
+
+    def rerun_checks(self):
+        '''
+        check if singularity was used last time if so reuse those settings.
+        '''
+
+        df = pandas.read_csv('source.log', sep = None, engine = 'python')
+
+        # if 
+
 
     def run_pipeline(self):
         '''
         Rerun the pipeline
         '''
-        self.run_checks()
+        # logger.info(f"Previous --use-singularity is still : {self.use_singularity}")
+        if self.use_singularity:
+            # check that the .singularity directory is present... if not rerun from scratch
+            self.check_singularity_directory()
+            logger.info(f"You have chosen to run bohra with singularity containers. Good luck")
+
+        else:
+            # check if the previous run used singularity - if so check for containers.
+            self.run_checks()
         # update source
         self.update_source_log()
         self.rerun_report()

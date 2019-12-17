@@ -76,7 +76,7 @@ def main():
     
     parser_sub_rerun = subparsers.add_parser('rerun', help='Rerun of Bohra. Add or remove isolates from isolate list, change mask or reference.', formatter_class=configargparse.ArgumentDefaultsHelpFormatter,default_config_files=[f"{pathlib.Path.cwd().absolute() / 'bohra.conf'}"])
     # options for rerun
-    parser_sub_rerun.add_argument('-S', '-use-singularity', action='store_true', help = 'Set if you would like to use singularity containers to run bohra.')
+    parser_sub_rerun.add_argument('-S', '--use_singularity', action='store_true', help = 'Set if you would like to use singularity containers to run bohra.')
     parser_sub_rerun.add_argument('--singularity_path', default='shub://phgenomics-singularity', help='The path to singularity containers. If you want to use locally stored contianers please pull from shub://phgenomics-singularity (snippy.simg, prokka.simg, seqtk.simg, mash_kmc.simg, assemblers.simg, roary.simg). IMPORTANT bohra is designed to run with these containers... if you wish to use custom containers please contact developer or proceed at your own risk.')
     parser_sub_rerun.add_argument('--reference','-r',help='Path to reference (.gbk or .fa)', default = '')
     parser_sub_rerun.add_argument('--mask','-m',default = '', help='Path to mask file if used (.bed)')
