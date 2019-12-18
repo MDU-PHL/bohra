@@ -240,12 +240,12 @@ class RunSnpDetection(object):
         '''
         ensure that kraken2 DB is not empty
         '''
-        if k2db.is_dir():
+        if pathlib.Path(k2db).is_dir():
                 logger.info('Found kraken2 DB, checking that files are not empty')
-                kmerfiles = sorted(k2db.glob('*'))
+                kmerfiles = sorted(pathlib.Path(k2db).glob('*'))
                 s = []
                 for k in range(len(kmerfiles)):
-                    s.append(self.check_size_file(k2db / kmerfiles[k]))
+                    s.append(self.check_size_file(pathlib.Path(k2db) / kmerfiles[k]))
                 if 0 not in s:
                     self.run_kraken = True
         
@@ -283,14 +283,13 @@ class RunSnpDetection(object):
         if self.pipeline != "a":
             self.check_snippycore()
             self.check_snpdists()
+            self.check_kraken2DB()
             self.check_iqtree()
             return(self.check_snippy())
         elif self.pipeline != "s":
             self.check_assembler()
             self.check_assemble_accesories()
-            self.check_kraken2DB()
             self.check_roary()
-
             return True
 
 
@@ -644,7 +643,82 @@ class RunSnpDetection(object):
         
         logger.info(f"This job : {self.job_id} contains {len(list(set(isolates)))}")
         return(list(set(isolates))) 
-        
+    
+    def kraken_output(self):
+        '''
+        the all output if running kraken
+        '''
+        return f"'species_identification.tab','report/species_identification.tab',expand('{{sample}}/kraken.tab',sample = SAMPLE)"
+    
+    def kraken_ind_string(self):
+        '''
+        the kraken rule for combination kraken
+        '''
+        return(f"""
+rule kraken:
+	input:
+		'READS/{{sample}}/R1.fq.gz',
+		'READS/{{sample}}/R2.fq.gz'
+	output:
+		"{{sample}}/kraken.tab"
+
+	shell:
+		\"""
+		KRAKENPATH=/{self.prefillpath}/{{wildcards.sample}}/kraken2.tab
+		if [ -f $KRAKENPATH ]; then
+			cp $KRAKENPATH {{output}}
+		else
+			kraken2 --paired {{input[0]}} {{input[1]}} --minimum-base-quality 13 --report {{output}}
+		fi
+		\"""
+		
+""")
+
+    def kraken_combine_string(self):
+        '''
+        string for combining kraken
+        '''
+        return(f"""
+rule combine_kraken:
+	input: 
+		expand(\"{{sample}}/kraken.tab\", sample = SAMPLE)
+	output:
+		\"species_identification.tab\"
+	run:
+		import pandas, pathlib, subprocess
+		kfiles = f\"{{input}}\".split()
+		id_table = pandas.DataFrame()
+		for k in kfiles:
+			kraken = pathlib.Path(k)
+			df = pandas.read_csv(kraken, sep = \"\\t\", header =None, names = ['percentage', 'frag1', 'frag2','code','taxon','name'])
+			df['percentage'] = df['percentage'].apply(lambda x:float(x.strip('%')) if isinstance(x, str) == True else float(x)) #remove % from columns
+			df = df.sort_values(by = ['percentage'], ascending = False)
+			df = df[df['code'].isin(['U','S'])]     
+			df = df.reset_index(drop = True) 
+			tempdf = pandas.DataFrame()
+			d = {{'Isolate': f\"{{kraken.parts[0]}}\",    
+					'#1 Match': df.ix[0,'name'].strip(), '%1': df.ix[0,'percentage'],
+					'#2 Match': df.ix[1,'name'].strip(), '%2': df.ix[1,'percentage'],       
+					'#3 Match': df.ix[2,'name'].strip(), '%3': df.ix[2,'percentage'] ,
+					'#4 Match': df.ix[3,'name'].strip(), '%4': df.ix[3,'percentage']
+					}}
+		
+			tempdf = pandas.DataFrame(data = d, index= [0])
+			if id_table.empty:
+					id_table = tempdf
+			else:
+					id_table = id_table.append(tempdf, sort = True)
+		id_table.to_csv(f\"{{output}}\", sep = \"\\t\", index = False)
+		subprocess.run(f"sed -i 's/%[0-9]/%/g' {{output}}", shell=True)
+""")
+    def kraken_report(self):
+
+        return "'report/species_identification.tab'"
+
+    def kraken_copy(self):
+
+        return "cp species_identification.tab report/species_identification.tabs"
+
     def write_pipeline_job(self, maskstring,  script_path = f"{pathlib.Path(__file__).parent / 'utils'}", resource_path = f"{pathlib.Path(__file__).parent / 'templates'}"):
         '''
         write out the pipeline string for transfer to job specific pipeline
@@ -653,6 +727,12 @@ class RunSnpDetection(object):
         wd = self.workdir / self.job_id
         
         
+        kraken_output = self.kraken_output() if self.run_kraken else ''
+        kraken_rule = self.kraken_ind_string() if self.run_kraken else ''
+        kraken_summary = self.kraken_combine_string() if self.run_kraken else ''
+        kraken_report = self.kraken_report() if self.run_kraken else ''    
+        copy_species_id = self.kraken_copy() if self.run_kraken else ''   
+
         pipeline_setup = {
             's':'Snakefile_snippy',
             'sa':'Snakefile_default_',
@@ -668,7 +748,12 @@ class RunSnpDetection(object):
             'assembler' : self.assembler if self.pipeline != 's' else 'no_assembler',
             'run_kraken' : self.run_kraken,
             'maskstring': maskstring, 
-            'template_path':resource_path
+            'template_path':resource_path,
+            'kraken_output':kraken_output,
+            'kraken_rule' : kraken_rule,
+            'kraken_summary': kraken_summary,
+            'species_report': kraken_report,
+            'copy_species_id': copy_species_id
         }
         
         logger.info(f"Writing Snakefile for job : {self.job_id}")
@@ -739,13 +824,7 @@ class RunSnpDetection(object):
 
         logger.info(f"Setting up {self.job_id} specific workflow")
         
-
-        # if self.gubbins == True:
-        #     gubbins_string = f"""
-        # 'gubbins.aln', 'gubbins.treefile'
-        #     """
-        # else:
-        gubbins_string = " "
+        gubbins_string = ""
         # make a masking string
 
         if self.mask != '':
