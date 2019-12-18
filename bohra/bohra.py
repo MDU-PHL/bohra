@@ -66,7 +66,7 @@ def main():
     parser_sub_run.add_argument('-resources','-s', default = f"{pathlib.Path(__file__).parent / 'templates'}", help='Directory where templates are stored')
     parser_sub_run.add_argument('-force','-f', action="store_true", help = "Add if you would like to force a complete restart of the pipeline. All previous logs will be lost.")
     parser_sub_run.add_argument('-dry-run','-n', action="store_true", help = "If you would like to see a dry run of commands to be executed.")
-    parser_sub_run.add_argument('-cluster', action="store_true", help = "If you are running Bohra on a cluster.")
+    parser_sub_run.add_argument('--cluster', action="store_true", help = "If you are running Bohra on a cluster.")
     parser_sub_run.add_argument('--json',help='Path to cluster.json - required if --cluster is set', default='')
     parser_sub_run.add_argument('--queue',help='Type of queue (sbatch or qsub currently supported) - required if --cluster is set.', default='')
     
