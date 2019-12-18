@@ -275,6 +275,6 @@ rule write_html_report:
 	
 	shell:
 		"""
-		python3 {{script_path}}/write_report.py {{workdir}} {{template_path}} s {{job_id}} {{assembler}} {{run_kraken}}
+		python3 {{script_path}}/write_report.py {{workdir}} {{template_path}} s {{job_id}} no_assembler {{run_kraken}}
 		"""
 

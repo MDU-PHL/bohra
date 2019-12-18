@@ -164,7 +164,7 @@ class RunSnpDetection(object):
             snippy = subprocess.run(['snippy', '--version'], stderr=subprocess.PIPE)
             snippy = snippy.stderr.decode().strip()
             self.snippy_version = version_pat.search(snippy)
-            logger.info('info', f"Snippy {snippy} found. Good job!")
+            logger.info(f"Snippy {snippy} found. Good job!")
             return(version_pat.search(snippy))
         except FileNotFoundError:
             logger.info(f"snippy is not installed.")
@@ -200,7 +200,7 @@ class RunSnpDetection(object):
         if shutil.which(software):
             logger.info(f"{software} is installed")
         else:
-            logger.warning('warning', f"{software} is not installed, please check dependencies and try again.")
+            logger.warning(f"{software} is not installed, please check dependencies and try again.")
             raise SystemExit
 
 
@@ -241,7 +241,7 @@ class RunSnpDetection(object):
         ensure that kraken2 DB is not empty
         '''
         if pathlib.Path(k2db).is_dir():
-                logger.info('Found kraken2 DB, checking that files are not empty')
+                logger.info(f'Found {k2db}, checking that files are not empty')
                 kmerfiles = sorted(pathlib.Path(k2db).glob('*'))
                 s = []
                 for k in range(len(kmerfiles)):
@@ -254,11 +254,11 @@ class RunSnpDetection(object):
         '''
         ensure that DB is present and not emtpy
         '''
-        logger.info('Searching for kraken2 DB')
-        if self.kraken_db != "KRAKEN2_DEFAULT_DB":
+        logger.info(f'Searching for kraken2 DB {self.kraken_db}')
+        if self.kraken_db != f"{pathlib.Path(os.environ['KRAKEN2_DEFAULT_DB'])}":
             logger.info('You are attempting to use a custom kraken2 DB. This is pretty advanced, good luck!')
             if pathlib.Path(self.kraken_db).exists():
-                logger.info(f"{self.kraken_db} has been found. Checking that directory is not empty")
+                logger.info(f"{self.kraken_db} has been found.")
                 self.check_kraken2_files(k2db = self.kraken_db)
             else:
                 logger.warning(f"It seems that your settings for the kraken DB are incorrect. Bohra will check for the presence of a default kraken2 DB.")
