@@ -86,7 +86,7 @@ rule combine_seqdata:
 			if seqdata.empty:
 				seqdata = df
 			else:
-				seqdata = seqdata.append(df)
+				seqdata = seqdata.append(df, sort = True)
 		seqdata['Quality'] = numpy.where(seqdata['Estimated depth'] >= 40, 'PASS','FAIL')
 		seqdata = seqdata[['Isolate','Reads','Yield','GC content','Min len','Avg len','Max len','Avg Qual','Estimated depth', 'Quality']]
 		seqdata.to_csv(f"{output}", sep = '\t', index = False)

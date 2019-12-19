@@ -12,7 +12,6 @@ import subprocess
 import json
 from Bio import SeqIO, Phylo
 from packaging import version
-from bohra.utils.write_snakemake import MakeWorkflow
 from bohra.bohra_logger import logger
 # from bohra.utils.write_report import Report
 
@@ -32,6 +31,7 @@ class RunSnpDetection(object):
         self.resources = pathlib.Path(args.resources)
         # path to reference and mask
         self.ref = pathlib.Path(args.reference)
+        self.check_rerun()
         # 
         # (args.mask)
         if args.mask:
@@ -300,7 +300,7 @@ class RunSnpDetection(object):
         Run checks prior to start - checking all software is installed, if this is a rerun and the input files
         '''
         self.check_setup_files()
-        self.check_rerun()
+        
         self.check_deps()
         # check reference
         if self.pipeline != 'a':
@@ -320,7 +320,7 @@ class RunSnpDetection(object):
 
         if cluster_log.exists():
             cluster_df = pandas.read_csv(cluster_log, '\t')
-            cluster_df = cluster_df.append(new_df)
+            cluster_df = cluster_df.append(new_df, sort = True)
         else:
             cluster_df = new_df
         
@@ -347,7 +347,7 @@ class RunSnpDetection(object):
         source_path = self.workdir / 'source.log'
         if source_path.exists():
             source_df = pandas.read_csv(source_path, '\t')
-            source_df = source_df.append(new_df)
+            source_df = source_df.append(new_df, sort = True)
         else:
             source_df = new_df
         
@@ -648,12 +648,13 @@ class RunSnpDetection(object):
         '''
         the all output if running kraken
         '''
-        return f"'species_identification.tab','report/species_identification.tab',expand('{{sample}}/kraken.tab',sample = SAMPLE)"
+        return f"\"species_identification.tab\",\n\"report/species_identification.tab\",\nexpand(\"{{sample}}/kraken.tab\",sample = SAMPLE)"
     
     def kraken_ind_string(self):
         '''
         the kraken rule for combination kraken
         '''
+        mem_mapping = "--memory-mapping" if not self.cluster else ''
         return(f"""
 rule kraken:
 	input:
@@ -661,14 +662,13 @@ rule kraken:
 		'READS/{{sample}}/R2.fq.gz'
 	output:
 		"{{sample}}/kraken.tab"
-
 	shell:
 		\"""
-		KRAKENPATH=/{self.prefillpath}/{{wildcards.sample}}/kraken2.tab
+		KRAKENPATH={self.prefillpath}{{wildcards.sample}}/kraken2.tab
 		if [ -f $KRAKENPATH ]; then
 			cp $KRAKENPATH {{output}}
 		else
-			kraken2 --paired {{input[0]}} {{input[1]}} --minimum-base-quality 13 --report {{output}}
+			kraken2 --paired {{input[0]}} {{input[1]}} --minimum-base-quality 13 --report {{output}} {mem_mapping}
 		fi
 		\"""
 		
@@ -711,13 +711,16 @@ rule combine_kraken:
 		id_table.to_csv(f\"{{output}}\", sep = \"\\t\", index = False)
 		subprocess.run(f"sed -i 's/%[0-9]/%/g' {{output}}", shell=True)
 """)
+    def species_summary(self):
+        return "'species_identification.tab'"
+
     def kraken_report(self):
 
         return "'report/species_identification.tab'"
 
     def kraken_copy(self):
 
-        return "cp species_identification.tab report/species_identification.tabs"
+        return "cp species_identification.tab report/species_identification.tab"
 
     def write_pipeline_job(self, maskstring,  script_path = f"{pathlib.Path(__file__).parent / 'utils'}", resource_path = f"{pathlib.Path(__file__).parent / 'templates'}"):
         '''
@@ -731,7 +734,8 @@ rule combine_kraken:
         kraken_rule = self.kraken_ind_string() if self.run_kraken else ''
         kraken_summary = self.kraken_combine_string() if self.run_kraken else ''
         kraken_report = self.kraken_report() if self.run_kraken else ''    
-        copy_species_id = self.kraken_copy() if self.run_kraken else ''   
+        copy_species_id = self.kraken_copy() if self.run_kraken else ''  
+        species_summary = self.species_summary() if self.run_kraken else '' 
 
         pipeline_setup = {
             's':'Snakefile_snippy',
@@ -753,6 +757,7 @@ rule combine_kraken:
             'kraken_rule' : kraken_rule,
             'kraken_summary': kraken_summary,
             'species_report': kraken_report,
+            'species_summary':species_summary,
             'copy_species_id': copy_species_id
         }
         

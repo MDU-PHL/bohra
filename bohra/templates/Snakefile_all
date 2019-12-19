@@ -101,7 +101,7 @@ rule combine_seqdata:
 			if seqdata.empty:
 				seqdata = df
 			else:
-				seqdata = seqdata.append(df)
+				seqdata = seqdata.append(df, sort = True)
 		seqdata['Quality'] = numpy.where(seqdata['Estimated depth'] >= 40, 'PASS','FAIL')
 		seqdata = seqdata[['Isolate','Reads','Yield','GC content','Min len','Avg len','Max len','Avg Qual','Estimated depth', 'Quality']]
 		seqdata.to_csv(f"{output}", sep = '\t', index = False)
@@ -266,7 +266,7 @@ rule assemble:
 	singularity:{% endraw %}"{{singularity_dir}}/assemblers"{% raw %}
 	shell:
 		"""
-		ASSEMBLEPATH=/{% endraw %}{{prefill_path}}{% raw %}/{wildcards.sample}
+		ASSEMBLEPATH={% endraw %}{{prefill_path}}{% raw %}{wildcards.sample}
 		if [ -f $ASSEMBLEPATH/contigs.fa ]; then
 			cp $ASSEMBLEPATH/contigs.fa {output}
 
@@ -411,7 +411,8 @@ rule collate_report:
 	input:{% endraw %}
 		'seqdata.tab', 'assembly.tab', 'mlst.tab', 'resistome.tab', 'core.txt', 'core.treefile', 'core.tab', 'distances.tab', 'core.tab', 'pan_genome.svg','roary/summary_statistics.txt',{{species_summary}}
 	output:
-		'report/seqdata.tab', 'report/assembly.tab', 'report/mlst.tab',  'report/resistome.tab', 'report/core_genome.tab', 'report/core.treefile','report/distances.tab','report/core.tab','report/pan_genome.svg', 'report/summary_statistics.txt' {{species_report}}{% raw %}
+		'report/seqdata.tab', 'report/assembly.tab', 'report/mlst.tab',  'report/resistome.tab', 'report/core_genome.tab', 'report/core.treefile','report/distances.tab','report/core.tab','report/pan_genome.svg', 'report/summary_statistics.txt', 
+		 {{species_report}}{% raw %}
 	run:
 		
 		

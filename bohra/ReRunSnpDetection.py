@@ -33,6 +33,9 @@ class ReRunSnpDetection(RunSnpDetection):
         self.assembler = ""
         self.use_singularity = args.use_singularity
         self.singularity_path = args.singularity_path
+
+        self.run_kraken = False
+        self.kraken_db = args.kraken_db
         # get original data 
         self.get_source()
         # Reference mask and snippy
@@ -42,6 +45,10 @@ class ReRunSnpDetection(RunSnpDetection):
             # check dependencies
             self.check_for_snippy()
             self.mask = self.check_mask(args.mask, original_mask = self.original_mask)
+        elif self.pipeline == 'a':
+            self.snippy_version = ''
+            self.ref = ''
+            self.mask = ''
         # user
         self.user = getpass.getuser()
         # gubbins TODO add back in later!!
@@ -63,8 +70,6 @@ class ReRunSnpDetection(RunSnpDetection):
         
         self.assembler_dict = {'shovill': 'shovill', 'skesa':'skesa','spades':'spades.py'}
         
-        self.run_kraken = False
-        self.kraken_db = args.kraken_db
         self.cpus = args.cpus
         self.set_snakemake_jobs()
 
@@ -163,9 +168,10 @@ class ReRunSnpDetection(RunSnpDetection):
         '''
         logger.info(f"Updating {self.job_id} records.")
         df = pandas.read_csv('source.log', sep = None, engine = 'python')
+        # if self.pipeline == 'a':
         snippy_v = f'singularity_{self.day}' if self.use_singularity else self.snippy_version
         data =pandas.DataFrame({'JobID':self.job_id, 'Reference':self.ref,'Mask':self.mask, 'Pipeline': self.pipeline, 'CPUS': self.cpus,'MinAln':self.minaln,'Date':self.day, 'User':self.user,'snippy_version':snippy_v ,'input_file':f"{self.input_file}",'prefillpath': self.prefillpath,'Assembler':self.assembler},index=[0])
-        df = df.append(data)
+        df = df.append(data, sort = True)
         df.to_csv('source.log', index=False, sep = '\t')
     
         

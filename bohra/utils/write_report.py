@@ -438,27 +438,26 @@ class Report:
         df_list = []
         # print(tabs)
         for tab in tabs:
-            # print(tab)
             # print(df)
-            if 'species' in f"{tab}":
+            if 'species' in f"{tab.name}":
                 species = pandas.read_csv(tab, sep = '\t')
                 species = species[['Isolate', '#1 Match']]
                 summary_df = self.merge_dfs(summary_df, species)
                 summary_df = summary_df.rename(columns={'#1 Match': 'Species'})
-            elif 'seqdata' in f"{tab}":
+            elif 'seqdata' in f"{tab.name}":
                 seq = pandas.read_csv(tab, sep = '\t')
                 seq = seq[['Isolate', 'Estimated depth']]
                 summary_df = self.merge_dfs(summary_df, seq)
-            elif 'assembly' in f"{tab}":
+            elif 'assembly' in f"{tab.name}":
                 assembly = pandas.read_csv(tab, sep = '\t')
                 assembly = assembly[['Isolate', '# Contigs']]
                 summary_df = self.merge_dfs(summary_df, assembly)
-            elif 'mlst' in f"{tab}":
+            elif 'mlst' in f"{tab.name}":
                 mlst = pandas.read_csv(tab, sep = '\t', skiprows=1, header=None)
                 mlst = mlst.rename(columns = {0:'Isolate', 2:'ST'})
                 mlst = mlst[['Isolate', 'ST']]
                 summary_df = self.merge_dfs(summary_df, mlst)
-            elif 'core_genome' in f"{tab}":
+            elif 'core_genome' in f"{tab.name}":
                 core = pandas.read_csv(tab, sep = '\t')
                 core = core[['Isolate', '% USED']]
                 summary_df = self.merge_dfs(summary_df, core)
