@@ -52,10 +52,7 @@ class ReRunSnpDetection(RunSnpDetection):
         # user
         self.user = getpass.getuser()
         # gubbins TODO add back in later!!
-        # if not args.gubbins:
-        #     self.gubbins = numpy.nan
-        # else:
-        #     self.gubbins = args.gubbins
+        self.gubbins = args.gubbins
         # cluster settings default to command line, 
         self.cluster = args.cluster
         self.json = args.json
@@ -170,22 +167,29 @@ class ReRunSnpDetection(RunSnpDetection):
         df = pandas.read_csv('source.log', sep = None, engine = 'python')
         # if self.pipeline == 'a':
         snippy_v = f'singularity_{self.day}' if self.use_singularity else self.snippy_version
-        data =pandas.DataFrame({'JobID':self.job_id, 'Reference':self.ref,'Mask':self.mask, 'Pipeline': self.pipeline, 'CPUS': self.cpus,'MinAln':self.minaln,'Date':self.day, 'User':self.user,'snippy_version':snippy_v ,'input_file':f"{self.input_file}",'prefillpath': self.prefillpath,'Assembler':self.assembler},index=[0])
+        data =pandas.DataFrame({'JobID':self.job_id, 'Reference':self.ref,'Mask':self.mask, 'Pipeline': self.pipeline, 'CPUS': self.cpus,'MinAln':self.minaln,'Date':self.day, 'User':self.user,'snippy_version':snippy_v ,'input_file':f"{self.input_file}",'prefillpath': self.prefillpath,'Assembler':self.assembler, 'Gubbins':self.gubbins},index=[0])
         df = df.append(data, sort = True)
         df.to_csv('source.log', index=False, sep = '\t')
     
         
-    # def run_with_gubbins(self):
-    #     '''
-    #     Check if user wants to use Gubbins - return Y or N
-    #     '''
-    #     if self.confirm(f"Would you like to use gubbins to remove recombination?", True):
-    #         self.log_messages('info', f"Gubbins will be used to remove recombination today.")
-    #         return True
-    #     else:
-    #         self.log_messages('info', f"No recombination filtering will be used.")
-    #         return False
-    # TODO change this delete to unlink from pathlib
+    def run_with_gubbins(self):
+        '''
+        rename core and distance files
+        '''
+        if self.gubbins:
+            logger.info(f"You have chosen to run gubbins. Existing core files will be archived and not removed.")
+            corefiles = sorted(pathlib.Path(self.workdir, self.job_id).glob('core*'))
+            if corefiles:
+                for core in corefiles:
+                    new = f"{core}".replace('core', 'core_uncorrected')
+                    cmd = f"mv {core} {new}"
+                    subprocess.run(cmd,shell = True)
+            dists = pathlib.Path(self.workdir,self.job_id, 'distances.tab')
+            new_dists = f"{dists}".replace('distances', 'distances_uncorrected')
+            if dists.exists():
+                cmd = f"mv {dists} {new_dists}"
+                subprocess.run(cmd,shell = True)
+            self.keep = True
     
     def rerun_report(self):
         '''
@@ -198,6 +202,7 @@ class ReRunSnpDetection(RunSnpDetection):
         if self.keep:
             logger.info(f"Archiving previous report files")
             cmd = f"mv {p1} {p2}"
+            self.remove_core()
         else:
             logger.info("Removing previous report files.")
             cmd = f"if [ -d {p1} ];then rm -r {p1}; fi"
@@ -251,8 +256,9 @@ class ReRunSnpDetection(RunSnpDetection):
             self.run_checks()
         # update source
         self.update_source_log()
+        self.run_with_gubbins()
         self.rerun_report()
-        self.remove_core()
+        # self.remove_core()
         
         isolates = self.set_workflow_input()
         # setup the workflow files Snakefile and config file

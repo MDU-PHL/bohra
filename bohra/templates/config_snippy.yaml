@@ -17,3 +17,6 @@ day:
 
 isolates:
         "{{isolates}}"
+
+gubbins:
+        {{gubbins}}

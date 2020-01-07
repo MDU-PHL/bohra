@@ -6,6 +6,11 @@ SAMPLE = config['isolates'].split()
 
 min_aln = int(config['min_perc'])
 REFERENCE = config['reference']
+GUBBINS = config['gubbins']
+if GUBBINS:
+	CORE_OUTPUT = 'gubbins.aln'
+else:
+	CORE_OUTPUT = 'core.aln'
 
 rule all:
 	input:{% raw %}
@@ -186,11 +191,28 @@ rule run_snippy_core:
 		snippy-core --ref {REFERENCE}  $(cat core_isolates.txt)
 		
 		"""
-	
+
+
+if GUBBINS:
+
+	rule run_gubbins:
+		input:
+			'core.full.aln'
+		output:
+			clean.full.aln',
+			gubbins.aln'
+			
+		
+		shell:
+			"""
+			snippy-clean_full_aln {input} > {output[0]}
+			run_gubbins.py -c 36  --prefix {job} {output[0]}
+			snp-sites -c core.filtered_polymorphic_sites.fasta > {output[1]}
+			"""
 
 rule run_snpdists:
 	input:
-		'core.aln' 
+		CORE_OUTPUT
 	output:
 		'distances.tab' 
 	singularity:{% endraw %}"{{singularity_dir}}/snippy.simg"{% raw %}
@@ -224,7 +246,7 @@ rule index_reference:
 
 rule calculate_iqtree_command_core:
 	input:
-		'core.aln',
+		CORE_OUTPUT,
 		"ref.fa"
 	output:
 		'run_iqtree_core.sh'

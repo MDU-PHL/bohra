@@ -70,8 +70,6 @@ def main():
     parser_sub_run.add_argument('--json',help='Path to cluster.json - required if --cluster is set', default='')
     parser_sub_run.add_argument('--queue',help='Type of queue (sbatch or qsub currently supported) - required if --cluster is set.', default='')
     
-
-    # parser_sub_run.add_argument('--gubbins','-g', action="store_true", help = "If you would like to run gubbins. NOT IN USE YET - PLEASE DO NOT USE")
     # parser for rerun
     
     parser_sub_rerun = subparsers.add_parser('rerun', help='Rerun of Bohra. Add or remove isolates from isolate list, change mask or reference.', formatter_class=configargparse.ArgumentDefaultsHelpFormatter,default_config_files=[f"{pathlib.Path.cwd().absolute() / 'bohra.conf'}"])
@@ -85,7 +83,7 @@ def main():
     parser_sub_rerun.add_argument('--kraken_db', '-k', env_var="KRAKEN2_DEFAULT_DB", help="Path to DB for use with kraken2, if no DB present speciation will not be performed.")
     parser_sub_rerun.add_argument('-resources','-s', default = f"{pathlib.Path(__file__).parent / 'templates'}", help='Directory where templates are stored')
     parser_sub_rerun.add_argument('-dry-run','-n', action="store_true", help = "If you would like to see a dry run of commands to be executed.")
-    # parser_sub_rerun.add_argument('--gubbins','-g', action="store_true", help = "If you would like to run gubbins. NOT IN USE YET - PLEASE DO NOT USE")
+    parser_sub_rerun.add_argument('--gubbins','-g', action="store_true", help = "If you would like to run gubbins.")
     parser_sub_rerun.add_argument('-keep', action= 'store_true', help="Keep report from previous run")
     parser_sub_rerun.add_argument('-cluster', action="store_true", help = "If you are running Bohra on a cluster. Note if set you will need to provide a cluster.json file and a run_snakemake.sh, you can see examples on the documentation page.")
     parser_sub_rerun.add_argument('--json',help='Path to cluster.json - if not included will default to version provided in previous run', default='')

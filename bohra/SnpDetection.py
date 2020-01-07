@@ -61,13 +61,9 @@ class RunSnpDetection(object):
             self.set_cluster_log()
         
         self.user = getpass.getuser()
-        # gubbins TODO add back in later!!
-        # if not args.gubbins:
-        #     self.gubbins = numpy.nan
-        # else:
-        #     self.gubbins = args.gubbins
         
-        self.gubbins = numpy.nan
+        self.gubbins = False
+        
         self.mdu = args.mdu
         if isinstance(args.prefillpath, str):
             self.prefillpath = args.prefillpath
@@ -291,10 +287,6 @@ class RunSnpDetection(object):
             self.check_assemble_accesories()
             self.check_roary()
             return True
-
-
-    
-
     def run_checks(self):
         '''
         Run checks prior to start - checking all software is installed, if this is a rerun and the input files
@@ -341,7 +333,7 @@ class RunSnpDetection(object):
         logger.info(f"Recording your settings for job: {self.job_id}")
         new_df = pandas.DataFrame({'JobID':self.job_id, 'Reference':f"{self.ref}",'Mask':f"{self.mask}", 
                                     'MinAln':self.minaln, 'Pipeline': self.pipeline, 'CPUS': self.cpus, 'Assembler':self.assembler,
-                                    'Date':self.day, 'User':self.user, 'snippy_version':snippy_v, 'input_file':f"{self.input_file}",'prefillpath': self.prefillpath, 'cluster': self.cluster,'singularity': s, 'kraken_db':kraken}, 
+                                    'Date':self.day, 'User':self.user, 'snippy_version':snippy_v, 'input_file':f"{self.input_file}",'prefillpath': self.prefillpath, 'cluster': self.cluster,'singularity': s, 'kraken_db':kraken, 'Gubbins': self.gubbins}, 
                                     index=[0], )
         
         source_path = self.workdir / 'source.log'
@@ -390,11 +382,7 @@ class RunSnpDetection(object):
                 logger.info(f"Found {path.name}.")
 
             return True
-
     
-        
-
-
     def _name_exists(self, name):
         '''
         check if the name is an empty string JOB id can not be empty
@@ -841,7 +829,7 @@ rule combine_kraken:
         config_template = jinja2.Template(pathlib.Path(self.resources, 'config_snippy.yaml').read_text())
         config = self.workdir / f"{self.job_id}"/ f"{config_name}"
         
-        config.write_text(config_template.render(reference = f"{pathlib.Path(self.workdir, self.ref)}", cpus = self.cpus, name = self.job_id,  minperc = self.minaln,now = self.now, maskstring = maskstring, day = self.day, isolates = ' '.join(isolates)))
+        config.write_text(config_template.render(reference = f"{pathlib.Path(self.workdir, self.ref)}", cpus = self.cpus, name = self.job_id,  gubbins = self.gubbins, minperc = self.minaln,now = self.now, maskstring = maskstring, day = self.day, isolates = ' '.join(isolates)))
         
         logger.info(f"Config file successfully created")
 
