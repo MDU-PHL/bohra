@@ -479,7 +479,8 @@ class Report:
             :gubbins: not in use yet
             :pipeline: the type of pipeline - default is sa = snippy and assembly
         '''
-
+        
+        
         # set up paths variables
         p = pathlib.Path('.')
         print(sorted(p.glob('*.fa*')))
@@ -492,6 +493,9 @@ class Report:
         csstemplate = jinja2.Template(pathlib.Path(resources,'job.css').read_text())
         csstarget = reportdir / 'job.css'
         csstarget.write_text(csstemplate.render())
+        # newick string
+        newick_path = reportdir / 'core.treefile'
+        newick_string = open(newick_path).read()
         # save tool table
         self.get_software_file(reportdir = reportdir, pipeline = pipeline, assembler = assembler)
         
@@ -575,7 +579,7 @@ class Report:
         # fill template
         date = datetime.datetime.today().strftime("%d/%m/%y")
         report_template = jinja2.Template(pathlib.Path(indexhtml).read_text())
-        reporthtml.write_text(report_template.render( display = display,tables = tables,td = td, job_id = job_id, pipeline = pipeline, snpdistances=snpdistances, snpdensity = snpdensity, modaltables = modaltables, date = date))
+        reporthtml.write_text(report_template.render(newick = newick_string, display = display,tables = tables,td = td, job_id = job_id, pipeline = pipeline, snpdistances=snpdistances, snpdensity = snpdensity, modaltables = modaltables, date = date))
     #    TODO pass a list of links for the javascript section called 'table'
     # TODO pass the value of the graphs as separate variable 
         return(True)
