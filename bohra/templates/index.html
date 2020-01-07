@@ -177,6 +177,8 @@
         <div class="modal-content">
           <h2 class="modal-title" style= "color: #3973ac; margin:3px;"> Information </h2>
           <hr>
+          <h3 style="margin:6px;"> Download newick </h3>
+          <p style="margin:10px;"> Download the newick file by selecting the <span data-feather="arrow-down"></span> icon above the tree.</p>
           <h3 style="margin:6px;"> View branch support </h3>
           <p style="margin:10px;">Toggle branch support by selecting the <span data-feather="info"></span> icon above the tree.</p>
           <h3 style="margin:6px;"> Highlight tree tips </h3>
@@ -190,7 +192,8 @@
     </div>
 
 <div id="help-button" style = "float:right;">
-  <button type="button" class="btn btn-sm btn-outline-secondary zoom-button" id = "help" data-toggle="modal" data-target="#myModal3" data-placement="top" title="Select"> Helpful tips </button>      
+  <button type="button" class="btn btn-sm btn-outline-secondary zoom-button" id = "help" data-toggle="modal" data-target="#myModal3" data-placement="top" title="Select"> Helpful tips </button>    
+  <button type="button" class="btn btn-sm btn-outline-secondary" id = "nwk" ><span data-feather="arrow-down"> Download newick </button>        
 </div>
 <!-- div for summary table and phylogenetic tree -->
 <div class= "container-fluid">
@@ -368,6 +371,36 @@ $("button.phylogeny-button").click(function(){
   $("#phylogeny").show();
 });
 
+
+function download(file, text) { 
+  
+  //creating an invisible element 
+  var element = document.createElement('a'); 
+  element.setAttribute('href', 'data:text/plain;charset=utf-8, ' 
+                       + encodeURIComponent(text)); 
+  element.setAttribute('download', file); 
+
+  //the above code is equivalent to 
+  // <a href="path of file" download="file name"> 
+
+  document.body.appendChild(element); 
+
+  //onClick property 
+  element.click(); 
+
+  document.body.removeChild(element); 
+} 
+
+// Start file download. 
+document.getElementById("nwk").addEventListener("click", function() { 
+  // Generate download of hello.txt file with some content 
+  var text = {{nwk}};
+  var filename = "tree.newick"; 
+
+  download(filename, text); 
+}, false); 
+
+
 $("#sprt").click(function() {
    $('.branch-support').toggle();
 });
@@ -395,6 +428,8 @@ $("text.tiplab").click(function(){
     $("#myModal").modal();
   });
 
+
+
 // for hover details
   $("text.tiplab").hover(function(){
   var isolateid = $(this).text();
@@ -405,7 +440,8 @@ $("text.tiplab").click(function(){
  var info = isolateid + "\nContigs: " + $('tr.' + isolateid).find("td").eq(3).html() +"\nMLST: " +  $('tr.' + isolateid).find("td").eq(4).html() +"\nSpecies: " +  $('tr.' + isolateid).find("td").eq(5).html();
  $("text."+isolateid).tooltip({title: info, placement:"right"});
 });
-  
+
+
 
 $("button.help").click(function(){
   $("#myModal3").modal();
