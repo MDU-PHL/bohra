@@ -42,9 +42,14 @@ def rerun_pipeline(args):
 def main():
     # setup the parser
   
-    parser = configargparse.ArgumentParser(description='Bohra - a bacterial genomics pipeline',formatter_class=configargparse.ArgumentDefaultsHelpFormatter)
+    parser = configargparse.ArgumentParser(description=f'Bohra - a bacterial genomics pipeline - version {version}',formatter_class=configargparse.ArgumentDefaultsHelpFormatter)
+    
+
+    parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + version)
     # subparser for running the pipeline
     subparsers = parser.add_subparsers(help="Task to perform")
+
+    
 
     parser_sub_run = subparsers.add_parser('run', help='Initial run of Bohra', formatter_class=configargparse.ArgumentDefaultsHelpFormatter,default_config_files=[f"{pathlib.Path.cwd().absolute() / 'bohra.conf'}"])
     
