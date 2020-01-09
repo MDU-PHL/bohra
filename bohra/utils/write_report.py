@@ -495,7 +495,7 @@ class Report:
         csstarget.write_text(csstemplate.render())
         # newick string
         newick_path = reportdir / 'core.treefile'
-        newick_string = open(newick_path).read()
+        newick_string = open(newick_path).read().strip()
         # save tool table
         self.get_software_file(reportdir = reportdir, pipeline = pipeline, assembler = assembler)
         

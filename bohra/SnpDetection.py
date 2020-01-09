@@ -68,7 +68,7 @@ class RunSnpDetection(object):
         if isinstance(args.prefillpath, str):
             self.prefillpath = args.prefillpath
         elif self.mdu:
-            self.prefillpath = pathlib.Path('home', 'seq', 'MDU', 'QC')
+            self.prefillpath = f"{pathlib.Path('/', 'home', 'seq', 'MDU', 'QC')}/"
         else:
             self.prefillpath = ''
         self.force = args.force
@@ -717,7 +717,7 @@ rule combine_kraken:
         
         wd = self.workdir / self.job_id
         
-        
+        logger.info(f'mask strin = {maskstring}')
         kraken_output = self.kraken_output() if self.run_kraken else ''
         kraken_rule = self.kraken_ind_string() if self.run_kraken else ''
         kraken_summary = self.kraken_combine_string() if self.run_kraken else ''
@@ -739,7 +739,7 @@ rule combine_kraken:
             'job_id' : self.job_id,
             'assembler' : self.assembler if self.pipeline != 's' else 'no_assembler',
             'run_kraken' : self.run_kraken,
-            'maskstring': maskstring, 
+            'mask_string': maskstring, 
             'template_path':resource_path,
             'kraken_output':kraken_output,
             'kraken_rule' : kraken_rule,
@@ -824,6 +824,7 @@ rule combine_kraken:
             maskstring = f"--mask {self.workdir / self.mask}"
         else:
             maskstring = ''
+        logger.info(f'Mask string : {maskstring}')
         logger.info(f"Writing config file for job : {self.job_id}")
         # read the config file which is written with jinja2 placeholders (like django template language)
         config_template = jinja2.Template(pathlib.Path(self.resources, 'config_snippy.yaml').read_text())
@@ -862,7 +863,7 @@ rule combine_kraken:
         if self.cluster:
             cmd = f"{self.cluster_cmd()} -s {snake_name} {force} {singularity_string} --latency-wait 1200"
         else:
-            cmd = f"snakemake {dry} -s {snake_name} --j {self.cpus} {force} {singularity_string} 2>&1 | tee -a bohra.log"
+            cmd = f"snakemake {dry} -s {snake_name} -j {self.cpus} {force} {singularity_string} 2>&1 | tee -a bohra.log"
             # cmd = f"snakemake -s {snake_name} --cores {self.cpus} {force} "
         logger.info(f"Running job : {self.job_id} with {cmd} this may take some time. We appreciate your patience.")
         wkf = subprocess.run(cmd, shell = True)

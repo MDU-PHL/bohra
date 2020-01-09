@@ -187,14 +187,14 @@ if GUBBINS:
 		input:
 			'core.full.aln'
 		output:
-			clean.full.aln',
-			gubbins.aln'
+			'clean.full.aln',
+			'gubbins.aln'
 			
 		
 		shell:
 			"""
 			snippy-clean_full_aln {input} > {output[0]}
-			run_gubbins.py -c 36  --prefix {job} {output[0]}
+			run_gubbins.py -c 36  --prefix core {output[0]}
 			snp-sites -c core.filtered_polymorphic_sites.fasta > {output[1]}
 			"""	
 
