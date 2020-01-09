@@ -43,8 +43,6 @@ def main():
     # setup the parser
   
     parser = configargparse.ArgumentParser(description=f'Bohra - a bacterial genomics pipeline - version {version}',formatter_class=configargparse.ArgumentDefaultsHelpFormatter)
-    
-
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + version)
     # subparser for running the pipeline
     subparsers = parser.add_subparsers(help="Task to perform")
