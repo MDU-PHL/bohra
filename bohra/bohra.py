@@ -19,7 +19,7 @@ import sys
 import os
 from bohra.SnpDetection import RunSnpDetection
 from bohra.ReRunSnpDetection import ReRunSnpDetection
-
+from bohra.version import version
 
 
 #logging.basicConfig(filename='job.log',level=logging.INFO, format='[%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
