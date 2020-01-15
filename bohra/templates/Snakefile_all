@@ -51,8 +51,8 @@ rule all:
 
 rule seqdata:
 	input:
-		'READS/{sample}/R1.fq.gz',
-		'READS/{sample}/R2.fq.gz'
+		ancient('READS/{sample}/R1.fq.gz'),
+		ancient('READS/{sample}/R2.fq.gz')
 	output:
 		"{sample}/seqdata.tab"
 	singularity:{% endraw %}"{{singularity_dir}}/seqtk"{% raw %}
@@ -64,8 +64,8 @@ rule seqdata:
 
 rule estimate_coverage:
 	input:
-		"READS/{sample}/R1.fq.gz",
-		"READS/{sample}/R2.fq.gz"
+		ancient("READS/{sample}/R1.fq.gz"),
+		ancient("READS/{sample}/R2.fq.gz")
 	output:
 		"{sample}/mash.txt"
 	singularity:{% endraw %}"{{singularity_dir}}/mash_kmc"{% raw %}
@@ -113,8 +113,8 @@ rule combine_seqdata:
 	
 rule snippy:
 	input:
-		'READS/{sample}/R1.fq.gz',
-		'READS/{sample}/R2.fq.gz'
+		ancient('READS/{sample}/R1.fq.gz'),
+		ancient('READS/{sample}/R2.fq.gz')
 	output:
 		'{sample}/snps.vcf',
 		'{sample}/snps.aligned.fa'
@@ -278,8 +278,8 @@ rule run_iqtree_core:
 
 rule assemble:
 	input:
-		'READS/{sample}/R1.fq.gz',
-		'READS/{sample}/R2.fq.gz'
+		ancient('READS/{sample}/R1.fq.gz'),
+		ancient('READS/{sample}/R2.fq.gz')
 	output:
 		'{sample}/{sample}.fa'
 	threads:
