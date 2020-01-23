@@ -100,8 +100,22 @@ def main():
     if vars(args) == {}:
         parser.print_help(sys.stderr)
     else:
-        # logging.basicConfig(filename='job.log',level=logging.INFO, format='[%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-        # logger = logging.getLogger(__name__)
+        logger = logging.getLogger(__name__)
+        logger.setLevel(logging.INFO)
+        # create file handler which logs even debug messages
+        fh = logging.FileHandler('bohra.log')
+        fh.setLevel(logging.INFO)
+        # create console handler with a higher log level
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.INFO)
+        # create formatter and add it to the handlers
+        formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+        fh.setFormatter(formatter)
+        ch.setFormatter(formatter)
+        # add the handlers to the logger
+        logger.addHandler(ch)
+        logger.addHandler(fh)
+        logger.info(f"Starting bohra pipeline using {' '.join(sys.argv)}")
         args.func(args)
 	
 if __name__ == '__main__':

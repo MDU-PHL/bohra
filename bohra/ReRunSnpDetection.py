@@ -13,13 +13,30 @@ import re
 from packaging import version
 from Bio import SeqIO, Phylo
 from bohra.SnpDetection import RunSnpDetection
-from bohra.bohra_logger import logger
+# from bohra.bohra_logger import logger
 class ReRunSnpDetection(RunSnpDetection):
     '''
     A class for a Bohra reurn objects - inherits RunSnpDetection
     '''
 
     def __init__(self, args):
+
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.INFO)
+        # create file handler which logs even debug messages
+        fh = logging.FileHandler('bohra.log')
+        fh.setLevel(logging.INFO)
+        # create console handler with a higher log level
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.INFO)
+        # create formatter and add it to the handlers
+        formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+        fh.setFormatter(formatter)
+        ch.setFormatter(formatter)
+        # add the handlers to the logger
+        self.logger.addHandler(ch)
+        self.logger.addHandler(fh)
+        
         # get date and time
         self.now = datetime.datetime.today().strftime("%d_%m_%y_%H")
         self.day = datetime.datetime.today().strftime("%d_%m_%y")
@@ -118,7 +135,7 @@ class ReRunSnpDetection(RunSnpDetection):
         self.cpus = df.loc[df.index[-1], 'CPUS']
         self.prefillpath = df.loc[df.index[-1], 'prefillpath']
         self.minaln = df.loc[df.index[-1], 'MinAln']
-        
+        self.logger.info(f"This is a re-run of an existing job : {self.job_id}. Previous settings will be used.")
         # return reference, mask, snippy_version, date, input_file, pipeline
         
 
@@ -177,7 +194,7 @@ class ReRunSnpDetection(RunSnpDetection):
         rename core and distance files
         '''
         if self.gubbins:
-            logger.info(f"You have chosen to run gubbins. Existing core files will be archived and not removed.")
+            self.logger.info(f"You have chosen to run gubbins. Existing core files will be archived and not removed.")
             corefiles = sorted(pathlib.Path(self.workdir, self.job_id).glob('core*'))
             if corefiles:
                 for core in corefiles:
@@ -200,11 +217,11 @@ class ReRunSnpDetection(RunSnpDetection):
         p1 = pathlib.Path(self.workdir, self.job_id, 'report')
         p2 = pathlib.Path(self.workdir, self.job_id, f"report_{self.orignal_date}")
         if self.keep:
-            logger.info(f"Archiving previous report files")
+            self.logger.info(f"Archiving previous report files")
             cmd = f"mv {p1} {p2}"
             self.remove_core()
         else:
-            logger.info("Removing previous report files.")
+            self.logger.info("Removing previous report files.")
             cmd = f"if [ -d {p1} ];then rm -r {p1}; fi"
         subprocess.run(cmd, shell = True)
     
@@ -212,7 +229,7 @@ class ReRunSnpDetection(RunSnpDetection):
         '''
         Need to remove core_isolates.txt to get snakemake to redo snippy core step
         '''
-        logger.info(f"Removing previous snippy-core output.")
+        self.logger.info(f"Removing previous snippy-core output.")
         corefiles = sorted(pathlib.Path(self.workdir, self.job_id).glob('core*'))
         if corefiles:
             for core in corefiles:
@@ -225,10 +242,10 @@ class ReRunSnpDetection(RunSnpDetection):
         sing_storage_dir = self.workdir / self.job_id / '.snakemake' / 'singularity'
         containers = sorted(sing_storage_dir.glob("*.si*"))
         if len(containers) != 0:
-            logger.info(f"You already have singularity containers stored. These will be reused.")
+            self.logger.info(f"You already have singularity containers stored. These will be reused.")
             return True
         else:
-            logger.info(f"There are no singularity containers present. These will be pulled from {self.singularity_path}.")
+            self.logger.info(f"There are no singularity containers present. These will be pulled from {self.singularity_path}.")
             return True
 
     def rerun_checks(self):
@@ -245,11 +262,11 @@ class ReRunSnpDetection(RunSnpDetection):
         '''
         Rerun the pipeline
         '''
-        # logger.info(f"Previous --use-singularity is still : {self.use_singularity}")
+        # self.logger.info(f"Previous --use-singularity is still : {self.use_singularity}")
         if self.use_singularity:
             # check that the .singularity directory is present... if not rerun from scratch
             self.check_singularity_directory()
-            logger.info(f"You have chosen to run bohra with singularity containers. Good luck")
+            self.logger.info(f"You have chosen to run bohra with singularity containers. Good luck")
 
         else:
             # check if the previous run used singularity - if so check for containers.
@@ -266,7 +283,7 @@ class ReRunSnpDetection(RunSnpDetection):
         # run the workflow
         if self.run_workflow(): 
             if not self.dryrun:
-                logger.info(f"Report can be found in {self.job_id}")
-                logger.info(f"Process specific log files can be found in process directories. Job settings can be found in source.log") 
+                self.logger.info(f"Report can be found in {self.job_id}")
+                self.logger.info(f"Process specific log files can be found in process directories. Job settings can be found in source.log") 
     
-            logger.info(f"Have a nice day. Come back soon.") 
+            self.logger.info(f"Have a nice day. Come back soon.") 
