@@ -1,4 +1,4 @@
-import sys, pathlib, pandas, pytest, numpy
+import sys, pathlib, pandas, pytest, numpy,logging
 
 from unittest.mock import patch
 
@@ -14,6 +14,7 @@ def test_name_string():
         '''
         with patch.object(RunSnpDetection, "__init__", lambda x: None):
                 detect_obj = RunSnpDetection()
+                detect_obj.logger = logging.getLogger(__name__)
                 assert detect_obj._name_exists('somestring')
 
 def test_name_non_string():
@@ -22,6 +23,7 @@ def test_name_non_string():
         '''
         with patch.object(RunSnpDetection, "__init__", lambda x: None):
                 detect_obj = RunSnpDetection()
+                detect_obj.logger = logging.getLogger(__name__)
                 with pytest.raises(SystemExit):
                         detect_obj._name_exists(9)
 
@@ -31,6 +33,7 @@ def test_name_empty_string():
         '''
         with patch.object(RunSnpDetection, "__init__", lambda x: None):
                 detect_obj = RunSnpDetection()
+                detect_obj.logger = logging.getLogger(__name__)
                 with pytest.raises(SystemExit):
                         detect_obj._name_exists('')
               
@@ -41,6 +44,7 @@ def test_3col_dimensions():
         '''
         with patch.object(RunSnpDetection, "__init__", lambda x: None):
                 detect_obj = RunSnpDetection()
+                detect_obj.logger = logging.getLogger(__name__)
                 tab = pandas.DataFrame({'A':[1], 'B':[2], 'C':[3]})
                 assert detect_obj.three_cols(tab)
 
@@ -50,6 +54,7 @@ def test_2col_dimensions():
         '''
         with patch.object(RunSnpDetection, "__init__", lambda x: None):
                 detect_obj = RunSnpDetection()
+                detect_obj.logger = logging.getLogger(__name__)
                 tab = pandas.DataFrame({'A':[1], 'B':[2]})
                 assert detect_obj.three_cols(tab) == False
 
@@ -60,6 +65,7 @@ def test_four_isolates():
         '''
         with patch.object(RunSnpDetection, "__init__", lambda x: None):
                 detect_obj = RunSnpDetection()
+                detect_obj.logger = logging.getLogger(__name__)
                 tab = pandas.DataFrame({'A':[1,2,3,4]})
                 assert detect_obj.min_four_samples(tab) == False
 
@@ -69,6 +75,7 @@ def test_notfour_isolates():
         '''
         with patch.object(RunSnpDetection, "__init__", lambda x: None):
                 detect_obj = RunSnpDetection()
+                detect_obj.logger = logging.getLogger(__name__)
                 tab = pandas.DataFrame({'A':[1,2,3]})
                 assert detect_obj.min_four_samples(tab)
 
@@ -78,6 +85,7 @@ def test_missing():
         '''
         with patch.object(RunSnpDetection, "__init__", lambda x: None):
                 detect_obj = RunSnpDetection()
+                detect_obj.logger = logging.getLogger(__name__)
                 tab = pandas.DataFrame({'A':[1,2,3,4], 'B':[5,6,7,8], 'C':[9,10,11,12]})
                 assert detect_obj.all_data_filled(tab)
 
@@ -87,6 +95,7 @@ def test_with_missing():
         '''
         with patch.object(RunSnpDetection, "__init__", lambda x: None):
                 detect_obj = RunSnpDetection()
+                detect_obj.logger = logging.getLogger(__name__)
                 tab = pandas.DataFrame({'A':[1,2,4, numpy.nan], 'B':[5,6,7,8], 'C':[9,10,11,12]})
                 assert detect_obj.all_data_filled(tab) == False
 
@@ -94,6 +103,7 @@ def test_with_missing():
 def test_structure():
         with patch.object(RunSnpDetection, "__init__", lambda x: None):
                 detect_obj = RunSnpDetection()
+                detect_obj.logger = logging.getLogger(__name__)
                 tab = pandas.DataFrame({'A':[1,2,3,4], 'B':[5,6,7,8], 'C':[9,10,11,12]})
                 assert detect_obj.check_input_structure(tab) == True
 
@@ -105,5 +115,6 @@ def test_path_exists():
         with patch.object(RunSnpDetection, "__init__", lambda x: None):
                 p = pathlib.Path('bohra','tests', 'test_file.txt')
                 detect_obj = RunSnpDetection()
+                detect_obj.logger = logging.getLogger(__name__)
                 assert detect_obj.path_exists(p)
 
