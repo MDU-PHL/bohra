@@ -116,8 +116,9 @@ class ReRunSnpDetection(RunSnpDetection):
         
         self.pipeline = df.loc[df.index[-1], 'Pipeline']
         self.logger.info(f"Previous pipeline was : {self.pipeline}")
-        self.use_singularity = df.loc[df.index[-1], 'singularity']
-        self.logger.info(f"Previous --use-singularity was set to : {self.use_singularity}")
+        if 'singularity' in list(df.columns):
+            self.use_singularity = df.loc[df.index[-1], 'singularity']
+            self.logger.info(f"Previous --use-singularity was set to : {self.use_singularity}")
         if self.pipeline != 'a':
             self.original_reference = df.loc[df.index[-1], 'Reference']
             self.logger.info(f"Previous reference was : {self.original_reference}")
