@@ -110,24 +110,24 @@ class ReRunSnpDetection(RunSnpDetection):
         '''
         open the source.log file and extract reference, mask, date, snippy_version
         '''
-        logger.info(f"Retrieving settings and software versions.")
+        self.logger.info(f"Retrieving settings and software versions.")
         version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
         df = pandas.read_csv('source.log', sep = None, engine = 'python')
         
         self.pipeline = df.loc[df.index[-1], 'Pipeline']
-        logger.info(f"Previous pipeline was : {self.pipeline}")
+        self.logger.info(f"Previous pipeline was : {self.pipeline}")
         self.use_singularity = df.loc[df.index[-1], 'singularity']
-        logger.info(f"Previous --use-singularity was set to : {self.use_singularity}")
+        self.logger.info(f"Previous --use-singularity was set to : {self.use_singularity}")
         if self.pipeline != 'a':
             self.original_reference = df.loc[df.index[-1], 'Reference']
-            logger.info(f"Previous reference was : {self.original_reference}")
+            self.logger.info(f"Previous reference was : {self.original_reference}")
             self.original_mask = df.loc[df.index[-1],'Mask'] if isinstance(df.loc[df.index[-1],'Mask'], str) else ''
-            logger.info(f"Previous mask was : {self.original_mask}")
+            self.logger.info(f"Previous mask was : {self.original_mask}")
             self.original_snippy_version = version_pat.search(df.loc[df.index[-1], 'snippy_version']) if not self.use_singularity else df.loc[df.index[-1], 'snippy_version']
-            logger.info(f"Previous snippy_version was : {self.original_snippy_version}")
+            self.logger.info(f"Previous snippy_version was : {self.original_snippy_version}")
         if self.pipeline != 's':
             self.assembler = df['Assembler'].unique()[0]
-            logger.info(f"Previous assembler used was : {self.assembler}")
+            self.logger.info(f"Previous assembler used was : {self.assembler}")
         self.orignal_date = df.loc[df.index[-1], 'Date']
         self.input_file = pathlib.Path(f"{df.loc[df.index[-1], 'input_file']}")
         # print(self.input_file)
