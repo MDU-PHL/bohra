@@ -144,7 +144,7 @@ class ReRunSnpDetection(RunSnpDetection):
         Check that reference used in rerun is the same as the reference used in previous run. If not will need to force new SNP detection
         '''
         # check if refs are the same if not set self.ref to new and change to force, else set ref to original
-        logger.info(f"Checking reference.")
+        self.logger.info(f"Checking reference.")
         if isinstance(new, str) and len(new) > 0 and len(self.original_reference) > 0:
             new_reference = pathlib.Path(f"{new}")
             if f"{new_reference.name}" == self.original_reference:
@@ -153,11 +153,11 @@ class ReRunSnpDetection(RunSnpDetection):
             else:
                 self.ref = self.link_file(path = new_reference)
                 self.force = True
-                logger.info(f"You have chosen a different reference from the previous run. Snippy will be forced to run again from the beginning.")
+                self.logger.info(f"You have chosen a different reference from the previous run. Snippy will be forced to run again from the beginning.")
         elif isinstance(new, str) and len(new) == 0 and len(self.original_reference) > 0:
             self.ref = pathlib.Path(self.original_reference)
         else:
-            logger.warning('There appears to be something wrong with the reference. You will need to run Bohra using the run command.')
+            self.logger.warning('There appears to be something wrong with the reference. You will need to run Bohra using the run command.')
             raise SystemExit
 
 
@@ -167,20 +167,20 @@ class ReRunSnpDetection(RunSnpDetection):
         '''
         self.check_setup_files()
         if self.use_singularity:
-            logger.info(f"You used singulairty containers to run bohra last time, therefore no need to compare snippy versions.")
+            self.logger.info(f"You used singulairty containers to run bohra last time, therefore no need to compare snippy versions.")
         else:
             self.current_snippy_version = self.check_deps()
-            logger.info(f"Comapring snippy versions.")
+            self.logger.info(f"Comapring snippy versions.")
             if self.current_snippy_version.group("major", "minor") != self.original_snippy_version.group("major", "minor"):
                 self.force = True
-                logger.info(f"You are using a different version of Snippy for this re-run, SNP calling will be repeated.")
+                self.logger.info(f"You are using a different version of Snippy for this re-run, SNP calling will be repeated.")
 
 
     def update_source_log(self):
         '''
         update source.log if user changes parameters
         '''
-        logger.info(f"Updating {self.job_id} records.")
+        self.logger.info(f"Updating {self.job_id} records.")
         df = pandas.read_csv('source.log', sep = None, engine = 'python')
         # if self.pipeline == 'a':
         snippy_v = f'singularity_{self.day}' if self.use_singularity else self.snippy_version
@@ -194,7 +194,7 @@ class ReRunSnpDetection(RunSnpDetection):
         rename core and distance files
         '''
         if self.gubbins:
-            self.logger.info(f"You have chosen to run gubbins. Existing core files will be archived and not removed.")
+            self.self.logger.info(f"You have chosen to run gubbins. Existing core files will be archived and not removed.")
             corefiles = sorted(pathlib.Path(self.workdir, self.job_id).glob('core*'))
             if corefiles:
                 for core in corefiles:
