@@ -91,7 +91,7 @@ class ReRunSnpDetection(RunSnpDetection):
         '''
         check if new cluster configs are being used if not default to stored
         '''
-        logger.info(f"Retrieving cluster settings.")
+        self.logger.info(f"Retrieving cluster settings.")
         cluster_log = self.workdir / 'cluster.log'
         if self.cluster == False: #if there is no cluster setting double check if there is an exisitng log 
             if cluster_log.exists(): #reset settings to reflect 
@@ -195,7 +195,7 @@ class ReRunSnpDetection(RunSnpDetection):
         rename core and distance files
         '''
         if self.gubbins:
-            self.self.logger.info(f"You have chosen to run gubbins. Existing core files will be archived and not removed.")
+            self.logger.info(f"You have chosen to run gubbins. Existing core files will be archived and not removed.")
             corefiles = sorted(pathlib.Path(self.workdir, self.job_id).glob('core*'))
             if corefiles:
                 for core in corefiles:
