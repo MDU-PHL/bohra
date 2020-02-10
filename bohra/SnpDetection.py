@@ -702,10 +702,10 @@ rule combine_kraken:
 			df = df.reset_index(drop = True) 
 			tempdf = pandas.DataFrame()
 			d = {{'Isolate': f\"{{kraken.parts[0]}}\",    
-					'#1 Match': df.ix[0,'name'].strip(), '%1': df.ix[0,'percentage'],
-					'#2 Match': df.ix[1,'name'].strip(), '%2': df.ix[1,'percentage'],       
-					'#3 Match': df.ix[2,'name'].strip(), '%3': df.ix[2,'percentage'] ,
-					'#4 Match': df.ix[3,'name'].strip(), '%4': df.ix[3,'percentage']
+					'#1 Match': df.loc[0,'name'].strip(), '%1': df.loc[0,'percentage'],
+					'#2 Match': df.loc[1,'name'].strip(), '%2': df.loc[1,'percentage'],       
+					'#3 Match': df.loc[2,'name'].strip(), '%3': df.loc[2,'percentage'] ,
+					'#4 Match': df.loc[3,'name'].strip(), '%4': df.loc[3,'percentage']
 					}}
 		
 			tempdf = pandas.DataFrame(data = d, index= [0])
