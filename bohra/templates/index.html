@@ -177,16 +177,12 @@
         <div class="modal-content">
           <h2 class="modal-title" style= "color: #3973ac; margin:3px;"> Information </h2>
           <hr>
-          <h3 style="margin:6px;"> Download newick </h3>
-          <p style="margin:10px;"> Download the newick file by selecting the <span data-feather="arrow-down"></span> icon above the tree.</p>
-          <h3 style="margin:6px;"> View branch support </h3>
-          <p style="margin:10px;">Toggle branch support by selecting the <span data-feather="info"></span> icon above the tree.</p>
-          <h3 style="margin:6px;"> Highlight tree tips </h3>
-          <p style="margin:10px;">Toggle the isolates from the summary table to highlight their position in the tree</p>
-          <h3 style="margin:6px;"> Isolate details </h3>
-          <p style="margin:10px;">Select an isolate from the tree to see isolate specific details</p>
+          <<h3 style="margin:6px;"> Download tree</h3>
+          <p style="margin:10px;"> To download a newick file right click on tree and select export as newick</p>
+          <h3 style="margin:6px;"> Isolate details</h3>
+          <p style="margin:10px;"> Select an isolate node from the tree to see isolate specific details</p>
           <h3 style="margin:6px;"> SNP distances </h3>
-          <p style="margin:10px;">Drag a box around a group of isolates that you would like to see SNP distances for</p>
+          <p style="margin:10px;"> Select the parent node to display pariwise SNP distances</p>
         </div>
       </div>
     </div>
@@ -203,10 +199,10 @@
       {% for t in td %}
       {% if t.type == 'summary' %}
       <!-- <h2 style= "color: #3973ac; float:left;" class='summary-table-header'>Summary Table</h2> -->
-      <button type="button" class="btn btn-primary btn-xlg btn-outline-primary summary-table-button" ><h3>{{t.title}}</h3></button>
+      <button type="button" class="btn btn-primary btn-xlg btn-outline-primary btn-lg summary-table-button" >{{t.title}}</button>
       {% elif t.type == 'tree' %}
       <!-- <h2 style= "color: #3973ac; float:right;" class='phylogeny-table-header'>Phylogeny</h2> -->
-      <button type="button" class="btn btn-primary btn-xlg btn-outline-primary phylogeny-button" ><h3>{{t.title}}</h3></button>
+      <button type="button" class="btn btn-primary btn-xlg btn-outline-primary btn-lg phylogeny-button" >{{t.title}}</button>
       {% endif %}
       {% endfor %}
       <div id="tablediv" style = "display: none;">
@@ -225,17 +221,16 @@
           </table>
       </div>
       {% elif t.type == 'tree' %}
-    <div id="{{t.link}}" >
-      <!-- <p>{{message}}</p> -->
+      <div id="phylocanvas" style="width: 100%; height: {{tree_height}};" >
       
-      <hr>
-      <!-- button div -->
-      <div id="brnch-sprt">
-        <button type="button" class="btn btn-sm btn-outline-secondary" id = "sprt" ><span data-feather="info"> toggle branch support </button>      
+        <!-- <p>{{message}}</p> -->
+        
+        <hr>
+        <!-- button div -->
+        <div class = "radial-div">
+          <button id="change-tree" type="button" class="btn btn-sm btn-outline-secondary">Circular</button>
       </div>
-      <div id = "svg_div" style="overflow-y:scroll;">    
-        {{ t.image }}
-       </div>
+        
         {% endif %}
         {% endfor %}
       
@@ -368,77 +363,85 @@ $("button.summary-table-button").click(function(){
 $("button.phylogeny-button").click(function(){
   console.log('slected phylogeny');
   $("#tablediv").hide();
-  $("#phylogeny").show();
+  $("#phylocanvas").show();
 });
 
+// using phylocanvas to make tree
+var nwk = "{{ newick }}";
+var tree = Phylocanvas.createTree('phylocanvas', {
+  showInternalNodeLabels: true,
+  alignLabels: true,
+  lineWidth: 2,
+  disableZoom: true,    
+  scalebar: { active: true, position: { bottom: 10, centre: 10 } },
+});  
+tree.internalLabelStyle.colour = '#adf0ad';
+tree.on('error', function (event) { throw event.error; });
+tree.on('loaded', function () { console.log('loaded phylocanvas'); });
+tree.load(nwk);
+tree.setTreeType('rectangular');
+tree.setTextSize(20);
+tree.setNodeSize(4);
+tree.draw();
 
-function download(file, text) { 
-  
-  //creating an invisible element 
-  var element = document.createElement('a'); 
-  element.setAttribute('href', 'data:text/plain;charset=utf-8, ' 
-                       + encodeURIComponent(text)); 
-  element.setAttribute('download', file); 
+// display modal tables from tree
 
-  //the above code is equivalent to 
-  // <a href="path of file" download="file name"> 
-
-  document.body.appendChild(element); 
-
-  //onClick property 
-  element.click(); 
-
-  document.body.removeChild(element); 
-} 
-
-// Start file download. 
-document.getElementById("nwk").addEventListener("click", function() { 
-  // Generate download of hello.txt file with some content 
-  var text = "{{newick}}";
-  var filename = "tree.newick"; 
-
-  download(filename, text); 
-}, false); 
-
-
-$("#sprt").click(function() {
-   $('.branch-support').toggle();
+tree.on('click', function (e) {
+  var node = tree.getNodeAtMousePosition(e);
+  console.log(node.getChildProperties('id'));
+  var selected = node.getChildProperties('id');
+  // snp-distances
+  if (selected.length > 1) {
+      var table_head = "<thead>\n<tr>\n<th></th>";
+      var table_body = "<tbody>";
+      for (var i = 0; i < selected.length; i++) {
+          console.log(selected[i]);
+          table_head = table_head + '<th>' + selected[i] + '</th>\n';
+          var row = '<tr>\n';
+          var first_cell= $('.' + selected[i] + '_snp-dists')[0].innerHTML;
+          row = row + '<td>' + first_cell + '</td>';
+          for (var j = 0; j < selected.length; j++) {
+              console.log(selected[j]);
+              console.log($('.'+selected[i]+'_'+selected[j])[0].innerHTML);
+              var cell = $('.'+selected[i]+'_'+selected[j])[0].innerHTML;
+              row = row +'<td>'+ cell + '</td>\n';
+          }
+          row = row + '</tr>\n';
+          table_body = table_body + row;
+      }
+      table_head = table_head + '</tr>\n</thead>';
+      table_body = table_body + '</tbody>';
+      console.log(table_head);
+      console.log(table_body);
+      var t = table_head +table_body;
+      $('.modal-selected-snps-table').html(t);
+      $("#myModal2").modal();
+  } else {
+      // tables for each isolate - 
+      var modaltables = {{modaltables | tojson}}; // jinja2 passing a list of tables
+      var isolateid = selected[0];
+      console.log(isolateid);
+    //     need to set .modal-table to row with isolate id $('model-content').html(tablerow)
+      $('.modal-title').html(isolateid + ' details');
+      $('tr.' + isolateid).clone().appendTo('.modal-summary-table');
+      // for each table in analysis generate a specific table
+      $.each(modaltables, function(index, table){
+        $('tr.' + isolateid + '-' + table).clone().appendTo('.modal-body-' + table);
+      });      
+      $("#myModal").modal();
+  }
 });
-// highlioght tree tip based on row in table
-$( "tr" ).click(function() {
-        var isolaterow = $(this).find('td'); // this will access the clicked row.
-        console.log(isolaterow);
-        var isolateid = isolaterow.eq(0).text(); // get the first cell (isolate id)
-        console.log(isolateid);
-        //   $( "tr.tiplab" + isolateid ).toggleClass( "activeisolate" );
-          $( "svg text." + isolateid ).toggleClass( "activeisolate" ); // change class of text here based on isolateid
-});    
-// modal of isolate specific data
-$("text.tiplab").click(function(){
-    var isolateid = $(this).text();
-    var modaltables = {{modaltables | tojson}}; // jinja2 passing a list of tables
-    console.log(isolateid);
-//     need to set .modal-table to row with isolate id $('model-content').html(tablerow)
-    $('.modal-title').html(isolateid + ' details');
-    $('tr.' + isolateid).clone().appendTo('.modal-summary-table');
-    // for each table in analysis generate a specific table
-    $.each(modaltables, function(index, table){
-      $('tr.' + isolateid + '-' + table).clone().appendTo('.modal-body-' + table);
-    });      
-    $("#myModal").modal();
-  });
 
-
-
-// for hover details
-  $("text.tiplab").hover(function(){
-  var isolateid = $(this).text();
-  console.log(isolateid)
- // $('.btn-warning').tooltip({title: "Hooray", placement: "top"}); 
- console.log($('tr.' + isolateid).find("td").eq(2).html());
- console.log($('tr.' + isolateid).html());
- var info = isolateid + "\nContigs: " + $('tr.' + isolateid).find("td").eq(3).html() +"\nMLST: " +  $('tr.' + isolateid).find("td").eq(4).html() +"\nSpecies: " +  $('tr.' + isolateid).find("td").eq(5).html();
- $("text."+isolateid).tooltip({title: info, placement:"right"});
+$("#change-tree").on("click", function (e) {
+    var button_text = $(this).text();
+    if (button_text == "Circular"){
+        tree.setTreeType("circular");
+        $(this).html("Rectangular");
+    } else if (button_text == "Rectangular") {
+        tree.setTreeType("rectangular");
+        $(this).html("Circular");
+    }
+    
 });
 
 
