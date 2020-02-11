@@ -8,150 +8,6 @@ import datetime
 # from bokeh.io import export_png
 # import PyQt5
 # from ete3 import Tree, TreeStyle, NodeStyle, TextFace
-
-class Tree:
-    '''
-    This script will draw a tree from a newick using a recursive approach to extract positions of nodes (adapted for my needs from https://github.com/plotly/dash-phylogeny/blob/dev/app.py) and placement with svgwrite.
-    '''
-    def read_treefile(self,filename):
-        '''
-        Open the treefile
-        '''
-        tree = Phylo.read(filename, "newick")
-        return tree 
-
-    def get_x_coordinates(self,tree):
-        """Associates to  each clade an x-coord.
-        returns dict {clade: x-coord}
-        """
-        xcoords = tree.depths()
-        # tree.depth() maps tree clades to depths (by branch length).
-        # returns a dict {clade: depth} where clade runs over all Clade instances of the tree, and depth
-        # is the distance from root to clade
-
-        #  If there are no branch lengths, assign unit branch lengths
-        if not max(xcoords.values()):
-            xcoords = tree.depths(unit_branch_lengths=True)
-        return xcoords
-
-    def get_y_coordinates(self,tree, dist=.8):
-        """
-        returns  dict {clade: y-coord}
-        The y-coordinates are  (float) multiple of integers (i*dist below)
-        dist depends on the number of tree leafs
-        """
-        maxheight = tree.count_terminals()  # Counts the number of tree leafs.
-        # Rows are defined by the tips/leafs
-        ycoords = dict((leaf, maxheight - i * dist) for i, leaf in enumerate(reversed(tree.get_terminals())))
-        
-        def calc_row(clade):
-            for subclade in clade:
-                if subclade not in ycoords:
-                    calc_row(subclade)
-            ycoords[clade] = (ycoords[clade.clades[0]] +
-                            ycoords[clade.clades[-1]]) / 2
-
-        if tree.root.clades:
-            calc_row(tree.root)
-        return ycoords
-
-    def get_clade_lines(self,orientation='horizontal',y_curr=0, x_start=0, x_curr=0, y_bot=0, y_top=0):
-        """define a shape of type 'line', for branch
-        """
-        branch_line = dict()
-        if orientation == 'horizontal':
-            branch_line.update(x0=x_start,
-                            y0=y_curr,
-                            x1=x_curr,
-                            y1=y_curr)
-        elif orientation == 'vertical':
-            branch_line.update(x0=x_curr,
-                            y0=y_bot,
-                            x1=x_curr,
-                            y1=y_top,
-                            type = 'vertical')
-        else:
-            raise ValueError("Line type can be 'horizontal' or 'vertical'")
-
-        return branch_line
-
-
-    def draw_clade(self,clade, x_start, line_shapes, line_width=1, x_coords=0, y_coords=0):
-        """Recursively draw the tree branches, down from the given clade"""
-
-        x_curr = x_coords[clade]
-        y_curr = y_coords[clade]
-
-        # Draw a horizontal line from start to here
-        branch_line = self.get_clade_lines(orientation='horizontal', y_curr=y_curr, x_start=x_start, x_curr=x_curr)
-        # add in name of node
-        branch_line['nodename'] = clade.name
-        branch_line['type'] = 'horizontal'
-        line_shapes.append(branch_line)
-        if clade.clades:
-            # Draw a vertical line connecting all children
-            y_top = y_coords[clade.clades[0]]
-            y_bot = y_coords[clade.clades[-1]]
-            line_shapes.append(self.get_clade_lines(orientation='vertical', x_curr=x_curr, y_bot=y_bot, y_top=y_top))
-
-    # Draw descendant
-            for child in clade:
-                self.draw_clade(child, x_curr, line_shapes, x_coords=x_coords, y_coords=y_coords)
-        
-        return(line_shapes)
-
-    def main(self,treepath, outpath):
-        '''
-        Use svgwrite to generate a tree
-        '''
-        # get the tree using bio phylo
-        tree = self.read_treefile(treepath)
-        # get the x and y co-ordinates for nodes
-        xs = self.get_x_coordinates(tree)
-        ys = self.get_y_coordinates(tree)
-        terms = [t.name for t in tree.get_terminals()]
-        line_shapes = [] # empty list to begin 
-        # line shapes is a list of dictionaries for each node and branch
-        tree_coords = self.draw_clade(tree.root, 0, line_shapes, x_coords=xs,y_coords=ys)
-    
-        # find the maximum x position for generation of a figure which will scale
-        maxlength = 0
-        minheight = len(terms)
-        maxheight = 0
-        for t in tree_coords:
-            if t['type'] == 'horizontal':
-                if t['x1'] > float(maxlength):
-                    maxlength = t['x1']
-                if t['y1'] < float(minheight):
-                    minheight = t['y1']
-                if t['y1'] > float(maxheight):
-                    maxheight = t['y1']
-        f = 10/maxlength # factor to multiply the
-        # a drawing object
-        # viewbox is calculated based on 1cm = 37.8 pixels
-        svg_text = [f"<svg baseProfile=\"full\" version=\"1.1\" viewBox=\"-37.8,{(minheight*37.8)-37.8},1000,{(maxheight*37.8)+37.8}\" ><defs />\""]
-        
-        for t in tree_coords:
-            if t['type'] == 'horizontal':
-                # branches.add(dwg.line(start=((t['x0']*f)*cm, t['y0']*cm), end=((t['x1']*f)*cm, t['y1']*cm)))
-                svg_text.append(f"<line x1=\"{(t['x0']*f)*cm}\" x2=\"{(t['x1']*f)*cm}\" y1=\"{t['y0']*cm}\" y2=\"{t['y1']*cm}\" stroke=\"black\"/>")
-                if t['nodename'] in terms:
-                    svg_text.append(f"<text class = \"tiplab {t['nodename']}\" x=\"{((t['x1']*f) + 0.1)*cm}\" y=\"{t['y1']*cm}\">{t['nodename']}</text>")
-                    # labels.add(dwg.text(t['nodename'], ((((t['x1']*f) + 0.1)*cm, (t['y1']*cm))),style = 'font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji"'))
-                    # circleA = dwg.circle(center=((t['x1']*f)*cm, t['y1']*cm), r='0.05cm')
-                    svg_text.append(f"<circle cx=\"{(t['x1']*f)*cm}\" cy=\"{t['y1']*cm}\" r=\"0.05cm\" />")
-                    # tips.add(circleA)
-                elif (t['nodename'] not in terms) and (t['nodename'] != 'None'):
-                    svg_text.append(f"<text class = \"branch-support\" x=\"{((t['x1']*f) + 0.1)*cm}\" y=\"{t['y1']*cm}\" style=\"font-size:smaller; color:#3973ac; display:none;\">{t['nodename']}</text>")
-            elif t['type'] == 'vertical':
-                # vlines.add(dwg.line(start = ((t['x0']*f)*cm, t['y0']*cm), end = ((t['x1']*f)*cm, t['y1']*cm)))
-                svg_text.append(f"<line x1=\"{(t['x0']*f)*cm}\" x2=\"{(t['x1']*f)*cm}\" y1=\"{t['y0']*cm}\" y2=\"{t['y1']*cm}\" stroke = \"black\"/>")
-        # dwg.save()
-        # svg_text.append('</svg')
-        return('\n'.join(svg_text))
-
-
-
 class Report:
     '''
     A class to generate the tables and figures for use in the report.html
@@ -198,10 +54,14 @@ class Report:
                 row = [f"<tr class='{raw[0]}-sequence-data'>"]
             else:
                 row = [f"<tr>"] # TODO add class isolate id to <tr>
-            for d in raw:
-                row.append(f"<td align=\"center\">{d}</td>")
-            row.append(f"</tr>")
-            body = body + row
+            if 'distances.tab' in table:
+                    for d in range(len(raw)):
+                        row.append(f"<td align=\"center\" class = \"{raw[0]}_{header[d]}\">{raw[d]}</td>")    
+                else:
+                    for d in raw:
+                        row.append(f"<td align=\"center\">{d}</td>")
+                row.append(f"</tr>")
+                body = body + row
         return('\n'.join(tablehead),'\n'.join(body))
 
     
@@ -333,7 +193,7 @@ class Report:
         return(list(melted_df['value']))
 
 
-    def get_tree_image(self,reportdir):
+    def get_tree_string(self,reportdir):
         '''
         Generate a tree image from a newick
         input:
@@ -341,12 +201,10 @@ class Report:
         output:
             string reporesentation of the path to the tree image
         '''
-        # get tree
-        nwk=f"{reportdir / 'core.treefile'}"
-        out = f"{reportdir / 'core_tree.svg'}"
-        tree = Tree()
-        
-        return(tree.main(treepath=nwk, outpath=out))
+        with open(f"{reportdir / 'core.treefile'}", 'r') as t:
+            tree = t.read().strip()
+
+        return tree
 
     def get_software_versions(self, software):
 
@@ -494,8 +352,7 @@ class Report:
         csstarget = reportdir / 'job.css'
         csstarget.write_text(csstemplate.render())
         # newick string
-        newick_path = reportdir / 'core.treefile'
-        newick_string = open(newick_path).read().strip()
+        newick = self.get_tree_string(reportdir)
         # save tool table
         self.get_software_file(reportdir = reportdir, pipeline = pipeline, assembler = assembler)
         
@@ -579,7 +436,7 @@ class Report:
         # fill template
         date = datetime.datetime.today().strftime("%d/%m/%y")
         report_template = jinja2.Template(pathlib.Path(indexhtml).read_text())
-        reporthtml.write_text(report_template.render(newick = newick_string, display = display,tables = tables,td = td, job_id = job_id, pipeline = pipeline, snpdistances=snpdistances, snpdensity = snpdensity, modaltables = modaltables, date = date))
+        reporthtml.write_text(report_template.render(newick = newick, display = display,tables = tables,td = td, job_id = job_id, pipeline = pipeline, snpdistances=snpdistances, snpdensity = snpdensity, modaltables = modaltables, date = date))
     #    TODO pass a list of links for the javascript section called 'table'
     # TODO pass the value of the graphs as separate variable 
         return(True)
