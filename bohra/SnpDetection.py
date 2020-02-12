@@ -304,6 +304,7 @@ class RunSnpDetection(object):
             self.check_assemble_accesories()
             self.check_roary()
             return True
+    
     def run_checks(self):
         '''
         Run checks prior to start - checking all software is installed, if this is a rerun and the input files
@@ -364,14 +365,14 @@ class RunSnpDetection(object):
 
     def check_rerun(self):
         '''
-        Check if the job is a rerun of an existing job, if so print message informing user and exit
+        Check if the job is a rerun of an existing job, if so print message informing user and exit it is considered a rerun if there is a report directory present 
 
         '''
 
-        source_path = self.workdir / 'source.log'
+        report_path = self.workdir / self.job_id / 'report'
         # if the path is a string convert to Path
-        if isinstance(source_path, str):
-            source_path = pathlib.Path(source_path)
+        if isinstance(report_path, str):
+            report_path = pathlib.Path(report_path)
         if source_path.exists():
             self.logger.warning(f"This may be a re-run of an existing job. Please try again using rerun instead of run OR use -f to force an overwrite of the existing job.")
             self.logger.warning(f"Exiting....")
@@ -702,10 +703,10 @@ rule combine_kraken:
 			df = df.reset_index(drop = True) 
 			tempdf = pandas.DataFrame()
 			d = {{'Isolate': f\"{{kraken.parts[0]}}\",    
-					'#1 Match': df.ix[0,'name'].strip(), '%1': df.ix[0,'percentage'],
-					'#2 Match': df.ix[1,'name'].strip(), '%2': df.ix[1,'percentage'],       
-					'#3 Match': df.ix[2,'name'].strip(), '%3': df.ix[2,'percentage'] ,
-					'#4 Match': df.ix[3,'name'].strip(), '%4': df.ix[3,'percentage']
+					'#1 Match': df.loc[0,'name'].strip(), '%1': df.loc[0,'percentage'],
+					'#2 Match': df.loc[1,'name'].strip(), '%2': df.loc[1,'percentage'],       
+					'#3 Match': df.loc[2,'name'].strip(), '%3': df.loc[2,'percentage'] ,
+					'#4 Match': df.loc[3,'name'].strip(), '%4': df.loc[3,'percentage']
 					}}
 		
 			tempdf = pandas.DataFrame(data = d, index= [0])
