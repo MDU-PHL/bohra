@@ -363,7 +363,7 @@ rule run_prokka:
 	singularity:{% endraw %}"{{singularity_dir}}/prokka"{% raw %}
 	shell:
 		"""
-		prokka --outdir prokka/{wildcards.sample} --prefix {wildcards.sample} --mincontiglen 500 --notrna --fast --force {input}
+		prokka --outdir prokka/{wildcards.sample} --prefix {wildcards.sample} --mincontiglen 500 --notrna --fast --force {input} --cpus 1
 		"""
 
 rule run_roary:
