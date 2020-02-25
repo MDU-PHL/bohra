@@ -361,16 +361,14 @@ class Report:
         version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
 
         if software == 'snp-dists':
-            v = '-v'
+            vs = '-v'
         else:
-            v = '--version'
+            vs = '--version'
+        cmd = f"{software} {vs}  2>&1"
         
-        if software in ['snippy', 'prokka']:
-            sft = subprocess.run([software, v], stderr=subprocess.PIPE)
-            sft = sft.stderr.decode().strip()
-        else:
-            sft = subprocess.run([software, v], stdout=subprocess.PIPE)
-            sft = sft.stdout.decode().strip()
+        p = subprocess.run(cmd, shell = True, capture_output=True, encoding = "utf-8")
+        sft = p.stdout
+        
         v = version_pat.search(sft)
         v = v.group()
         sft_version = f"{software} v.{v}"
