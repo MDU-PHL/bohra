@@ -174,8 +174,9 @@ class RunSnpDetection(object):
         self.logger.info(f"Checking that snippy is installed and recording version.")
         version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
         try:
-            snippy = subprocess.run(['snippy', '--version'], stderr=subprocess.PIPE)
-            snippy = snippy.stderr.decode().strip()
+            cmd = f"snippy --version 2>&1"
+            snippy = subprocess.run(cmd, shell = True, capture_output = True, encoding = "utf-8")
+            snippy = snippy.stdout
             self.snippy_version = version_pat.search(snippy)
             self.logger.info(f"Snippy {snippy} found. Good job!")
             return(version_pat.search(snippy))
