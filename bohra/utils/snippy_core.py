@@ -1,0 +1,78 @@
+import toml, pathlib, subprocess, sys, pandas, datetime
+
+def get_isolate_list(inputs):
+    
+    isolates = []
+    for i in inputs:
+        data = open_toml(i)
+        isolate = pathlib.Path(i).parts[0]
+        if data[isolate]['Quality'] == 'PASS':
+            isolates.append(isolate)
+    
+    return ' '.join(isolates)
+
+def core_stats():
+
+    # for core.txt
+    df = pandas.read_csv(f"core.txt", sep = '\t')
+    df['% USED'] = 100 * (df['LENGTH'] - df['UNALIGNED'])/ df['LENGTH']
+    df['% USED'] = df['% USED'].round(2)
+    df = df.rename(columns={'ID':'Isolate'})
+    df.to_csv(f"core_genome.tab", sep='\t', index = False)
+
+    return df.to_dict(orient = 'records')
+
+
+def generate_snippy_core_cmd(isolates, reference, mask):
+
+    cmd = f"snippy-core {mask} --ref {reference} {isolates}"								
+    return cmd
+
+def run_cmd(cmd):
+
+    p = subprocess.run(cmd, shell = True, capture_output=True, encoding = 'utf-8')
+    return p.returncode
+
+def open_toml(tml):
+
+    data = toml.load(tml)
+
+    return data
+
+def write_toml(data, output):
+    
+    with open(output, 'wt') as f:
+        toml.dump(data, f)
+    
+def main(inputs, mask, reference):
+    
+    isolates = get_isolate_list(inputs)
+    cmd = generate_snippy_core_cmd(isolates = isolates, reference = reference, mask = mask)
+    p = run_cmd(cmd)
+
+    if p == 0:
+        
+        date = datetime.datetime.today().strftime("%d_%m_%y")
+        data['snippy-core'][date] = {}
+        data['snippy-core'][date]['isolates'] = isolates.split()
+        data['snippy-core'][date]['reference'] = reference
+        data['snippy-core'][date]['mask'] = mask 
+        data['snippy-core'][date]['vcf'] = 'core.vcf'
+        data['snippy-core'][date]['aln'] = 'core.aln'
+        data['snippy-core'][date]['txt'] = 'core.txt'
+        data['snippy-core'][date]['tab'] = 'core.tab'
+        data['snippy-core'][date]['fullaln'] = 'core.full.aln'
+        data['snippy-core'][date]['stats'] = core_stats()
+
+        write_toml(data = data, output = "snippy_core.toml")
+
+if __name__ == '__main__':
+    
+    main(inputs = f"{sys.argv[1]}", mask = f"{sys.argv[2]}", reference = f"{sys.argv[2]}")
+    
+
+
+
+# mash triangle -C *.msh
+
+# mash sketch -m 5 -s 10000 -r -o 2019-12803-6/sketch -I 2019-12803-6 -C 2019-12803-6/R1.fq.gz 2019-12803-6/R1.fq.gz

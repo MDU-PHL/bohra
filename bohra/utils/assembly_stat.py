@@ -1,12 +1,22 @@
 from Bio import SeqIO
-import pathlib
-import pandas, argparse
+import pathlib, toml, pandas
 
 
 
-def fa(path, min_size, full_path):
+def open_toml(tml):
+
+    data = toml.load(tml)
+
+    return data
+
+def write_toml(data, output):
+    
+    with open(output, 'wt') as f:
+        toml.dump(data, f)
+
+
+def fa(inputs, isolate, min_size =500):
     p = pathlib.Path(f"{path}")
-    isolate = f"{p}" if full_path else p.name.split('.')[0]
     min_len = 1.0e+10
     max_len = 0
     contig_length = []
@@ -41,39 +51,22 @@ def fa(path, min_size, full_path):
     data = {'Name': isolate, 'bp':length, '# Contigs':no, 'Ns':Ns, '# Gaps':gaps, 'Min Contig size':min_len, 'Max Contig size':max_len,  'Avg Contig size':avg_len, 'N50':N50}
     return(data)
 
-def get_fa_stat(assemblies, minsize, full_path):
-    colnames = ['Name','bp','# Contigs','Ns','# Gaps','Min Contig size','Max Contig size','Avg Contig size','N50']
+def get_fa_stat(assembly,isolate):
+#     colnames = ['Name','bp','# Contigs','Ns','# Gaps','Min Contig size','Max Contig size','Avg Contig size','N50']
     # print(colnames)
-    print('\t'.join(colnames))
-    for a in assemblies:
-        data = fa(path=a, min_size = minsize, full_path = full_path)
+    # print('\t'.join(colnames))
+    d = fa(path=assembly, isolate)
+    data = {}
+    data[isolate]={}
+    data[isolate]['assembly_stats'] = d
+    write_toml(data= data, output = f'{isolate}/assembly_stats.toml')
         # print(data)
-        print('\t'.join([f"{data[x]}" for x in colnames]))
+        # print('\t'.join([f"{data[x]}" for x in colnames]))
         
-
-
-def set_parsers():
-    parser = argparse.ArgumentParser(description='Python version of torstyvers fa',formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
-    parser.add_argument('assemblies', help = 'white space separated list of assemblies', nargs='+')
-    parser.add_argument('-m', '--minsize', help = 'min contig size to be included in calculations', default = 500)
-    parser.add_argument('-f', '--full_path',action = 'store_true', help = 'Set if you would like to use the full path as the isolate identifer - default to the name of the fasta file')
-    
-
-
-    args = parser.parse_args()
-    return(args)
-
 def main():
 
-    args = set_parsers()
-    if vars(args) == {}:
-        parser.print_help(sys.stderr)
-    else:
-        assemblies = args.assemblies
-        full_path = args.full_path
-        minsize = args.minsize
-        get_fa_stat(assemblies, minsize, full_path)
+    main(inputs = f"{sys.argv[1]}", minsize = f"{sys.argv[2]}", isolate = f"{sys.argv[3]}",  prefill =  f"{sys.argv[4]}")
+    
 
 
 if __name__ == '__main__':

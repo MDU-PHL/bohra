@@ -51,8 +51,8 @@ rule all:
 
 rule seqdata:
 	input:
-		ancient('READS/{sample}/R1.fq.gz'),
-		ancient('READS/{sample}/R2.fq.gz')
+		'{sample}/R1.fq.gz',
+		'{sample}/R2.fq.gz'
 	output:
 		"{sample}/seqdata.tab"
 	singularity:{% endraw %}"{{singularity_dir}}/seqtk"{% raw %}
@@ -64,8 +64,8 @@ rule seqdata:
 
 rule estimate_coverage:
 	input:
-		ancient("READS/{sample}/R1.fq.gz"),
-		ancient("READS/{sample}/R2.fq.gz")
+		"{sample}/R1.fq.gz",
+		"{sample}/R2.fq.gz"
 	output:
 		"{sample}/mash.txt"
 	singularity:{% endraw %}"{{singularity_dir}}/mash_kmc"{% raw %}
@@ -113,8 +113,8 @@ rule combine_seqdata:
 	
 rule snippy:
 	input:
-		ancient('READS/{sample}/R1.fq.gz'),
-		ancient('READS/{sample}/R2.fq.gz')
+		'{sample}/R1.fq.gz',
+		'{sample}/R2.fq.gz'
 	output:
 		'{sample}/snps.vcf',
 		'{sample}/snps.aligned.fa'
@@ -278,8 +278,8 @@ rule run_iqtree_core:
 
 rule assemble:
 	input:
-		ancient('READS/{sample}/R1.fq.gz'),
-		ancient('READS/{sample}/R2.fq.gz')
+		'{sample}/R1.fq.gz',
+		'{sample}/R2.fq.gz'
 	output:
 		'{sample}/{sample}.fa'
 	threads:
@@ -359,16 +359,17 @@ rule run_prokka:
 	input:
 		"{sample}/{sample}.fa"
 	output:
-		"prokka/{sample}/{sample}.gff","prokka/{sample}/{sample}.txt"
+		"{sample}/{sample}.gff","{sample}/{sample}.txt"
 	singularity:{% endraw %}"{{singularity_dir}}/prokka"{% raw %}
 	shell:
 		"""
-		prokka --outdir prokka/{wildcards.sample} --prefix {wildcards.sample} --mincontiglen 500 --notrna --fast --force {input}
+		prokka --outdir {wildcards.sample} --prefix {wildcards.sample} --mincontiglen 500 --notrna --fast --force {input}
+		rm {wildcards.sample}/*.err {wildcards.sample}/*.faa {wildcards.sample}/*.ffn {wildcards.sample}/*.fsa {wildcards.sample}/*.sqn {wildcards.sample}/*.tbl {wildcards.sample}/*.tsv
 		"""
 
 rule run_roary:
     input:
-        expand("prokka/{sample}/{sample}.gff", sample = SAMPLE)
+        expand("{sample}/{sample}.gff", sample = SAMPLE)
     output:
         "roary/gene_presence_absence.csv", "roary/summary_statistics.txt"
     threads:
@@ -394,7 +395,7 @@ rule pan_figure:
 
 rule combine_assembly_metrics:
 	input:
-		prokka = expand("prokka/{sample}/{sample}.txt",sample = SAMPLE), 
+		prokka = expand("{sample}/{sample}.txt",sample = SAMPLE), 
 		assembly = "denovo.tab"
 	output:
 		"assembly.tab"

@@ -19,6 +19,7 @@ import sys
 import os
 from bohra.SnpDetection import RunSnpDetection
 from bohra.ReRunSnpDetection import ReRunSnpDetection
+from bohra.Utils import Nulla2bohra, UpdateBohra
 from bohra.version import version
 
 
@@ -38,7 +39,14 @@ def rerun_pipeline(args):
     R = ReRunSnpDetection(args)
     return(R.run_pipeline())
 
+def nulla2bohra(args):
+    '''
+    ensure that bohra can be rerun over the top of an existing nullarbor directory
+    '''
+    N = Nulla2bohra(args)
+    return(N.update())
 
+    
 def main():
     # setup the parser
   
@@ -62,7 +70,8 @@ def main():
     parser_sub_run.add_argument('--pipeline','-p', default = 'sa', choices=['sa','s','a', 'all'], help=f"The pipeline to run. SNPS ('s') will call SNPs and generate phylogeny, ASSEMBLIES ('a') will generate assemblies and perform mlst and species identification using kraken2, SNPs and ASSEMBLIES ('sa' - default) will perform SNPs and ASSEMBLIES. ALL ('all') will perform SNPS, ASSEMBLIES and ROARY for pan-genome analysis")
     parser_sub_run.add_argument('--assembler','-a', default = 'shovill', choices=['shovill','skesa','spades'], help=f"Assembler to use.")
     parser_sub_run.add_argument('--cpus','-c',help='Number of CPU cores to run, will define how many rules are run at a time', default=36)
-    parser_sub_run.add_argument('--minaln','-ma',help='Minimum percent alignment', default=0)
+    parser_sub_run.add_argument('--minaln','-ma',help='Minimum percent alignment. Isolates which do not align to reference at this threshold will not be included in core phylogeny.', default=80)
+    parser_sub_run.add_argument('--mincov','-mc',help='Minimum percent alignment. Isolates which do not align to reference at this threshold will not be included in core phylogeny.', default=40)
     parser_sub_run.add_argument('--prefillpath','-pf',help='Path to existing assemblies - in the form path_to_somewhere/isolatename/contigs.fa')
     parser_sub_run.add_argument('-mdu', action = "store_true", help='If running on MDU data')
     parser_sub_run.add_argument('-workdir','-w', default = f"{pathlib.Path.cwd().absolute()}", help='The directory where Bohra will be run, default is current directory')
@@ -92,9 +101,17 @@ def main():
     parser_sub_rerun.add_argument('--json',help='Path to cluster.json - if not included will default to version provided in previous run', default='')
     parser_sub_rerun.add_argument('--queue',help='Type of queue (sbatch or qsub currently supported) - if not included will default to previous run', default='')
     
+    # parser for update
+    parser_sub_nulla2bohra = subparsers.add_parser('nulla2bohra', help='Ensure that bohra can be rerun over an existing nullarbor folder. Can also be used to update older bohra directories. Must supply name of nullarbor directory, and your isolates.tab file', formatter_class=configargparse.ArgumentDefaultsHelpFormatter,default_config_files=[f"{pathlib.Path.cwd().absolute() / 'bohra.conf'}"])
+
+    parser_sub_nulla2bohra.add_argument('-workdir','-w', default = f"{pathlib.Path.cwd().absolute()}", help='Working directory, default is current directory')
+    parser_sub_nulla2bohra.add_argument('--job_id','-j',help='Job directory - the --name you used for nullarbor, will be the name of the output directory', default='')
+    parser_sub_nulla2bohra.add_argument('--input_file','-i',help='Input file = tab-delimited with 3 columns <isolatename>  <path_to_read1> <path_to_read2>', default='')
+
     parser_sub_run.set_defaults(func=run_pipeline)
-    
     parser_sub_rerun.set_defaults(func = rerun_pipeline)
+    parser_sub_nulla2bohra.set_defaults(func=nulla2bohra)
+        
     args = parser.parse_args()
     
     if vars(args) == {}:

@@ -37,8 +37,8 @@ rule all:
 
 rule seqdata:
 	input:
-		ancient('READS/{sample}/R1.fq.gz'),
-		ancient('READS/{sample}/R2.fq.gz')
+		'{sample}/R1.fq.gz',
+		'{sample}/R2.fq.gz'
 	output:
 		"{sample}/seqdata.tab"
 	singularity:{% endraw %}"{{singularity_dir}}/seqtk"{% raw %}
@@ -50,8 +50,8 @@ rule seqdata:
 
 rule estimate_coverage:
 	input:
-		ancient("READS/{sample}/R1.fq.gz"),
-		ancient("READS/{sample}/R2.fq.gz")
+		"{sample}/R1.fq.gz",
+		"{sample}/R2.fq.gz"
 	output:
 		"{sample}/mash.txt"
 	singularity:{% endraw %}"{{singularity_dir}}/mash_kmc"{% raw %}
@@ -99,8 +99,8 @@ rule combine_seqdata:
 	
 rule snippy:
 	input:
-		ancient('READS/{sample}/R1.fq.gz'),
-		ancient('READS/{sample}/R2.fq.gz')
+		'{sample}/R1.fq.gz',
+		'{sample}/R2.fq.gz'
 	output:
 		'{sample}/snps.vcf',
 		'{sample}/snps.aligned.fa'
@@ -118,7 +118,7 @@ rule qc_snippy:
 		expand('{sample}/snps.aligned.fa', sample = SAMPLE)
 		
 	output:
-		'core_isolates.txt'
+		'core_isolates.txt', 'excluded_isolates.txt'
 		
 	run:
 		from Bio import SeqIO

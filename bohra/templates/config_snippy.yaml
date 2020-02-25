@@ -1,22 +1,28 @@
 reference:
         "{{reference}}"
-name:
-        "{{name}}"
-
 min_perc:
         "{{minperc}}"
-
 now:
         "{{now}}"
-
-mask:
-        "{{mask}}"
-
+mask_string:
+        "{{mask_string}}"
 day:
         "{{day}}"
-
 isolates:
         "{{isolates}}"
-
 gubbins:
         {{gubbins}}
+prefill_path:
+        "{{prefill_path}}"
+pipeline:
+        "{{pipeline}}"
+workdir:
+        "{{workdir}}"
+job_id:
+        "{{job_id}}"
+assembler:
+        "{{assembler}}"
+template_path:
+        "{{template_path}}"
+script_path:
+        "{{script_path}}"

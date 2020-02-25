@@ -48,7 +48,6 @@ class RunSnpDetection(object):
         self.resources = pathlib.Path(args.resources)
         # path to reference and mask
         self.ref = pathlib.Path(args.reference)
-        self.check_rerun()
         # 
         # (args.mask)
         if args.mask:
@@ -65,6 +64,8 @@ class RunSnpDetection(object):
         # self.source_log_path = pathlib.Path(self.workdir, 'source.log')
         # job id
         self.job_id = self._name_exists(args.job_id)
+        self.logger.info(f"Job ID is set {self.job_id}")
+        self.check_rerun()
         # other variables
         # min aln 
         self.minaln = args.minaln
@@ -283,7 +284,8 @@ class RunSnpDetection(object):
         if self.run_kraken:
             self.logger.info(f"Congratulations your kraken database is present")  
         else:
-            self.logger.warning(f"Your kraken DB is not installed in the expected path. Speciation will not be performed. If you would like to perform speciation in future please re-read bohra installation instructions.")
+            self.logger.warning(f"Your kraken DB is not installed in the expected path. Please re-read bohra installation instructions.")
+            raise SystemExit
             
 
     def check_deps(self):
@@ -368,12 +370,12 @@ class RunSnpDetection(object):
         Check if the job is a rerun of an existing job, if so print message informing user and exit it is considered a rerun if there is a report directory present 
 
         '''
-
+        self.logger.info(f'Checking if job is a rerun of existing job.')
         report_path = self.workdir / self.job_id / 'report'
         # if the path is a string convert to Path
         if isinstance(report_path, str):
             report_path = pathlib.Path(report_path)
-        if source_path.exists():
+        if report_path.exists():
             self.logger.warning(f"This may be a re-run of an existing job. Please try again using rerun instead of run OR use -f to force an overwrite of the existing job.")
             self.logger.warning(f"Exiting....")
             
@@ -424,14 +426,11 @@ class RunSnpDetection(object):
         '''
         # check that job directory exists
         # self.logger.info(f"Checking that reads are present.")
-        J = pathlib.Path(self.workdir, self.job_id)
-        if not J.exists():
-            J.mkdir()
-        # check that READS exists
-        R = J / 'READS'
+        R = pathlib.Path(self.workdir, self.job_id)
         if not R.exists():
             R.mkdir()
-        
+        # check that READS exists
+             
         if f"{read_source}"[0] != '/':
             read_source = self.workdir / read_source
         
@@ -650,125 +649,26 @@ class RunSnpDetection(object):
         self.logger.info(f"This job : {self.job_id} contains {len(list(set(isolates)))}")
         return(list(set(isolates))) 
     
-    def kraken_output(self):
-        '''
-        the all output if running kraken
-        '''
-        return f"\"species_identification.tab\",\n\"report/species_identification.tab\",\nexpand(\"{{sample}}/kraken.tab\",sample = SAMPLE)"
     
-    def kraken_ind_string(self):
-        '''
-        the kraken rule for combination kraken
-        '''
-        mem_mapping = "--memory-mapping" if not self.cluster else ''
-        return(f"""
-rule kraken:
-	input:
-		'READS/{{sample}}/R1.fq.gz',
-		'READS/{{sample}}/R2.fq.gz'
-	output:
-		"{{sample}}/kraken.tab"
-	shell:
-		\"""
-		KRAKENPATH={self.prefillpath}{{wildcards.sample}}/kraken2.tab
-		if [ -f $KRAKENPATH ]; then
-			cp $KRAKENPATH {{output}}
-		else
-			kraken2 --paired {{input[0]}} {{input[1]}} --minimum-base-quality 13 --report {{output}} {mem_mapping}
-		fi
-		\"""
-		
-""")
-
-    def kraken_combine_string(self):
-        '''
-        string for combining kraken
-        '''
-        return(f"""
-rule combine_kraken:
-	input: 
-		expand(\"{{sample}}/kraken.tab\", sample = SAMPLE)
-	output:
-		\"species_identification.tab\"
-	run:
-		import pandas, pathlib, subprocess
-		kfiles = f\"{{input}}\".split()
-		id_table = pandas.DataFrame()
-		for k in kfiles:
-			kraken = pathlib.Path(k)
-			df = pandas.read_csv(kraken, sep = \"\\t\", header =None, names = ['percentage', 'frag1', 'frag2','code','taxon','name'])
-			df['percentage'] = df['percentage'].apply(lambda x:float(x.strip('%')) if isinstance(x, str) == True else float(x)) #remove % from columns
-			df = df.sort_values(by = ['percentage'], ascending = False)
-			df = df[df['code'].isin(['U','S'])]     
-			df = df.reset_index(drop = True) 
-			tempdf = pandas.DataFrame()
-			d = {{'Isolate': f\"{{kraken.parts[0]}}\",    
-					'#1 Match': df.loc[0,'name'].strip(), '%1': df.loc[0,'percentage'],
-					'#2 Match': df.loc[1,'name'].strip(), '%2': df.loc[1,'percentage'],       
-					'#3 Match': df.loc[2,'name'].strip(), '%3': df.loc[2,'percentage'] ,
-					'#4 Match': df.loc[3,'name'].strip(), '%4': df.loc[3,'percentage']
-					}}
-		
-			tempdf = pandas.DataFrame(data = d, index= [0])
-			if id_table.empty:
-					id_table = tempdf
-			else:
-					id_table = id_table.append(tempdf, sort = True)
-		id_table.to_csv(f\"{{output}}\", sep = \"\\t\", index = False)
-		subprocess.run(f"sed -i 's/%[0-9]/%/g' {{output}}", shell=True)
-""")
-    def species_summary(self):
-        return "'species_identification.tab'"
-
-    def kraken_report(self):
-
-        return "'report/species_identification.tab'"
-
-    def kraken_copy(self):
-
-        return "cp species_identification.tab report/species_identification.tab"
-
-    def write_pipeline_job(self, maskstring,  script_path = f"{pathlib.Path(__file__).parent / 'utils'}", resource_path = f"{pathlib.Path(__file__).parent / 'templates'}"):
+    def write_pipeline_job(self):
         '''
         write out the pipeline string for transfer to job specific pipeline
         '''
         
         wd = self.workdir / self.job_id
-        
-        self.logger.info(f'mask strin = {maskstring}')
-        kraken_output = self.kraken_output() if self.run_kraken else ''
-        kraken_rule = self.kraken_ind_string() if self.run_kraken else ''
-        kraken_summary = self.kraken_combine_string() if self.run_kraken else ''
-        kraken_report = self.kraken_report() if self.run_kraken else ''    
-        copy_species_id = self.kraken_copy() if self.run_kraken else ''  
-        species_summary = self.species_summary() if self.run_kraken else '' 
-
-        pipeline_setup = {
-            's':'Snakefile_snippy',
-            'sa':'Snakefile_default_',
-            'a':'Snakefile_assembly',
-            'all': 'Snakefile_all'
-        }
+        # pipeline_setup = {
+        #     's':'Snakefile_snippy',
+        #     'sa':'Snakefile_default_',
+        #     'a':'Snakefile_assembly',
+        #     'all': 'Snakefile_all'
+        # }
         vars_for_file = {
             'workdir': f"{wd}",
-            'script_path' : script_path,
-            'prefill_path' : self.prefillpath,
             'singularity_dir' : self.singularity_path, 
-            'job_id' : self.job_id,
-            'assembler' : self.assembler if self.pipeline != 's' else 'no_assembler',
-            'run_kraken' : self.run_kraken,
-            'mask_string': maskstring, 
-            'template_path':resource_path,
-            'kraken_output':kraken_output,
-            'kraken_rule' : kraken_rule,
-            'kraken_summary': kraken_summary,
-            'species_report': kraken_report,
-            'species_summary':species_summary,
-            'copy_species_id': copy_species_id
         }
         
         self.logger.info(f"Writing Snakefile for job : {self.job_id}")
-        snk_template = jinja2.Template(pathlib.Path(self.resources, pipeline_setup[self.pipeline]).read_text())
+        snk_template = jinja2.Template(pathlib.Path(self.resources, "bohra.smk").read_text())
         snk = self.workdir / 'Snakefile'
 
         snk.write_text(snk_template.render(vars_for_file)) 
@@ -837,22 +737,40 @@ rule combine_kraken:
         
         gubbins_string = ""
         # make a masking string
-
+        wd = self.workdir / self.job_id
         if self.mask != '':
             maskstring = f"--mask {self.workdir / self.mask}"
         else:
             maskstring = ''
         self.logger.info(f'Mask string : {maskstring}')
         self.logger.info(f"Writing config file for job : {self.job_id}")
+        
+        vars_for_file = {
+            'workdir': f"{wd}",
+            'prefill_path' : self.prefillpath,
+            'job_id' : self.job_id,
+            'assembler' : self.assembler if self.pipeline != 's' else 'no_assembler',
+            'mask_string': maskstring, 
+            'template_path':f"{pathlib.Path(__file__).parent / 'templates'}",
+            'script_path':f"{pathlib.Path(__file__).parent / 'utils'}",
+            'reference' : f"{pathlib.Path(self.workdir, self.ref)}",
+            'minperc' : self.minaln,
+            'now' : self.now,
+            'day': self.day, 
+            'isolates' : ' '.join(isolates),
+            'gubbins': self.gubbins,
+            'pipeline': self.pipeline
+        }
+
         # read the config file which is written with jinja2 placeholders (like django template language)
         config_template = jinja2.Template(pathlib.Path(self.resources, 'config_snippy.yaml').read_text())
         config = self.workdir / f"{self.job_id}"/ f"{config_name}"
         
-        config.write_text(config_template.render(reference = f"{pathlib.Path(self.workdir, self.ref)}", cpus = self.cpus, name = self.job_id,  gubbins = self.gubbins, minperc = self.minaln,now = self.now, maskstring = maskstring, day = self.day, isolates = ' '.join(isolates)))
+        config.write_text(config_template.render(vars_for_file))
         
         self.logger.info(f"Config file successfully created")
 
-        self.write_pipeline_job(maskstring = maskstring)
+        self.write_pipeline_job()
         
 
  

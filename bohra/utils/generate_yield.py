@@ -36,14 +36,14 @@ def get_coverage(mashdata):
 
 def main(pathtoseqtkdata, pathtomashdata, outputpath):
     output = pathlib.Path(f"{pathtoseqtkdata}").open().readlines()
-    print(output)
+    # print(output)
     seqtkdata = get_data(output)
     df = pandas.DataFrame(data = seqtkdata, index = [0])
     df = df[['Reads','bases','GC content','min_len', 'avg_len', 'max_len','avgQ']]
     mash = pathlib.Path(f"{pathtomashdata}").open().readlines()
     df['Estimated depth'] = int(get_coverage(mash))
     df = df.rename(columns={'bases':'Yield', 'min_len': 'Min len', 'avg_len': 'Avg len', 'max_len':'Max len', 'avgQ': 'Avg Qual'})
-    print(df.head())
+    # print(df.head)
     df = df[['Reads','Yield','GC content','Min len','Avg len','Max len','Avg Qual','Estimated depth']]
     df.to_csv(pathlib.Path(f"{outputpath}"), index = False, sep = '\t')
 
