@@ -1,4 +1,4 @@
-import toml, pathlib, subprocess, sys
+import toml, pathlib, subprocess, sys, pandas
 
 def get_top_3(isolate):
     
@@ -9,14 +9,14 @@ def get_top_3(isolate):
     df = df[df['code'].isin(['U','S'])]     
     df = df.reset_index(drop = True) 
     top_three = [
-        (f"{df.ix[0,'name'].strip()}",round(df.ix[0,'percentage'],2)),
-        (f"{df.ix[1,'name'].strip()}",round(df.ix[1,'percentage'],2)),
-        (f"{df.ix[2,'name'].strip()}",round(df.ix[2,'percentage'],2))
+        (f"{df.loc[0,'name'].strip()}",round(df.loc[0,'percentage'],2)),
+        (f"{df.loc[1,'name'].strip()}",round(df.loc[1,'percentage'],2)),
+        (f"{df.loc[2,'name'].strip()}",round(df.loc[2,'percentage'],2))
     ]
 
     return top_three
 
-def generate_cmd(prfl, r1, r2, isolate, db, data):
+def generate_cmd(prefill, r1, r2, isolate, db, data):
     
     prfl = pathlib.Path(prefill, isolate, 'kraken2.tab')
     if prfl.exists():
@@ -52,7 +52,7 @@ def write_toml(data, output):
     with open(output, 'wt') as f:
         toml.dump(data, f)
     
-def main(r1, r2, isolate, output, kraken_db, prefill):
+def main(r1, r2, isolate, kraken_db,prefill):
     
     # set up data dict
     tml = f"{pathlib.Path(isolate, 'kraken.toml')}"
@@ -60,7 +60,7 @@ def main(r1, r2, isolate, output, kraken_db, prefill):
     data[isolate] = {}
     data[isolate]['kraken'] = {}
     # run kraken
-    cmd, data = generate_cmd(prfl = prefill, r1 = r1, r2 = r2, isolate = isolate, db = kraken_db, data = data)
+    cmd, data = generate_cmd(prefill = prefill, r1 = r1, r2 = r2, isolate = isolate, db = kraken_db, data = data)
     kraken_returncode = run_cmd(cmd)
     if kraken_returncode == 0:
         # add to data dict
@@ -68,12 +68,12 @@ def main(r1, r2, isolate, output, kraken_db, prefill):
         data[isolate]['kraken']['file'] = f"{isolate}/kraken2.tab"
         data[isolate]['kraken']['top_3'] = get_top_3(isolate)
         
-        write_toml(data = data, output= output)
+        write_toml(data = data, output= f"{isolate}/kraken.toml")
 
 
 
 if __name__ == '__main__':
     
-    main(r1 = f"{sys.argv[1]}", r2 = f"{sys.argv[2]}", isolate = f"{sys.argv[3]}", output = f"{sys.argv[4]}", kraken_db = f"{sys.argv[5]}", prefill =  f"{sys.argv[6]}")
+    main(r1 = f"{sys.argv[1]}", r2 = f"{sys.argv[2]}", isolate = f"{sys.argv[3]}", kraken_db = f"{sys.argv[4]}", prefill = f"{sys.argv[5]}")
     
 

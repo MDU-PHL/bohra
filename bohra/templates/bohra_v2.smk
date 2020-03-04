@@ -1,4 +1,5 @@
-workdir:{% raw %}{% endraw %} '{{workdir}}'{% raw %}
+
+import pathlib
 configfile: 'config.yaml'
 localrules: all, generate_yield, combine_seqdata, qc_snippy, index_reference, calculate_iqtree_command_core,combine_assembly_metrics,assembly_statistics,collate_report,write_html_report
 
@@ -15,31 +16,33 @@ def get_collation_input(pipeline):
 		]
 	s = [
 		"{sample}/snippy.toml",
-		"{sample}/snippy_qc.toml"
+		"{sample}/snippy_qc.toml", 
 		]
 		
 	if pipeline == 'sa' or pipeline == 'all':
 		for x in s:
 			output.append(x)
 		for y in a:
-			output.append(x)
+			output.append(y)
 	elif pipeline == 'a':
 		for y in a:
-			output.append(x)
+			output.append(y)
 	elif pipeline == 's':
 		for x in s:
 			output.append(x)
+	
+		
 
 	return output
 
 
 def get_report_tomls(pipeline):
-	output = ["seqdata.toml"
+	output = ["seqdata.toml",
 		"kraken.toml"]
 	a = ["mlst.toml", 
 		"assembly.toml", 
 		"resistome.toml"]
-	s = ['gubbins.toml', 'snippy_core.toml']
+	s = ['gubbins.toml', 'snippy_core.toml', 'iqtree.toml', 'distances.toml']
 	r = ["roary.toml",
 		'pan_genome.toml']
 	
@@ -61,13 +64,22 @@ def get_report_tomls(pipeline):
 			output.append(y)
 		for z in r:
 			output.append(z)
+	elif pipeline == 'preview':
+		output = ['report.toml']
 	
 	return output
 
+def final_output(tomls):
 
+	output = [f"{pathlib.Path('report', t)}" for t in tomls]
+	output.append(f"{pathlib.Path('report', 'index.html')}")
+	# if 'report.html' not in output:
+	# 	output.append(f"{pathlib.Path('report', 'report.toml')}")
+	return output
 
 PREFILLPATH = config['prefill_path']
 SAMPLE = config['isolates'].split()
+print(SAMPLE)
 MIN_ALN = int(config['min_perc'])
 REFERENCE = config['reference']
 GUBBINS = config['gubbins']
@@ -76,24 +88,21 @@ ALL_TOMLS = get_collation_input(pipeline = PIPELINE)
 print(ALL_TOMLS)
 REPORT_TOMLS = get_report_tomls(pipeline = PIPELINE)
 print(REPORT_TOMLS)
+FINAL_OUTPUT = final_output(tomls = REPORT_TOMLS)
+print(FINAL_OUTPUT)
 WORKDIR = config['workdir']
 JOB_ID = config['job_id']
 ASSEMBLER = config['assembler']
 TEMPLATE_PATH = config['template_path']
 SCRIPT_PATH = config['script_path']
-MASK_STRING = config['mask_string']
+MASK_STRING = config['mask_string'] if config['mask_string'] != '' else 'nomask'
 PREVIEW = config['preview']	
 KRAKEN_DB=config['kraken_db']
 MIN_COV = config['min_cov']
 
-if GUBBINS:
-	CORE_OUTPUT = 'gubbins.aln'
-else:
-	CORE_OUTPUT = 'core.aln'
-	
 rule all:
 	input:
-		"report.html", "report.toml",
+		FINAL_OUTPUT,
 		expand("{sample}/final.toml", sample = SAMPLE)
 
 rule estimate_coverage:
@@ -102,7 +111,9 @@ rule estimate_coverage:
 		r2="{sample}/R2.fq.gz"
 	output:
 		"{sample}/mash.toml"
-	# singularity:{% endraw %}"{{singularity_dir}}/mash_kmc"{% raw %}
+	params:
+		script_path = SCRIPT_PATH
+	
 	shell:
 		"""
 		python3 {params.script_path}/mash.py {input.r1} {input.r2} {wildcards.sample} {output}
@@ -118,7 +129,7 @@ rule seqdata:
 	params:
 		script_path=SCRIPT_PATH,
 		mincov = MIN_COV
-	# singularity:{% endraw %}"{{singularity_dir}}/seqtk"{% raw %}
+	
 	shell:
 		"""
 		python3 {params.script_path}/seqdata.py {input.r1} {input.r2} {wildcards.sample} {input.mash} {params.mincov}
@@ -128,30 +139,30 @@ rule combine_seqdata:
 	input:
 		expand("{sample}/seqdata.toml", sample = SAMPLE)
 	output:
-		"seqdata.tab"
+		"seqdata.toml"
 	params:
 		script_path=SCRIPT_PATH
 	shell:
 		"""
-		python3 {params.script_path}/combine_seqdata.py {input} {output}
+		python3 {params.script_path}/combine_seqdata.py {input} 
 		"""
 
-if preview:
+if PREVIEW:
 	rule preview:
 		input:
 			expand("{sample}/mash.toml", sample = SAMPLE)
 		output:
-			expand("{sample}/preview.toml", sample = SAMPLE)
+			"preview.toml"
 		params:
 			reference = REFERENCE,
 			script_path = SCRIPT_PATH
 		shell:
 			"""
-			python3 {params.script_path}/preview.py {input} {output}
+			python3 {params.script_path}/preview.py {input} 
 			"""
 	rule combine_preview_tomls:
 		input:
-			"{sample}/preview.toml"
+			"{sample}/mash.toml"
 		output:
 			"{sample}/final.toml"
 		shell:
@@ -160,16 +171,17 @@ if preview:
 			"""
 	rule compile:
 		input:
-			expand("{sample}/preview.toml", sample = SAMPLE)
+			"preview.toml"
 		output: #this is where I stopped
 			"report.toml"
 		params:
 			pipeline = 'preview',
 			script_path = SCRIPT_PATH,
-			job_id = JOB_ID
+			job_id = JOB_ID,
+			assembler = ASSEMBLER
 		shell:
 			"""
-			python3 {params.script_path}/compile.py {input} {params.pipeline} {params.job_id}
+			python3 {params.script_path}/compile.py {params.pipeline} {params.job_id} {params.assembler} {input}
 			"""
 else:
 	rule run_kraken:
@@ -184,7 +196,7 @@ else:
 			script_path = SCRIPT_PATH
 		shell:
 			"""
-			python3 {params.script_path}/kraken.py {input.r1} {input.r2} {wildcards.sample} {params.kraken_db}
+			python3 {params.script_path}/kraken.py {input.r1} {input.r2} {wildcards.sample} {params.kraken_db} {params.prefill_path}
 			"""
 	rule combine_kraken:
 		input:
@@ -207,7 +219,7 @@ else:
 				'{sample}/snippy.toml',
 			threads:
 				8
-			singularity:{% endraw %}"{{singularity_dir}}/snippy"{% raw %}
+			
 			params:
 				script_path=SCRIPT_PATH,
 				reference = REFERENCE
@@ -225,10 +237,10 @@ else:
 				'{sample}/snippy_qc.toml'
 			params:
 				script_path = SCRIPT_PATH,
-				minalin = MIN_ALN
+				minaln = MIN_ALN
 			shell:
 				"""
-				python3 {params.script_path}/snippy.py {input} {wildcards.sample} {output} {params.minaln}
+				python3 {params.script_path}/snippy_qc.py {input} {wildcards.sample} {output} {params.minaln}
 				"""
 
 		rule run_snippy_core:
@@ -236,19 +248,15 @@ else:
 				expand("{sample}/snippy_qc.toml", sample = SAMPLE)
 			output:
 				'snippy_core.toml'
-				# 'core.vcf',
-				# 'core.txt',
-				# 'core.aln', 
-				# 'core.full.aln',
-				# 'core.tab'
-			singularity:{% endraw %}"{{singularity_dir}}/snippy"{% raw %}
+			
 			params:
 				mask_string = MASK_STRING,
 				script_path = SCRIPT_PATH,
-				reference = REFERENCE
+				reference = REFERENCE,
+				
 			shell:
 				"""
-				python3 {params.script_path}/snippy_core.py {input} {params.mask_string} {params.reference}
+				python3 {params.script_path}/snippy_core.py {params.mask_string} {params.reference} {input}
 				"""
 
 		rule run_gubbins:
@@ -269,12 +277,11 @@ else:
 				'gubbins.toml'
 			output:
 				'distances.toml' 
-			# singularity:{% endraw %}"{{singularity_dir}}/snippy"{% raw %}
 			params:
 				script_path = SCRIPT_PATH
 			shell:
 				"""
-				python3 {params.script_path}/snpdists.py {input}
+				python3 {params.script_path}/snp_dists.py {input}
 				"""
 			
 
@@ -301,16 +308,17 @@ else:
 
 		rule run_iqtree_core:
 			input:
-				'gubbins.toml', 'ref.fa', 'ref.fa.fai'
+				gubbins = 'gubbins.toml', 
+				ref = 'ref.fa', 
+				idx = 'ref.fa.fai'
 			
 			output:
 				'iqtree.toml',
 			params:
 				script_path = SCRIPT_PATH	
-			# singularity:{% endraw %}"{{singularity_dir}}/iqtree"{% raw %}
 			shell:
 				"""	
-				python3 {params.script_path}/iqtree.py {input} {params.script_path}
+				python3 {params.script_path}/run_iqtree.py {input.gubbins} {input.ref} {input.idx} {params.script_path}
 				"""
 				
 		
@@ -326,48 +334,50 @@ else:
 				prefill_path = PREFILLPATH,
 				assembler = ASSEMBLER, 
 				script_path = SCRIPT_PATH
-			# singularity:{% endraw %}"{{singularity_dir}}/assemblers"{% raw %}
 			shell:
 				"""
-				python3 {params.script_path}/assembly.py {input} {wildcards.sample}  {params.assembler}
+				python3 {params.script_path}/assemble.py {input} {wildcards.sample}  {params.assembler} {params.prefill_path}
 				"""
+
 		rule assembly_statistics:
 			input:
 				"{sample}/assembly.toml"
 			output:
 				"{sample}/assembly_stats.toml"
 			params:
-				script_path = SCRIPT_PATH
+				script_path = SCRIPT_PATH,
+				minsize = 500,
+				prefill_path = PREFILLPATH
 			shell:
 				"""
-				python3 {params.script_path}/assembly_stat.py {input} {wildcards.sample}
+				python3 {params.script_path}/assembly_stat.py {input} {wildcards.sample} 
 				"""
 			
 		rule run_prokka:
 			input:
-				"{sample}/assembly_stats.toml"
+				assembly = "{sample}/assembly_stats.toml",
+				seqdata = "{sample}/seqdata.toml"
 			output:
 				"{sample}/prokka.toml"
 			params:
 				script_path = SCRIPT_PATH
-			# singularity:{% endraw %}"{{singularity_dir}}/prokka"{% raw %}
 			shell:
 				"""
-				python3 {params.script_path}/prokka.py {input} {wildcards.sample}
+				python3 {params.script_path}/prokka.py {input.assembly} {wildcards.sample} {input.seqdata}
 				"""
 		
 
 		rule combine_assembly_metrics:
 			input:
 				prokka = expand("{sample}/prokka.toml",sample = SAMPLE), 
-				assembly = expand("{sample}/assembly_stats.toml",sample = SAMPLE)
+				# assembly = expand("{sample}/assembly_stats.toml",sample = SAMPLE)
 			output:
 				"assembly.toml"
 			params:
 				script_path= SCRIPT_PATH
 			shell:
 				"""
-				python3 {params.script_path}/prokka.py {input.assembly} {assembly.prokka}
+				python3 {params.script_path}/assembly_combine.py {input.prokka}
 				"""
 
 
@@ -377,14 +387,12 @@ else:
 				seqdata = '{sample}/seqdata.toml'
 			output:
 				'{sample}/resistome.toml'
-			# singularity:{% endraw %}"{{singularity_dir}}/abricate"{% raw %}
-			shadow:
-				"full"
 			params:
-				script_path= SCRIPT_PATH
+				script_path= SCRIPT_PATH,
+				work_dir = WORKDIR
 			shell:
 				"""
-				python3 {params.script_path}/resistome.py {input.assembly} {wildcards.sample} {input.seqdata}
+				python3 {params.script_path}/resistome.py {input.assembly} {wildcards.sample} {input.seqdata} {wildcards.sample}
 				"""
 		rule combine_resistome:
 			input:
@@ -406,7 +414,6 @@ else:
 				'{sample}/mlst.toml'
 			params:
 				script_path=SCRIPT_PATH
-			# singularity:{% endraw %}"{{singularity_dir}}/mlst"{% raw %}
 			shell:
 				"""
 				python3 {params.script_path}/mlst.py {input.assembly} {wildcards.sample} {input.seqdata}
@@ -420,7 +427,7 @@ else:
 				script_path = SCRIPT_PATH
 			shell:
 				"""
-				python3 {script_path}/combine_mlst.py {input}
+				python3 {params.script_path}/combine_mlst.py {input}
 				"""
 			
 		
@@ -436,7 +443,7 @@ else:
 				script_path = SCRIPT_PATH
 			shell:
 				"""
-				python3 {script_path}/roary.py {input}
+				python3 {params.script_path}/roary.py {input}
 				"""
 
 		rule pan_figure:
@@ -448,7 +455,7 @@ else:
 				script_path = SCRIPT_PATH
 			shell:
 				"""
-				python3 {script_path}/pan_figure.py {input} {params.script_path} 
+				python3 {params.script_path}/pan_figure.py {input} {params.script_path} 
 				"""
 
 	rule collate_isolate_tomls:
@@ -460,7 +467,7 @@ else:
 			script_path = SCRIPT_PATH
 		shell:	
 			"""
-			python3 {script_path}/collate_tomls.py {input}
+			python3 {params.script_path}/collate_tomls.py {wildcards.sample} {input}
 			"""
 		
 	rule compile_report_toml:
@@ -475,7 +482,7 @@ else:
 			job_id = JOB_ID
 		shell:
 			"""
-			python3 {params.script_path}/compile.py {input} {params.pipeline} {params.job_id} {params.assembler} 
+			python3 {params.script_path}/compile.py {params.pipeline} {params.job_id} {params.assembler} {input}
 			"""
 
 rule write_html_report:
@@ -493,4 +500,15 @@ rule write_html_report:
 	shell:
 		"""
 		python3 {params.script_path}/write_report.py {input} {params.work_dir} {params.template_path}
+		"""
+rule move_outputs:
+	input:
+		REPORT_TOMLS, 'report.html', 'report.toml'
+	output:
+		FINAL_OUTPUT
+	params:
+		script_path= SCRIPT_PATH
+	shell:
+		"""
+		python3 {params.script_path}/move_outputs.py {input}
 		"""

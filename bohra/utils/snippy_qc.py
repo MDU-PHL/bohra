@@ -1,11 +1,11 @@
 import toml, pathlib, subprocess, sys, pandas
 
 from Bio import SeqIO
-				
-				
-def check_snippy(data, isolate, minaln, data, aln):
+                
+                
+def check_snippy(data, isolate, minaln, aln):
     
-    p = pathlib.Path(isolate,aln)
+    p = pathlib.Path(aln)
     fasta = p.open()
     for i in SeqIO.parse(fasta,'fasta'): # use BioPython to determine percent alignment
         length = len(i.seq)
@@ -14,24 +14,24 @@ def check_snippy(data, isolate, minaln, data, aln):
         het = i.seq.count('n')
         unaln = nocov + lowcov + het
         perc_aln = 100*(length - unaln) / length
-		data[isolate]['qc_snippy']['length'] = length
-		data[isolate]['qc_snippy']['nocov'] = nocov
-		data[isolate]['qc_snippy']['lowcov'] = lowcov
-		data[isolate]['qc_snippy']['het'] = het
-		data[isolate]['qc_snippy']['unaln'] = unaln
-		data[isolate]['qc_snippy']['pecr_aln'] = perc_aln
+        data[isolate]['qc_snippy']['length'] = length
+        data[isolate]['qc_snippy']['nocov'] = nocov
+        data[isolate]['qc_snippy']['lowcov'] = lowcov
+        data[isolate]['qc_snippy']['het'] = het
+        data[isolate]['qc_snippy']['unaln'] = unaln
+        data[isolate]['qc_snippy']['pecr_aln'] = perc_aln
         # if the percent alignement is greater than the min alignment
-        if perc_aln > minaln:
-			data[isolate]['qc_snippy']['Quality'] = 'PASS'
-		else:
-			data[isolate]['qc_snippy']['Quality'] = 'FAIL - isolate will not be included in core'
-		return data
-										
+        if perc_aln > float(minaln):
+            data[isolate]['qc_snippy']['Quality'] = 'PASS'
+        else:
+            data[isolate]['qc_snippy']['Quality'] = f'Alignment < {float(minaln)} - isolate will not be included in core'
+        return data
+                                        
 
 def open_toml(tml):
 
     data = toml.load(tml)
-
+    print(data)
     return data
 
 def write_toml(data, output):
@@ -43,14 +43,18 @@ def main(inputs, isolate, output, minaln):
     
 
     s = open_toml(tml = inputs)
-	rs = s[isolate]['snippy']['run_snippy']
-	data = {}
-	data[isolate] = {}
-	data[isolate]['qc_snippy'] = {}
-	data[isolate]['qc_snippy']['run_snippy'] = rs
+    print(s)
+    rs = s[isolate]['snippy']['run_snippy']
+    data = {}
+    data[isolate] = {}
+    data[isolate]['qc_snippy'] = {}
+    data[isolate]['qc_snippy']['run_snippy'] = rs
     if rs:
-        data = check_snippy(data = s, minaln = minaln,data = data, aln = s[isolate]['snippy']['aln'])
-		write_toml(data = data, output = f"{isolate}/snippy_qc.toml") 
+        data = check_snippy(minaln = minaln,data = data, aln = s[isolate]['snippy']['alignment'], isolate = isolate)
+    else:
+        data[isolate]['qc_snippy']['Quality'] = 'FAILED sequence QC will not be included in further analysis.'
+    
+    write_toml(data = data, output = f"{isolate}/snippy_qc.toml") 
 
    
 

@@ -7,29 +7,38 @@ def combine_mlst(inputs):
 
     for i in inputs:
         tml = open_toml(i)
-        isolate = tml.keys()[0]
+        print(tml.keys())
+        isolate = list(tml.keys())[0]
         d = {
             "Isolate": isolate,
             "Scheme" : '',
             "ST": '',
             "Quality": 'PASS'
         }
-        if tml[isolate]['mlst']['done'] and tml[isolate]['mlst']['data']['scheme'] != '-':
-            for a in len(tml[isolate]['mlst']['data']['alleles']):
-                d[f"Allele {a+1}"] = tml[isolate]['mlst']['data']['alleles'][a]
+        if tml[isolate]['mlst']['done'] == 'Yes' and tml[isolate]['mlst']['data']['scheme'] != '-':
             d['Scheme'] = tml[isolate]['mlst']['data']['scheme']
-            d['ST'] = tml[isolate]['mlst']['data']['ST']
+            d['ST'] = int(tml[isolate]['mlst']['data']['ST']) if tml[isolate]['mlst']['data']['ST'] != '-' else '-'
+            for a in range(len(tml[isolate]['mlst']['data']['alleles'])):
+                d[f"Allele {a+1}"] = tml[isolate]['mlst']['data']['alleles'][a]
             
-        elif tml[isolate]['mlst']['done'] and tml[isolate]['mlst']['data']['scheme'] == '-':
+            
+        elif tml[isolate]['mlst']['done'] == 'Yes' and tml[isolate]['mlst']['data']['scheme'] == '-':
             d["Scheme"] = "No scheme available"
-        elif not tml[isolate]['mlst']['done']:
-            df['Quality '] = 'NOT INCLUDED - FAIL QC'
+        elif tml[isolate]['mlst']['done'] == 'No':
+            d['Quality'] = 'NOT INCLUDED - FAIL QC'
         df = pandas.DataFrame(d, index = [0])
+        print(df)
         if tab.empty:
             tab = df
         else:
             tab = tab.append(df, sort = True)
+        print(tab)
     tab = tab.set_index('Isolate')
+    cols = ['Scheme', 'ST']
+    cols.extend([a for a in tab.columns if 'Allele' in a])
+    cols.append('Quality')
+    tab = tab[cols]
+    print(tab)
     tab.to_csv('mlst.tab', sep= '\t', index = True)
     return tab
 
@@ -56,6 +65,6 @@ def main(inputs):
 
 if __name__ == '__main__':
     
-    main(inputs = f"{sys.argv[1]}")
+    main(inputs = sys.argv[1:])
     
 

@@ -7,7 +7,7 @@ def combine_kraken(inputs):
 
     for i in inputs:
         tml = open_toml(i)
-        isolate = tml.keys()[0]
+        isolate = list(tml.keys())[0]
         top_3 = tml[isolate]['kraken']['top_3']
         d = {
             'Isolate':isolate,
@@ -27,7 +27,7 @@ def combine_kraken(inputs):
         else:
             tab = tab.append(df, sort = True)
     tab = tab[['Isolate', 'Match #1', '%1', 'Match #2', '%2', 'Match #3', '%3']]
-    tab.to_csv('species_identification.tab', sep= '\t', index = True)
+    tab.to_csv('species_identification.tab', sep= '\t', index = False)
     subprocess.run(f"sed -i 's/%[0-9]/%/g' species_identification.tab", shell=True)
     return tab
 
@@ -45,7 +45,7 @@ def write_toml(data, output):
 def main(inputs):
     
     # set up data dict
-    tab = combine_resistome(inputs)
+    tab = combine_kraken(inputs)
     data = {}
     data['kraken'] = tab.to_dict(orient= 'records')
     write_toml(data = data, output= f'kraken.toml')
@@ -54,6 +54,6 @@ def main(inputs):
 
 if __name__ == '__main__':
     
-    main(inputs = sys.argv[1])
+    main(inputs = sys.argv[1:])
     
 

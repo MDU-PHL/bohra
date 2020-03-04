@@ -6,9 +6,10 @@ def get_gffs(inputs):
     l = []
     for i in inputs:
         tml = open_toml(i)
-        isolate = tml.keys()[0]
-        gff = tml[isolate]['prokka']['gff']
-        l.append(gff)
+        isolate = list(tml.keys())[0]
+        if tml[isolate]['prokka']['done']:
+            gff = tml[isolate]['prokka']['gff']
+            l.append(gff)
     return ' '.join(l)
 
 def generate_roary_cmd(gffs):
@@ -29,6 +30,7 @@ def generate_rm_cmd():
 def run_cmd(cmd):
     
     p = subprocess.run(cmd, shell = True, capture_output=True, encoding = 'utf-8')
+    print(p)
     return p.returncode
 
 def open_toml(tml):
@@ -50,13 +52,14 @@ def main(inputs):
     
     roary = run_cmd(generate_roary_cmd(gffs))
     if roary == 0:
-        generate_mv_cmd()
-        generate_rm_cmd()
+        run_cmd(generate_mv_cmd())
+        run_cmd(generate_rm_cmd())
 
         data['roary']['done'] = True
         data['roary']['csv'] = "roary/gene_presence_absence.csv"
-        data['roary']['txt'] "roary/summary_statistics.txt"
-    
+        data['roary']['txt']="roary/summary_statistics.txt"
+    else:
+        data['roary']['done'] = False
     
     write_toml(data = data, output= f'roary.toml')
 
@@ -64,6 +67,6 @@ def main(inputs):
 
 if __name__ == '__main__':
     
-    main(inputs = sys.argv[1])
+    main(inputs = sys.argv[1:])
     
 

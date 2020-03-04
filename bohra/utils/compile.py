@@ -1,4 +1,4 @@
-import toml, pathlib, subprocess, sys, datetime
+import toml, pathlib, subprocess, sys, datetime, pandas, re, numpy
 
 
 def write_tables(table):
@@ -154,7 +154,7 @@ def plot_snpdensity():
     return(list(melted_df['POS_OFFSET']/1000))
 
 
-def plot_distances(self):
+def plot_distances():
 
     '''
     generate a snp-density plot - using the distacnes.tab file
@@ -195,21 +195,24 @@ def snps_dict(td):
     snp_density_td = {'title': 'SNP density', 'link':'snp-density', 'type':'graph'}
     core_phylogeny_td = {'title': 'Phylogeny', 'link':'phylogeny', 'file': 'core.treefile', 'type': 'tree'}
     snp_distance_td = {'file': 'distances.tab', 'title':'SNP distances', 'type':'matrix', 'link':'snp-distances'}
-    snps = [core_genome_td, snp_density_td, core_genome_td, snp_density_td]
+    snps = [core_genome_td, snp_density_td, core_phylogeny_td,snp_distance_td]
     for s in snps:
         td.append(s)
     
     return td
 
 def assembly_dict(td):
-    
+    for_td = []
     mlst_td = {'file':'mlst.tab', 'title':'MLST', 'type':'table', 'link':'mlst'}
     resistome_td = {'file':'resistome.tab', 'title':'Resistome', 'type':'table', 'link':'resistome'}
     # list of assembly tasks
     assembly_stat_td = {'file': 'assembly.tab', 'title':'Assembly', 'type':'table', 'link':'assembly'}
-    a_td = [assembly_stat_td, species_id_td, mlst_td, resistome_td]
+    a_td = [assembly_stat_td, mlst_td, resistome_td]
     for a in a_td:
-        td.append(a)
+        if pathlib.Path(a['file']).exists():
+            for_td.append(a)
+    for f in for_td:
+        td.append(f)
 
     return td
 
@@ -222,7 +225,7 @@ def sa_dict(td):
 
 def roary_dict(td):
 
-    roary_td = [{'file':'summary_statistics.txt', 'title':'Pan Genome', 'type': 'pan', 'image': f"{pathlib.Path('pan_genome.svg').open().read()}", 'link':'pan-genome'}]
+    roary_td = {'file':'roary/summary_statistics.txt', 'title':'Pan Genome', 'type': 'pan', 'image': f"{pathlib.Path('pan_genome.svg').open().read()}", 'link':'pan-genome'}
 
     td.append(roary_td)
 
@@ -248,6 +251,7 @@ def get_dict(pipeline):
         td = sa_dict(td)
     elif pipeline == 'all':
         td = all_dict(td)
+    # print(td)
     return td
 
 def fill_vals(td, pipeline):
@@ -260,8 +264,12 @@ def fill_vals(td, pipeline):
     # # snpdistances = []
     # # snpdensity = []
     # else:
+    print(range(len(td)))
+    # print(td[10])
     for t in range(len(td)):
         # print(t)
+        # print(td[t])
+
         # TODO if table add a modal modal + link and link will be title lowercase with hyphen
         if td[t]['type'] == 'table':
             td[t]['head'], td[t]['body'] = write_tables(table=td[t]['file'])
@@ -277,8 +285,49 @@ def fill_vals(td, pipeline):
         if td[t]['type'] == 'summary':
             # generate_summary()
             td[t]['head'], td[t]['body'] = write_tables(table = td[t]['file'])
-
+        print(t)
     return td
+
+def get_software_versions(software):
+
+    '''
+    Given the name of the software, find the version
+    input:
+        :software: the name of the software
+    output:
+        a string in the form of 'Name_of_Sofware v.X.Y.Z'
+    '''
+    
+    version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
+
+    if software == 'snp-dists':
+        vs = '-v'
+    else:
+        vs = '--version'
+    cmd = f"{software} {vs} 2>&1"
+    
+    p = subprocess.run(cmd, shell = True, capture_output=True, encoding = "utf-8")
+    sft = p.stdout
+    
+    v = version_pat.search(sft)
+    v = v.group()
+    sft_version = f"{software} v.{v}"
+    return(sft_version)
+
+def make_dict_versions(tools):
+    '''
+    Called by get_software_file to make a dictionary of tools used
+    input:
+        :tools: a list of tools
+    output:
+        a dictionary with tools and versions.
+    '''
+    tool_dict = {}
+    for t in tools:
+            v = get_software_versions(t)
+            tool_dict[t] = v
+    return(tool_dict)
+
 
 def get_software_file(pipeline, assembler = ''):
     '''
@@ -292,23 +341,23 @@ def get_software_file(pipeline, assembler = ''):
     assembly_tools = ['mlst', 'kraken2', 'prokka', 'abricate', assembler]
     
     if pipeline == 's':
-        tool_dict = self.make_dict_versions(snippy_tools)
+        tool_dict = make_dict_versions(snippy_tools)
     elif pipeline == 'a':
-        tool_dict = self.make_dict_versions(assembly_tools)
+        tool_dict = make_dict_versions(assembly_tools)
     elif pipeline == 'sa':
         snippy_tools.extend(assembly_tools)
-        tool_dict = self.make_dict_versions(snippy_tools)
+        tool_dict = make_dict_versions(snippy_tools)
     elif pipeline == 'all':
         snippy_tools.extend(assembly_tools)
         snippy_tools.append('roary')
-        tool_dict = self.make_dict_versions(snippy_tools)
+        tool_dict = make_dict_versions(snippy_tools)
     
     
     versions = ['Software versions']
     for t in tool_dict:
         versions.append(tool_dict[t])
     
-    p = reportdir / 'software_versions.tab'
+    p = pathlib.Path('software_versions.tab')
 
     p.write_text('\n'.join(versions))
 
@@ -316,7 +365,7 @@ def merge_dfs(start, added):
     if start.empty:
         start = added
     else:
-        start = start.merge(added)
+        start = start.merge(added, how = 'outer')
     return(start)
 
 def generate_summary():
@@ -325,67 +374,66 @@ def generate_summary():
     '''
     p = pathlib.Path('.')
     tabs = [t for t in p.iterdir() if f"{t.suffix}" == '.tab']
+    # print(tabs)
     summary_df = pandas.DataFrame()
     df_list = []
     
     # print(tabs)
     for tab in tabs:
         # print(df)
+        # print(tab)
         if 'species' in f"{tab.name}":
             species = pandas.read_csv(tab, sep = '\t')
-            species = species[['Isolate', '#1 Match']]
-            summary_df = self.merge_dfs(summary_df, species)
-            summary_df = summary_df.rename(columns={'#1 Match': 'Species'})
+            species = species[['Isolate', 'Match #1']]
+            summary_df = merge_dfs(summary_df, species)
+            summary_df = summary_df.rename(columns={'Match #1': 'Species'})
         elif 'seqdata' in f"{tab.name}":
             seq = pandas.read_csv(tab, sep = '\t')
             seq = seq[['Isolate', 'Estimated depth']]
-            summary_df = self.merge_dfs(summary_df, seq)
+            summary_df = merge_dfs(summary_df, seq)
         elif 'assembly' in f"{tab.name}":
             assembly = pandas.read_csv(tab, sep = '\t')
             assembly = assembly[['Isolate', '# Contigs']]
-            summary_df = self.merge_dfs(summary_df, assembly)
+            summary_df = merge_dfs(summary_df, assembly)
         elif 'mlst' in f"{tab.name}":
             mlst = pandas.read_csv(tab, sep = '\t', skiprows=1, header=None)
             mlst = mlst.rename(columns = {0:'Isolate', 2:'ST'})
             mlst = mlst[['Isolate', 'ST']]
-            summary_df = self.merge_dfs(summary_df, mlst)
+            summary_df = merge_dfs(summary_df, mlst)
         elif 'core_genome' in f"{tab.name}":
             core = pandas.read_csv(tab, sep = '\t')
+            # print(core)
             core = core[['Isolate', '% USED']]
-            summary_df = self.merge_dfs(summary_df, core)
+            summary_df = merge_dfs(summary_df, core)
+    isolates = len(summary_df['Isolate'])
     # print(mlst)
     # print(summary_df)
-    
+    summary_df = summary_df.fillna('NA')
     summary_file = 'summary_table.tab'
     summary_df.to_csv(summary_file, sep = '\t', index = False)
 
-    return len(summary_df['Isolate'])
+    return isolates
 
 def return_tables(pipeline):
 
     if pipeline == 's':
-        td.extend(s_td)
-        tables =['core-genome', 'snp-distances', 'sequence-data']
+        
+        tables =['core-genome', 'snp-distances', 'sequence-data','species-identification']
         modaltables =['core-genome',  'sequence-data','species-identification']
         display = f"display:inline;"
     elif pipeline == 'a':
-        td.extend(a_td)
-        tables =['mlst', 'assembly', 'resistome', 'sequence-data']
+        
+        tables =['mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
         modaltables = ['mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
         display = f"display:none;"
     elif pipeline == 'sa':
-        a_td.extend(s_td)
-        td.extend(a_td)
-        tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data']
+        
+        tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
         modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
         display = f""
         # td.extend(s_td)
     elif pipeline == 'all':
         # a_ll = td.extend()
-        
-        td.extend(a_td)
-        td.extend(s_td)
-        td.extend(roary_td)
         tables =['core-genome', 'species-identification','snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data', 'pan-genome']
         modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data']
         display = f""
@@ -407,6 +455,8 @@ def write_toml(data, output):
     
 def main(inputs, pipeline,job_id, assembler = ''):
     # initialise dictionary
+    # print(pipeline)
+    print(inputs)
     data = {
         'newick' :'',
         'snpdensity':'',
@@ -415,20 +465,20 @@ def main(inputs, pipeline,job_id, assembler = ''):
         'job_id':job_id,
         'pipeline':pipeline,
         'date':datetime.datetime.today().strftime("%d_%m_%y"), 
-        'tree_height':0,
+        'tree_heigth':0,
         'modaltables':'',
         'tables':''
         }
-    print(data)
+    # print(data)
     if pipeline == 'preview':
         td = get_preview_dict()
         data['tree_height'] = get_isolates_preview('preview_distances.tab') * 25
         data['tables'] = ['mash-distances']
         data['modaltables'] = ['mash-distances']
-        print(td)
+        # print(td)
     else:
         isos = generate_summary()
-        print(isos)
+        # print(isos)
         get_software_file(pipeline = pipeline, assembler = assembler)  
         td = get_dict(pipeline = pipeline)
         tables, modaltables, display = return_tables(pipeline = pipeline)
@@ -440,20 +490,21 @@ def main(inputs, pipeline,job_id, assembler = ''):
     if pipeline not in ['a', 'preview']:
         data['snpdensity']= plot_snpdensity()
         data['snpdistances']= plot_distances()
-    elif pipeline != 'a':
+        data['newick'] = get_tree_string(pipeline = pipeline)
+    elif pipeline in ['s', 'sa', 'preview', 'all']:
         data['newick'] = get_tree_string(pipeline = pipeline)
     
 
 # newick = newick, display = display,tables = tables,td = td, job_id = job_id, pipeline = pipeline, snpdistances=snpdistances, snpdensity = snpdensity, modaltables = modaltables, date = date
     td = fill_vals(td=td, pipeline = pipeline)
     data['td'] = td
-    
+    # print(data)
     write_toml(data = data, output = 'report.toml')    
 
 
 if __name__ == '__main__':
     
-    main(inputs = f"{sys.argv[1]}", pipeline = f"{sys.argv[2]}", job_id = f"{sys.argv[3]}",assembler = f"{sys.argv[4]}")
+    main(inputs = sys.argv[4:], pipeline = f"{sys.argv[1]}", job_id = f"{sys.argv[2]}",assembler = f"{sys.argv[3]}")
     
 
 

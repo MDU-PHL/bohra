@@ -7,10 +7,10 @@ def combine_tomls(inputs, isolate):
     final_toml[isolate] = {}
     for i in inputs:
         tml = open_toml(i)
-
-        t = tml[isolate].keys()[0]
+        # print(st)
+        t = list(tml[isolate].keys())[0]
         final_toml[isolate][t] = tml[isolate][t]
-        subprocess.run(f"rm {i}", shell = True, capture_output = True, encoding = "utf-8")
+        # subprocess.run(f"rm {i}", shell = True, capture_output = True, encoding = "utf-8")
     
     return final_toml
 
@@ -36,6 +36,6 @@ def main(inputs, isolate):
 
 if __name__ == '__main__':
     
-    main(inputs = sys.argv[1], isolate = f"{sys.argv[2]}")
+    main(isolate = f"{sys.argv[1]}", inputs = sys.argv[2:])
     
 

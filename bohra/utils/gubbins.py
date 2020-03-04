@@ -32,8 +32,11 @@ def write_toml(data, output):
         toml.dump(data, f)
     
 def main(inputs, gubbins):
+    data = {}
     data['gubbins'] = {}
-    if gubbins:
+    # print(gubbins)
+    if gubbins != 'False':
+        print('inside true')
         clean = run_cmd(generate_snippy_clean_cmd())
         if clean == 0:
             gub = run_cmd(generate_gubbins_cmd())
@@ -50,7 +53,7 @@ def main(inputs, gubbins):
 
 if __name__ == '__main__':
     
-    main(inputs = f"{sys.argv[1]}", gubbins = f"{sys.argv[2]}")
+    main(inputs = f"{sys.argv[1]}", gubbins = sys.argv[2])
     
 
 

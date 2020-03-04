@@ -32,6 +32,7 @@ def main(inputs):
     
     dists= run_cmd(generate_dists_cmd(aln = aln))
     if dists == 0:
+        data = {}
         data['snp_dists'] = {}
         data['snp_dists']['input_file'] = aln
         data['snp_dists']['file'] = 'distances.tab'

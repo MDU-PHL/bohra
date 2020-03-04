@@ -2,7 +2,7 @@ import toml, pathlib, subprocess, sys
 
 def generate_prokka_cmd(isolate, assembly):
     
-    cm f"prokka --outdir {isolate} --prefix {isolate} --mincontiglen 500 --notrna --fast --force {assembly} --cpus 1"
+    cmd =  f"prokka --outdir {isolate} --prefix {isolate} --mincontiglen 500 --notrna --fast --force {assembly} --cpus 4"
 
     return cmd
 
@@ -28,29 +28,37 @@ def write_toml(data, output):
     with open(output, 'wt') as f:
         toml.dump(data, f)
     
-def main(inputs, isolate):
+def main(inputs, isolate, seqdata):
     
+    print(inputs)
     # set up data dict
-    data = {}
-    data[isolate] = {}
+    data = open_toml(inputs)
+    # data[isolate] = {}
     data[isolate]['prokka'] = {}
     # run kraken
-    cmd = generate_prokka_cmd(isolate = isolate, assembly = inputs)
-    p = run_cmd(cmd)
-    if p == 0:
-        rm_cmd = generate_rm_cmd(isolate = isolate)
-        r = generate_rm_cmd(run_cmd)
-        if r == 0:
-            data[isolate]['prokka'] = {}
-            data[isolate]['prokka']['gff'] = f'{sample}/{sample}.gff'
-            data[isolate]['prokka']['txt'] = f'{sample}/{sample}.txt'
-            [f'{sample}.gff', f'{sample}.txt']
-            write_toml(data = data, output= f'{isolate}/prokka.toml')
+    assembly = f"{isolate}/contigs.fa"
+    seqdata = open_toml(seqdata)
+    cmd = generate_prokka_cmd(isolate = isolate, assembly = assembly)
+    if seqdata[isolate]['seqdata']['data']['Quality'] == 'PASS':
+        print(cmd)
+        p = run_cmd(cmd)
+        if p == 0:
+            rm_cmd = generate_rm_cmd(isolate = isolate)
+            print(rm_cmd)
+            r = generate_rm_cmd(run_cmd)
+            data[isolate]['prokka']['done'] = True
+            data[isolate]['prokka']['gff'] = f'{isolate}/{isolate}.gff'
+            data[isolate]['prokka']['txt'] = f'{isolate}/{isolate}.txt'
+    else:
+        data[isolate]['prokka']['done'] = False
+
+    
+    write_toml(data = data, output= f'{isolate}/prokka.toml')
 
 
 
 if __name__ == '__main__':
     
-    main(inputs = f"{sys.argv[1]}", isolate = f"{sys.argv[2]}")
+    main(inputs = f"{sys.argv[1]}", isolate = f"{sys.argv[2]}", seqdata = f"{sys.argv[3]}")
     
 

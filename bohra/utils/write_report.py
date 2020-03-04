@@ -1,5 +1,5 @@
 
-import svgwrite, re, sys, subprocess, toml
+import re, sys, subprocess, toml
 import jinja2, pathlib, pandas, numpy, re
 from packaging import version
 import datetime
@@ -417,10 +417,10 @@ class Report:
         reporthtml = pathlib.Path('report.html')
         # path to html template
         indexhtml = pathlib.Path(resources,'index.html') # replace with template
-        print(indexhtml)
+        # print(indexhtml)
         tml =  self.open_toml(inputs)
-        print(type(tml))
-        print(tml)
+        # print(type(tml))
+        # print(tml)
         # copy scc across to report dir
         # csstemplate = jinja2.Template(pathlib.Path(resources,'job.css').read_text())
         # csstarget = reportdir / 'job.css'

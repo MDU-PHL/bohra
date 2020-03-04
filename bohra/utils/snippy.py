@@ -4,6 +4,7 @@ import toml, pathlib, subprocess, sys
 def generate_snippy_cmd(r1, r2, isolate, reference, threads):
     
     cmd = f"snippy --outdir {isolate} --ref {reference} --R1 {r1} --R2 {r2} --force --cpus {threads}"
+    print(cmd)
     return cmd
 
 def run_cmd(cmd):
@@ -21,6 +22,7 @@ def get_reads(inputs, isolate):
 def get_quality(inputs, isolate):
 
     s = open_toml(inputs)
+    print(s)
     if s[isolate]['seqdata']['data']['Quality'] == 'PASS':
         return True
     else:
@@ -40,11 +42,14 @@ def write_toml(data, output):
     
 def main(inputs, isolate, output, reference, threads):
     
-
+    print(inputs)
+    # print(threads)
     r1,r2 = get_reads(inputs = inputs, isolate = isolate)
     run_snippy = get_quality(inputs = inputs, isolate = isolate)
+    print(run_snippy)
     data = {}
     data[isolate] = {}
+    data[isolate]['snippy'] = {}
     data[isolate]['snippy']['reference'] = reference
     data[isolate]['snippy']['R1'] = r1
     data[isolate]['snippy']['R2'] = r2
@@ -52,11 +57,14 @@ def main(inputs, isolate, output, reference, threads):
 
     if run_snippy:
         cmd = generate_snippy_cmd(r1 = r1, r2=r2, isolate = isolate, reference = reference, threads = threads)
+        # print(cmd)
         p = run_cmd(cmd)
+        # print(p)
         if p == 0:
             data[isolate]['snippy']['alignment'] = f"{isolate}/snps.aligned.fa"
             data[isolate]['snippy']['vcf'] = f"{isolate}/snps.vcf"
-            write_toml(data = data, output = f"{isolate}/snippy.toml") 
+            data[isolate]['snippy']['cmd'] = cmd
+    write_toml(data = data, output = f"{isolate}/snippy.toml") 
     
 
 if __name__ == '__main__':

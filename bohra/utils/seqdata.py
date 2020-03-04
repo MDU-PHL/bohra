@@ -74,9 +74,9 @@ def main(r1, r2, isolate, mash, mincov):
     # print(p)
     if p == 0:
         cov = get_coverage(mash = mash, isolate=isolate)
-        print(cov)
+        # print(cov)
         data[isolate]['seqdata']['data'] = get_data(cmd_output = data[isolate]['seqdata']['file'])
-        data[isolate]['seqdata']['data']['Estimated_coverage'] = float(cov)
+        data[isolate]['seqdata']['data']['Estimated_coverage'] = round(float(cov),2)
         data[isolate]['seqdata']['data']['Quality'] = 'PASS' if data[isolate]['seqdata']['data']['Estimated_coverage'] > int(mincov) else 'FAIL - will be removed from further analysis'
         write_toml(data = data, output = f"{isolate}/seqdata.toml")   
 

@@ -1,4 +1,4 @@
-import toml, pathlib, subprocess, sys, pandas
+import toml, pathlib, subprocess, sys, pandas, numpy
 
 
 import pandas, pathlib
@@ -12,43 +12,52 @@ def assembly_combine(assemblies):
 # {'Name': isolate, 'bp':length, '# Contigs':no, 'Ns':Ns, '# Gaps':gaps, 'Min Contig size':min_len, 'Max Contig size':max_len,  'Avg Contig size':avg_len, 'N50':N50}
     for a in assemblies:
         d = open_toml(a)
-        isolate=d.keys()[0]
-        df = pandas.DataFrame(d =d[isolate], index = [0])
-        df['Quality'] = 'PASS'
-        if not tml[isolate]['resistome']['done']:
-            df['Quality '] = 'NOT INCLUDED - FAIL Sequence QC'
+        isolate=list(d.keys())[0]
+        df = pandas.DataFrame(d[isolate]['assembly_stats'], index = [0])
         if ac.empty:
             ac = df
         else:
             ac = df.append(ac, sort = True)
-    
+    # print(ac)
     return ac
 
 
-def combine(prokka, assembly_stats)
+def combine(prokka, assembly_stats):
 # 
     
     gff = pandas.DataFrame()
     
     for p in prokka:
         tml = open_toml(p)
-        isolate=tml.keys()[0]
-        g = pathlib.Path(tml[isolate]['prokka']['gff'])
-        df = pandas.read_csv(g, sep = ':', header = None, names = ['cond', f"{g.parts[1]}"])
-        
-        if gff.empty:
-                gff = df
-        else:
-                gff = gff.merge(df, how = 'outer')
+        isolate=list(tml.keys())[0]
+        if tml[isolate]['prokka']['done'] and 'txt' in tml[isolate]['prokka']:
+            g = pathlib.Path(tml[isolate]['prokka']['txt'])
+            df = pandas.read_csv(g, sep = ':', header = None, names = ['cond', f"{g.parts[0]}"])
+            # print(df)
+            if gff.empty:
+                    gff = df
+            else:
+                    gff = gff.merge(df, how = 'outer')
+    # print(gff)
     gff = gff[gff['cond'].isin(['CDS', 'rRNA'])]
+    # print(gff)
     gff = gff.T
+    # print(gff)
     gff.columns = gff.iloc[0]
     gff = gff.iloc[1:]  
+    # print(gff.columns)
+    # print(gff)
+    assembly = assembly_stats.merge(gff, left_on = ['Name'], right_on= gff.index, how = 'outer')
 
-    assembly = assembly_stats.merge(gff, left_on = ['Name'], right_on= gff.index)
-    cut = assembly['# Contigs'].mean() + (2* assembly['# Contigs'].std())
+    m = list(assembly[assembly['# Contigs'] != '-']['# Contigs'])  
+    mn = numpy.mean(m)
+    s =(2* numpy.std(m))
+    cut = mn + 2
+    # print(cut)
+    assembly['Quality'] = numpy.where(assembly['# Contigs'].replace('-',0) <= cut, assembly['Quality'], f'WARNING - assembly outlier (> {round(cut,2)} contigs)')
     assembly = assembly.rename(columns={'Name':'Isolate'})
-    assembly['Quality'] = numpy.where(assembly['# Contigs'] <= cut, assembly['Quality'], 'WARNING - assembly outlier')
+    # print(ass÷embly)
+    
     assembly = assembly[['Isolate', 'bp','# Contigs','Ns','# Gaps','Min Contig size','Max Contig size','Avg Contig size','N50', 'CDS','rRNA', 'Quality' ]]
 
     assembly.to_csv(f"assembly.tab", sep = '\t', index = False)
@@ -66,9 +75,9 @@ def write_toml(data, output):
     with open(output, 'wt') as f:
         toml.dump(data, f)
     
-def main(assembly_stats, prokka):
+def main(prokka):
     
-    assemblies = assembly_combine(assemblies = assemblies)
+    assemblies = assembly_combine(assemblies = prokka)
     assembly_stat_dict = combine(prokka = prokka, assembly_stats = assemblies) 
     # set up data dict
     data = {}
@@ -79,6 +88,6 @@ def main(assembly_stats, prokka):
 
 if __name__ == '__main__':
     
-    main(assembly_stats = f"{sys.argv[1]}", prokka = f"{sys.argv[2]}")
+    main(prokka = sys.argv[1:])
     
 

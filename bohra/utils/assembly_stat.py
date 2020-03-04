@@ -1,5 +1,5 @@
 from Bio import SeqIO
-import pathlib, toml, pandas
+import pathlib, toml, pandas, sys
 
 
 
@@ -16,7 +16,7 @@ def write_toml(data, output):
 
 
 def fa(inputs, isolate, min_size =500):
-    p = pathlib.Path(f"{path}")
+    p = pathlib.Path(f"{inputs}")
     min_len = 1.0e+10
     max_len = 0
     contig_length = []
@@ -48,28 +48,36 @@ def fa(inputs, isolate, min_size =500):
                     N50 = c
                     break
 
-    data = {'Name': isolate, 'bp':length, '# Contigs':no, 'Ns':Ns, '# Gaps':gaps, 'Min Contig size':min_len, 'Max Contig size':max_len,  'Avg Contig size':avg_len, 'N50':N50}
+    data = {'Name': isolate, 'bp':length, '# Contigs':no, 'Ns':Ns, '# Gaps':gaps, 'Min Contig size':min_len, 'Max Contig size':max_len,  'Avg Contig size':avg_len, 'N50':N50, 'Quality': 'PASS'}
     return(data)
 
-def get_fa_stat(assembly,isolate):
+def main(inputs,isolate):
 #     colnames = ['Name','bp','# Contigs','Ns','# Gaps','Min Contig size','Max Contig size','Avg Contig size','N50']
     # print(colnames)
     # print('\t'.join(colnames))
-    d = fa(path=assembly, isolate)
-    data = {}
-    data[isolate]={}
-    data[isolate]['assembly_stats'] = d
+    assembly_data = open_toml(tml = inputs)
+
+    if assembly_data[isolate]['assembly']['done'] == 'Yes':
+        # print('in true')
+        assembly = f"{pathlib.Path(isolate, 'contigs.fa')}"
+        d = fa(inputs=assembly,isolate= isolate)
+        data = {}
+        data[isolate]={}
+        data[isolate]['assembly_stats'] = d
+        
+    else:
+        data = {}
+        data[isolate]={}
+        data[isolate]['assembly_stats'] = {'Name': isolate, 'bp':'-', '# Contigs':'-', 'Ns':'-', '# Gaps':'-', 'Min Contig size':'-', 'Max Contig size':'-',  'Avg Contig size':'-', 'N50':'-', 'Quality': 'ASSEMBLY NOT PERFORMED please see Sequence data tab'}
+        # data[isolate]['assembly_stats']['Quality'] = 'Assembly not performed - failed QC'
     write_toml(data= data, output = f'{isolate}/assembly_stats.toml')
         # print(data)
         # print('\t'.join([f"{data[x]}" for x in colnames]))
-        
-def main():
-
-    main(inputs = f"{sys.argv[1]}", minsize = f"{sys.argv[2]}", isolate = f"{sys.argv[3]}",  prefill =  f"{sys.argv[4]}")
     
 
 
 if __name__ == '__main__':
-    main()
+    main(inputs = f"{sys.argv[1]}", isolate = f"{sys.argv[2]}")
+    
 
 

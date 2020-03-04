@@ -46,8 +46,14 @@ class RunSnpDetection(object):
         self.workdir = pathlib.Path(args.workdir)
         # path to pipeline resources
         self.resources = pathlib.Path(args.resources)
+        self.pipeline = args.pipeline
+        self.preview = True if self.pipeline == 'preview' else False
+        self.logger.info(f"You are running bohra in {self.pipeline} mode.")
         # path to reference and mask
-        self.ref = pathlib.Path(args.reference)
+        if self.pipeline != 'a':
+            self.ref = pathlib.Path(args.reference)
+        else:
+            self.ref = ''
         # 
         # (args.mask)
         if args.mask:
@@ -69,6 +75,7 @@ class RunSnpDetection(object):
         # other variables
         # min aln 
         self.minaln = args.minaln
+        self.mincov = args.mincov
         # cluster settings
         self.cluster = args.cluster
         # user
@@ -91,7 +98,7 @@ class RunSnpDetection(object):
             self.prefillpath = ''
         self.force = args.force
         self.dryrun = args.dry_run
-        self.pipeline = args.pipeline
+        
         self.cpus = args.cpus
         # kraken db settings
         self.kraken_db = args.kraken_db
@@ -352,7 +359,7 @@ class RunSnpDetection(object):
         s = True if self.use_singularity else False
         self.logger.info(f"Recording your settings for job: {self.job_id}")
         new_df = pandas.DataFrame({'JobID':self.job_id, 'Reference':f"{self.ref}",'Mask':f"{self.mask}", 
-                                    'MinAln':self.minaln, 'Pipeline': self.pipeline, 'CPUS': self.cpus, 'Assembler':self.assembler,
+                                    'MinAln':self.minaln, 'MinCov': self.mincov, 'Pipeline': self.pipeline, 'CPUS': self.cpus, 'Assembler':self.assembler,
                                     'Date':self.day, 'User':self.user, 'snippy_version':snippy_v, 'input_file':f"{self.input_file}",'prefillpath': self.prefillpath, 'cluster': self.cluster,'singularity': s, 'kraken_db':kraken, 'Gubbins': self.gubbins}, 
                                     index=[0], )
         
@@ -364,6 +371,13 @@ class RunSnpDetection(object):
             source_df = new_df
         
         source_df.to_csv(source_path , index=False, sep = '\t')
+    
+    def setup_for_rerun(self):
+        report_path_orig = self.workdir / self.job_id / 'report'
+        report_path_preview =  self.workdir / self.job_id / 'report_preview'
+        cmd = f"mv {report_path_orig} {report_path_preview}"
+        self.logger.info(f"Archiving preview directory...")
+        subprocess.run(cmd, shell = True, encoding = "utf-8", capture_output= True)
 
     def check_rerun(self):
         '''
@@ -371,16 +385,18 @@ class RunSnpDetection(object):
 
         '''
         self.logger.info(f'Checking if job is a rerun of existing job.')
-        report_path = self.workdir / self.job_id / 'report'
+        report_path = self.workdir / self.job_id / 'report' / 'report.html'
+        preview_path = self.workdir / self.job_id / 'report' / 'preview_distances.tab'
         # if the path is a string convert to Path
         if isinstance(report_path, str):
             report_path = pathlib.Path(report_path)
-        if report_path.exists():
+        if report_path.exists() and not preview_path.exists():
             self.logger.warning(f"This may be a re-run of an existing job. Please try again using rerun instead of run OR use -f to force an overwrite of the existing job.")
             self.logger.warning(f"Exiting....")
             
             raise SystemExit()
-        else:
+        elif preview_path.exists():
+            self.setup_for_rerun()
             return False
 
 
@@ -668,8 +684,8 @@ class RunSnpDetection(object):
         }
         
         self.logger.info(f"Writing Snakefile for job : {self.job_id}")
-        snk_template = jinja2.Template(pathlib.Path(self.resources, "bohra.smk").read_text())
-        snk = self.workdir / 'Snakefile'
+        snk_template = jinja2.Template(pathlib.Path(self.resources, "bohra_v2.smk").read_text())
+        snk = self.workdir / self.job_id/ 'Snakefile'
 
         snk.write_text(snk_template.render(vars_for_file)) 
         
@@ -739,7 +755,7 @@ class RunSnpDetection(object):
         # make a masking string
         wd = self.workdir / self.job_id
         if self.mask != '':
-            maskstring = f"--mask {self.workdir / self.mask}"
+            maskstring = f"{self.workdir / self.mask}"
         else:
             maskstring = ''
         self.logger.info(f'Mask string : {maskstring}')
@@ -759,7 +775,11 @@ class RunSnpDetection(object):
             'day': self.day, 
             'isolates' : ' '.join(isolates),
             'gubbins': self.gubbins,
-            'pipeline': self.pipeline
+            'pipeline': self.pipeline,
+            'min_cov': self.mincov,
+            'kraken_db': f"{self.kraken_db}",
+            'preview': self.preview, 
+            'prefill_path': self.prefillpath if self.prefillpath != '' else 'nopath'
         }
 
         # read the config file which is written with jinja2 placeholders (like django template language)
@@ -799,7 +819,7 @@ class RunSnpDetection(object):
         if self.cluster:
             cmd = f"{self.cluster_cmd()} -s {snake_name} {force} {singularity_string} --latency-wait 1200"
         else:
-            cmd = f"snakemake {dry} -s {snake_name} -j {self.cpus} {force} {singularity_string}"
+            cmd = f"cd {self.job_id} && snakemake {dry} -s {snake_name} -j {self.cpus} {force} {singularity_string}"
             # cmd = f"snakemake -s {snake_name} --cores {self.cpus} {force} "
         self.logger.info(f"Running job : {self.job_id} with {cmd} this may take some time. We appreciate your patience.")
         wkf = subprocess.run(cmd, shell = True)

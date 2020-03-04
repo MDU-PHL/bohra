@@ -26,3 +26,9 @@ template_path:
         "{{template_path}}"
 script_path:
         "{{script_path}}"
+preview:
+        {{preview}}
+kraken_db:
+        "{{kraken_db}}"
+min_cov:
+        {{min_cov}}
