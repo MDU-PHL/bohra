@@ -3,7 +3,7 @@ import toml, pathlib, subprocess, sys, pandas
 def generate_abritamr_cmd(input_file, isolate, wd):
     
     w = pathlib.Path(wd)
-    cmd = f"/home/khhor/.local/bin/abritamr -c {input_file} -pfx {isolate} -w {w}"
+    cmd = f"abriTAMR -c {input_file} -pfx {isolate} -w {w}"
     return cmd
 
 def generate_dict(isolate):
