@@ -3,7 +3,7 @@ import toml, pathlib, subprocess, sys
 
 def generate_cmd(r1, r2, isolate):
     
-    cmd = f"mash sketch -r {r1} {r2} -m 3 -k 31 -C {isolate} -o {isolate}/sketch"
+    cmd = f"mash sketch -r {r1} -m 5 -k 21 -C {isolate} -o {isolate}/sketch"
     return cmd
 
 def run_cmd(cmd):

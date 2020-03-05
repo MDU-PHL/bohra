@@ -24,9 +24,9 @@ def get_quality(inputs, isolate):
     s = open_toml(inputs)
     print(s)
     if s[isolate]['seqdata']['data']['Quality'] == 'PASS':
-        return True
+        return 'Yes'
     else:
-        return False
+        return 'No'
 
 
 def open_toml(tml):
@@ -55,7 +55,7 @@ def main(inputs, isolate, output, reference, threads):
     data[isolate]['snippy']['R2'] = r2
     data[isolate]['snippy']['run_snippy'] = run_snippy
 
-    if run_snippy:
+    if run_snippy == 'Yes':
         cmd = generate_snippy_cmd(r1 = r1, r2=r2, isolate = isolate, reference = reference, threads = threads)
         # print(cmd)
         p = run_cmd(cmd)
