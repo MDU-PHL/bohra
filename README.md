@@ -234,6 +234,7 @@ Phage masking is important for to prevent the inflation of SNPs that can be intr
 ### Run
 
 **Minimal command to run in preview mode**
+
 To use alternative modes, use `-p` with one of the following arguments.
 
 `s` for phylogeny
