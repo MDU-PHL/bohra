@@ -114,7 +114,7 @@ def main():
         
     args = parser.parse_args()
     
-    if vars(args) == {}:
+    if len(sys.argv) == 2:
         parser.print_help(sys.stderr)
     else:
         logger = logging.getLogger(__name__)
