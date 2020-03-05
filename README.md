@@ -5,6 +5,11 @@
 
 # Bohra 
 
+Bohra has a new look! 
+* A new preview mode for 'sneak peak' at your dataset. 
+* Built in filtering features to automatically remove isolates with low average coverage or alignment to your reference.
+* Provide a standardised config file for commonly used settings.
+
 Bohra is microbial genomics pipeline, designed predominantly for use in public health, but may also be useful in research settings. The pipeline takes as input a tab-delimited file with the isolate IDs followed by the path to READ1 and READ2, a reference for alignment and a unique identifier, where reads are illumina paired end reads (other platforms are not supported).
 
 ### Motivation
@@ -21,13 +26,17 @@ Bohra the name of an exinct species of tree kangaroo that lived on the nullarbor
 Bohra takes raw sequencing reads and produces a standalone html file for simple distribution of reports.
 ![Image](https://github.com/MDU-PHL/bohra/blob/master/workflow.png)
 
-Bohra can be run in three modes
-1. SNPs and Phylogeny
+Bohra can be run in four modes
+1. Preview (DEFAULT)
+* Calculate mash-distances
+* Build a mash-tree
+
+2. SNPs and Phylogeny
 * Clean reads
 * Call variants
 * Generate a phylogenetic tree
 
-2. SNPs, Phylogeny, Typing, Annotation and Species Identification (DEFAULT)
+3. SNPs, Phylogeny, Typing, Annotation and Species Identification 
 * Clean reads
 * Call variants
 * Generate a phylogenetic tree
@@ -37,7 +46,7 @@ Bohra can be run in three modes
 * Resistome
 * Annotate
 
-3. SNPs, Phylogeny, PanGenome and  Typing and Species Identification
+4. SNPs, Phylogeny, PanGenome and  Typing and Species Identification
 * Clean reads
 * Call variants
 * Generate a phylogenetic tree
@@ -75,19 +84,18 @@ If installing with `pip` you will need to ensure other dependencies are also ins
 ```
 pip3 install bohra
 ```
-
+* [snakemake](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
 * [Snippy](https://github.com/tseemann/snippy)
 * [Shovill (skesa and spades.py)](https://github.com/tseemann/shovill)
 * [Roary](https://sanger-pathogens.github.io/Roary/)
 * [Prokka](https://github.com/tseemann/prokka)
 * [kraken2](https://ccb.jhu.edu/software/kraken/)
-* [abricate](https://github.com/tseemann/abricate)
+* [abritamr](https://github.com/MDU-PHL/abritamr)
 * [mlst](https://github.com/tseemann/mlst)
 * [iqtree](http://www.iqtree.org/)
 * [seqtk](https://github.com/lh3/seqtk)
 * [snp-dists](https://github.com/tseemann/snp-dists)
-
-
+* [mash](https://github.com/lskatz/mashtree)
 
 *IMPORTANT*
 In addition to installing kraken ensure that you have a kraken2 database. Minikraken can obtained as follows
@@ -102,7 +110,105 @@ Once you have the DB downloaded you will have to create an environment variable 
 export KRAKEN_DEFAULT_DB=$HOME/minikraken2_v2_8GB_201904_UPDATE
 ```
 
-Bohra can be run in two modes `run` for an initial analysis and `rerun` for a re-analysis. A `.html` report is generated allowing for the visualisation of tree and examination of the dataset to provide insights that may be useful in interpretation of the results.
+### Running bohra
+
+#### Using CLI
+
+```
+bohra run -h
+usage: bohra run [-h] [--input_file INPUT_FILE] [-S]
+                 [--singularity_path SINGULARITY_PATH] [--job_id JOB_ID]
+                 [--reference REFERENCE] [--mask MASK] [--kraken_db KRAKEN_DB]
+                 [--pipeline {preview,sa,s,a,all}]
+                 [--assembler {shovill,skesa,spades}] [--cpus CPUS]
+                 [--minaln MINALN] [--mincov MINCOV]
+                 [--prefillpath PREFILLPATH] [-mdu] [-workdir WORKDIR]
+                 [-resources RESOURCES] [-force] [-dry-run] [--cluster]
+                 [--json JSON] [--queue QUEUE]
+optional arguments:
+  -h, --help            show this help message and exit
+  --input_file INPUT_FILE, -i INPUT_FILE
+                        Input file = tab-delimited with 3 columns
+                        <isolatename> <path_to_read1> <path_to_read2>
+                        (default: )
+  -S, --use_singularity
+                        Set if you would like to use singularity containers to
+                        run bohra. (default: False)
+  --singularity_path SINGULARITY_PATH
+                        The path to singularity containers. If you want to use
+                        locally stored contianers please pull from
+                        shub://phgenomics-singularity (snippy.simg,
+                        prokka.simg, seqtk.simg, mash_kmc.simg,
+                        assemblers.simg, roary.simg). IMPORTANT bohra is
+                        designed to run with these containers... if you wish
+                        to use custom containers please contact developer or
+                        proceed at your own risk. (default: shub://phgenomics-
+                        singularity)
+  --job_id JOB_ID, -j JOB_ID
+                        Job ID, will be the name of the output directory
+                        (default: )
+  --reference REFERENCE, -r REFERENCE
+                        Path to reference (.gbk or .fa) (default: )
+  --mask MASK, -m MASK  Path to mask file if used (.bed) (default: False)
+  --kraken_db KRAKEN_DB, -k KRAKEN_DB
+                        Path to DB for use with kraken2, if no DB present
+                        speciation will not be performed. [env var:
+                        KRAKEN2_DEFAULT_DB] (default: None)
+  --pipeline {preview,sa,s,a,all}, -p {preview,sa,s,a,all}
+                        The pipeline to run. SNPS ('s') will call SNPs and
+                        generate phylogeny, ASSEMBLIES ('a') will generate
+                        assemblies and perform mlst and species identification
+                        using kraken2, SNPs and ASSEMBLIES ('sa' - default)
+                        will perform SNPs and ASSEMBLIES. ALL ('all') will
+                        perform SNPS, ASSEMBLIES and ROARY for pan-genome
+                        analysis (default: preview)
+  --assembler {shovill,skesa,spades}, -a {shovill,skesa,spades}
+                        Assembler to use. (default: shovill)
+  --cpus CPUS, -c CPUS  Number of CPU cores to run, will define how many rules
+                        are run at a time (default: 16)
+  --minaln MINALN, -ma MINALN
+                        Minimum percent alignment. Isolates which do not align
+                        to reference at this threshold will not be included in
+                        core phylogeny. (default: 80)
+  --mincov MINCOV, -mc MINCOV
+                        Minimum percent alignment. Isolates which do not have
+                        average read coverage above this threshold will not be
+                        included further analysis. (default: 40)
+  --prefillpath PREFILLPATH, -pf PREFILLPATH
+                        Path to existing assemblies - in the form
+                        path_to_somewhere/isolatename/contigs.fa (default:
+                        None)
+  -mdu                  If running on MDU data (default: False)
+  -workdir WORKDIR, -w WORKDIR
+                        The directory where Bohra will be run, default is
+                        current directory (default: /home/khhor)
+  -resources RESOURCES, -s RESOURCES
+                        Directory where templates are stored (default:
+                        /home/khhor/dev/bohra/bohra/templates)
+  -force, -f            Add if you would like to force a complete restart of
+                        the pipeline. All previous logs will be lost.
+                        (default: False)
+  -dry-run, -n          If you would like to see a dry run of commands to be
+                        executed. (default: False)
+  --cluster             If you are running Bohra on a cluster. (default:
+                        False)
+  --json JSON           Path to cluster.json - required if --cluster is set
+                        (default: )
+  --queue QUEUE         Type of queue (sbatch or qsub currently supported) -
+                        required if --cluster is set. (default: )
+
+```
+
+#### Using a config file 
+Arguments that start with '--' (eg. --input_file) can also be set in a config file. Please put your config file in the working directory and name it 'bohra.conf'
+Config file syntax allows: key=value, flag=true,
+stuff=[a,b,c] (for details, see syntax at https://goo.gl/R74nmi). If an arg is
+specified in more than one place, then commandline values override environment
+variables which override config file values which override defaults.
+
+### Preview mode
+
+Bohra's preview mode (default mode) uses `mash` to calculate mash distances between isolates and generate a mash tree to rapidly identify outliers in your dataset or identify clades of interest for a more focused analysis.
 
 ### Set up
 
@@ -125,10 +231,19 @@ The choice of reference is important for the accuracy of SNP detection and there
 Phage masking is important for to prevent the inflation of SNPs that can be introduced by horizontal transfer as opposed to vertical transfer. For closed genomes or those that are publicly available `phaster-query.pl` can be used to identify regions for masking. If a denovo assembly is used the website `phaster.ca` can be used. Regions for masking should be provided in `.bed` format.
 
 
-
 ### Run
 
-**Minimal command**
+**Minimal command to run in preview mode**
+To use alternative modes, use `-p` with one of the following arguments.
+
+`s` for phylogeny
+
+`a` for assembly associated tools
+
+`sa` phylogeny and assembly associated tools
+
+`all` all functions (`sa` plus pan-genome analysis)
+
 
 `bohra run -r path/to/reference -i path/to/inputfile -j unique_id -m path/to/maskfile (optional)`
 
