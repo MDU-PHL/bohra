@@ -49,7 +49,8 @@ def main(inputs, isolate, output, minaln):
     data[isolate] = {}
     data[isolate]['qc_snippy'] = {}
     data[isolate]['qc_snippy']['run_snippy'] = rs
-    if rs:
+    print(s)
+    if rs == 'Yes':
         data = check_snippy(minaln = minaln,data = data, aln = s[isolate]['snippy']['alignment'], isolate = isolate)
     else:
         data[isolate]['qc_snippy']['Quality'] = 'FAILED sequence QC will not be included in further analysis.'

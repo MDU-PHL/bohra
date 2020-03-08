@@ -12,6 +12,7 @@ import subprocess
 import json
 from Bio import SeqIO, Phylo
 from packaging import version
+# from bohra.ReRunSnpDetection import ReRunSnpDetection
 # from bohra.bohra_logger import logger
 # from bohra.utils.write_report import Report
 
@@ -38,7 +39,6 @@ class RunSnpDetection(object):
         # add the handlers to the logger
         self.logger.addHandler(ch)
         self.logger.addHandler(fh)
-
         # get date and time
         self.now = datetime.datetime.today().strftime("%d_%m_%y_%H")
         self.day = datetime.datetime.today().strftime("%d_%m_%y")
@@ -49,6 +49,8 @@ class RunSnpDetection(object):
         self.pipeline = args.pipeline
         self.preview = True if self.pipeline == 'preview' else False
         self.logger.info(f"You are running bohra in {self.pipeline} mode.")
+        self.snippy_singularity = args.snippy_singularity
+        self.abritamr_singularity = args.abritamr_singularity
         # path to reference and mask
         if self.pipeline != 'a':
             self.ref = pathlib.Path(args.reference)
@@ -72,6 +74,8 @@ class RunSnpDetection(object):
         self.job_id = self._name_exists(args.job_id)
         self.logger.info(f"Job ID is set {self.job_id}")
         self.check_rerun()
+        self.keep = args.keep
+        self.gubbins = args.gubbins 
         # other variables
         # min aln 
         self.minaln = args.minaln
@@ -88,11 +92,12 @@ class RunSnpDetection(object):
         self.user = getpass.getuser()
         
         self.gubbins = False
-        
+        self.use_singularity = args.use_singularity
         self.mdu = args.mdu
         if isinstance(args.prefillpath, str):
             self.prefillpath = args.prefillpath
         elif self.mdu:
+            self.use_singularity = True
             self.prefillpath = f"{pathlib.Path('/', 'home', 'seq', 'MDU', 'QC')}/"
         else:
             self.prefillpath = ''
@@ -106,8 +111,6 @@ class RunSnpDetection(object):
         self.assembler = args.assembler
         self.snippy_version = ''
         self.assembler_dict = {'shovill': 'shovill', 'skesa':'skesa','spades':'spades.py'}
-        self.use_singularity = args.use_singularity
-        self.singularity_path = args.singularity_path
         self.set_snakemake_jobs()
 
     def check_queue(self, queue):
@@ -182,11 +185,12 @@ class RunSnpDetection(object):
         self.logger.info(f"Checking that snippy is installed and recording version.")
         version_pat = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
         try:
-            snippy = subprocess.run(['snippy', '--version'], stderr=subprocess.PIPE)
-            snippy = snippy.stderr.decode().strip()
-            self.snippy_version = version_pat.search(snippy)
-            self.logger.info(f"Snippy {snippy} found. Good job!")
-            return(version_pat.search(snippy))
+            snippy = subprocess.run(['snippy --version 2>&1'], capture_output=True, encoding = "utf-8", shell = True)
+            snippy = snippy.stdout
+            # print(snippy.strip())
+            # self.snippy_version = version_pat.search(snippy.strip())
+            # self.logger.info(f"Snippy {self.snippy_version} found. Good job!")
+            return(version_pat.search(snippy.strip()))
         except FileNotFoundError:
             self.logger.info(f"snippy is not installed.")
             raise SystemExit
@@ -293,7 +297,55 @@ class RunSnpDetection(object):
         else:
             self.logger.warning(f"Your kraken DB is not installed in the expected path. Please re-read bohra installation instructions.")
             raise SystemExit
-            
+
+        
+    def run_with_gubbins(self):
+        '''
+        rename core and distance files
+        '''
+        if self.gubbins:
+            self.logger.info(f"You have chosen to run gubbins. Existing core files will be archived and not removed.")
+            corefiles = sorted(pathlib.Path(self.workdir, self.job_id).glob('core*'))
+            if corefiles:
+                for core in corefiles:
+                    new = f"{core}".replace('core', 'core_uncorrected')
+                    cmd = f"mv {core} {new}"
+                    subprocess.run(cmd,shell = True)
+            dists = pathlib.Path(self.workdir,self.job_id, 'distances.tab')
+            new_dists = f"{dists}".replace('distances', 'distances_uncorrected')
+            if dists.exists():
+                cmd = f"mv {dists} {new_dists}"
+                subprocess.run(cmd,shell = True)
+            self.keep = True
+    
+    def rerun_report(self):
+        '''
+        Remove report directory from previous run 
+        '''
+        # os.chdir(self.workdir)
+        
+        p1 = pathlib.Path(self.workdir, self.job_id, 'report')
+        p2 = pathlib.Path(self.workdir, self.job_id, f"report_{self.orignal_date}")
+        if self.keep:
+            self.logger.info(f"Archiving previous report files")
+            cmd = f"mv {p1} {p2}"
+            self.remove_core()
+        else:
+            self.logger.info("Removing previous report files.")
+            cmd = f"if [ -d {p1} ];then rm -r {p1}; fi"
+        subprocess.run(cmd, shell = True)
+    
+    def remove_core(self):
+        '''
+        Need to remove core_isolates.txt to get snakemake to redo snippy core step
+        '''
+        self.logger.info(f"Removing previous snippy-core output.")
+        corefiles = sorted(pathlib.Path(self.workdir, self.job_id).glob('core*'))
+        if corefiles:
+            for core in corefiles:
+                core.unlink()
+                
+
 
     def check_deps(self):
         '''
@@ -320,7 +372,7 @@ class RunSnpDetection(object):
         '''
         self.check_setup_files()
         
-        self.check_deps()
+        self.snippy_version = self.check_deps()
         # check reference
         if self.pipeline != 'a':
             if self.ref == '':
@@ -352,9 +404,11 @@ class RunSnpDetection(object):
         
             
         '''   
+        
         # TODO add in options for using singularity containers
         # path if using containers.
         snippy_v = f'singularity_{self.day}' if self.use_singularity else self.snippy_version
+        self.logger.info(f"Snippy : {snippy_v.group()} has been added to the job log file.")
         kraken = self.kraken_db if self.run_kraken else ''
         s = True if self.use_singularity else False
         self.logger.info(f"Recording your settings for job: {self.job_id}")
@@ -363,12 +417,13 @@ class RunSnpDetection(object):
                                     'Date':self.day, 'User':self.user, 'snippy_version':snippy_v, 'input_file':f"{self.input_file}",'prefillpath': self.prefillpath, 'cluster': self.cluster,'singularity': s, 'kraken_db':kraken, 'Gubbins': self.gubbins}, 
                                     index=[0], )
         
-        source_path = self.workdir / 'source.log'
+        source_path = self.workdir / 'job.log'
         if source_path.exists():
             source_df = pandas.read_csv(source_path, '\t')
             source_df = source_df.append(new_df, sort = True)
         else:
             source_df = new_df
+
         
         source_df.to_csv(source_path , index=False, sep = '\t')
     
@@ -391,10 +446,10 @@ class RunSnpDetection(object):
         if isinstance(report_path, str):
             report_path = pathlib.Path(report_path)
         if report_path.exists() and not preview_path.exists():
-            self.logger.warning(f"This may be a re-run of an existing job. Please try again using rerun instead of run OR use -f to force an overwrite of the existing job.")
-            self.logger.warning(f"Exiting....")
-            
-            raise SystemExit()
+            self.logger.info(f"This appears to be a rerun of an existing job. Previous result will be removed unless you use --keep.")  
+            self.rerun_report()
+            self.remove_core()        
+            return True
         elif preview_path.exists():
             self.setup_for_rerun()
             return False
@@ -679,12 +734,11 @@ class RunSnpDetection(object):
         #     'all': 'Snakefile_all'
         # }
         vars_for_file = {
-            'workdir': f"{wd}",
-            'singularity_dir' : self.singularity_path, 
+            'workdir': f"{wd}"
         }
         
         self.logger.info(f"Writing Snakefile for job : {self.job_id}")
-        snk_template = jinja2.Template(pathlib.Path(self.resources, "bohra_v2.smk").read_text())
+        snk_template = jinja2.Template(pathlib.Path(self.resources, "bohra.smk").read_text())
         snk = self.workdir / self.job_id/ 'Snakefile'
 
         snk.write_text(snk_template.render(vars_for_file)) 
@@ -751,7 +805,6 @@ class RunSnpDetection(object):
 
         self.logger.info(f"Setting up {self.job_id} specific workflow")
         
-        gubbins_string = ""
         # make a masking string
         wd = self.workdir / self.job_id
         if self.mask != '':
@@ -779,7 +832,9 @@ class RunSnpDetection(object):
             'min_cov': self.mincov,
             'kraken_db': f"{self.kraken_db}",
             'preview': self.preview, 
-            'prefill_path': self.prefillpath if self.prefillpath != '' else 'nopath'
+            'prefill_path': self.prefillpath if self.prefillpath != '' else 'nopath',
+            'snippy_singularity': self.snippy_singularity,
+            'abritamr_singularity': self.abritamr_singularity
         }
 
         # read the config file which is written with jinja2 placeholders (like django template language)
@@ -819,15 +874,19 @@ class RunSnpDetection(object):
         if self.cluster:
             cmd = f"{self.cluster_cmd()} -s {snake_name} {force} {singularity_string} --latency-wait 1200"
         else:
-            cmd = f"cd {self.job_id} && snakemake {dry} -s {snake_name} -j {self.cpus} {force} {singularity_string}"
+            cmd = f"cd {self.job_id} && snakemake {dry} -s {snake_name} -j {self.cpus} {force} {singularity_string} 2>&1"
             # cmd = f"snakemake -s {snake_name} --cores {self.cpus} {force} "
         self.logger.info(f"Running job : {self.job_id} with {cmd} this may take some time. We appreciate your patience.")
         wkf = subprocess.run(cmd, shell = True)
-        # while True:
-        #     line = wkf.stdout.readline().strip()
-        #     if not line:
-        #         break
-        #     self.self.logger.info(f"{line}")
+        
+        while True:
+            if wkf.stdout != None:
+                line = wkf.stdout.readline().strip()
+                if not line:
+                    break
+            line = ''
+            break
+            self.self.logger.info(f"{line}")
         if wkf.returncode == 0:
             return True
         else:

@@ -51,12 +51,6 @@ def get_report_tomls(pipeline):
 			output.append(x)
 		for y in a:
 			output.append(y)
-	elif pipeline == 'a':
-		for y in a:
-			output.append(y)
-	elif pipeline == 's':
-		for x in s:
-			output.append(x)
 	elif pipeline == 'all':
 		for x in s:
 			output.append(x)
@@ -79,6 +73,9 @@ def final_output(tomls):
 
 PREFILLPATH = config['prefill_path']
 SAMPLE = config['isolates'].split()
+SNIPPY_SINGULARITY = config['snippy_singularity']
+# ASSEMBLER_SINGULARITY = config['assembler_singularity']
+ABRITAMR_SINGULARITY = config['abritamr_singularity']
 print(SAMPLE)
 MIN_ALN = int(config['min_perc'])
 REFERENCE = config['reference']
@@ -210,227 +207,225 @@ else:
 			python3 {params.script_path}/combine_kraken.py {input}
 			"""
 	
-	if PIPELINE != 'a': 
-		rule snippy:
-			input:
-				'{sample}/seqdata.toml'
-				
-			output:
-				'{sample}/snippy.toml',
-			threads:
-				8
+	rule snippy:
+		input:
+			'{sample}/seqdata.toml'
 			
-			params:
-				script_path=SCRIPT_PATH,
-				reference = REFERENCE
-			shell:
-				"""
-				python3 {params.script_path}/snippy.py {input} {wildcards.sample} {output} {params.reference} {threads}
-				"""
-			
-
-		rule qc_snippy: 
-			input:
-				'{sample}/snippy.toml'
-				
-			output:
-				'{sample}/snippy_qc.toml'
-			params:
-				script_path = SCRIPT_PATH,
-				minaln = MIN_ALN
-			shell:
-				"""
-				python3 {params.script_path}/snippy_qc.py {input} {wildcards.sample} {output} {params.minaln}
-				"""
-
-		rule run_snippy_core:
-			input:
-				expand("{sample}/snippy_qc.toml", sample = SAMPLE)
-			output:
-				'snippy_core.toml'
-			
-			params:
-				mask_string = MASK_STRING,
-				script_path = SCRIPT_PATH,
-				reference = REFERENCE,
-				
-			shell:
-				"""
-				python3 {params.script_path}/snippy_core.py {params.mask_string} {params.reference} {input}
-				"""
-
-		rule run_gubbins:
-			input:
-				'snippy_core.toml'
-			output:
-				'gubbins.toml'
-			params:
-				script_path = SCRIPT_PATH,	
-				gubbins = GUBBINS
-			shell:
-				"""
-				python3 {params.script_path}/gubbins.py {input} {params.gubbins}
-				"""
-
-		rule run_snpdists:
-			input:
-				'gubbins.toml'
-			output:
-				'distances.toml' 
-			params:
-				script_path = SCRIPT_PATH
-			shell:
-				"""
-				python3 {params.script_path}/snp_dists.py {input}
-				"""
-			
-
-		rule index_reference:
-			input:
-				REFERENCE
-			output:
-				"ref.fa",
-				"ref.fa.fai"
-			run:
-				from Bio import SeqIO
-				import pathlib, subprocess
-				ref = f"{output[0]}"
-				idx = f"{output[1]}"
-				print(type(ref))
-				print(type(idx))
-				if '.fa' not in REFERENCE:
-					print(f"converting {REFERENCE}")
-					SeqIO.convert(f"{input[0]}", 'genbank', ref	, 'fasta')
-					print(f"converted {REFERENCE}")
-				else:
-					subprocess.run(f"ln -sf {REFERENCE} {ref}", shell = True)
-				subprocess.run(f"samtools faidx {ref}", shell =True)
-
-		rule run_iqtree_core:
-			input:
-				gubbins = 'gubbins.toml', 
-				ref = 'ref.fa', 
-				idx = 'ref.fa.fai'
-			
-			output:
-				'iqtree.toml',
-			params:
-				script_path = SCRIPT_PATH	
-			shell:
-				"""	
-				python3 {params.script_path}/run_iqtree.py {input.gubbins} {input.ref} {input.idx} {params.script_path}
-				"""
-				
-		
-	if PIPELINE != 's':
-		rule assemble:
-			input:
-				'{sample}/seqdata.toml'
-			output:
-				'{sample}/assembly.toml'
-			threads:
-				16
-			params:
-				prefill_path = PREFILLPATH,
-				assembler = ASSEMBLER, 
-				script_path = SCRIPT_PATH
-			shell:
-				"""
-				python3 {params.script_path}/assemble.py {input} {wildcards.sample}  {params.assembler} {params.prefill_path}
-				"""
-
-		rule assembly_statistics:
-			input:
-				"{sample}/assembly.toml"
-			output:
-				"{sample}/assembly_stats.toml"
-			params:
-				script_path = SCRIPT_PATH,
-				minsize = 500,
-				prefill_path = PREFILLPATH
-			shell:
-				"""
-				python3 {params.script_path}/assembly_stat.py {input} {wildcards.sample} 
-				"""
-			
-		rule run_prokka:
-			input:
-				assembly = "{sample}/assembly_stats.toml",
-				seqdata = "{sample}/seqdata.toml"
-			output:
-				"{sample}/prokka.toml"
-			params:
-				script_path = SCRIPT_PATH
-			shell:
-				"""
-				python3 {params.script_path}/prokka.py {input.assembly} {wildcards.sample} {input.seqdata}
-				"""
+		output:
+			'{sample}/snippy.toml'
+		threads:
+			8
+		singularity: SNIPPY_SINGULARITY
+		params:
+			script_path=SCRIPT_PATH,
+			reference = REFERENCE
+		shell:
+			"""
+			python3 {params.script_path}/snippy.py {input} {wildcards.sample} {output} {params.reference} {threads}
+			"""
 		
 
-		rule combine_assembly_metrics:
-			input:
-				prokka = expand("{sample}/prokka.toml",sample = SAMPLE), 
-				# assembly = expand("{sample}/assembly_stats.toml",sample = SAMPLE)
-			output:
-				"assembly.toml"
-			params:
-				script_path= SCRIPT_PATH
-			shell:
-				"""
-				python3 {params.script_path}/assembly_combine.py {input.prokka}
-				"""
-
-
-		rule resistome:
-			input:
-				assembly = "{sample}/assembly.toml",
-				seqdata = '{sample}/seqdata.toml'
-			output:
-				'{sample}/resistome.toml'
-			params:
-				script_path= SCRIPT_PATH,
-				work_dir = WORKDIR
-			shell:
-				"""
-				python3 {params.script_path}/resistome.py {input.assembly} {wildcards.sample} {input.seqdata} {wildcards.sample}
-				"""
-		rule combine_resistome:
-			input:
-				expand("{sample}/resistome.toml", sample = SAMPLE)
-			output:
-				'resistome.toml'
-			params:
-				script_path=SCRIPT_PATH
-			shell:
-				"""
-				python3 {params.script_path}/combine_resistome.py {input}
-				"""
-
-		rule mlst:
-			input:
-				assembly = "{sample}/assembly.toml",
-				seqdata = "{sample}/seqdata.toml"
-			output:
-				'{sample}/mlst.toml'
-			params:
-				script_path=SCRIPT_PATH
-			shell:
-				"""
-				python3 {params.script_path}/mlst.py {input.assembly} {wildcards.sample} {input.seqdata}
-				"""		
-		rule combine_mlst:
-			input:
-				expand('{sample}/mlst.toml', sample = SAMPLE)
-			output:
-				"mlst.toml"
-			params:
-				script_path = SCRIPT_PATH
-			shell:
-				"""
-				python3 {params.script_path}/combine_mlst.py {input}
-				"""
+	rule qc_snippy: 
+		input:
+			'{sample}/snippy.toml'
 			
+		output:
+			'{sample}/snippy_qc.toml'
+		params:
+			script_path = SCRIPT_PATH,
+			minaln = MIN_ALN
+		shell:
+			"""
+			python3 {params.script_path}/snippy_qc.py {input} {wildcards.sample} {output} {params.minaln}
+			"""
+
+	rule run_snippy_core:
+		input:
+			expand("{sample}/snippy_qc.toml", sample = SAMPLE)
+		output:
+			'snippy_core.toml'
+		singularity: SNIPPY_SINGULARITY
+		params:
+			mask_string = MASK_STRING,
+			script_path = SCRIPT_PATH,
+			reference = REFERENCE,
+			
+		shell:
+			"""
+			python3 {params.script_path}/snippy_core.py {params.mask_string} {params.reference} {input}
+			"""
+
+	rule run_gubbins:
+		input:
+			'snippy_core.toml'
+		output:
+			'gubbins.toml'
+		params:
+			script_path = SCRIPT_PATH,	
+			gubbins = GUBBINS
+		shell:
+			"""
+			python3 {params.script_path}/gubbins.py {input} {params.gubbins}
+			"""
+
+	rule run_snpdists:
+		input:
+			'gubbins.toml'
+		output:
+			'distances.toml' 
+		params:
+			script_path = SCRIPT_PATH
+		shell:
+			"""
+			python3 {params.script_path}/snp_dists.py {input}
+			"""
 		
+
+	rule index_reference:
+		input:
+			REFERENCE
+		output:
+			"ref.fa",
+			"ref.fa.fai"
+		run:
+			from Bio import SeqIO
+			import pathlib, subprocess
+			ref = f"{output[0]}"
+			idx = f"{output[1]}"
+			print(type(ref))
+			print(type(idx))
+			if '.fa' not in REFERENCE:
+				print(f"converting {REFERENCE}")
+				SeqIO.convert(f"{input[0]}", 'genbank', ref	, 'fasta')
+				print(f"converted {REFERENCE}")
+			else:
+				subprocess.run(f"ln -sf {REFERENCE} {ref}", shell = True)
+			subprocess.run(f"samtools faidx {ref}", shell =True)
+
+	rule run_iqtree_core:
+		input:
+			gubbins = 'gubbins.toml', 
+			ref = 'ref.fa', 
+			idx = 'ref.fa.fai'
+		
+		output:
+			'iqtree.toml',
+		params:
+			script_path = SCRIPT_PATH	
+		shell:
+			"""	
+			python3 {params.script_path}/run_iqtree.py {input.gubbins} {input.ref} {input.idx} {params.script_path}
+			"""
+	
+	rule assemble:
+		input:
+			'{sample}/seqdata.toml'
+		output:
+			'{sample}/assembly.toml'
+		threads:
+			16
+		params:
+			prefill_path = PREFILLPATH,
+			assembler = ASSEMBLER, 
+			script_path = SCRIPT_PATH
+		shell:
+			"""
+			python3 {params.script_path}/assemble.py {input} {wildcards.sample}  {params.assembler} {params.prefill_path}
+			"""
+
+	rule assembly_statistics:
+		input:
+			"{sample}/assembly.toml"
+		output:
+			"{sample}/assembly_stats.toml"
+		params:
+			script_path = SCRIPT_PATH,
+			minsize = 500,
+			prefill_path = PREFILLPATH
+		shell:
+			"""
+			python3 {params.script_path}/assembly_stat.py {input} {wildcards.sample} 
+			"""
+		
+	rule run_prokka:
+		input:
+			assembly = "{sample}/assembly_stats.toml",
+			seqdata = "{sample}/seqdata.toml"
+		output:
+			"{sample}/prokka.toml"
+		params:
+			script_path = SCRIPT_PATH
+		shell:
+			"""
+			python3 {params.script_path}/prokka.py {input.assembly} {wildcards.sample} {input.seqdata}
+			"""
+	
+
+	rule combine_assembly_metrics:
+		input:
+			prokka = expand("{sample}/prokka.toml",sample = SAMPLE), 
+			# assembly = expand("{sample}/assembly_stats.toml",sample = SAMPLE)
+		output:
+			"assembly.toml"
+		params:
+			script_path= SCRIPT_PATH
+		shell:
+			"""
+			python3 {params.script_path}/assembly_combine.py {input.prokka}
+			"""
+
+
+	rule resistome:
+		input:
+			assembly = "{sample}/assembly.toml",
+			seqdata = '{sample}/seqdata.toml'
+		output:
+			'{sample}/resistome.toml'
+		params:
+			script_path= SCRIPT_PATH,
+			work_dir = WORKDIR
+		singularity:ABRITAMR_SINGULARITY
+		shell:
+			"""
+			python3 {params.script_path}/resistome.py {input.assembly} {wildcards.sample} {input.seqdata} {wildcards.sample}
+			"""
+	rule combine_resistome:
+		input:
+			expand("{sample}/resistome.toml", sample = SAMPLE)
+		output:
+			'resistome.toml'
+		params:
+			script_path=SCRIPT_PATH
+		shell:
+			"""
+			python3 {params.script_path}/combine_resistome.py {input}
+			"""
+
+	rule mlst:
+		input:
+			assembly = "{sample}/assembly.toml",
+			seqdata = "{sample}/seqdata.toml"
+		output:
+			'{sample}/mlst.toml'
+		params:
+			script_path=SCRIPT_PATH
+		shell:
+			"""
+			python3 {params.script_path}/mlst.py {input.assembly} {wildcards.sample} {input.seqdata}
+			"""		
+	rule combine_mlst:
+		input:
+			expand('{sample}/mlst.toml', sample = SAMPLE)
+		output:
+			"mlst.toml"
+		params:
+			script_path = SCRIPT_PATH
+		shell:
+			"""
+			python3 {params.script_path}/combine_mlst.py {input}
+			"""
+		
+	
 
 	if PIPELINE == 'all':
 	

@@ -3,7 +3,7 @@ import sys, pathlib, pandas, pytest, numpy,logging
 from unittest.mock import patch
 
 from bohra.SnpDetection import RunSnpDetection
-from bohra.ReRunSnpDetection import ReRunSnpDetection
+# from bohra.bohra.ReRunSnpDetection import ReRunSnpDetection
 
 
 

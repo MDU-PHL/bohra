@@ -18,7 +18,7 @@ import pathlib
 import sys
 import os
 from bohra.SnpDetection import RunSnpDetection
-from bohra.ReRunSnpDetection import ReRunSnpDetection
+# from bohra.ReRunSnpDetection import ReRunSnpDetection
 from bohra.Utils import Nulla2bohra, UpdateBohra
 from bohra.version import version
 
@@ -62,12 +62,13 @@ def main():
     # options for running
     parser_sub_run.add_argument('--input_file','-i',help='Input file = tab-delimited with 3 columns <isolatename>  <path_to_read1> <path_to_read2>', default='')
     parser_sub_run.add_argument('-S', '--use_singularity', action='store_true', help = 'Set if you would like to use singularity containers to run bohra.')
-    parser_sub_run.add_argument('--singularity_path', default='shub://phgenomics-singularity', help='The path to singularity containers. If you want to use locally stored contianers please pull from shub://phgenomics-singularity (snippy.simg, prokka.simg, seqtk.simg, mash_kmc.simg, assemblers.simg, roary.simg). IMPORTANT bohra is designed to run with these containers... if you wish to use custom containers please contact developer or proceed at your own risk.')
+    parser_sub_run.add_argument('--snippy_singularity', default='docker://mduphl/snippy:v4.5.1', help='The path to containers. If you want to use locally stored contianers please pull from dockerhub://mduphl/<toolname>.')
+    parser_sub_run.add_argument('--abritamr_singularity', default='docker://mduphl/abritamr:v0.2.2', help='The path to containers. If you want to use locally stored contianers please pull from dockerhub://mduphl/<toolname>.')
     parser_sub_run.add_argument('--job_id','-j',help='Job ID, will be the name of the output directory', default='')
     parser_sub_run.add_argument('--reference','-r',help='Path to reference (.gbk or .fa)', default = '')
     parser_sub_run.add_argument('--mask','-m',default = False, help='Path to mask file if used (.bed)')
     parser_sub_run.add_argument('--kraken_db', '-k', env_var="KRAKEN2_DEFAULT_DB", help="Path to DB for use with kraken2, if no DB present speciation will not be performed.")
-    parser_sub_run.add_argument('--pipeline','-p', default = 'preview', choices=['preview', 'sa','s','a', 'all'], help=f"The pipeline to run. SNPS ('s') will call SNPs and generate phylogeny, ASSEMBLIES ('a') will generate assemblies and perform mlst and species identification using kraken2, SNPs and ASSEMBLIES ('sa' - default) will perform SNPs and ASSEMBLIES. ALL ('all') will perform SNPS, ASSEMBLIES and ROARY for pan-genome analysis")
+    parser_sub_run.add_argument('--pipeline','-p', default = 'preview', choices=['preview', 'sa','all'], help=f"The pipeline to run. Preview (--preview - default) will calculate mash-distances and a mash-tree for quick inspection of your dataset. SNPs and ASSEMBLIES ('sa') will perform SNPs and ASSEMBLIES. ALL ('all') will perform SNPS, ASSEMBLIES and ROARY for pan-genome analysis")
     parser_sub_run.add_argument('--assembler','-a', default = 'shovill', choices=['shovill','skesa','spades'], help=f"Assembler to use.")
     parser_sub_run.add_argument('--cpus','-c',help='Number of CPU cores to run, will define how many rules are run at a time', default=16)
     parser_sub_run.add_argument('--minaln','-ma',help='Minimum percent alignment. Isolates which do not align to reference at this threshold will not be included in core phylogeny.', default=80)
@@ -81,25 +82,8 @@ def main():
     parser_sub_run.add_argument('--cluster', action="store_true", help = "If you are running Bohra on a cluster.")
     parser_sub_run.add_argument('--json',help='Path to cluster.json - required if --cluster is set', default='')
     parser_sub_run.add_argument('--queue',help='Type of queue (sbatch or qsub currently supported) - required if --cluster is set.', default='')
-    
-    # parser for rerun
-    
-    parser_sub_rerun = subparsers.add_parser('rerun', help='Rerun of Bohra. Add or remove isolates from isolate list, change mask or reference.', formatter_class=configargparse.ArgumentDefaultsHelpFormatter,default_config_files=[f"{pathlib.Path.cwd().absolute() / 'bohra.conf'}"])
-    # options for rerun
-    parser_sub_rerun.add_argument('-S', '--use_singularity', action='store_true', help = 'Set if you would like to use singularity containers to run bohra.')
-    parser_sub_rerun.add_argument('--singularity_path', default='shub://phgenomics-singularity', help='The path to singularity containers. If you want to use locally stored contianers please pull from shub://phgenomics-singularity (snippy.simg, prokka.simg, seqtk.simg, mash_kmc.simg, assemblers.simg, roary.simg). IMPORTANT bohra is designed to run with these containers... if you wish to use custom containers please contact developer or proceed at your own risk.')
-    parser_sub_rerun.add_argument('--reference','-r',help='Path to reference (.gbk or .fa)', default = '')
-    parser_sub_rerun.add_argument('--mask','-m',default = '', help='Path to mask file if used (.bed)')
-    parser_sub_rerun.add_argument('--cpus','-c',help='Number of CPU cores to run, will define how many rules are run at a time', default=16)
-    parser_sub_rerun.add_argument('-workdir','-w', default = f"{pathlib.Path.cwd().absolute()}", help='Working directory, default is current directory')
-    parser_sub_rerun.add_argument('--kraken_db', '-k', env_var="KRAKEN2_DEFAULT_DB", help="Path to DB for use with kraken2, if no DB present speciation will not be performed.")
-    parser_sub_rerun.add_argument('-resources','-s', default = f"{pathlib.Path(__file__).parent / 'templates'}", help='Directory where templates are stored')
-    parser_sub_rerun.add_argument('-dry-run','-n', action="store_true", help = "If you would like to see a dry run of commands to be executed.")
-    parser_sub_rerun.add_argument('--gubbins','-g', action="store_true", help = "If you would like to run gubbins.")
-    parser_sub_rerun.add_argument('-keep', action= 'store_true', help="Keep report from previous run")
-    parser_sub_rerun.add_argument('-cluster', action="store_true", help = "If you are running Bohra on a cluster. Note if set you will need to provide a cluster.json file and a run_snakemake.sh, you can see examples on the documentation page.")
-    parser_sub_rerun.add_argument('--json',help='Path to cluster.json - if not included will default to version provided in previous run', default='')
-    parser_sub_rerun.add_argument('--queue',help='Type of queue (sbatch or qsub currently supported) - if not included will default to previous run', default='')
+    parser_sub_run.add_argument('--gubbins', '-g', action = 'store_true', help = 'Set to use gubbins for recombination correction.')
+    parser_sub_run.add_argument('--keep', action = 'store_true', help = 'If you are rerunning bohra over an exisiting directory set this to archive report files.')
     
     # parser for update
     parser_sub_nulla2bohra = subparsers.add_parser('nulla2bohra', help='Ensure that bohra can be rerun over an existing nullarbor folder. Can also be used to update older bohra directories. Must supply name of nullarbor directory, and your isolates.tab file', formatter_class=configargparse.ArgumentDefaultsHelpFormatter,default_config_files=[f"{pathlib.Path.cwd().absolute() / 'bohra.conf'}"])
@@ -109,12 +93,11 @@ def main():
     parser_sub_nulla2bohra.add_argument('--input_file','-i',help='Input file = tab-delimited with 3 columns <isolatename>  <path_to_read1> <path_to_read2>', default='')
     parser_sub_nulla2bohra.add_argument('--reference', '-r', help = 'The reference that was used in the previous run/ nullarbor job', default = '')
     parser_sub_run.set_defaults(func=run_pipeline)
-    parser_sub_rerun.set_defaults(func = rerun_pipeline)
     parser_sub_nulla2bohra.set_defaults(func=nulla2bohra)
         
     args = parser.parse_args()
     
-    if len(sys.argv) == 2:
+    if len(sys.argv) == 2 and sys.argv[1] in ['run', 'nulla2bohra']:
         parser.print_help(sys.stderr)
     else:
         logger = logging.getLogger(__name__)
