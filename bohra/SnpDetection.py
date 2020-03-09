@@ -870,11 +870,11 @@ class RunSnpDetection(object):
             dry = '-np'
         else:
             dry = ''
-
+        wd = self.workdir / self.job_id
         if self.cluster:
             cmd = f"{self.cluster_cmd()} -s {snake_name} {force} {singularity_string} --latency-wait 1200"
         else:
-            cmd = f"cd {self.job_id} && snakemake {dry} -s {snake_name} -j {self.cpus} {force} {singularity_string} 2>&1"
+            cmd = f"snakemake {dry} -s {snake_name} -j {self.cpus} -d {force} {singularity_string} 2>&1"
             # cmd = f"snakemake -s {snake_name} --cores {self.cpus} {force} "
         self.logger.info(f"Running job : {self.job_id} with {cmd} this may take some time. We appreciate your patience.")
         wkf = subprocess.run(cmd, shell = True)
