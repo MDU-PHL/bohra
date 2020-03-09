@@ -140,9 +140,9 @@ rule combine_seqdata:
 		"seqdata.toml"
 	params:
 		script_path=SCRIPT_PATH
-	shell:
+	script:
 		"""
-		python3 {params.script_path}/combine_seqdata.py {input} 
+		combine_seqdata.py
 		"""
 
 if PREVIEW:
@@ -154,9 +154,9 @@ if PREVIEW:
 		params:
 			reference = REFERENCE,
 			script_path = SCRIPT_PATH
-		shell:
+		script:
 			"""
-			python3 {params.script_path}/preview.py {input} 
+			preview.py
 			"""
 	rule combine_preview_tomls:
 		input:
@@ -177,7 +177,7 @@ if PREVIEW:
 			script_path = SCRIPT_PATH,
 			job_id = JOB_ID,
 			assembler = ASSEMBLER
-		shell:
+		script:
 			"""
 			python3 {params.script_path}/compile.py {params.pipeline} {params.job_id} {params.assembler} {input}
 			"""

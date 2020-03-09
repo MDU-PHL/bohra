@@ -501,14 +501,12 @@ def main(inputs, pipeline,job_id, assembler = ''):
     # print(data)
     write_toml(data = data, output = 'report.toml')    
 
+pipeline = snakemake.params.pipeline
+job_id = snakemake.params.job_id
+assembler = snakemake.params.assembler
+inputs = snakemake.input
 
-if __name__ == '__main__':
-    
-    main(inputs = sys.argv[4:], pipeline = f"{sys.argv[1]}", job_id = f"{sys.argv[2]}",assembler = f"{sys.argv[3]}")
-    
-
-
-
+main(pipeline = pipeline, inputs = inputs, job_id= job_id, assembler= assembler)
 # mash triangle -C *.msh
 
 # mash sketch -m 5 -s 10000 -r -o 2019-12803-6/sketch -I 2019-12803-6 -C 2019-12803-6/R1.fq.gz 2019-12803-6/R1.fq.gz

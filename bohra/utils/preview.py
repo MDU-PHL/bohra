@@ -1,4 +1,4 @@
-import toml, pathlib, subprocess, sys, pandas
+import toml, pathlib, subprocess, sys, pandas, snakemake
 
 
 def generate_triangle_cmd():
@@ -61,11 +61,13 @@ def main(inputs):
             write_toml(data = data, output = 'preview.toml')
     
     
+inputs = snakemake.inputs
 
+main(inputs = inputs)
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     
-    main(inputs = sys.argv[1:])
+#     main(inputs = sys.argv[1:])
     
 
 
