@@ -1,4 +1,4 @@
-import toml, pathlib, subprocess, sys, pandas, json
+import toml, pathlib, subprocess, sys, pandas, json, snakemake
 
 def generate_mlst_cmd(assembly, isolate):
 
@@ -66,9 +66,11 @@ def main(inputs, isolate, seqdata):
     write_toml(data = data, output= f'{isolate}/mlst.toml')
 
 
+# {input.assembly} {wildcards.sample} {input.seqdata}
+inputs =snakemake.input.assembly
+isolate = snakemake.wildcards.sample
+seqdata = snakemake.input.seqdata
 
-if __name__ == '__main__':
-    
-    main(inputs = f"{sys.argv[1]}", isolate = f"{sys.argv[2]}", seqdata = f"{sys.argv[3]}")
+main(inputs = inputs, isolate = isolate, seqdata = seqdata)
     
 

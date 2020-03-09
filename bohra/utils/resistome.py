@@ -1,4 +1,4 @@
-import toml, pathlib, subprocess, sys, pandas
+import toml, pathlib, subprocess, sys, pandas, snakemake
 
 def generate_abritamr_cmd(input_file, isolate, wd):
     
@@ -58,6 +58,13 @@ def main(inputs, isolate, seqdata, wd):
 
 if __name__ == '__main__':
     
-    main(inputs = f"{sys.argv[1]}", isolate = f"{sys.argv[2]}", seqdata = f"{sys.argv[3]}", wd = f"{sys.argv[4]}")
+    
     
 
+# {input.assembly} {wildcards.sample} {input.seqdata} {wildcards.sample}
+inputs = snakemake.input.assembly
+isolate = snakemake.wildcards.sample
+seqdata = snakemake.input.seqdata
+wd = snakemake.params.work_dir
+
+main(inputs = inputs, isolate = isolate, seqdata = seqdata, wd = wd)

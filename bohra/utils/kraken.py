@@ -1,4 +1,4 @@
-import toml, pathlib, subprocess, sys, pandas
+import toml, pathlib, subprocess, sys, pandas, snakemake
 
 def get_top_3(isolate):
     
@@ -72,8 +72,15 @@ def main(r1, r2, isolate, kraken_db,prefill):
 
 
 
-if __name__ == '__main__':
+# if __name__ == '__main__':
     
-    main(r1 = f"{sys.argv[1]}", r2 = f"{sys.argv[2]}", isolate = f"{sys.argv[3]}", kraken_db = f"{sys.argv[4]}", prefill = f"{sys.argv[5]}")
+#     main(r1 = f"{sys.argv[1]}", r2 = f"{sys.argv[2]}", isolate = f"{sys.argv[3]}", kraken_db = f"{sys.argv[4]}", prefill = f"{sys.argv[5]}")
     
+# {input.r1} {input.r2} {wildcards.sample} {params.kraken_db} {params.prefill_path}
+r1 = snakemake.input.r1
+r2 = snakemake.input.r2
+isolate = snakemake.wildcards.sample
+kraken_db = snakemake.params.kraken_db
+prefill = snakemake.params.prefill_path
 
+main(r1 = r1, r2 = r2, isolate = isolate, kraken_db = kraken_db, prefill = prefill)

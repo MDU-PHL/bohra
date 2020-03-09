@@ -1,5 +1,5 @@
 from Bio import SeqIO
-import pathlib, toml, pandas, sys
+import pathlib, toml, pandas, sys, snakemake
 
 
 
@@ -73,11 +73,11 @@ def main(inputs,isolate):
     write_toml(data= data, output = f'{isolate}/assembly_stats.toml')
         # print(data)
         # print('\t'.join([f"{data[x]}" for x in colnames]))
-    
+ 
+inputs = snakemake.input
+isolate = snakemake.wildcards.sample
 
-
-if __name__ == '__main__':
-    main(inputs = f"{sys.argv[1]}", isolate = f"{sys.argv[2]}")
+main(inputs = inputs, isolate = isolate)
     
 
 

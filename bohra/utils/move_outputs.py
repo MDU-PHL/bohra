@@ -1,4 +1,4 @@
-import toml, pathlib, subprocess, sys
+import toml, pathlib, subprocess, sys, snakemake
 
 def generate_mv_cmd(iostring):
 
@@ -26,8 +26,7 @@ def main(inputs):
     
 
 
-if __name__ == '__main__':
-    
-    main(inputs = sys.argv[1:])
+inputs = snakemake.input    
+main(inputs = inputs)
     
 

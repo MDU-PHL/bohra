@@ -1,4 +1,4 @@
-import toml, pathlib, subprocess, sys, pandas
+import toml, pathlib, subprocess, sys, pandas, snakemake
 
 
 def combine_mlst(inputs):
@@ -61,10 +61,7 @@ def main(inputs):
     data['mlst'] = tab.to_dict(orient= 'records')
     write_toml(data = data, output= f'mlst.toml')
 
-
-
-if __name__ == '__main__':
-    
-    main(inputs = sys.argv[1:])
+inputs = snakemake.input
+main(inputs = inputs)
     
 

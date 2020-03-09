@@ -1,4 +1,4 @@
-import toml, pathlib, subprocess, sys, pandas, datetime
+import toml, pathlib, subprocess, sys, pandas, datetime, snakemake
 
 def get_isolate_list(inputs):
     
@@ -90,9 +90,13 @@ def main(inputs, mask, reference):
 
         write_toml(data = data, output = "snippy_core.toml")
 
-if __name__ == '__main__':
-    
-    main(inputs = sys.argv[3:], mask = f"{sys.argv[1]}", reference = f"{sys.argv[2]}")
+
+#  {params.mask_string} {params.reference} {input}
+mask_string = snakemake.params.mask_string
+reference = snakemake.params.reference
+inputs = snakemake.input
+
+main(inputs = inputs, mask = mask_string, reference =reference)
     
 
 

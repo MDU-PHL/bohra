@@ -1,8 +1,8 @@
-import toml, pathlib, subprocess, sys, pandas, datetime
+import toml, pathlib, subprocess, sys, pandas, datetime, snakemake
 
-def generate_iqtree_cmd(script_path, aln):
+def generate_iqtree_cmd(aln):
 
-    cmd = f"bash {script_path}/iqtree_generator.sh ref.fa {aln} core 20"								
+    cmd = f"bash iqtree_generator.sh ref.fa {aln} core 20"								
     return cmd
 
 def generate_delete_cmd():
@@ -26,7 +26,7 @@ def write_toml(data, output):
     with open(output, 'wt') as f:
         toml.dump(data, f)
     
-def main(inputs, ref, idx, script_path):
+def main(inputs, ref, idx):
     
     t = open_toml(inputs)
     print(t)
@@ -34,7 +34,7 @@ def main(inputs, ref, idx, script_path):
         aln = 'gubbins.aln'
     else:
         aln = 'core.aln'
-    cmd = generate_iqtree_cmd(aln = aln, script_path = script_path)
+    cmd = generate_iqtree_cmd(aln = aln)
     i = run_cmd(cmd)
     i = f"{i.strip()} -redo"
     print(i)
@@ -52,11 +52,12 @@ def main(inputs, ref, idx, script_path):
 
 if __name__ == '__main__':
     
-    main(inputs = f"{sys.argv[1]}", ref = f"{sys.argv[2]}", idx = f"{sys.argv[3]}",script_path = f"{sys.argv[4]}")
     
+    
+# {input.gubbins} {input.ref} {input.idx} {params.script_path}
+inputs = snakemake.input.gubbins
+ref = snakemake.input.ref
+idx = snakemake.input.idx
 
+main(inputs = inputs, ref = ref, idx = idx)
 
-
-# mash triangle -C *.msh
-
-# mash sketch -m 5 -s 10000 -r -o 2019-12803-6/sketch -I 2019-12803-6 -C 2019-12803-6/R1.fq.gz 2019-12803-6/R1.fq.gz

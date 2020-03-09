@@ -774,7 +774,7 @@ class RunSnpDetection(object):
             self.logger.warning(f'There is something wrong with your {self.json} file. Possible reasons for this error are incorrect use of single quotes. Check json format documentation and try again.')
 
 
-    def cluster_cmd(self):
+    def cluster_cmd(self, snake_name = f"{pathlib.Path(__file__).parent / 'utils'/ 'bohra.smk'}", wd = f"{self.workdir / self.job_id}"):
 
         queue_args = ""
         self.logger.info(f"Setting up cluster settings for {self.job_id} using {self.json}")
@@ -790,13 +790,11 @@ class RunSnpDetection(object):
     
         queue_string = self.json_setup(queue_args = queue_args)
 
-        return f"snakemake -j 999 --cluster-config {self.json} --cluster '{queue_cmd} {queue_string}'"
-
-        
-
+        return f"snakemake -s {snake_name} -d {wd} -j 999 --cluster-config {self.json} --cluster '{queue_cmd} {queue_string}'"
 
     
-    def setup_workflow(self, isolates, config_name = 'config.yaml', snake_name = 'Snakefile'):
+    
+    def setup_workflow(self, isolates, config_name = 'config.yaml'):
         '''
         generate job specific snakefile and config.yaml
         input:
@@ -849,12 +847,13 @@ class RunSnpDetection(object):
         
 
  
-    def run_workflow(self,snake_name = 'Snakefile'):
+    def run_workflow(self,snake_name = f"{pathlib.Path(__file__).parent / 'utils'/ 'bohra.smk'}"):
         '''
         run snp_detection
         set the current directory to working dir for correct running of pipeline
         if the pipeline works, return True else False
         '''
+        
         if self.use_singularity:
             singularity_string = f"--use-singularity --singularity-args '--bind /home'"
         else:
@@ -874,7 +873,7 @@ class RunSnpDetection(object):
         if self.cluster:
             cmd = f"{self.cluster_cmd()} -s {snake_name} {force} {singularity_string} --latency-wait 1200"
         else:
-            cmd = f"snakemake {dry} -s {snake_name} -j {self.cpus} -d {force} {singularity_string} 2>&1"
+            cmd = f"snakemake {dry} -s {snake_name} -j {self.cpus} -d {wd} {force} {singularity_string} 2>&1"
             # cmd = f"snakemake -s {snake_name} --cores {self.cpus} {force} "
         self.logger.info(f"Running job : {self.job_id} with {cmd} this may take some time. We appreciate your patience.")
         wkf = subprocess.run(cmd, shell = True)

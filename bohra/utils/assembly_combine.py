@@ -1,4 +1,4 @@
-import toml, pathlib, subprocess, sys, pandas, numpy
+import toml, pathlib, subprocess, sys, pandas, numpy, snakemakes
 
 
 import pandas, pathlib
@@ -85,9 +85,8 @@ def main(prokka):
     write_toml(data = data, output= f'assembly.toml')
 
 
+prokka = snakemake.input.prokka
 
-if __name__ == '__main__':
-    
-    main(prokka = sys.argv[1:])
+main(prokka = prokka)
     
 

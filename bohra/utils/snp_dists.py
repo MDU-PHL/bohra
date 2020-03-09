@@ -1,4 +1,4 @@
-import toml, pathlib, subprocess, sys, pandas, datetime
+import toml, pathlib, subprocess, sys, pandas, datetime, snakemake
 
 def generate_dists_cmd(aln):
     
@@ -41,13 +41,5 @@ def main(inputs):
         
         write_toml(data = data, output = "distances.toml")
 
-if __name__ == '__main__':
-    
-    main(inputs = f"{sys.argv[1]}")
-    
-
-
-
-# mash triangle -C *.msh
-
-# mash sketch -m 5 -s 10000 -r -o 2019-12803-6/sketch -I 2019-12803-6 -C 2019-12803-6/R1.fq.gz 2019-12803-6/R1.fq.gz
+inputs = snakemake.input
+main(inputs = inputs)

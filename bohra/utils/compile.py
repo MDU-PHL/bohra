@@ -1,4 +1,4 @@
-import toml, pathlib, subprocess, sys, datetime, pandas, re, numpy
+import toml, pathlib, subprocess, sys, datetime, pandas, re, numpy, snakemake
 
 
 def write_tables(table):
@@ -505,7 +505,7 @@ pipeline = snakemake.params.pipeline
 job_id = snakemake.params.job_id
 assembler = snakemake.params.assembler
 inputs = snakemake.input
-
+# {params.pipeline} {params.job_id} {params.assembler} {input}
 main(pipeline = pipeline, inputs = inputs, job_id= job_id, assembler= assembler)
 # mash triangle -C *.msh
 

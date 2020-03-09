@@ -1,4 +1,4 @@
-import toml, pathlib, subprocess, sys, pandas, json
+import toml, pathlib, subprocess, sys, pandas, json, snakemake
 
 
 def get_gffs(inputs):
@@ -63,10 +63,8 @@ def main(inputs):
     
     write_toml(data = data, output= f'roary.toml')
 
+inputs = snakemake.input.prokka
 
-
-if __name__ == '__main__':
-    
-    main(inputs = sys.argv[1:])
+main(inputs = inputs)
     
 

@@ -1,4 +1,4 @@
-import toml, pathlib, subprocess, sys
+import toml, pathlib, subprocess, sys, snakemake
 
 def generate_asm_cmd(assembler, r1, r2, isolate, threads = 4, memory = 8):
     
@@ -71,10 +71,9 @@ def main(seqdata, isolate, assembler, prefill):
 
     write_toml(data = data, output= f'{isolate}/assembly.toml')
 
+seqdata = snakemake.input
+isolate = snakemake.wildcards.sample
+assembler = snakemake.params.assembler
+prefill= snakemake.params.prefill_path
 
-
-if __name__ == '__main__':
-    
-    main(seqdata = f"{sys.argv[1]}", isolate = f"{sys.argv[2]}",  assembler = f"{sys.argv[3]}", prefill =  f"{sys.argv[4]}")
-    
-
+main(seqdata = seqdata, isolate = isolate,  assembler = assembler, prefill = prefill)

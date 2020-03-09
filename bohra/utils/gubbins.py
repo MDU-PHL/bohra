@@ -1,4 +1,4 @@
-import toml, pathlib, subprocess, sys, pandas, datetime
+import toml, pathlib, subprocess, sys, pandas, datetime, snakemake
 
 def generate_snippy_clean_cmd():
 
@@ -53,9 +53,12 @@ def main(inputs, gubbins):
 
 if __name__ == '__main__':
     
-    main(inputs = f"{sys.argv[1]}", gubbins = sys.argv[2])
     
+#    {input} {params.gubbins}
 
+inputs = snakemake.input
+gubbins = snakemake.params.gubbins
+main(inputs = inputs, gubbins = gubbins)
 
 
 # mash triangle -C *.msh

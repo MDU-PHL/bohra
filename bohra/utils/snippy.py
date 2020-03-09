@@ -1,4 +1,4 @@
-import toml, pathlib, subprocess, sys
+import toml, pathlib, subprocess, sys, snakemake
 
 
 def generate_snippy_cmd(r1, r2, isolate, reference, threads):
@@ -66,13 +66,15 @@ def main(inputs, isolate, output, reference, threads):
             data[isolate]['snippy']['cmd'] = cmd
     write_toml(data = data, output = f"{isolate}/snippy.toml") 
     
+ 
+#  {input} {wildcards.sample} {output} {params.reference} {threads}
+inputs = snakemake.input
+isolate = snakemake.wildcards.sample
+output = snakemake.output
+reference = snakemake.params.reference
+threads = snakemake.threads
 
-if __name__ == '__main__':
-    
-    main(inputs = f"{sys.argv[1]}", isolate = f"{sys.argv[2]}", output = f"{sys.argv[3]}",reference = f"{sys.argv[4]}", threads =f"{sys.argv[5]}" )
-    
-
-
+main(inputs = inputs, isolate = isolate, output = output,reference = reference, threads =threads)
 
 # mash triangle -C *.msh
 

@@ -1,5 +1,5 @@
 
-import re, sys, subprocess, toml
+import re, sys, subprocess, toml, snakemake
 import jinja2, pathlib, pandas, numpy, re
 from packaging import version
 import datetime
@@ -470,7 +470,10 @@ class Report:
     # TODO pass the value of the graphs as separate variable 
         return(True)
 
-if __name__ == '__main__':
-    report = Report()
-    
-    report.main(inputs = f"{sys.argv[1]}", resources=f"{sys.argv[3]}", workdir=f"{sys.argv[2]}")
+
+# {input} {params.work_dir} {params.template_path}
+inputs = snakemake.input
+resources = snakemake.params.template_path
+workdir = snakemake.params.work_dir
+report = Report()
+report.main(inputs = inputs, resources=resources, workdir=workdir)

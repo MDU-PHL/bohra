@@ -1,4 +1,4 @@
-import toml, pathlib, subprocess, sys, pandas
+import toml, pathlib, subprocess, sys, pandas, snakemake
 
 from Bio import SeqIO
                 
@@ -58,14 +58,10 @@ def main(inputs, isolate, output, minaln):
     write_toml(data = data, output = f"{isolate}/snippy_qc.toml") 
 
    
+# {input} {wildcards.sample} {output} {params.minaln}
+inputs = snakemake.input
+isolate = snakemake.wildcards.sample
+output = snakemake.output
+minaln=snakemake.params.minaln
 
-if __name__ == '__main__':
-    
-    main(inputs = f"{sys.argv[1]}", isolate = f"{sys.argv[2]}", output = f"{sys.argv[3]}",minaln = f"{sys.argv[4]}")
-    
-
-
-
-# mash triangle -C *.msh
-
-# mash sketch -m 5 -s 10000 -r -o 2019-12803-6/sketch -I 2019-12803-6 -C 2019-12803-6/R1.fq.gz 2019-12803-6/R1.fq.gz
+main(inputs = inputs, isolate = isolate, output = output, minaln = minaln)

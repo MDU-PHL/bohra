@@ -179,7 +179,7 @@ if PREVIEW:
 			assembler = ASSEMBLER
 		script:
 			"""
-			python3 {params.script_path}/compile.py {params.pipeline} {params.job_id} {params.assembler} {input}
+			compile.py
 			"""
 else:
 	rule run_kraken:
@@ -192,9 +192,9 @@ else:
 			prefill_path = PREFILLPATH,
 			kraken_db = KRAKEN_DB,
 			script_path = SCRIPT_PATH
-		shell:
+		script:
 			"""
-			python3 {params.script_path}/kraken.py {input.r1} {input.r2} {wildcards.sample} {params.kraken_db} {params.prefill_path}
+			kraken.py
 			"""
 	rule combine_kraken:
 		input:
@@ -203,9 +203,9 @@ else:
 			"kraken.toml"
 		params:
 			script_path = SCRIPT_PATH
-		shell:
+		script:
 			"""
-			python3 {params.script_path}/combine_kraken.py {input}
+			combine_kraken.py
 			"""
 	
 	rule snippy:
@@ -220,9 +220,9 @@ else:
 		params:
 			script_path=SCRIPT_PATH,
 			reference = REFERENCE
-		shell:
+		script:
 			"""
-			python3 {params.script_path}/snippy.py {input} {wildcards.sample} {output} {params.reference} {threads}
+			snippy.py
 			"""
 		
 
@@ -235,9 +235,9 @@ else:
 		params:
 			script_path = SCRIPT_PATH,
 			minaln = MIN_ALN
-		shell:
+		script:
 			"""
-			python3 {params.script_path}/snippy_qc.py {input} {wildcards.sample} {output} {params.minaln}
+			snippy_qc.py 
 			"""
 
 	rule run_snippy_core:
@@ -251,9 +251,9 @@ else:
 			script_path = SCRIPT_PATH,
 			reference = REFERENCE,
 			
-		shell:
+		script:
 			"""
-			python3 {params.script_path}/snippy_core.py {params.mask_string} {params.reference} {input}
+			snippy_core.py
 			"""
 
 	rule run_gubbins:
@@ -264,9 +264,9 @@ else:
 		params:
 			script_path = SCRIPT_PATH,	
 			gubbins = GUBBINS
-		shell:
+		script:
 			"""
-			python3 {params.script_path}/gubbins.py {input} {params.gubbins}
+			gubbins.py
 			"""
 
 	rule run_snpdists:
@@ -276,9 +276,10 @@ else:
 			'distances.toml' 
 		params:
 			script_path = SCRIPT_PATH
-		shell:
+		singularity: SNIPPY_SINGULARITY
+		script:
 			"""
-			python3 {params.script_path}/snp_dists.py {input}
+			snp_dists.py
 			"""
 		
 
@@ -313,7 +314,7 @@ else:
 			'iqtree.toml',
 		params:
 			script_path = SCRIPT_PATH	
-		shell:
+		script:
 			"""	
 			python3 {params.script_path}/run_iqtree.py {input.gubbins} {input.ref} {input.idx} {params.script_path}
 			"""
@@ -329,9 +330,9 @@ else:
 			prefill_path = PREFILLPATH,
 			assembler = ASSEMBLER, 
 			script_path = SCRIPT_PATH
-		shell:
+		script:
 			"""
-			python3 {params.script_path}/assemble.py {input} {wildcards.sample}  {params.assembler} {params.prefill_path}
+			assemble.py
 			"""
 
 	rule assembly_statistics:
@@ -343,9 +344,9 @@ else:
 			script_path = SCRIPT_PATH,
 			minsize = 500,
 			prefill_path = PREFILLPATH
-		shell:
+		script:
 			"""
-			python3 {params.script_path}/assembly_stat.py {input} {wildcards.sample} 
+			assembly_stat.py 
 			"""
 		
 	rule run_prokka:
@@ -356,9 +357,9 @@ else:
 			"{sample}/prokka.toml"
 		params:
 			script_path = SCRIPT_PATH
-		shell:
+		script:
 			"""
-			python3 {params.script_path}/prokka.py {input.assembly} {wildcards.sample} {input.seqdata}
+			prokka.py
 			"""
 	
 
@@ -370,9 +371,9 @@ else:
 			"assembly.toml"
 		params:
 			script_path= SCRIPT_PATH
-		shell:
+		script:
 			"""
-			python3 {params.script_path}/assembly_combine.py {input.prokka}
+			assembly_combine.py
 			"""
 
 
@@ -386,9 +387,9 @@ else:
 			script_path= SCRIPT_PATH,
 			work_dir = WORKDIR
 		singularity:ABRITAMR_SINGULARITY
-		shell:
+		script:
 			"""
-			python3 {params.script_path}/resistome.py {input.assembly} {wildcards.sample} {input.seqdata} {wildcards.sample}
+			resistome.py 
 			"""
 	rule combine_resistome:
 		input:
@@ -397,9 +398,9 @@ else:
 			'resistome.toml'
 		params:
 			script_path=SCRIPT_PATH
-		shell:
+		script:
 			"""
-			python3 {params.script_path}/combine_resistome.py {input}
+			combine_resistome.py
 			"""
 
 	rule mlst:
@@ -410,9 +411,9 @@ else:
 			'{sample}/mlst.toml'
 		params:
 			script_path=SCRIPT_PATH
-		shell:
+		script:
 			"""
-			python3 {params.script_path}/mlst.py {input.assembly} {wildcards.sample} {input.seqdata}
+			mlst.py
 			"""		
 	rule combine_mlst:
 		input:
@@ -421,9 +422,9 @@ else:
 			"mlst.toml"
 		params:
 			script_path = SCRIPT_PATH
-		shell:
+		script:
 			"""
-			python3 {params.script_path}/combine_mlst.py {input}
+			combine_mlst.py
 			"""
 		
 	
@@ -437,9 +438,9 @@ else:
 				"roary.toml"
 			params:
 				script_path = SCRIPT_PATH
-			shell:
+			script:
 				"""
-				python3 {params.script_path}/roary.py {input}
+				roary.py
 				"""
 
 		rule pan_figure:
@@ -449,9 +450,9 @@ else:
 				"pan_genome.toml"
 			params:
 				script_path = SCRIPT_PATH
-			shell:
+			script:
 				"""
-				python3 {params.script_path}/pan_figure.py {input} {params.script_path} 
+				pan_figure.py
 				"""
 
 	rule collate_isolate_tomls:
@@ -461,9 +462,9 @@ else:
 			"{sample}/final.toml"
 		params:
 			script_path = SCRIPT_PATH
-		shell:	
+		script:	
 			"""
-			python3 {params.script_path}/collate_tomls.py {wildcards.sample} {input}
+			collate_tomls.py {wildcards.sample} {input}
 			"""
 		
 	rule compile_report_toml:
@@ -476,9 +477,9 @@ else:
 			script_path = SCRIPT_PATH,
 			assembler = ASSEMBLER, 
 			job_id = JOB_ID
-		shell:
+		script:
 			"""
-			python3 {params.script_path}/compile.py {params.pipeline} {params.job_id} {params.assembler} {input}
+			compile.py 
 			"""
 
 rule write_html_report:
@@ -493,9 +494,9 @@ rule write_html_report:
 		template_path = TEMPLATE_PATH,
 		script_path = SCRIPT_PATH,
 		pipeline = PIPELINE
-	shell:
+	script:
 		"""
-		python3 {params.script_path}/write_report.py {input} {params.work_dir} {params.template_path}
+		write_report.py 
 		"""
 rule move_outputs:
 	input:
@@ -504,7 +505,7 @@ rule move_outputs:
 		FINAL_OUTPUT
 	params:
 		script_path= SCRIPT_PATH
-	shell:
+	script:
 		"""
-		python3 {params.script_path}/move_outputs.py {input}
+		move_outputs.py
 		"""
