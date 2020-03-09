@@ -45,6 +45,8 @@ r2 = snakemake.input.r2
 isolate = snakemake.wildcards.sample
 output = snakemake.output
 
+main(r1 = r1, r2 = r2, isolate = isolate, output = outputs)
+
 
 # if __name__ == '__main__':
     

@@ -1,4 +1,5 @@
-import toml, pathlib, subprocess, sys, re
+import toml, pathlib, subprocess, sys, re, snakemake    
+from Bio import SeqIO
 
 
 def generate_seqdata_cmd(r1, r2, isolate):
@@ -39,11 +40,25 @@ def get_data(cmd_output):
             break
     return(summary_dict)
 
-def get_coverage(mash, isolate):
+def get_length(fasta):
 
-    m = open_toml(mash)
-    print(m)
-    return m[isolate]['mash']['Estimated coverage']
+    length = 0
+    for i in SeqIO.parse(fasta,'fasta'): # use BioPython to determine percent alignment
+        l = len(i.seq)
+        length = length + l
+    return length
+
+def get_coverage(reference, isolate, yld):
+
+    if '.gbk' in reference:
+        SeqIO.convert(reference, 'genbank', 'ref.fa', 'fasta')
+        length = get_length('ref.fa')
+    else:
+        length = get_length(reference)
+    
+    cov = float(yld)/length
+
+    return cov
 
 
 def open_toml(tml):
@@ -57,10 +72,10 @@ def write_toml(data, output):
     with open(output, 'wt') as f:
         toml.dump(data, f)
     
-def main(r1, r2, isolate, mash, mincov):
+def main(r1, r2, isolate, mincov, reference):
     
-    msh = open_toml(mash)
-    print(msh)
+    # msh = open_toml(mash)
+    # print(msh)
     data = {}
     data[isolate] = {}
     data[isolate]['seqdata'] = {}
@@ -73,18 +88,23 @@ def main(r1, r2, isolate, mash, mincov):
     p = run_cmd(cmd)
     # print(p)
     if p == 0:
-        cov = get_coverage(mash = mash, isolate=isolate)
         # print(cov)
         data[isolate]['seqdata']['data'] = get_data(cmd_output = data[isolate]['seqdata']['file'])
+        cov = get_coverage(reference = reference, isolate = isolate, yld = data[isolate]['seqdata']['data']['bases'])
         data[isolate]['seqdata']['data']['Estimated_coverage'] = round(float(cov),2)
         data[isolate]['seqdata']['data']['Quality'] = 'PASS' if data[isolate]['seqdata']['data']['Estimated_coverage'] > int(mincov) else 'FAIL - will be removed from further analysis'
         write_toml(data = data, output = f"{isolate}/seqdata.toml")   
 
 
-if __name__ == '__main__':
-    
-    main(r1 = f"{sys.argv[1]}", r2 = f"{sys.argv[2]}", isolate = f"{sys.argv[3]}", mash = f"{sys.argv[4]}", mincov = f"{sys.argv[5]}")
-    
+r1 = snakemake.input.r1
+r2 = snakemake.input.r2
+mash = snakemake.input.mash
+isolate = snakemake.wildcards.sample
+mincov = snakemake.params.min_cov
+output = snakemake.output
+reference = snakemake.params.reference
+
+main(r1 = r1, r2 = r2, isolate = isolate, mash = mash, mincov = mincov, reference = reference)
 
 
 

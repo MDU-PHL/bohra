@@ -113,23 +113,24 @@ rule estimate_coverage:
 	
 	shell:
 		"""
-		python3 {params.script_path}/mash.py {input.r1} {input.r2} {wildcards.sample} {output}
+		mash.py
 		"""
 
 rule seqdata:
 	input:
 		r1 = '{sample}/R1.fq.gz',
 		r2 = '{sample}/R2.fq.gz',
-		mash = '{sample}/mash.toml'
+		# mash = '{sample}/mash.toml'
 	output:
 		"{sample}/seqdata.toml"
 	params:
 		script_path=SCRIPT_PATH,
-		mincov = MIN_COV
+		mincov = MIN_COV,
+		reference = REFERENCE
 	
 	script:
 		"""
-		python3 seqdata.py {input.r1} {input.r2} {wildcards.sample} {input.mash} {params.mincov}
+		seqdata.py
 		"""
 
 rule combine_seqdata:
