@@ -1,15 +1,18 @@
-import toml, pathlib, subprocess, sys, snakemake
-
+import toml, pathlib, subprocess, sys
+from snakemake import shell
 
 def generate_snippy_cmd(r1, r2, isolate, reference, threads):
     
-    cmd = f"snippy --outdir {isolate} --ref {reference} --R1 {r1} --R2 {r2} --force --cpus {threads}"
+    print(pathlib.Path(reference))
+    print(pathlib.Path(reference).exists())
+    cmd = f"ls && snippy --outdir {isolate} --ref {reference} --R1 {r1} --R2 {r2} --force --cpus {threads}"
     print(cmd)
     return cmd
 
 def run_cmd(cmd):
     
     p = subprocess.run(cmd, shell = True, capture_output=True, encoding = 'utf-8')
+    print(p)
     return p.returncode
 
 def get_reads(inputs, isolate):
@@ -58,8 +61,9 @@ def main(inputs, isolate, output, reference, threads):
     if run_snippy == 'Yes':
         cmd = generate_snippy_cmd(r1 = r1, r2=r2, isolate = isolate, reference = reference, threads = threads)
         # print(cmd)
+        print(run_cmd(f"ls"))
         p = run_cmd(cmd)
-        # print(p)
+        print(p)
         if p == 0:
             data[isolate]['snippy']['alignment'] = f"{isolate}/snps.aligned.fa"
             data[isolate]['snippy']['vcf'] = f"{isolate}/snps.vcf"

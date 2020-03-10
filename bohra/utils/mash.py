@@ -1,4 +1,6 @@
-import toml, pathlib, subprocess, sys, snakemake
+import toml, pathlib, subprocess, sys
+
+from snakemake import shell
 
 
 def generate_cmd(r1, r2, isolate):
@@ -45,7 +47,7 @@ r2 = snakemake.input.r2
 isolate = snakemake.wildcards.sample
 output = snakemake.output
 
-main(r1 = r1, r2 = r2, isolate = isolate, output = outputs)
+main(r1 = r1, r2 = r2, isolate = isolate, output = output)
 
 
 # if __name__ == '__main__':

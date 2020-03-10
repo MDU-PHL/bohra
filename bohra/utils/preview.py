@@ -1,5 +1,5 @@
-import toml, pathlib, subprocess, sys, pandas, snakemake
-
+import toml, pathlib, subprocess, sys, pandas
+from snakemake import shell
 
 def generate_triangle_cmd():
     
@@ -61,7 +61,7 @@ def main(inputs):
             write_toml(data = data, output = 'preview.toml')
     
     
-inputs = snakemake.inputs
+inputs = snakemake.input
 
 main(inputs = inputs)
 

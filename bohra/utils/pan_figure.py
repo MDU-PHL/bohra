@@ -1,5 +1,5 @@
-import toml, pathlib, subprocess, sys, pandas, json, snakemake 
-
+import toml, pathlib, subprocess, sys, pandas, json 
+from snakemake import shell
 
 def get_roary(inputs):
 

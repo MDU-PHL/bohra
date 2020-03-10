@@ -1,4 +1,5 @@
-import toml, pathlib, subprocess, sys, pandas, snakemake
+import toml, pathlib, subprocess, sys, pandas
+from snakemake import shell
 
 def open_toml(tml):
     print(tml)
@@ -34,7 +35,7 @@ def main(inputs):
     write_toml(data = data, output= "seqdata.toml")
     
 
-inputs = snakemake.inputs
+inputs = snakemake.input
 
 main(inputs = inputs)
 # if __name__ == '__main__':

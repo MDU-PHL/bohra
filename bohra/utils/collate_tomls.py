@@ -1,5 +1,5 @@
-import toml, pathlib, subprocess, sys, pandas, snakemake
-
+import toml, pathlib, subprocess, sys, pandas
+from snakemake import shell
 
 def combine_tomls(inputs, isolate):
 
@@ -32,7 +32,7 @@ def main(inputs, isolate):
     
     write_toml(data = final_toml, output= f'{isolate}/final.toml')
 
-isolate = sample.wildcards.sample
+isolate = snakemake.wildcards.sample
 inputs = snakemake.input
 
 main(isolate = isolate, inputs = inputs)

@@ -1,4 +1,5 @@
-import toml, pathlib, subprocess, sys, pandas, datetime, snakemake
+import toml, pathlib, subprocess, sys, pandas, datetime
+from snakemake import shell
 
 def get_isolate_list(inputs):
     
@@ -45,11 +46,13 @@ def core_stats(inputs):
 def generate_snippy_core_cmd(isolates, reference, mask):
     
     cmd = f"snippy-core --mask {mask} --ref {reference} {isolates}" if mask != 'nomask' else f"snippy-core --ref {reference} {isolates}"
+    print(cmd)
     return cmd
 
 def run_cmd(cmd):
 
     p = subprocess.run(cmd, shell = True, capture_output=True, encoding = 'utf-8')
+    print(p)
     return p.returncode
 
 def open_toml(tml):

@@ -1,4 +1,5 @@
-import toml, pathlib, subprocess, sys, pandas, datetime, snakemake
+import toml, pathlib, subprocess, sys, pandas, datetime
+from snakemake import shell
 
 def generate_dists_cmd(aln):
     
@@ -24,8 +25,8 @@ def write_toml(data, output):
 def main(inputs):
     
     t = open_toml(inputs)
-    
-    if t['gubbins']['run_gubbins']:
+    print(t)
+    if t['gubbins']['run_gubbins'] == 'Yes':
         aln = 'gubbins.aln'
     else:
         aln = 'core.aln'

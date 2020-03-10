@@ -1,4 +1,5 @@
-import toml, pathlib, subprocess, sys, pandas, json, snakemake
+import toml, pathlib, subprocess, sys, pandas, json
+from snakemake import shell
 
 def generate_mlst_cmd(assembly, isolate):
 

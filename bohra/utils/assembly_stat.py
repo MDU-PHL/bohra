@@ -1,6 +1,6 @@
 from Bio import SeqIO
-import pathlib, toml, pandas, sys, snakemake
-
+import pathlib, toml, pandas, sys
+from snakemake import shell
 
 
 def open_toml(tml):

@@ -1,4 +1,5 @@
-import toml, pathlib, subprocess, sys, snakemake
+import toml, pathlib, subprocess, sys
+from snakemake import shell
 
 def generate_mv_cmd(iostring):
 

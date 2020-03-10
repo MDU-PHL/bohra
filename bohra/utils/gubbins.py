@@ -1,4 +1,5 @@
-import toml, pathlib, subprocess, sys, pandas, datetime, snakemake
+import toml, pathlib, subprocess, sys, pandas, datetime
+from snakemake import shell
 
 def generate_snippy_clean_cmd():
 
@@ -35,7 +36,7 @@ def main(inputs, gubbins):
     data = {}
     data['gubbins'] = {}
     # print(gubbins)
-    if gubbins != 'False':
+    if gubbins != False:
         print('inside true')
         clean = run_cmd(generate_snippy_clean_cmd())
         if clean == 0:
@@ -43,18 +44,13 @@ def main(inputs, gubbins):
             if gub == 0:
                 sites = run_cmd(generate_snp_sites_cmd())
                 if sites == 0:
-                    data['gubbins']['run_gubbins'] = True
+                    data['gubbins']['run_gubbins'] = 'Yes'
                     data['gubbins']['aln'] = 'gubbins.aln'
     else:
-        data['gubbins']['run_gubbins'] = False
+        data['gubbins']['run_gubbins'] = 'No'
 
         
     write_toml(data = data, output = "gubbins.toml")
-
-if __name__ == '__main__':
-    
-    
-#    {input} {params.gubbins}
 
 inputs = snakemake.input
 gubbins = snakemake.params.gubbins

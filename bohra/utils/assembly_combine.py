@@ -1,6 +1,6 @@
-import toml, pathlib, subprocess, sys, pandas, numpy, snakemakes
+import toml, pathlib, subprocess, sys, pandas, numpy
 
-
+from snakemake import shell
 import pandas, pathlib
 
 

@@ -1,4 +1,5 @@
-import toml, pathlib, subprocess, sys, snakemake
+import toml, pathlib, subprocess, sys
+from snakemake import shell
 
 def generate_prokka_cmd(isolate, assembly):
     
@@ -54,9 +55,6 @@ def main(inputs, isolate, seqdata):
 
     
     write_toml(data = data, output= f'{isolate}/prokka.toml')
-
-
-#  {input.assembly} {wildcards.sample} {input.seqdata}
 
 inputs = snakemake.input.assembly
 isolate = snakemake.wildcards.sample

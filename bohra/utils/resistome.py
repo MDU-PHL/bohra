@@ -1,8 +1,10 @@
-import toml, pathlib, subprocess, sys, pandas, snakemake
+import toml, pathlib, subprocess, sys, pandas
+from snakemake import shell
 
-def generate_abritamr_cmd(input_file, isolate, wd):
+def generate_abritamr_cmd(input_file, isolate, wd, job_id):
     
-    w = pathlib.Path(wd)
+    w = pathlib.Path(wd, isolate)
+    print(w)
     cmd = f"abriTAMR -c {input_file} -pfx {isolate} -w {w}"
     return cmd
 
@@ -27,7 +29,7 @@ def write_toml(data, output):
     with open(output, 'wt') as f:
         toml.dump(data, f)
     
-def main(inputs, isolate, seqdata, wd):
+def main(inputs, isolate, seqdata, wd, job_id):
     
     seqdata = open_toml(seqdata)
     data = {}
@@ -38,9 +40,10 @@ def main(inputs, isolate, seqdata, wd):
         print('doing something')
         tml = open_toml(inputs)
         contigs = f"{isolate}/contigs.fa"
-        cmd = generate_abritamr_cmd(input_file = contigs, isolate = isolate, wd = wd)
+        cmd = generate_abritamr_cmd(input_file = contigs, isolate = isolate, wd = wd, job_id = job_id)
         print(cmd)
         p = run_cmd(cmd)
+        print(p)
         data[isolate]['resistome']['tool'] = 'abritamr'
         
         if f"pipeline successfully completed" in p:
@@ -54,17 +57,10 @@ def main(inputs, isolate, seqdata, wd):
     
     write_toml(data = data, output= f'{isolate}/resistome.toml')
 
-
-
-if __name__ == '__main__':
-    
-    
-    
-
-# {input.assembly} {wildcards.sample} {input.seqdata} {wildcards.sample}
 inputs = snakemake.input.assembly
 isolate = snakemake.wildcards.sample
 seqdata = snakemake.input.seqdata
 wd = snakemake.params.work_dir
+job_id = snakemake.params.job_id
 
-main(inputs = inputs, isolate = isolate, seqdata = seqdata, wd = wd)
+main(inputs = inputs, isolate = isolate, seqdata = seqdata, wd = wd, job_id = job_id)

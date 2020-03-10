@@ -51,11 +51,12 @@ class RunSnpDetection(object):
         self.logger.info(f"You are running bohra in {self.pipeline} mode.")
         self.snippy_singularity = args.snippy_singularity
         self.abritamr_singularity = args.abritamr_singularity
+        self.job_id = self._name_exists(args.job_id)
+        self.logger.info(f"Job ID is set {self.job_id}")
         # path to reference and mask
-        if self.pipeline != 'a':
-            self.ref = pathlib.Path(args.reference)
-        else:
-            self.ref = ''
+        self.ref = pathlib.Path(args.reference)
+        self.logger.info(f"The reference is {self.ref}")
+        self.link_file(self.ref)
         # 
         # (args.mask)
         if args.mask:
@@ -71,8 +72,7 @@ class RunSnpDetection(object):
         # # path to a source file for tracking of reference, jobid and mask
         # self.source_log_path = pathlib.Path(self.workdir, 'source.log')
         # job id
-        self.job_id = self._name_exists(args.job_id)
-        self.logger.info(f"Job ID is set {self.job_id}")
+        
         self.check_rerun()
         self.keep = args.keep
         self.gubbins = args.gubbins 
@@ -371,15 +371,15 @@ class RunSnpDetection(object):
         Run checks prior to start - checking all software is installed, if this is a rerun and the input files
         '''
         self.check_setup_files()
-        
+        self.logger.info(f"{self.ref}")
         self.snippy_version = self.check_deps()
         # check reference
-        if self.pipeline != 'a':
-            if self.ref == '':
-                self.logger.warning(f"You are trying call SNPs, a reference file is required. Please try again using '-r path to reference'")
-                raise SystemExit
-            else:
-                self.ref = self.link_file(self.ref)
+        if self.ref == '':
+            self.logger.warning(f"You are trying call SNPs, a reference file is required. Please try again using '-r path to reference'")
+            raise SystemExit
+        else:
+            self.logger.info(f"Starting to link reference")
+            self.ref = self.link_file(self.ref)
         
     def set_cluster_log(self):
         '''
@@ -400,15 +400,13 @@ class RunSnpDetection(object):
 
     def set_source_log(self):
         '''
-        set the reference, mask and id for tracking and potential.
-        
-            
+        set the reference, mask and id for tracking and potential.           
         '''   
         
         # TODO add in options for using singularity containers
         # path if using containers.
-        snippy_v = f'singularity_{self.day}' if self.use_singularity else self.snippy_version
-        self.logger.info(f"Snippy : {snippy_v.group()} has been added to the job log file.")
+        snippy_v = f'singularity_{self.day}' if self.use_singularity else self.snippy_version.group()
+        self.logger.info(f"Snippy : {snippy_v} has been added to the job log file.")
         kraken = self.kraken_db if self.run_kraken else ''
         s = True if self.use_singularity else False
         self.logger.info(f"Recording your settings for job: {self.job_id}")
@@ -555,8 +553,10 @@ class RunSnpDetection(object):
         output:
             returns path.name (str)   
         '''
-        
-        self.logger.info(f"Getting input files.") 
+        J = self.workdir / self.job_id
+        if not J.exists():
+            J.mkdir()
+        self.logger.info(f"Getting input files from {path}.") 
         if path.exists():
             if f"{path.suffix}" in ['.gz','zip']:
                     path = pathlib.Path(self.unzip_files(path, f"{path.suffix}"))
@@ -564,12 +564,14 @@ class RunSnpDetection(object):
                         self.logger.warning(f"{path} does not exist. Please try again.")
                         raise SystemExit
             else:
-                target = self.workdir / path.name
+                target = J /  path.name
+                # self.logger.info(f"Target is {target}")
                 # use rename to copy reference to working directory
                 # if the reference is not already in the working directory symlink it to working dir
                 if not target.exists():
-                    self.logger.info(f"Linking {path.name} to {self.workdir.name}")
-                    target.symlink_to(path)
+                    self.logger.info(f"Copying {path.name} to {J}")
+                    # target.symlink_to(path)
+                    subprocess.run(f"cp {path} {target}", shell = True)
                     found = True
                     
         else:
@@ -774,8 +776,9 @@ class RunSnpDetection(object):
             self.logger.warning(f'There is something wrong with your {self.json} file. Possible reasons for this error are incorrect use of single quotes. Check json format documentation and try again.')
 
 
-    def cluster_cmd(self, snake_name = f"{pathlib.Path(__file__).parent / 'utils'/ 'bohra.smk'}", wd = f"{self.workdir / self.job_id}"):
-
+    def cluster_cmd(self):
+        snake_name = f"{pathlib.Path(__file__).parent / 'utils'/ 'bohra.smk'}"
+        wd = f"{self.workdir / self.job_id}"
         queue_args = ""
         self.logger.info(f"Setting up cluster settings for {self.job_id} using {self.json}")
         if self.queue == 'sbatch':
@@ -790,7 +793,7 @@ class RunSnpDetection(object):
     
         queue_string = self.json_setup(queue_args = queue_args)
 
-        return f"snakemake -s {snake_name} -d {wd} -j 999 --cluster-config {self.json} --cluster '{queue_cmd} {queue_string}'"
+        return f"snakemake -j 999 --cluster-config {self.json} --cluster '{queue_cmd} {queue_string}'"
 
     
     
@@ -806,7 +809,7 @@ class RunSnpDetection(object):
         # make a masking string
         wd = self.workdir / self.job_id
         if self.mask != '':
-            maskstring = f"{self.workdir / self.mask}"
+            maskstring = f"{self.workdir / self.job_id /self.mask}"
         else:
             maskstring = ''
         self.logger.info(f'Mask string : {maskstring}')
@@ -820,7 +823,7 @@ class RunSnpDetection(object):
             'mask_string': maskstring, 
             'template_path':f"{pathlib.Path(__file__).parent / 'templates'}",
             'script_path':f"{pathlib.Path(__file__).parent / 'utils'}",
-            'reference' : f"{pathlib.Path(self.workdir, self.ref)}",
+            'reference' : f"{wd / self.ref.name}",
             'minperc' : self.minaln,
             'now' : self.now,
             'day': self.day, 
@@ -847,13 +850,13 @@ class RunSnpDetection(object):
         
 
  
-    def run_workflow(self,snake_name = f"{pathlib.Path(__file__).parent / 'utils'/ 'bohra.smk'}"):
+    def run_workflow(self):
         '''
         run snp_detection
         set the current directory to working dir for correct running of pipeline
         if the pipeline works, return True else False
         '''
-        
+        snake_name = f"{pathlib.Path(__file__).parent / 'utils'/ 'bohra.smk'}"
         if self.use_singularity:
             singularity_string = f"--use-singularity --singularity-args '--bind /home'"
         else:
@@ -871,7 +874,7 @@ class RunSnpDetection(object):
             dry = ''
         wd = self.workdir / self.job_id
         if self.cluster:
-            cmd = f"{self.cluster_cmd()} -s {snake_name} {force} {singularity_string} --latency-wait 1200"
+            cmd = f"{self.cluster_cmd()} -s {snake_name} -d {wd} {force} {singularity_string} --latency-wait 1200"
         else:
             cmd = f"snakemake {dry} -s {snake_name} -j {self.cpus} -d {wd} {force} {singularity_string} 2>&1"
             # cmd = f"snakemake -s {snake_name} --cores {self.cpus} {force} "
@@ -926,7 +929,7 @@ class RunSnpDetection(object):
                     force = f"-F"
                 else:
                     force = f""
-                self.logger.info(f"snakemake -j {self.jobs} {force} 2>&1 | tee -a bohra.log")
+                # self.logger.info(f"snakemake -j {self.jobs} {force} 2>&1 ")
             self.logger.info(f"Have a nice day. Come back soon.") 
             
 

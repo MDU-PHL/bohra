@@ -1,6 +1,6 @@
-import toml, pathlib, subprocess, sys, re, snakemake    
+import toml, pathlib, subprocess, sys, re
 from Bio import SeqIO
-
+from snakemake import shell
 
 def generate_seqdata_cmd(r1, r2, isolate):
     
@@ -45,7 +45,9 @@ def get_length(fasta):
     length = 0
     for i in SeqIO.parse(fasta,'fasta'): # use BioPython to determine percent alignment
         l = len(i.seq)
+        print(l)
         length = length + l
+    print(length)
     return length
 
 def get_coverage(reference, isolate, yld):
@@ -98,13 +100,13 @@ def main(r1, r2, isolate, mincov, reference):
 
 r1 = snakemake.input.r1
 r2 = snakemake.input.r2
-mash = snakemake.input.mash
+# mash = snakemake.input.mash
 isolate = snakemake.wildcards.sample
-mincov = snakemake.params.min_cov
+mincov = snakemake.params.mincov
 output = snakemake.output
 reference = snakemake.params.reference
 
-main(r1 = r1, r2 = r2, isolate = isolate, mash = mash, mincov = mincov, reference = reference)
+main(r1 = r1, r2 = r2, isolate = isolate, mincov = mincov, reference = reference)
 
 
 

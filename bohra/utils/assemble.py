@@ -1,4 +1,6 @@
-import toml, pathlib, subprocess, sys, snakemake
+import toml, pathlib, subprocess, sys
+
+from snakemake import shell
 
 def generate_asm_cmd(assembler, r1, r2, isolate, threads = 4, memory = 8):
     

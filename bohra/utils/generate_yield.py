@@ -1,5 +1,5 @@
 import pandas, re, pathlib, sys
-
+from snakemake import shell
 
 
 

@@ -1,4 +1,5 @@
-import toml, pathlib, subprocess, sys, pandas, snakemake
+import toml, pathlib, subprocess, sys, pandas
+from snakemake import shell
 
 def get_top_3(isolate):
     

@@ -111,10 +111,8 @@ rule estimate_coverage:
 	params:
 		script_path = SCRIPT_PATH
 	
-	shell:
-		"""
-		mash.py
-		"""
+	script:
+		"mash.py"
 
 rule seqdata:
 	input:
@@ -129,9 +127,7 @@ rule seqdata:
 		reference = REFERENCE
 	
 	script:
-		"""
-		seqdata.py
-		"""
+		"seqdata.py"
 
 rule combine_seqdata:
 	input:
@@ -141,9 +137,7 @@ rule combine_seqdata:
 	params:
 		script_path=SCRIPT_PATH
 	script:
-		"""
-		combine_seqdata.py
-		"""
+		"combine_seqdata.py"
 
 if PREVIEW:
 	rule preview:
@@ -155,9 +149,8 @@ if PREVIEW:
 			reference = REFERENCE,
 			script_path = SCRIPT_PATH
 		script:
-			"""
-			preview.py
-			"""
+			"preview.py"
+
 	rule combine_preview_tomls:
 		input:
 			"{sample}/mash.toml"
@@ -178,9 +171,7 @@ if PREVIEW:
 			job_id = JOB_ID,
 			assembler = ASSEMBLER
 		script:
-			"""
-			compile.py
-			"""
+			"compile.py"
 else:
 	rule run_kraken:
 		input:
@@ -193,9 +184,8 @@ else:
 			kraken_db = KRAKEN_DB,
 			script_path = SCRIPT_PATH
 		script:
-			"""
-			kraken.py
-			"""
+			"kraken.py"
+
 	rule combine_kraken:
 		input:
 			expand("{sample}/kraken.toml", sample = SAMPLE)
@@ -204,9 +194,7 @@ else:
 		params:
 			script_path = SCRIPT_PATH
 		script:
-			"""
-			combine_kraken.py
-			"""
+			"combine_kraken.py"
 	
 	rule snippy:
 		input:
@@ -221,10 +209,7 @@ else:
 			script_path=SCRIPT_PATH,
 			reference = REFERENCE
 		script:
-			"""
-			snippy.py
-			"""
-		
+			"snippy.py"		
 
 	rule qc_snippy: 
 		input:
@@ -236,9 +221,7 @@ else:
 			script_path = SCRIPT_PATH,
 			minaln = MIN_ALN
 		script:
-			"""
-			snippy_qc.py 
-			"""
+			"snippy_qc.py"
 
 	rule run_snippy_core:
 		input:
@@ -252,9 +235,7 @@ else:
 			reference = REFERENCE,
 			
 		script:
-			"""
-			snippy_core.py
-			"""
+			"snippy_core.py"
 
 	rule run_gubbins:
 		input:
@@ -265,9 +246,7 @@ else:
 			script_path = SCRIPT_PATH,	
 			gubbins = GUBBINS
 		script:
-			"""
-			gubbins.py
-			"""
+			"gubbins.py"
 
 	rule run_snpdists:
 		input:
@@ -278,9 +257,7 @@ else:
 			script_path = SCRIPT_PATH
 		singularity: SNIPPY_SINGULARITY
 		script:
-			"""
-			snp_dists.py
-			"""
+			"snp_dists.py"
 		
 
 	rule index_reference:
@@ -315,9 +292,7 @@ else:
 		params:
 			script_path = SCRIPT_PATH	
 		script:
-			"""	
-			python3 {params.script_path}/run_iqtree.py {input.gubbins} {input.ref} {input.idx} {params.script_path}
-			"""
+			"run_iqtree.py"
 	
 	rule assemble:
 		input:
@@ -331,9 +306,7 @@ else:
 			assembler = ASSEMBLER, 
 			script_path = SCRIPT_PATH
 		script:
-			"""
-			assemble.py
-			"""
+			"assemble.py"
 
 	rule assembly_statistics:
 		input:
@@ -345,9 +318,7 @@ else:
 			minsize = 500,
 			prefill_path = PREFILLPATH
 		script:
-			"""
-			assembly_stat.py 
-			"""
+			"assembly_stat.py"
 		
 	rule run_prokka:
 		input:
@@ -358,9 +329,7 @@ else:
 		params:
 			script_path = SCRIPT_PATH
 		script:
-			"""
-			prokka.py
-			"""
+			"prokka.py"
 	
 
 	rule combine_assembly_metrics:
@@ -372,9 +341,7 @@ else:
 		params:
 			script_path= SCRIPT_PATH
 		script:
-			"""
-			assembly_combine.py
-			"""
+			"assembly_combine.py"
 
 
 	rule resistome:
@@ -385,12 +352,12 @@ else:
 			'{sample}/resistome.toml'
 		params:
 			script_path= SCRIPT_PATH,
-			work_dir = WORKDIR
+			work_dir = WORKDIR,
+			job_id = JOB_ID
 		singularity:ABRITAMR_SINGULARITY
 		script:
-			"""
-			resistome.py 
-			"""
+			"resistome.py"
+
 	rule combine_resistome:
 		input:
 			expand("{sample}/resistome.toml", sample = SAMPLE)
@@ -399,9 +366,7 @@ else:
 		params:
 			script_path=SCRIPT_PATH
 		script:
-			"""
-			combine_resistome.py
-			"""
+			"combine_resistome.py"
 
 	rule mlst:
 		input:
@@ -412,9 +377,8 @@ else:
 		params:
 			script_path=SCRIPT_PATH
 		script:
-			"""
-			mlst.py
-			"""		
+			"mlst.py"
+
 	rule combine_mlst:
 		input:
 			expand('{sample}/mlst.toml', sample = SAMPLE)
@@ -423,10 +387,7 @@ else:
 		params:
 			script_path = SCRIPT_PATH
 		script:
-			"""
-			combine_mlst.py
-			"""
-		
+			"combine_mlst.py"	
 	
 
 	if PIPELINE == 'all':
@@ -439,9 +400,7 @@ else:
 			params:
 				script_path = SCRIPT_PATH
 			script:
-				"""
-				roary.py
-				"""
+				"roary.py"
 
 		rule pan_figure:
 			input:
@@ -451,9 +410,7 @@ else:
 			params:
 				script_path = SCRIPT_PATH
 			script:
-				"""
-				pan_figure.py
-				"""
+				"pan_figure.py"
 
 	rule collate_isolate_tomls:
 		input:
@@ -463,9 +420,7 @@ else:
 		params:
 			script_path = SCRIPT_PATH
 		script:	
-			"""
-			collate_tomls.py {wildcards.sample} {input}
-			"""
+			"collate_tomls.py"
 		
 	rule compile_report_toml:
 		input:
@@ -478,9 +433,7 @@ else:
 			assembler = ASSEMBLER, 
 			job_id = JOB_ID
 		script:
-			"""
-			compile.py 
-			"""
+			"compile.py"
 
 rule write_html_report:
 	input:
@@ -495,9 +448,8 @@ rule write_html_report:
 		script_path = SCRIPT_PATH,
 		pipeline = PIPELINE
 	script:
-		"""
-		write_report.py 
-		"""
+		"write_report.py"
+
 rule move_outputs:
 	input:
 		REPORT_TOMLS, 'report.html', 'report.toml'
@@ -506,6 +458,4 @@ rule move_outputs:
 	params:
 		script_path= SCRIPT_PATH
 	script:
-		"""
-		move_outputs.py
-		"""
+		"move_outputs.py"

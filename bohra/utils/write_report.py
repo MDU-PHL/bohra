@@ -1,8 +1,9 @@
 
-import re, sys, subprocess, toml, snakemake
+import re, sys, subprocess, toml
 import jinja2, pathlib, pandas, numpy, re
 from packaging import version
 import datetime
+from snakemake import shell
 
 class Report:
     '''

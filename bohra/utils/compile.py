@@ -1,5 +1,5 @@
-import toml, pathlib, subprocess, sys, datetime, pandas, re, numpy, snakemake
-
+import toml, pathlib, subprocess, sys, datetime, pandas, re, numpy
+from snakemake import shell
 
 def write_tables(table):
     '''

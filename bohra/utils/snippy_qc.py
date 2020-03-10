@@ -1,5 +1,5 @@
-import toml, pathlib, subprocess, sys, pandas, snakemake
-
+import toml, pathlib, subprocess, sys, pandas
+from snakemake import shell
 from Bio import SeqIO
                 
                 
