@@ -36,7 +36,7 @@ class Report:
         
         # set up paths variables
         p = pathlib.Path('.')
-        reporthtml = pathlib.Path('index.html')
+        reporthtml = pathlib.Path('report.html')
         # path to html template
         indexhtml = pathlib.Path(resources,'index.html') # replace with template
         tml =  self.open_toml(inputs)
