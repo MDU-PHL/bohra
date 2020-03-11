@@ -74,7 +74,7 @@ class RunSnpDetection(object):
         # job id
         
         self.check_rerun()
-        self.keep = args.keep
+        self.keep = True if args.keep == 'Y' else False
         self.gubbins = args.gubbins 
         # other variables
         # min aln 
