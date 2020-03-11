@@ -7,10 +7,12 @@
 
 Bohra has a new look! 
 * A new preview mode for 'sneak peak' at your dataset. 
+* `rerun` has been deprecated. If you would like to rerun a job etc; use the run command.
+* If rerunning a job, a new --keep flag to archive previous report files.
 * Built in filtering features to automatically remove isolates with low average coverage or alignment to your reference.
 * Provide a standardised config file for commonly used settings.
 
-Bohra is microbial genomics pipeline, designed predominantly for use in public health, but may also be useful in research settings. The pipeline takes as input a tab-delimited file with the isolate IDs followed by the path to READ1 and READ2, a reference for alignment and a unique identifier, where reads are illumina paired end reads (other platforms are not supported).
+Bohra is microbial genomics pipeline, designed predominantly for use in public health, but may also be useful in research settings. The pipeline takes as input a tab-delimited file with the isolate IDs followed by the path to READ1 and READ2, a reference for alignment and a unique identifier, where reads are illumina reads (other platforms are not supported at this stage).
 
 ### Motivation
 
@@ -31,12 +33,7 @@ Bohra can be run in four modes
 * Calculate mash-distances
 * Build a mash-tree
 
-2. SNPs and Phylogeny
-* Clean reads
-* Call variants
-* Generate a phylogenetic tree
-
-3. SNPs, Phylogeny, Typing, Annotation and Species Identification 
+2. SNPs, species ID and Assembly based tools (MLST, Resistome and annotation)
 * Clean reads
 * Call variants
 * Generate a phylogenetic tree
@@ -61,7 +58,7 @@ Bohra can be run in four modes
 
 Bohra requires >=python3.7
 
-#### Conda (Recomended)
+#### Conda (Highly recomended)
 
 Installing bohra with conda will ensure that all dependencies are present. See below for instructions on how to configure the databases for kraken2.
 
@@ -97,7 +94,17 @@ pip3 install bohra
 * [snp-dists](https://github.com/tseemann/snp-dists)
 * [mash](https://github.com/lskatz/mashtree)
 
+
+#### Check installation
+
+Check that all dependencies are installed.
+
+```
+bohra check
+```
+
 *IMPORTANT*
+
 In addition to installing kraken ensure that you have a kraken2 database. Minikraken can obtained as follows
 ```
 wget ftp://ftp.ccb.jhu.edu/pub/data/kraken2_dbs/minikraken2_v2_8GB_201904_UPDATE.tgz
@@ -117,14 +124,15 @@ export KRAKEN_DEFAULT_DB=$HOME/minikraken2_v2_8GB_201904_UPDATE
 ```
 bohra run -h
 usage: bohra run [-h] [--input_file INPUT_FILE] [-S]
-                 [--singularity_path SINGULARITY_PATH] [--job_id JOB_ID]
-                 [--reference REFERENCE] [--mask MASK] [--kraken_db KRAKEN_DB]
-                 [--pipeline {preview,sa,s,a,all}]
+                 [--abritamr_singularity ABRITAMR_SINGULARITY]
+                 [--job_id JOB_ID] [--reference REFERENCE] [--mask MASK]
+                 [--kraken_db KRAKEN_DB] [--pipeline {preview,sa,all}]
                  [--assembler {shovill,skesa,spades}] [--cpus CPUS]
                  [--minaln MINALN] [--mincov MINCOV]
                  [--prefillpath PREFILLPATH] [-mdu] [-workdir WORKDIR]
                  [-resources RESOURCES] [-force] [-dry-run] [--cluster]
-                 [--json JSON] [--queue QUEUE]
+                 [--json JSON] [--queue QUEUE] [--gubbins] [--keep {Y,N}]
+
 optional arguments:
   -h, --help            show this help message and exit
   --input_file INPUT_FILE, -i INPUT_FILE
@@ -134,16 +142,11 @@ optional arguments:
   -S, --use_singularity
                         Set if you would like to use singularity containers to
                         run bohra. (default: False)
-  --singularity_path SINGULARITY_PATH
-                        The path to singularity containers. If you want to use
-                        locally stored contianers please pull from
-                        shub://phgenomics-singularity (snippy.simg,
-                        prokka.simg, seqtk.simg, mash_kmc.simg,
-                        assemblers.simg, roary.simg). IMPORTANT bohra is
-                        designed to run with these containers... if you wish
-                        to use custom containers please contact developer or
-                        proceed at your own risk. (default: shub://phgenomics-
-                        singularity)
+  --abritamr_singularity ABRITAMR_SINGULARITY
+                        The path to containers. If you want to use locally
+                        stored contianers please pull from
+                        dockerhub://mduphl/<toolname>. (default:
+                        docker://mduphl/abritamr:v0.2.2)
   --job_id JOB_ID, -j JOB_ID
                         Job ID, will be the name of the output directory
                         (default: )
@@ -154,13 +157,12 @@ optional arguments:
                         Path to DB for use with kraken2, if no DB present
                         speciation will not be performed. [env var:
                         KRAKEN2_DEFAULT_DB] (default: None)
-  --pipeline {preview,sa,s,a,all}, -p {preview,sa,s,a,all}
-                        The pipeline to run. SNPS ('s') will call SNPs and
-                        generate phylogeny, ASSEMBLIES ('a') will generate
-                        assemblies and perform mlst and species identification
-                        using kraken2, SNPs and ASSEMBLIES ('sa' - default)
-                        will perform SNPs and ASSEMBLIES. ALL ('all') will
-                        perform SNPS, ASSEMBLIES and ROARY for pan-genome
+  --pipeline {preview,sa,all}, -p {preview,sa,all}
+                        The pipeline to run. Preview (--preview - default)
+                        will calculate mash-distances and a mash-tree for
+                        quick inspection of your dataset. SNPs and ASSEMBLIES
+                        ('sa') will perform SNPs and ASSEMBLIES. ALL ('all')
+                        will perform SNPS, ASSEMBLIES and ROARY for pan-genome
                         analysis (default: preview)
   --assembler {shovill,skesa,spades}, -a {shovill,skesa,spades}
                         Assembler to use. (default: shovill)
@@ -181,7 +183,8 @@ optional arguments:
   -mdu                  If running on MDU data (default: False)
   -workdir WORKDIR, -w WORKDIR
                         The directory where Bohra will be run, default is
-                        current directory (default: /home/khhor)
+                        current directory (default:
+                        /home/khhor/dev/playground/bohra/20200218_/test_f)
   -resources RESOURCES, -s RESOURCES
                         Directory where templates are stored (default:
                         /home/khhor/dev/bohra/bohra/templates)
@@ -196,6 +199,11 @@ optional arguments:
                         (default: )
   --queue QUEUE         Type of queue (sbatch or qsub currently supported) -
                         required if --cluster is set. (default: )
+  --gubbins, -g         Set to use gubbins for recombination correction.
+                        (default: False)
+  --keep {Y,N}          If you are rerunning bohra over an exisiting directory
+                        set --keep to 'Y' to archive report files - otherwise
+                        previous reprot files will be removed. (default: N)
 
 ```
 
@@ -237,122 +245,12 @@ Phage masking is important for to prevent the inflation of SNPs that can be intr
 
 To use alternative modes, use `-p` with one of the following arguments.
 
-`s` for phylogeny
-
-`a` for assembly associated tools
-
 `sa` phylogeny and assembly associated tools
 
 `all` all functions (`sa` plus pan-genome analysis)
 
 
 `bohra run -r path/to/reference -i path/to/inputfile -j unique_id -m path/to/maskfile (optional)`
-
-```bohra run -h
-usage: bohra run [-h] [--input_file INPUT_FILE] [--job_id JOB_ID]
-                 [--reference REFERENCE] [--mask MASK]
-                 [--pipeline {sa,s,a,all}]
-                 [--assembler {shovill,skesa,spades}] [--cpus CPUS]
-                 [--minaln MINALN] [--prefillpath PREFILLPATH] [--mdu MDU]
-                 [--workdir WORKDIR] [--resources RESOURCES] [--force]
-                 [--dryrun] [--gubbins]
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --input_file INPUT_FILE, -i INPUT_FILE
-                        Input file = tab-delimited with 3 columns
-                        <isolatename> <path_to_read1> <path_to_read2>
-                        (default: )
-  --job_id JOB_ID, -j JOB_ID
-                        Job ID, will be the name of the output directory
-                        (default: )
-  --reference REFERENCE, -r REFERENCE
-                        Path to reference (.gbk or .fa) (default: )
-  --mask MASK, -m MASK  Path to mask file if used (.bed) (default: False)
-  --pipeline {sa,s,a,all}, -p {sa,s,a,all}
-                        The pipeline to run. SNPS ('s') will call SNPs and
-                        generate phylogeny, ASSEMBLIES ('a') will generate
-                        assemblies and perform mlst and species identification
-                        using kraken2, SNPs and ASSEMBLIES ('sa' - default)
-                        will perform SNPs and ASSEMBLIES. ALL ('all') will
-                        perform SNPS, ASSEMBLIES and ROARY for pan-genome
-                        analysis (default: sa)
-  --assembler {shovill,skesa,spades}, -a {shovill,skesa,spades}
-                        Assembler to use. (default: shovill)
-  --cpus CPUS, -c CPUS  Number of CPU cores to run, will define how many rules
-                        are run at a time (default: 36)
-  --minaln MINALN, -ma MINALN
-                        Minimum percent alignment (default: 0)
-  --prefillpath PREFILLPATH, -pf PREFILLPATH
-                        Path to existing assemblies - in the form
-                        path_to_somewhere/isolatename/contigs.fa (default:
-                        None)
-  --mdu MDU             If running on MDU data (default: True)
-  --workdir WORKDIR, -w WORKDIR
-                        Working directory, default is current directory
-                        (default: /home/khhor)
-  --resources RESOURCES, -s RESOURCES
-                        Directory where templates are stored (default:
-                        /home/khhor/dev/bohra/bohra/templates)
-  --force, -f           Add if you would like to force a complete restart of
-                        the pipeline. All previous logs will be lost.
-                        (default: False)
-  --dryrun, -n          If you would like to see a dry run of commands to be
-                        executed. (default: False)
-  --gubbins, -g         If you would like to run gubbins. NOT IN USE YET -
-                        PLEASE DO NOT USE (default: False)
-  --cluster, -clst      If you are running Bohra on a cluster. Note if set you 
-                        will need to provide a cluster.json file and a 
-                        run_snakemake.sh, you can see examples on the 
-                        documentation page.
-  --json                Path to cluster.json - required if --cluster is set
-  --run-snake           Path to run_snakemake.sh - required if --cluster is set
-```
-
-### Rerun
-
-A rerun may be performed if changes to the reference and/or mask file are needed. In addition, if isolates need to be removed or added to the analysis. 
-The following behaviour on a rerun should be expected;
-* New reference will result in calling of snps in all isolates of the analysis
-* If the reference is unchanged SNPs will only be called on new isolates
-* Determination of core alignment, distances and generation of trees will occur for every rerun
-
-`-r` and `-m` are only required if these are to be different to the previous run. If not Bohra will detect and use the previous reference and mask files. Also changes to the isolates included should be made to the input file used in the original run. New isolates can be added to the bottom of the input file and prefixing an isolate with `#` will remove it from the analysis.
-
-**Minimal command**
-
-`bohra rerun`
-
-```usage: bohra rerun [-h] [--reference REFERENCE] [--mask MASK] [--cpus CPUS]
-                   [--workdir WORKDIR] [--resources RESOURCES] [--dryrun]
-                   [--gubbins] [--keep]
-
-optional arguments:
-  -h, --help            show this help message and exit
-  --reference REFERENCE, -r REFERENCE
-                        Path to reference (.gbk or .fa) (default: )
-  --mask MASK, -m MASK  Path to mask file if used (.bed) (default: )
-  --cpus CPUS, -c CPUS  Number of CPU cores to run, will define how many rules
-                        are run at a time (default: 36)
-  --workdir WORKDIR, -w WORKDIR
-                        Working directory, default is current directory
-                        (default: /home/khhor)
-  --resources RESOURCES, -s RESOURCES
-                        Directory where templates are stored (default:
-                        /home/khhor/dev/bohra/bohra/templates)
-  --dryrun, -n          If you would like to see a dry run of commands to be
-                        executed. (default: False)
-  --gubbins, -g         If you would like to run gubbins. NOT IN USE YET -
-                        PLEASE DO NOT USE (default: False)
-  --keep, -k            Keep report from previous run (default: False)
-  --cluster, -clst      If you are running Bohra on a cluster. Note if set you 
-                        will need to provide a cluster.json file and a 
-                        run_snakemake.sh, you can see examples on the 
-                        documentation page.
-  --json                Path to cluster.json - if not included will default
-                        to version provided in previous run
-  --queue               The queueing system in use - qsub or sbatch
-  ```
 
 ### Running Bohra in a HPC environment
 Bohra can be run in a HPC environment (currently only sbatch and qsub are supported). To do this some knowledge and experience in such environments is assumed. You will need to provide a file called `cluster.json`. This file will contain rule specifc and default settings for running the pipeline. An template is shown below (it is recommended that you use this template, settings have been established using a slurm queueing system), in addition you can see further documentation [here](https://snakemake.readthedocs.io/en/stable/snakefiles/configuration.html#cluster-configuration).
