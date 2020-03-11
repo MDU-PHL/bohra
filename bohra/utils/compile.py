@@ -11,12 +11,7 @@ def write_tables(table):
     data = open(path).readlines()
     # for header
     header = data[0].split('\t')
-    # if 'mlst' in f"{table}":
-    #     # number of alleles
-    #     length = len(data[1].split('\t'))-2
-    #     header = ['Isolate', 'Scheme', 'ST']
-    #     for l in range(1,length):
-    #         header.append(f"Allele_{l}")
+    
     if 'distances.tab' in table:
         tablehead = [f"<th class='{column}-head'>{column}</th>" for column in header]
     else:
@@ -75,7 +70,6 @@ def preview_distances_tab(table):
     for d in range(1,len(data)):
         row = [f"<tr>"]
         l = data[d].split()
-        print(l)
         header.append(l[0])
         for i in range(len(l)):
         # print(d)  
@@ -256,20 +250,8 @@ def get_dict(pipeline):
 
 def fill_vals(td, pipeline):
 
-    # if pipeline == 'preview':
-    #     for t in range(len(td)):
-    #         if td[t]['type'] == 'matrix':
-    #             td[t]['head'], td[t]['body'] = preview_distances_tab(table=td[t]['file'])
-    
-    # # snpdistances = []
-    # # snpdensity = []
-    # else:
-    print(range(len(td)))
-    # print(td[10])
     for t in range(len(td)):
-        # print(t)
-        # print(td[t])
-
+    
         # TODO if table add a modal modal + link and link will be title lowercase with hyphen
         if td[t]['type'] == 'table':
             td[t]['head'], td[t]['body'] = write_tables(table=td[t]['file'])
@@ -285,7 +267,6 @@ def fill_vals(td, pipeline):
         if td[t]['type'] == 'summary':
             # generate_summary()
             td[t]['head'], td[t]['body'] = write_tables(table = td[t]['file'])
-        print(t)
     return td
 
 def get_software_versions(software):

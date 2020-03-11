@@ -1,7 +1,7 @@
 
 import pathlib
 configfile: 'config.yaml'
-localrules: all, generate_yield, combine_seqdata, qc_snippy, index_reference, calculate_iqtree_command_core,combine_assembly_metrics,assembly_statistics,collate_report,write_html_report
+localrules: all,combine_seqdata, qc_snippy, index_reference, calculate_iqtree_command_core,combine_assembly_metrics,assembly_statistics,collate_report,write_html_report
 
 def get_collation_input(pipeline):
 	
@@ -31,8 +31,6 @@ def get_collation_input(pipeline):
 		for x in s:
 			output.append(x)
 	
-		
-
 	return output
 
 

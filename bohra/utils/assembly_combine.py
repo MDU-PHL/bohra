@@ -38,25 +38,18 @@ def combine(prokka, assembly_stats):
                     gff = df
             else:
                     gff = gff.merge(df, how = 'outer')
-    # print(gff)
     gff = gff[gff['cond'].isin(['CDS', 'rRNA'])]
-    # print(gff)
     gff = gff.T
-    # print(gff)
     gff.columns = gff.iloc[0]
     gff = gff.iloc[1:]  
-    # print(gff.columns)
-    # print(gff)
     assembly = assembly_stats.merge(gff, left_on = ['Name'], right_on= gff.index, how = 'outer')
 
     m = list(assembly[assembly['# Contigs'] != '-']['# Contigs'])  
     mn = numpy.mean(m)
     s =(2* numpy.std(m))
-    cut = mn + 2
-    # print(cut)
+    cut = mn + s
     assembly['Quality'] = numpy.where(assembly['# Contigs'].replace('-',0) <= cut, assembly['Quality'], f'WARNING - assembly outlier (> {round(cut,2)} contigs)')
     assembly = assembly.rename(columns={'Name':'Isolate'})
-    # print(ass÷embly)
     
     assembly = assembly[['Isolate', 'bp','# Contigs','Ns','# Gaps','Min Contig size','Max Contig size','Avg Contig size','N50', 'CDS','rRNA', 'Quality' ]]
 

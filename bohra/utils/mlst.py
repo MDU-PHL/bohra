@@ -66,8 +66,6 @@ def main(inputs, isolate, seqdata):
             
     write_toml(data = data, output= f'{isolate}/mlst.toml')
 
-
-# {input.assembly} {wildcards.sample} {input.seqdata}
 inputs =snakemake.input.assembly
 isolate = snakemake.wildcards.sample
 seqdata = snakemake.input.seqdata

@@ -7,7 +7,6 @@ def combine_mlst(inputs):
 
     for i in inputs:
         tml = open_toml(i)
-        print(tml.keys())
         isolate = list(tml.keys())[0]
         d = {
             "Isolate": isolate,
@@ -27,18 +26,15 @@ def combine_mlst(inputs):
         elif tml[isolate]['mlst']['done'] == 'No':
             d['Quality'] = 'NOT INCLUDED - FAIL QC'
         df = pandas.DataFrame(d, index = [0])
-        print(df)
         if tab.empty:
             tab = df
         else:
             tab = tab.append(df, sort = True)
-        print(tab)
     tab = tab.set_index('Isolate')
     cols = ['Scheme', 'ST']
     cols.extend([a for a in tab.columns if 'Allele' in a])
     cols.append('Quality')
     tab = tab[cols]
-    print(tab)
     tab.to_csv('mlst.tab', sep= '\t', index = True)
     return tab
 

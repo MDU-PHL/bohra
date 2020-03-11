@@ -7,7 +7,6 @@ def combine_resistome(inputs):
 
     for i in inputs:
         tml = open_toml(i)
-        print(tml)
         isolate = list(tml.keys())[0]
 
         if tml[isolate]['resistome']['done']:

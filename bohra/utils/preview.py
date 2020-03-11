@@ -14,7 +14,6 @@ def generate_tree_cmd():
 def run_cmd(cmd):
     
     p = subprocess.run(cmd, shell = True, capture_output=True, encoding = 'utf-8')
-    print(p)
     return p.returncode
 
 def get_isolates(tab):

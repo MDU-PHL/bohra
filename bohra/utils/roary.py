@@ -30,7 +30,6 @@ def generate_rm_cmd():
 def run_cmd(cmd):
     
     p = subprocess.run(cmd, shell = True, capture_output=True, encoding = 'utf-8')
-    print(p)
     return p.returncode
 
 def open_toml(tml):

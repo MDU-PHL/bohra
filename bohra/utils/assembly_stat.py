@@ -69,10 +69,8 @@ def main(inputs,isolate):
         data = {}
         data[isolate]={}
         data[isolate]['assembly_stats'] = {'Name': isolate, 'bp':'-', '# Contigs':'-', 'Ns':'-', '# Gaps':'-', 'Min Contig size':'-', 'Max Contig size':'-',  'Avg Contig size':'-', 'N50':'-', 'Quality': 'ASSEMBLY NOT PERFORMED please see Sequence data tab'}
-        # data[isolate]['assembly_stats']['Quality'] = 'Assembly not performed - failed QC'
     write_toml(data= data, output = f'{isolate}/assembly_stats.toml')
-        # print(data)
-        # print('\t'.join([f"{data[x]}" for x in colnames]))
+        
  
 inputs = snakemake.input
 isolate = snakemake.wildcards.sample
