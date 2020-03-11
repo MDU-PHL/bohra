@@ -73,7 +73,7 @@ def final_output(tomls):
 
 PREFILLPATH = config['prefill_path']
 SAMPLE = config['isolates'].split()
-SNIPPY_SINGULARITY = config['snippy_singularity']
+# SNIPPY_SINGULARITY = config['snippy_singularity']
 # ASSEMBLER_SINGULARITY = config['assembler_singularity']
 ABRITAMR_SINGULARITY = config['abritamr_singularity']
 print(SAMPLE)
@@ -203,7 +203,7 @@ else:
 			'{sample}/snippy.toml'
 		threads:
 			8
-		singularity: SNIPPY_SINGULARITY
+		# singularity: SNIPPY_SINGULARITY
 		params:
 			script_path=SCRIPT_PATH,
 			reference = REFERENCE
@@ -227,7 +227,7 @@ else:
 			expand("{sample}/snippy_qc.toml", sample = SAMPLE)
 		output:
 			'snippy_core.toml'
-		singularity: SNIPPY_SINGULARITY
+		# singularity: SNIPPY_SINGULARITY
 		params:
 			mask_string = MASK_STRING,
 			script_path = SCRIPT_PATH,
@@ -254,7 +254,7 @@ else:
 			'distances.toml' 
 		params:
 			script_path = SCRIPT_PATH
-		singularity: SNIPPY_SINGULARITY
+		# singularity: SNIPPY_SINGULARITY
 		script:
 			"snp_dists.py"
 		

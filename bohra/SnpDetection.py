@@ -49,7 +49,7 @@ class RunSnpDetection(object):
         self.pipeline = args.pipeline
         self.preview = True if self.pipeline == 'preview' else False
         self.logger.info(f"You are running bohra in {self.pipeline} mode.")
-        self.snippy_singularity = args.snippy_singularity
+        # self.snippy_singularity = args.snippy_singularity
         self.abritamr_singularity = args.abritamr_singularity
         self.job_id = self._name_exists(args.job_id)
         self.logger.info(f"Job ID is set {self.job_id}")
@@ -857,7 +857,7 @@ class RunSnpDetection(object):
             'kraken_db': f"{self.kraken_db}",
             'preview': self.preview, 
             'prefill_path': self.prefillpath if self.prefillpath != '' else 'nopath',
-            'snippy_singularity': self.snippy_singularity,
+            # 'snippy_singularity': self.snippy_singularity,
             'abritamr_singularity': self.abritamr_singularity
         }
 

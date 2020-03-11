@@ -69,7 +69,7 @@ def main():
     # options for running
     parser_sub_run.add_argument('--input_file','-i',help='Input file = tab-delimited with 3 columns <isolatename>  <path_to_read1> <path_to_read2>', default='')
     parser_sub_run.add_argument('-S', '--use_singularity', action='store_true', help = 'Set if you would like to use singularity containers to run bohra.')
-    parser_sub_run.add_argument('--snippy_singularity', default='docker://mduphl/snippy:v4.6.0', help='The path to containers. If you want to use locally stored contianers please pull from dockerhub://mduphl/<toolname>.')
+    # parser_sub_run.add_argument('--snippy_singularity', default='docker://mduphl/snippy:v4.6.0', help='The path to containers. If you want to use locally stored contianers please pull from dockerhub://mduphl/<toolname>.')
     parser_sub_run.add_argument('--abritamr_singularity', default='docker://mduphl/abritamr:v0.2.2', help='The path to containers. If you want to use locally stored contianers please pull from dockerhub://mduphl/<toolname>.')
     parser_sub_run.add_argument('--job_id','-j',help='Job ID, will be the name of the output directory', default='')
     parser_sub_run.add_argument('--reference','-r',help='Path to reference (.gbk or .fa)', default = '')
