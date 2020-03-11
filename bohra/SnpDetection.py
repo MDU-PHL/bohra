@@ -743,34 +743,7 @@ class RunSnpDetection(object):
         isolates = self.set_isolate_log(tab = tab, logfile = logfile, validation = validation)
         
         self.logger.info(f"This job : {self.job_id} contains {len(list(set(isolates)))}")
-        return(list(set(isolates))) 
-    
-    
-    def write_pipeline_job(self):
-        '''
-        write out the pipeline string for transfer to job specific pipeline
-        '''
-        
-        wd = self.workdir / self.job_id
-        # pipeline_setup = {
-        #     's':'Snakefile_snippy',
-        #     'sa':'Snakefile_default_',
-        #     'a':'Snakefile_assembly',
-        #     'all': 'Snakefile_all'
-        # }
-        vars_for_file = {
-            'workdir': f"{wd}"
-        }
-        
-        self.logger.info(f"Writing Snakefile for job : {self.job_id}")
-        snk_template = jinja2.Template(pathlib.Path(self.resources, "bohra.smk").read_text())
-        snk = self.workdir / self.job_id/ 'Snakefile'
-
-        snk.write_text(snk_template.render(vars_for_file)) 
-        
-        self.logger.info(f"Snakefile successfully created")
-        
-        
+        return(list(set(isolates)))         
 
     def json_setup(self, queue_args):
         '''
@@ -868,11 +841,7 @@ class RunSnpDetection(object):
         config.write_text(config_template.render(vars_for_file))
         
         self.logger.info(f"Config file successfully created")
-
-        self.write_pipeline_job()
-        
-
- 
+       
     def run_workflow(self):
         '''
         run snp_detection
