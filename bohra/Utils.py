@@ -169,11 +169,23 @@ class Nulla2bohra(UpdateBohra):
         self.workdir = pathlib.Path(args.workdir)
         self.job_id = self._name_exists(args.job_id)
         if args.input_file == '':
-                self.logger.warning('Input file can not be empty, please set -i path_to_input to try again')
-                raise SystemExit()
+                self.logger.info('Checking your job folder for an input file')
+                self.input_file = self.check_for_input_file()
         else:
             self.input_file = pathlib.Path(args.input_file)
 
+    def check_for_input_file(self):
+
+        p = self.workdir / self.job_id
+
+        infile = p / 'input.tab'
+        if infile.exists():
+            return f"{infile}"
+        else:
+            self.logger.warning(f"You have not supplied an input file and none can be found in your {self.job_id} directory. Please supply an input file and try again.")
+            raise SystemExit
+
+        
 class CheckDeps(RunSnpDetection):
 
     def __init__(self, args):
