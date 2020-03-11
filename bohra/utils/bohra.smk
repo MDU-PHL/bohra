@@ -74,7 +74,6 @@ SAMPLE = config['isolates'].split()
 # SNIPPY_SINGULARITY = config['snippy_singularity']
 # ASSEMBLER_SINGULARITY = config['assembler_singularity']
 ABRITAMR_SINGULARITY = config['abritamr_singularity']
-print(SAMPLE)
 MIN_ALN = int(config['min_perc'])
 REFERENCE = config['reference']
 GUBBINS = config['gubbins']
@@ -268,12 +267,10 @@ else:
 			import pathlib, subprocess
 			ref = f"{output[0]}"
 			idx = f"{output[1]}"
-			print(type(ref))
-			print(type(idx))
 			if '.fa' not in REFERENCE:
-				print(f"converting {REFERENCE}")
+				# print(f"converting {REFERENCE}")
 				SeqIO.convert(f"{input[0]}", 'genbank', ref	, 'fasta')
-				print(f"converted {REFERENCE}")
+				# print(f"converted {REFERENCE}")
 			else:
 				subprocess.run(f"ln -sf {REFERENCE} {ref}", shell = True)
 			subprocess.run(f"samtools faidx {ref}", shell =True)
