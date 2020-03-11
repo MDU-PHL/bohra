@@ -4,7 +4,6 @@ from snakemake import shell
 def generate_snippy_cmd(r1, r2, isolate, reference, threads):
     
     p = pathlib.Path(isolate)
-    reads = sorted(p.glob("*.f*q.gz"))
     cmd = f"snippy --outdir {isolate} --ref {reference} --R1 {r1} --R2 {r1} --force --cpus {threads}"
     
     return cmd
@@ -56,10 +55,7 @@ def main(inputs, isolate, output, reference, threads):
 
     if run_snippy == 'Yes':
         cmd = generate_snippy_cmd(r1 = r1, r2=r2, isolate = isolate, reference = reference, threads = threads)
-        # print(cmd)
-        print(run_cmd(f"ls"))
         p = run_cmd(cmd)
-        print(p)
         if p == 0:
             data[isolate]['snippy']['alignment'] = f"{isolate}/snps.aligned.fa"
             data[isolate]['snippy']['vcf'] = f"{isolate}/snps.vcf"
@@ -68,23 +64,11 @@ def main(inputs, isolate, output, reference, threads):
         else:
             data[isolate]['snippy']['done'] = 'No'
     write_toml(data = data, output = f"{isolate}/snippy.toml") 
-    
- 
-#  {input} {wildcards.sample} {output} {params.reference} {threads}
+
 inputs = snakemake.input
 isolate = snakemake.wildcards.sample
 output = snakemake.output
 reference = snakemake.params.reference
 threads = snakemake.threads
 
-# inputs = 'SRR1609871/seqdata.toml'
-# isolate = 'SRR1609871'
-# output = 'SRR1609871/snippy.toml'
-# reference = 'GCA_000703365.1.gbk'
-# threads = 8
-
 main(inputs = inputs, isolate = isolate, output = output,reference = reference, threads =threads)
-
-# mash triangle -C *.msh
-
-# mash sketch -m 5 -s 10000 -r -o 2019-12803-6/sketch -I 2019-12803-6 -C 2019-12803-6/R1.fq.gz 2019-12803-6/R1.fq.gz
