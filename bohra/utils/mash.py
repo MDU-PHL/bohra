@@ -17,7 +17,7 @@ def extract_metrics(mash_string):
     mash_string = mash_string.split('\n')
     d = ''
     for m in mash_string:
-        print(m)
+        
         if 'Estimated coverage' in m:
             d = m.split(':')[-1].strip()
             print(d)
@@ -36,7 +36,7 @@ def main(r1, r2, isolate, output):
     data = {}
     data[isolate] = {}
     data[isolate]['mash'] = {}
-    data[isolate]['mash']['Estimated coverage'] = extract_metrics(mash_string)
+    # data[isolate]['mash']['Estimated coverage'] = extract_metrics(mash_string)
     data[isolate]['mash']['sketch'] = f"{pathlib.Path(f'{isolate}', 'sketch.msh')}"
 
     write_toml(data = data, output= f'{isolate}/mash.toml')

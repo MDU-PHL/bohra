@@ -37,7 +37,6 @@ def main(inputs, gubbins):
     data['gubbins'] = {}
     # print(gubbins)
     if gubbins != False:
-        print('inside true')
         clean = run_cmd(generate_snippy_clean_cmd())
         if clean == 0:
             gub = run_cmd(generate_gubbins_cmd())

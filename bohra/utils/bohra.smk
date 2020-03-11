@@ -198,8 +198,7 @@ else:
 	
 	rule snippy:
 		input:
-			'{sample}/seqdata.toml'
-			
+			'{sample}/seqdata.toml'	
 		output:
 			'{sample}/snippy.toml'
 		threads:

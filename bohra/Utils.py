@@ -11,6 +11,7 @@ import itertools
 import subprocess
 import re
 import toml
+import shutil
 from packaging import version
 from Bio import SeqIO, Phylo
 from bohra.SnpDetection import RunSnpDetection
@@ -172,4 +173,46 @@ class Nulla2bohra(UpdateBohra):
                 raise SystemExit()
         else:
             self.input_file = pathlib.Path(args.input_file)
-    
+
+class CheckDeps(RunSnpDetection):
+
+    def __init__(self, args):
+        self.logger = logging.getLogger(__name__)
+        self.logger.setLevel(logging.INFO)
+        # create file handler which logs even debug messages
+        fh = logging.FileHandler('bohra.log')
+        fh.setLevel(logging.INFO)
+        # create console handler with a higher log level
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.INFO)
+        # create formatter and add it to the handlers
+        formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
+        fh.setFormatter(formatter)
+        ch.setFormatter(formatter)
+        # add the handlers to the logger
+        self.logger.addHandler(ch)
+        self.logger.addHandler(fh)
+        self.kraken_db = args.kraken_db 
+
+    def check_sa(self):
+        deps = ['shovill', 'skesa', 'spades.py']
+        self.check_quals()
+        self.check_snippycore()
+        self.check_snpdists()
+        self.check_kraken2DB()
+        # self.check_iqtree()
+        # self.check_assembler()
+        self.check_assemble_accesories()
+        for d in deps:
+            self.check_installation(software = d)
+
+
+    def check(self):
+        """
+        for bohra check
+        """
+
+        self.check_sa()
+        self.check_roary()
+        # self.logger.info("Well done, you have all dependencies installed correctly!!")
+            

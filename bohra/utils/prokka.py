@@ -31,7 +31,6 @@ def write_toml(data, output):
     
 def main(inputs, isolate, seqdata):
     
-    print(inputs)
     # set up data dict
     data = open_toml(inputs)
     # data[isolate] = {}
@@ -41,11 +40,9 @@ def main(inputs, isolate, seqdata):
     seqdata = open_toml(seqdata)
     cmd = generate_prokka_cmd(isolate = isolate, assembly = assembly)
     if seqdata[isolate]['seqdata']['data']['Quality'] == 'PASS':
-        print(cmd)
         p = run_cmd(cmd)
         if p == 0:
             rm_cmd = generate_rm_cmd(isolate = isolate)
-            print(rm_cmd)
             r = generate_rm_cmd(run_cmd)
             data[isolate]['prokka']['done'] = True
             data[isolate]['prokka']['gff'] = f'{isolate}/{isolate}.gff'

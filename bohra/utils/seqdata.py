@@ -5,11 +5,13 @@ from snakemake import shell
 def generate_seqdata_cmd(r1, r2, isolate):
     
     cmd = f"seqtk fqchk {r1} {r2} > {isolate}/seqdata.tab"
+    
     return cmd
 
 def run_cmd(cmd):
     
     p = subprocess.run(cmd, shell = True, capture_output=True, encoding = 'utf-8')
+    
     return p.returncode
 
 
@@ -19,7 +21,6 @@ def get_data(cmd_output):
     summary_pat = re.compile(r'(\w+):\s(\d+\.?\d?\d?);')
     distinct_values = re.compile(r';\s(\d+)\s\w+')
     # print(distinct_values)
-    print(output[1])
     record = re.compile(r'(\d+\.?\d?\d?)')
     summary_dict = dict((k, float(v)) for k, v in summary_pat.findall(output[0]))
     # print(distinct_values.findall(output[0]))
@@ -45,18 +46,20 @@ def get_length(fasta):
     length = 0
     for i in SeqIO.parse(fasta,'fasta'): # use BioPython to determine percent alignment
         l = len(i.seq)
-        print(l)
         length = length + l
     print(length)
     return length
 
 def get_coverage(reference, isolate, yld):
 
-    if '.gbk' in reference:
+    if '.fa' in reference:
+        length = get_length(reference)
+    elif pathlib.Path('ref.fa').exists():
+        length = get_length('ref.fa')
+    elif '.gbk' in reference:
         SeqIO.convert(reference, 'genbank', 'ref.fa', 'fasta')
         length = get_length('ref.fa')
-    else:
-        length = get_length(reference)
+        
     
     cov = float(yld)/length
 
@@ -88,7 +91,7 @@ def main(r1, r2, isolate, mincov, reference):
 
     cmd = generate_seqdata_cmd(r1 = r1, r2 = r2, isolate = isolate)
     p = run_cmd(cmd)
-    # print(p)
+    
     if p == 0:
         # print(cov)
         data[isolate]['seqdata']['data'] = get_data(cmd_output = data[isolate]['seqdata']['file'])

@@ -3,12 +3,9 @@ from snakemake import shell
 
 def get_isolate_list(inputs):
     
-    print(inputs)
     isolates = []
     for i in inputs:
-        print(i)
         data = open_toml(i)
-        print(data)
         isolate = pathlib.Path(i).parts[0]
         if data[isolate]['qc_snippy']['Quality'] == 'PASS':
             isolates.append(isolate)
@@ -19,11 +16,9 @@ def core_stats(inputs):
     df = pandas.DataFrame()
     for i in inputs:
         tml = open_toml(i)
-        print(tml)
         isolate = list(tml.keys())[0]
         d = pandas.DataFrame(tml[isolate]['qc_snippy'], index = [0])
         d['Isolate'] = isolate
-        print(d)
         d = d[['Isolate', 'Quality']]
         if df.empty:
             df = d
@@ -32,7 +27,6 @@ def core_stats(inputs):
 
     # for core.txt
     tab = pandas.read_csv(f"core.txt", sep = '\t')
-    print(tab)
     tab['% USED'] = 100 * (tab['LENGTH'] - tab['UNALIGNED'])/ tab['LENGTH']
     tab['% USED'] = tab['% USED'].round(2)
     tab = tab.rename(columns={'ID':'Isolate'})
@@ -46,13 +40,11 @@ def core_stats(inputs):
 def generate_snippy_core_cmd(isolates, reference, mask):
     
     cmd = f"snippy-core --mask {mask} --ref {reference} {isolates}" if mask != 'nomask' else f"snippy-core --ref {reference} {isolates}"
-    print(cmd)
     return cmd
 
 def run_cmd(cmd):
 
     p = subprocess.run(cmd, shell = True, capture_output=True, encoding = 'utf-8')
-    print(p)
     return p.returncode
 
 def open_toml(tml):
@@ -67,13 +59,9 @@ def write_toml(data, output):
         toml.dump(data, f)
     
 def main(inputs, mask, reference):
-    # print(inputs)
-    # print(mask)
-    # print(reference)
+
     isolates = get_isolate_list(inputs)
-    # print(isolates)
     cmd = generate_snippy_core_cmd(isolates = isolates, reference = reference, mask = mask)
-    # print(cmd)
     p = run_cmd(cmd)
     data = {}
     data['snippy-core'] = {}

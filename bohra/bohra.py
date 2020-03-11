@@ -17,9 +17,10 @@ import configargparse
 import pathlib
 import sys
 import os
+import shutil
 from bohra.SnpDetection import RunSnpDetection
 # from bohra.ReRunSnpDetection import ReRunSnpDetection
-from bohra.Utils import Nulla2bohra, UpdateBohra
+from bohra.Utils import Nulla2bohra, UpdateBohra, CheckDeps
 from bohra.version import version
 
 
@@ -46,6 +47,12 @@ def nulla2bohra(args):
     N = Nulla2bohra(args)
     return(N.update())
 
+def check_deps(args):
+    """
+    check that dependencies are all installed
+    """
+    C = CheckDeps(args)
+    return(C.check())
     
 def main():
     # setup the parser
@@ -68,7 +75,7 @@ def main():
     parser_sub_run.add_argument('--reference','-r',help='Path to reference (.gbk or .fa)', default = '')
     parser_sub_run.add_argument('--mask','-m',default = False, help='Path to mask file if used (.bed)')
     parser_sub_run.add_argument('--kraken_db', '-k', env_var="KRAKEN2_DEFAULT_DB", help="Path to DB for use with kraken2, if no DB present speciation will not be performed.")
-    parser_sub_run.add_argument('--pipeline','-p', default = 'preview', choices=['preview', 'sa','all'], help=f"The pipeline to run. Preview (--preview - default) will calculate mash-distances and a mash-tree for quick inspection of your dataset. SNPs and ASSEMBLIES ('sa') will perform SNPs and ASSEMBLIES. ALL ('all') will perform SNPS, ASSEMBLIES and ROARY for pan-genome analysis")
+    parser_sub_run.add_argument('--pipeline','-p', default = 'preview', choices=['preview','sa','all'], help=f"The pipeline to run. Preview (--preview - default) will calculate mash-distances and a mash-tree for quick inspection of your dataset. SNPs and ASSEMBLIES ('sa') will perform SNPs and ASSEMBLIES. ALL ('all') will perform SNPS, ASSEMBLIES and ROARY for pan-genome analysis")
     parser_sub_run.add_argument('--assembler','-a', default = 'shovill', choices=['shovill','skesa','spades'], help=f"Assembler to use.")
     parser_sub_run.add_argument('--cpus','-c',help='Number of CPU cores to run, will define how many rules are run at a time', default=16)
     parser_sub_run.add_argument('--minaln','-ma',help='Minimum percent alignment. Isolates which do not align to reference at this threshold will not be included in core phylogeny.', default=80)
@@ -92,8 +99,15 @@ def main():
     parser_sub_nulla2bohra.add_argument('--job_id','-j',help='Job directory - the --name you used for nullarbor, will be the name of the output directory', default='')
     parser_sub_nulla2bohra.add_argument('--input_file','-i',help='Input file = tab-delimited with 3 columns <isolatename>  <path_to_read1> <path_to_read2>', default='')
     parser_sub_nulla2bohra.add_argument('--reference', '-r', help = 'The reference that was used in the previous run/ nullarbor job', default = '')
+    
+    # parser for checks
+    parser_sub_check = subparsers.add_parser('check', help = "Check that all dependencies for bohra have been installed.")
+    parser_sub_check.add_argument('--kraken_db', '-k', env_var="KRAKEN2_DEFAULT_DB", help="Path to DB for use with kraken2, if no DB present speciation will not be performed.")
     parser_sub_run.set_defaults(func=run_pipeline)
     parser_sub_nulla2bohra.set_defaults(func=nulla2bohra)
+    parser_sub_check.set_defaults(func = check_deps)
+
+
         
     args = parser.parse_args()
     

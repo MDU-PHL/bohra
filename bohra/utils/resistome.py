@@ -4,7 +4,6 @@ from snakemake import shell
 def generate_abritamr_cmd(input_file, isolate, wd, job_id):
     
     w = pathlib.Path(wd, isolate)
-    print(w)
     cmd = f"abriTAMR -c {input_file} -pfx {isolate} -w {w}"
     return cmd
 
@@ -37,13 +36,10 @@ def main(inputs, isolate, seqdata, wd, job_id):
     data[isolate]['resistome'] = {}
     if seqdata[isolate]['seqdata']['data']['Quality'] == 'PASS':
     # set up data dict
-        print('doing something')
         tml = open_toml(inputs)
         contigs = f"{isolate}/contigs.fa"
         cmd = generate_abritamr_cmd(input_file = contigs, isolate = isolate, wd = wd, job_id = job_id)
-        print(cmd)
         p = run_cmd(cmd)
-        print(p)
         data[isolate]['resistome']['tool'] = 'abritamr'
         
         if f"pipeline successfully completed" in p:

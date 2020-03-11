@@ -3,16 +3,16 @@ from snakemake import shell
 
 def generate_snippy_cmd(r1, r2, isolate, reference, threads):
     
-    print(pathlib.Path(reference))
-    print(pathlib.Path(reference).exists())
-    cmd = f"ls && snippy --outdir {isolate} --ref {reference} --R1 {r1} --R2 {r2} --force --cpus {threads}"
-    print(cmd)
+    p = pathlib.Path(isolate)
+    reads = sorted(p.glob("*.f*q.gz"))
+    cmd = f"snippy --outdir {isolate} --ref {reference} --R1 {r1} --R2 {r1} --force --cpus {threads}"
+    
     return cmd
 
 def run_cmd(cmd):
     
     p = subprocess.run(cmd, shell = True, capture_output=True, encoding = 'utf-8')
-    print(p)
+
     return p.returncode
 
 def get_reads(inputs, isolate):
@@ -25,7 +25,6 @@ def get_reads(inputs, isolate):
 def get_quality(inputs, isolate):
 
     s = open_toml(inputs)
-    print(s)
     if s[isolate]['seqdata']['data']['Quality'] == 'PASS':
         return 'Yes'
     else:
@@ -45,11 +44,8 @@ def write_toml(data, output):
     
 def main(inputs, isolate, output, reference, threads):
     
-    print(inputs)
-    # print(threads)
     r1,r2 = get_reads(inputs = inputs, isolate = isolate)
     run_snippy = get_quality(inputs = inputs, isolate = isolate)
-    print(run_snippy)
     data = {}
     data[isolate] = {}
     data[isolate]['snippy'] = {}
@@ -68,6 +64,9 @@ def main(inputs, isolate, output, reference, threads):
             data[isolate]['snippy']['alignment'] = f"{isolate}/snps.aligned.fa"
             data[isolate]['snippy']['vcf'] = f"{isolate}/snps.vcf"
             data[isolate]['snippy']['cmd'] = cmd
+            data[isolate]['snippy']['done'] = 'Yes'
+        else:
+            data[isolate]['snippy']['done'] = 'No'
     write_toml(data = data, output = f"{isolate}/snippy.toml") 
     
  
@@ -77,6 +76,12 @@ isolate = snakemake.wildcards.sample
 output = snakemake.output
 reference = snakemake.params.reference
 threads = snakemake.threads
+
+# inputs = 'SRR1609871/seqdata.toml'
+# isolate = 'SRR1609871'
+# output = 'SRR1609871/snippy.toml'
+# reference = 'GCA_000703365.1.gbk'
+# threads = 8
 
 main(inputs = inputs, isolate = isolate, output = output,reference = reference, threads =threads)
 

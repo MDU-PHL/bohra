@@ -13,7 +13,6 @@ def generate_delete_cmd():
 def run_cmd(cmd):
 
     p = subprocess.run(cmd, shell = True, capture_output=True, encoding = 'utf-8')
-    print(p)
     return p.stdout
 
 def open_toml(tml):
@@ -30,7 +29,6 @@ def write_toml(data, output):
 def main(inputs, ref, idx, script_path):
     
     t = open_toml(inputs)
-    print(t)
     if t['gubbins']['run_gubbins'] == 'Yes':
         aln = 'gubbins.aln'
     else:
@@ -38,7 +36,6 @@ def main(inputs, ref, idx, script_path):
     cmd = generate_iqtree_cmd(aln = aln, script_path = script_path)
     i = run_cmd(cmd)
     i = f"{i.strip()} -redo"
-    print(i)
     iqtree = run_cmd(i)
     # print(iqtree)
     dl = generate_delete_cmd()

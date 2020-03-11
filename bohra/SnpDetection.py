@@ -97,7 +97,7 @@ class RunSnpDetection(object):
         if isinstance(args.prefillpath, str):
             self.prefillpath = args.prefillpath
         elif self.mdu:
-            self.use_singularity = True
+            # self.use_singularity = True
             self.prefillpath = f"{pathlib.Path('/', 'home', 'seq', 'MDU', 'QC')}/"
         else:
             self.prefillpath = ''
@@ -237,15 +237,25 @@ class RunSnpDetection(object):
         
         self.check_installation(self.assembler_dict[self.assembler])
 
+    def check_abritamr(self):
+
+        if shutil.which('abritamr'):
+            self.logger.info(f"abritamr is installed")
+        elif shutil.which('abriTAMR'):
+            self.logger.info(f"abritamr is installed")
+        else:
+            self.logger.warning(f"abritamr is not installed, resistome will not be determined. Check https://github.com/MDU-PHL/abritamr for installation instructions.")
+
 
     def check_assemble_accesories(self):
         '''
         check the assembly accessories mlst, kraken, abricate and prokka
         '''
-        accessories = ['mlst', 'kraken2', 'abricate', 'prokka']
+        accessories = ['mlst', 'kraken2', 'prokka']
         
         for a in accessories:
             self.check_installation(a)
+        self.check_abritamr()
     
     def check_roary(self):
         '''
@@ -344,8 +354,25 @@ class RunSnpDetection(object):
         if corefiles:
             for core in corefiles:
                 core.unlink()
-                
+    
+    def check_quals(self):
 
+        quals = ['mash', 'seqtk']
+        for q in quals:
+            self.check_installation(software = q)
+
+
+    def check_sa(self):
+        
+        self.check_quals()
+        self.check_snippycore()
+        self.check_snpdists()
+        self.check_kraken2DB()
+        self.check_iqtree()
+        self.check_assembler()
+        self.check_assemble_accesories()
+
+        return(self.check_snippy())
 
     def check_deps(self):
         '''
@@ -354,17 +381,13 @@ class RunSnpDetection(object):
         # TODO check all software tools used and is there a way to check database last update??
         # TODO check assemblers
         self.logger.info(f"Checking software dependencies")
-        if self.pipeline != "a":
-            self.check_snippycore()
-            self.check_snpdists()
-            self.check_kraken2DB()
-            self.check_iqtree()
-            return(self.check_snippy())
-        elif self.pipeline != "s":
-            self.check_assembler()
-            self.check_assemble_accesories()
+        if self.pipeline == "sa":
+            return(self.check_sa())
+
+        if self.pipeline == "all":
             self.check_roary()
-            return True
+            return(self.check_sa())
+            
     
     def run_checks(self):
         '''
@@ -814,7 +837,7 @@ class RunSnpDetection(object):
             maskstring = ''
         self.logger.info(f'Mask string : {maskstring}')
         self.logger.info(f"Writing config file for job : {self.job_id}")
-        
+        reference = pathlib.Path(self.ref)
         vars_for_file = {
             'workdir': f"{wd}",
             'prefill_path' : self.prefillpath,
@@ -823,7 +846,7 @@ class RunSnpDetection(object):
             'mask_string': maskstring, 
             'template_path':f"{pathlib.Path(__file__).parent / 'templates'}",
             'script_path':f"{pathlib.Path(__file__).parent / 'utils'}",
-            'reference' : f"{wd / self.ref.name}",
+            'reference' : f"{wd / reference.name}",
             'minperc' : self.minaln,
             'now' : self.now,
             'day': self.day, 
@@ -931,5 +954,6 @@ class RunSnpDetection(object):
                     force = f""
                 # self.logger.info(f"snakemake -j {self.jobs} {force} 2>&1 ")
             self.logger.info(f"Have a nice day. Come back soon.") 
-            
+
+        
 

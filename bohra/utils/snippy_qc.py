@@ -31,7 +31,6 @@ def check_snippy(data, isolate, minaln, aln):
 def open_toml(tml):
 
     data = toml.load(tml)
-    print(data)
     return data
 
 def write_toml(data, output):
@@ -43,13 +42,13 @@ def main(inputs, isolate, output, minaln):
     
 
     s = open_toml(tml = inputs)
-    print(s)
-    rs = s[isolate]['snippy']['run_snippy']
+    
+    rs = s[isolate]['snippy']['done']
     data = {}
     data[isolate] = {}
     data[isolate]['qc_snippy'] = {}
     data[isolate]['qc_snippy']['run_snippy'] = rs
-    print(s)
+    
     if rs == 'Yes':
         data = check_snippy(minaln = minaln,data = data, aln = s[isolate]['snippy']['alignment'], isolate = isolate)
     else:
