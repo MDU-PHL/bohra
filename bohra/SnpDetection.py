@@ -95,8 +95,8 @@ class RunSnpDetection(object):
         if isinstance(args.prefillpath, str):
             self.prefillpath = args.prefillpath
         elif self.mdu:
-            # self.use_singularity = True
-            # self.logger.info(f"You are running bohra on mdu business - so singularity containers will be used automatically {self.use_singularity}")
+            self.use_singularity = True
+            self.logger.info(f"You are running bohra on mdu business - so singularity containers will be used automatically {self.use_singularity}")
             self.prefillpath = f"{pathlib.Path('/', 'home', 'seq', 'MDU', 'QC')}/"
         else:
             self.prefillpath = ''
@@ -847,8 +847,8 @@ class RunSnpDetection(object):
             'kraken_db': f"{self.kraken_db}",
             'preview': self.preview, 
             'prefill_path': self.prefillpath if self.prefillpath != '' else 'nopath',
-            # 'snippy_singularity': self.snippy_singularity,
-            # 'abritamr_singularity': self.abritamr_singularity
+            'snippy_singularity': self.snippy_singularity,
+            'abritamr_singularity': self.abritamr_singularity
         }
 
         # read the config file which is written with jinja2 placeholders (like django template language)
@@ -867,7 +867,7 @@ class RunSnpDetection(object):
         '''
         snake_name = f"{pathlib.Path(__file__).parent / 'utils'/ 'bohra.smk'}"
         if self.use_singularity:
-            singularity_string = f"--use-singularity --singularity-args \"--home /home/khhor\""
+            singularity_string = f"--use-singularity --singularity-args \"--home /home\""
         else:
             singularity_string = ''
 
