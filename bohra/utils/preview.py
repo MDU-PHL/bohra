@@ -3,7 +3,7 @@ from snakemake import shell
 
 def generate_triangle_cmd():
     
-    cmd = f"mash triangle -C */sketch.msh > preview_distances.tab"
+    cmd = f"mash triangle -C */sketch.msh ref.fa > preview_distances.tab"
     return cmd
 
 def generate_tree_cmd():
@@ -15,6 +15,7 @@ def run_cmd(cmd):
     
     print(f"Running : {cmd}")
     p = subprocess.run(cmd, shell = True, capture_output=True, encoding = 'utf-8')
+    print(p)
     return p.returncode
 
 def get_isolates(tab):
@@ -61,7 +62,7 @@ def main(inputs):
             clean_dist_mat(data['preview']['distances'])
             write_toml(data = data, output = 'preview.toml')
     
-    
+# reference = snakemake.params.reference
 inputs = snakemake.input
 
 main(inputs = inputs)

@@ -608,6 +608,22 @@ class RunSnpDetection(object):
         
         return  path.name
 
+    def index_reference(self):
+
+        ref = pathlib.Path(self.job_id , 'ref.fa')
+        idx = pathlib.Path(self.job_id , 'ref.fa.fai')
+        if '.fa' not in self.ref:
+            self.logger.info(f"converting {self.ref} to fasta format.")
+            SeqIO.convert(f"{self.ref}", 'genbank', f"{ref}", 'fasta')
+        else:
+            subprocess.run(f"cp {self.ref} {ref}", shell = True)
+        record = SeqIO.parse(f"{ref}", "fasta")
+        for r in record:
+            r.description = ''
+            SeqIO.write(r, f"{ref}", "fasta")
+        self.logger.info(f"Indexing reference.")
+        subprocess.run(f"samtools faidx {ref}", shell =True)
+
     def check_mask(self, mask, original_mask = False):
         '''
         input:
@@ -904,7 +920,7 @@ class RunSnpDetection(object):
             self.logger.info(f"You have chosen to run bohra with singularity containers. Good luck")
         else:
             self.run_checks()
-        
+        self.index_reference()
         # update source data in source.log
         self.set_source_log()
         
