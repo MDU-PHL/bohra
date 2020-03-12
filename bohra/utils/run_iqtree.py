@@ -11,7 +11,7 @@ def generate_delete_cmd():
     return cmd
 
 def run_cmd(cmd):
-    
+
     print(f"Running : {cmd}.")
     p = subprocess.run(cmd, shell = True, capture_output=True, encoding = 'utf-8')
     return p.stdout
@@ -51,8 +51,8 @@ def main(inputs, ref, idx, script_path):
     write_toml(data = data, output = "iqtree.toml")
 
 inputs = snakemake.input.gubbins
-ref = snakemake.input.ref
-idx = snakemake.input.idx
+ref = snakemake.params.ref
+idx = snakemake.params.idx
 script_path = snakemake.params.script_path
 
 main(inputs = inputs, ref = ref, idx = idx, script_path = script_path)

@@ -12,9 +12,6 @@ import subprocess
 import json
 from Bio import SeqIO, Phylo
 from packaging import version
-# from bohra.ReRunSnpDetection import ReRunSnpDetection
-# from bohra.bohra_logger import logger
-# from bohra.utils.write_report import Report
 
 
 class RunSnpDetection(object):

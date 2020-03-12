@@ -256,35 +256,37 @@ else:
 			"snp_dists.py"
 		
 
-	rule index_reference:
-		input:
-			REFERENCE
-		output:
-			"ref.fa",
-			"ref.fa.fai"
-		run:
-			from Bio import SeqIO
-			import pathlib, subprocess
-			ref = f"{output[0]}"
-			idx = f"{output[1]}"
-			if '.fa' not in REFERENCE:
-				# print(f"converting {REFERENCE}")
-				SeqIO.convert(f"{input[0]}", 'genbank', ref	, 'fasta')
-				# print(f"converted {REFERENCE}")
-			else:
-				subprocess.run(f"ln -sf {REFERENCE} {ref}", shell = True)
-			subprocess.run(f"samtools faidx {ref}", shell =True)
+	# rule index_reference:
+	# 	input:
+	# 		REFERENCE
+	# 	output:
+	# 		"ref.fa",
+	# 		"ref.fa.fai"
+	# 	run:
+	# 		from Bio import SeqIO
+	# 		import pathlib, subprocess
+	# 		ref = f"{output[0]}"
+	# 		idx = f"{output[1]}"
+	# 		if '.fa' not in REFERENCE:
+	# 			# print(f"converting {REFERENCE}")
+	# 			SeqIO.convert(f"{input[0]}", 'genbank', ref	, 'fasta')
+	# 			# print(f"converted {REFERENCE}")
+	# 		else:
+	# 			subprocess.run(f"ln -sf {REFERENCE} {ref}", shell = True)
+	# 		subprocess.run(f"samtools faidx {ref}", shell =True)
 
 	rule run_iqtree_core:
 		input:
 			gubbins = 'gubbins.toml', 
-			ref = 'ref.fa', 
-			idx = 'ref.fa.fai'
+			# ref = 'ref.fa', 
+			# idx = 'ref.fa.fai'
 		
 		output:
 			'iqtree.toml',
 		params:
-			script_path = SCRIPT_PATH	
+			script_path = SCRIPT_PATH,
+			ref = "ref.fa",
+			idx = "ref.fa.fai"
 		script:
 			"run_iqtree.py"
 	
