@@ -8,4 +8,4 @@ psutil
 pytest
 sh
 packaging
-snakemake>=5.4.0
+snakemake==5.9.1
