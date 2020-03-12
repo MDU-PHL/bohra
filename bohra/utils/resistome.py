@@ -14,6 +14,7 @@ def generate_dict(isolate):
 
 def run_cmd(cmd):
     
+    print(f"Running : {cmd}.")
     p = subprocess.run(cmd, shell = True, capture_output=True, encoding = 'utf-8')
     return p.stderr
 
@@ -36,6 +37,7 @@ def main(inputs, isolate, seqdata, wd, job_id):
     data[isolate]['resistome'] = {}
     if seqdata[isolate]['seqdata']['data']['Quality'] == 'PASS':
     # set up data dict
+        print(f"Isolate {isolate} passed quality checks, resistome will be found.")
         tml = open_toml(inputs)
         contigs = f"{isolate}/contigs.fa"
         cmd = generate_abritamr_cmd(input_file = contigs, isolate = isolate, wd = wd, job_id = job_id)
@@ -43,11 +45,14 @@ def main(inputs, isolate, seqdata, wd, job_id):
         data[isolate]['resistome']['tool'] = 'abritamr'
         
         if f"pipeline successfully completed" in p:
+            print(f"Resistome was successfully identified, results will now be added to the toml file.")
             data[isolate]['resistome']['data'] = generate_dict(isolate)
             data[isolate]['resistome']['done'] = True
         else:
+            print(f"Something has gone wrong with the resistome - please check your data and you may try again.")
             data[isolate]['resistome']['done'] = False
     else:
+        print(f"Isolate {isolate} did not pass quality checks - no further analysis will be performed.")
         data[isolate]['resistome']['done'] = False
         data[isolate]['resistome']['tool'] = f"AMR not performed - failed QC"
     

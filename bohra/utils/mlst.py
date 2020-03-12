@@ -31,7 +31,7 @@ def generate_rm_cmd(isolate):
     return df.to_dict(orient = 'records')
 
 def run_cmd(cmd):
-    
+    print(f"Running : {cmd}")
     p = subprocess.run(cmd, shell = True, capture_output=True, encoding = 'utf-8')
     return p.returncode
 
@@ -55,15 +55,18 @@ def main(inputs, isolate, seqdata):
     assembly = f"{pathlib.Path(isolate, 'contigs.fa')}"
     if seqdata[isolate]['seqdata']['data']['Quality'] == 'PASS':
     # set up data dict
+        print(f"Isolate {isolate} has passed quality checks, mlst will be found.")
         cmd = generate_mlst_cmd(assembly = assembly, isolate = isolate)
         p = run_cmd(cmd)
         if p == 0:
+            print('MLST has successfuly completed, toml will now be updated.')
             data[isolate]['mlst']['done'] = 'Yes'
             data[isolate]['mlst']['data'] = extract_mlst(isolate)
     else:
-            data[isolate]['mlst']['done'] = 'No'
-            data[isolate]['mlst']['data'] = f"MLST not performed - failed QC"
-            
+        print(f"Isolate {isolate} did not pass quality checks, no mlst will be determined.")
+        data[isolate]['mlst']['done'] = 'No'
+        data[isolate]['mlst']['data'] = f"MLST not performed - failed QC"
+        
     write_toml(data = data, output= f'{isolate}/mlst.toml')
 
 inputs =snakemake.input.assembly

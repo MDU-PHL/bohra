@@ -11,7 +11,8 @@ def generate_delete_cmd():
     return cmd
 
 def run_cmd(cmd):
-
+    
+    print(f"Running : {cmd}.")
     p = subprocess.run(cmd, shell = True, capture_output=True, encoding = 'utf-8')
     return p.stdout
 
@@ -33,6 +34,7 @@ def main(inputs, ref, idx, script_path):
         aln = 'gubbins.aln'
     else:
         aln = 'core.aln'
+    print(f"Generating iqtree command.")
     cmd = generate_iqtree_cmd(aln = aln, script_path = script_path)
     i = run_cmd(cmd)
     i = f"{i.strip()} -redo"

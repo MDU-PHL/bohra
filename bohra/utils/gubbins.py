@@ -13,11 +13,11 @@ def generate_gubbins_cmd():
 
 def generate_snp_sites_cmd():
     
-    cmd = f"run_gubbins.py -c 36  --prefix core gubbins.aln"								
+    cmd = f"snp-sites -c clean.filtered_polymorphic_sites.fasta > gubbins.aln"								
     return cmd
 
 def run_cmd(cmd):
-
+    print(f"Now running {cmd}.")
     p = subprocess.run(cmd, shell = True, capture_output=True, encoding = 'utf-8')
     return p.returncode
 
@@ -37,6 +37,7 @@ def main(inputs, gubbins):
     data['gubbins'] = {}
     # print(gubbins)
     if gubbins != False:
+        print(f"You have elected to correct for recombination. Gubbins will now be used.")
         clean = run_cmd(generate_snippy_clean_cmd())
         if clean == 0:
             gub = run_cmd(generate_gubbins_cmd())
@@ -46,6 +47,7 @@ def main(inputs, gubbins):
                     data['gubbins']['run_gubbins'] = 'Yes'
                     data['gubbins']['aln'] = 'gubbins.aln'
     else:
+        print(f"Gubbins is not necessary for the current job.")
         data['gubbins']['run_gubbins'] = 'No'
 
         

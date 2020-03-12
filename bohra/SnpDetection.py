@@ -49,8 +49,8 @@ class RunSnpDetection(object):
         self.pipeline = args.pipeline
         self.preview = True if self.pipeline == 'preview' else False
         self.logger.info(f"You are running bohra in {self.pipeline} mode.")
-        self.snippy_singularity = args.snippy_singularity
-        self.abritamr_singularity = args.abritamr_singularity
+        # self.snippy_singularity = args.snippy_singularity
+        # self.abritamr_singularity = args.abritamr_singularity
         self.job_id = self._name_exists(args.job_id)
         self.logger.info(f"Job ID is set {self.job_id}")
         # path to reference and mask
@@ -94,10 +94,12 @@ class RunSnpDetection(object):
         self.gubbins = False
         self.use_singularity = args.use_singularity
         self.mdu = args.mdu
+        # self.logger.info(f"{self.mdu}")
         if isinstance(args.prefillpath, str):
             self.prefillpath = args.prefillpath
         elif self.mdu:
             # self.use_singularity = True
+            # self.logger.info(f"You are running bohra on mdu business - so singularity containers will be used automatically {self.use_singularity}")
             self.prefillpath = f"{pathlib.Path('/', 'home', 'seq', 'MDU', 'QC')}/"
         else:
             self.prefillpath = ''
@@ -381,7 +383,8 @@ class RunSnpDetection(object):
         # TODO check all software tools used and is there a way to check database last update??
         # TODO check assemblers
         self.logger.info(f"Checking software dependencies")
-        if self.pipeline == "sa":
+        # self.logger.info(f"{self.pipeline}")
+        if self.pipeline in ["sa", "preview"]:
             return(self.check_sa())
 
         if self.pipeline == "all":
@@ -394,7 +397,8 @@ class RunSnpDetection(object):
         Run checks prior to start - checking all software is installed, if this is a rerun and the input files
         '''
         self.check_setup_files()
-        self.logger.info(f"{self.ref}")
+        # self.logger.info(f"{self.ref}")
+        # self.logger.info(f"Checking software dependencies")
         self.snippy_version = self.check_deps()
         # check reference
         if self.ref == '':
@@ -830,8 +834,8 @@ class RunSnpDetection(object):
             'kraken_db': f"{self.kraken_db}",
             'preview': self.preview, 
             'prefill_path': self.prefillpath if self.prefillpath != '' else 'nopath',
-            'snippy_singularity': self.snippy_singularity,
-            'abritamr_singularity': self.abritamr_singularity
+            # 'snippy_singularity': self.snippy_singularity,
+            # 'abritamr_singularity': self.abritamr_singularity
         }
 
         # read the config file which is written with jinja2 placeholders (like django template language)
@@ -850,7 +854,7 @@ class RunSnpDetection(object):
         '''
         snake_name = f"{pathlib.Path(__file__).parent / 'utils'/ 'bohra.smk'}"
         if self.use_singularity:
-            singularity_string = f"--use-singularity --singularity-args '--bind /home'"
+            singularity_string = f"--use-singularity --singularity-args \"--home /home/khhor\""
         else:
             singularity_string = ''
 
@@ -868,7 +872,7 @@ class RunSnpDetection(object):
         if self.cluster:
             cmd = f"{self.cluster_cmd()} -s {snake_name} -d {wd} {force} {singularity_string} --latency-wait 1200"
         else:
-            cmd = f"snakemake {dry} -s {snake_name} -j {self.cpus} -d {wd} {force} {singularity_string} 2>&1"
+            cmd = f"snakemake {dry} -s {snake_name} {singularity_string} -j {self.cpus} -d {self.job_id} {force} --verbose 2>&1"
             # cmd = f"snakemake -s {snake_name} --cores {self.cpus} {force} "
         self.logger.info(f"Running job : {self.job_id} with {cmd} this may take some time. We appreciate your patience.")
         wkf = subprocess.run(cmd, shell = True)

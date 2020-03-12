@@ -23,10 +23,11 @@ def generate_cmd(prefill, r1, r2, isolate, db, data):
     if prfl.exists():
         cmd = f"cp {prfl} {isolate}/kraken2.tab"
         data[isolate]['kraken']['kraken_db'] = f"Prefilled from: {prfl}"
+        print(f"Species id will be determined from results retrieved from {prfl}")
     else:
         cmd = f"kraken2 --paired {r1} {r2} --minimum-base-quality 13 --report {isolate}/kraken2.tab --memory-mapping --db {db}"
         data[isolate]['kraken']['kraken_db'] = f"{db}"
-
+        print(f"Species id will be determined from {db}")
     return cmd, data
 
 def run_cmd(cmd):
@@ -61,15 +62,19 @@ def main(r1, r2, isolate, kraken_db,prefill):
     data[isolate] = {}
     data[isolate]['kraken'] = {}
     # run kraken
+    print(f"Identifying species of isolate {isolate}")
     cmd, data = generate_cmd(prefill = prefill, r1 = r1, r2 = r2, isolate = isolate, db = kraken_db, data = data)
     kraken_returncode = run_cmd(cmd)
     if kraken_returncode == 0:
         # add to data dict
+        print(f"Kraken successfully ran - you will be able to see the top 3 species id in the toml file.")
         data[isolate]['kraken']['done'] = True
         data[isolate]['kraken']['file'] = f"{isolate}/kraken2.tab"
         data[isolate]['kraken']['top_3'] = get_top_3(isolate)
         
         write_toml(data = data, output= f"{isolate}/kraken.toml")
+    else:
+        print(f"Somthing went wrong with species identification, please check your inputs.")
 
 
 

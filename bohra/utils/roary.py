@@ -29,6 +29,7 @@ def generate_rm_cmd():
 
 def run_cmd(cmd):
     
+    print(f"Running : {cmd}.")
     p = subprocess.run(cmd, shell = True, capture_output=True, encoding = 'utf-8')
     return p.returncode
 
@@ -48,9 +49,10 @@ def main(inputs):
     gffs = get_gffs(inputs)
     data = {}
     data['roary'] = {}
-    
+    print(f"Roary will now be performed.")
     roary = run_cmd(generate_roary_cmd(gffs))
     if roary == 0:
+        print(f"Roary successfully completed.")
         run_cmd(generate_mv_cmd())
         run_cmd(generate_rm_cmd())
 
@@ -58,6 +60,7 @@ def main(inputs):
         data['roary']['csv'] = "roary/gene_presence_absence.csv"
         data['roary']['txt']="roary/summary_statistics.txt"
     else:
+        print('Something went wrong - roary did not complete.')
         data['roary']['done'] = False
     
     write_toml(data = data, output= f'roary.toml')

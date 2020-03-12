@@ -13,6 +13,7 @@ def generate_svg_cmd(csv, output):
 
 def run_cmd(cmd):
     
+    print(f"Running : {cmd}")
     p = subprocess.run(cmd, shell = True, capture_output=True, encoding = 'utf-8')
     return p.returncode
 
@@ -33,6 +34,7 @@ def main(inputs):
     data = {}
     data['pan_figure'] = {}
     data['pan_figure']['figure'] = "pan_genome.svg"   
+    print("Generating pan genome figure")
     fig = run_cmd(generate_svg_cmd(csv = csv, output = data['pan_figure']['figure']))
     if fig == 0:
         data['pan_figure']['done'] = True

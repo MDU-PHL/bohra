@@ -23,8 +23,10 @@ def check_snippy(data, isolate, minaln, aln):
         # if the percent alignement is greater than the min alignment
         if perc_aln > float(minaln):
             data[isolate]['qc_snippy']['Quality'] = 'PASS'
+            print(f'Isolate {isolate} will be included in core analysis')
         else:
             data[isolate]['qc_snippy']['Quality'] = f'Alignment < {float(minaln)} - isolate will not be included in core'
+            print(f'Isolate {isolate} did not meet the {minaln} threshold for alignment and will not be included in the core analysis.')
         return data
                                         
 
@@ -42,7 +44,7 @@ def main(inputs, isolate, output, minaln):
     
 
     s = open_toml(tml = inputs)
-    
+    print(f'Checking if snippy was performed for isolate {isolate}.')
     rs = s[isolate]['snippy']['done']
     data = {}
     data[isolate] = {}
@@ -50,10 +52,11 @@ def main(inputs, isolate, output, minaln):
     data[isolate]['qc_snippy']['run_snippy'] = rs
     
     if rs == 'Yes':
+        print(f'snp calling was performed on isolate {isolate}, further checks will now be performed.')
         data = check_snippy(minaln = minaln,data = data, aln = s[isolate]['snippy']['alignment'], isolate = isolate)
     else:
         data[isolate]['qc_snippy']['Quality'] = 'FAILED sequence QC will not be included in further analysis.'
-    
+    print(f'Alignment assessment has been performed for isolate {isolate} and is now being written tot toml.')
     write_toml(data = data, output = f"{isolate}/snippy_qc.toml") 
 
    

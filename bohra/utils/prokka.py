@@ -14,6 +14,7 @@ def generate_rm_cmd(isolate):
 
 def run_cmd(cmd):
     
+    print(f'Running : {cmd}')
     p = subprocess.run(cmd, shell = True, capture_output=True, encoding = 'utf-8')
     return p.returncode
    
@@ -40,14 +41,17 @@ def main(inputs, isolate, seqdata):
     seqdata = open_toml(seqdata)
     cmd = generate_prokka_cmd(isolate = isolate, assembly = assembly)
     if seqdata[isolate]['seqdata']['data']['Quality'] == 'PASS':
+        print(f"Isolate {isolate} has passed quality checks, prokka will be used to annotate assembly.")
         p = run_cmd(cmd)
         if p == 0:
+            print(f"Prokka ran successfully, now cleaning up.")
             rm_cmd = generate_rm_cmd(isolate = isolate)
             r = generate_rm_cmd(run_cmd)
             data[isolate]['prokka']['done'] = True
             data[isolate]['prokka']['gff'] = f'{isolate}/{isolate}.gff'
             data[isolate]['prokka']['txt'] = f'{isolate}/{isolate}.txt'
     else:
+        print(f"Isolate {isolate} did not pass quality checks no further analysis will be performed.")
         data[isolate]['prokka']['done'] = False
 
     

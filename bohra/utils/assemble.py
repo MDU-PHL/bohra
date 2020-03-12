@@ -10,7 +10,7 @@ def generate_asm_cmd(assembler, r1, r2, isolate, threads = 4, memory = 8):
         cmd = f"spades.py -1 {r1} -2 {r2} -o {isolate}/spades --threads {threads} --memory {memory}"
     else:
         cmd = f"skesa --fastq {r1},{r2} --contigs_out {isolate}/contigs.fa --cores {threads} --memory {memory}"
-    print(cmd)
+    print(f"Assembling using : {cmd}")
     return cmd
 
 
@@ -20,7 +20,9 @@ def generate_cmd(prefill, r1, r2, isolate, assembler, data):
     if prfl.exists():
         cmd = f"cp {prfl} {isolate}/contigs.fa"
         data[isolate]['assembly']['source'] = f"Prefilled from: {prfl}"
+        print(f'Isolate has passed quality checks and assembly will be retrieved from {prfl}.')
     else:
+        print(f'Isolate has passed quality checks and assembly will be generated.')
         cmd = generate_asm_cmd(assembler = assembler, r1 = r1, r2 = r2, isolate = isolate)
         data[isolate]['assembly']['source'] = cmd
     
@@ -59,15 +61,19 @@ def main(seqdata, isolate, assembler, prefill):
     data[isolate]['assembly'] = {}
     # run kraken
     # data[isolate]['seqdata']['data']['Quality']
+    print(f'Checking the quality of isolate {isolate}')
     if seqdata[isolate]['seqdata']['data']['Quality'] == 'PASS':
+        
         cmd, data = generate_cmd(prefill = prefill, r1 = r1, r2 = r2, isolate = isolate, assembler =assembler, data = data)
         assembly_returncode = run_cmd(cmd)
         if assembly_returncode == 0:
+            print('Assembly was successful, toml will be updated.')
             p = run_cmd(generate_mv_cmd(assembler = assembler, isolate = isolate))
             # add to data dict
             data[isolate]['assembly']['done'] = 'Yes'
             data[isolate]['assembly']['assembler'] = assembler
     else:
+        print(f'Isolate {isolate} did not pass quality checks so assembly was not performed.')
         data[isolate]['assembly']['done'] = 'No'
         data[isolate]['assembly']['assembler'] = f"Assembly not performed - failed QC"
 

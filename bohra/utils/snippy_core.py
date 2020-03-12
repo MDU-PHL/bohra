@@ -60,13 +60,15 @@ def write_toml(data, output):
     
 def main(inputs, mask, reference):
 
+    print('Getting a list of isolates to include in core analysis.')
     isolates = get_isolate_list(inputs)
     cmd = generate_snippy_core_cmd(isolates = isolates, reference = reference, mask = mask)
+    print(f'Running core analysis with {cmd}')
     p = run_cmd(cmd)
     data = {}
     data['snippy-core'] = {}
     if p == 0:
-        
+        print('Core analysis has been performed and toml file will be updated.')
         date = datetime.datetime.today().strftime("%d_%m_%y")
         data['snippy-core'][date] = {}
         data['snippy-core'][date]['isolates'] = isolates.split()

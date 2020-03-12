@@ -52,13 +52,12 @@ def fa(inputs, isolate, min_size =500):
     return(data)
 
 def main(inputs,isolate):
-#     colnames = ['Name','bp','# Contigs','Ns','# Gaps','Min Contig size','Max Contig size','Avg Contig size','N50']
-    # print(colnames)
-    # print('\t'.join(colnames))
+
     assembly_data = open_toml(tml = inputs)
 
     if assembly_data[isolate]['assembly']['done'] == 'Yes':
         # print('in true')
+        print(f"Calculating assembly statistics.")
         assembly = f"{pathlib.Path(isolate, 'contigs.fa')}"
         d = fa(inputs=assembly,isolate= isolate)
         data = {}

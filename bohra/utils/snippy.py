@@ -55,14 +55,21 @@ def main(inputs, isolate, output, reference, threads):
 
     if run_snippy == 'Yes':
         cmd = generate_snippy_cmd(r1 = r1, r2=r2, isolate = isolate, reference = reference, threads = threads)
+        print(f"Reads for isolate {isolate} have passed checks and snp calling will now be peformed : {cmd}.")
         p = run_cmd(cmd)
         if p == 0:
+            print(f'snp calling was successful - snippy finished running and returned a 0 exit code. Phew!')
             data[isolate]['snippy']['alignment'] = f"{isolate}/snps.aligned.fa"
             data[isolate]['snippy']['vcf'] = f"{isolate}/snps.vcf"
             data[isolate]['snippy']['cmd'] = cmd
             data[isolate]['snippy']['done'] = 'Yes'
         else:
+            print('Something went wrong with snp calling. It seems that snippy struggled - please check reads and reference are ok and try again.')
             data[isolate]['snippy']['done'] = 'No'
+    else:
+        print(f'Isolate {isolate} did not pass checks and will not be included in further analysis' )
+        data[isolate]['snippy']['done'] = 'No'
+    print('Saving toml file for snippy.')
     write_toml(data = data, output = f"{isolate}/snippy.toml") 
 
 inputs = snakemake.input

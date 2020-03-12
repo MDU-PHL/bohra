@@ -23,6 +23,7 @@ def main(inputs):
     for i in inputs:
         iostring = get_io(i)
         cmd = generate_mv_cmd(iostring)
+        print(f"Moving out files : {cmd}")
         p = run_cmd(cmd)
     
 

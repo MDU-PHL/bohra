@@ -36,3 +36,5 @@ min_cov:
 #         "{{snippy_singularity}}"
 abritamr_singularity:
         "{{abritamr_singularity}}"
+snippy_singularity:
+        "{{snippy_singularity}}"

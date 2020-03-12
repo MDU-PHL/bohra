@@ -46,7 +46,10 @@ def get_length(fasta):
     length = 0
     for i in SeqIO.parse(fasta,'fasta'): # use BioPython to determine percent alignment
         l = len(i.seq)
+        print(l)
         length = length + l
+        print(length)
+    print(length)
     return length
 
 def get_coverage(reference, isolate, yld):

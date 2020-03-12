@@ -13,6 +13,7 @@ def generate_tree_cmd():
 
 def run_cmd(cmd):
     
+    print(f"Running : {cmd}")
     p = subprocess.run(cmd, shell = True, capture_output=True, encoding = 'utf-8')
     return p.returncode
 
@@ -47,6 +48,7 @@ def main(inputs):
     # print(triangle)
     p = run_cmd(triangle)
     # print(p)
+    print(f"Generating preview files.")
     if p == 0:
         tree = generate_tree_cmd()
         # print(tree)
