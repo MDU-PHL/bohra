@@ -46,8 +46,8 @@ class RunSnpDetection(object):
         self.pipeline = args.pipeline
         self.preview = True if self.pipeline == 'preview' else False
         self.logger.info(f"You are running bohra in {self.pipeline} mode.")
-        # self.snippy_singularity = args.snippy_singularity
-        # self.abritamr_singularity = args.abritamr_singularity
+        self.snippy_singularity = args.snippy_singularity
+        self.abritamr_singularity = args.abritamr_singularity
         self.job_id = self._name_exists(args.job_id)
         self.logger.info(f"Job ID is set {self.job_id}")
         # path to reference and mask
