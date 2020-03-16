@@ -3,9 +3,12 @@ from snakemake import shell
 
 def generate_snippy_cmd(r1, r2, isolate, reference, threads):
     
-    p = pathlib.Path(isolate)
-    print(r1, r2, isolate, reference, threads)
-    cmd = f"snippy --outdir {isolate} --ref {reference} --R1 {r1} --R2 {r1} --force --cpus {threads}"
+    print(r1)
+    print(r2)
+    print(isolate)
+    print(reference)
+    print(threads)
+    cmd = f'snippy --outdir {isolate} --ref {reference} --R1 {r1} --R2 {r2} --force --cpus {threads}'
     print(cmd)
     return cmd
 
@@ -78,6 +81,5 @@ isolate = snakemake.wildcards.sample
 output = snakemake.output
 reference = snakemake.params.reference
 threads = snakemake.threads
-
 
 main(inputs = inputs, isolate = isolate, output = output,reference = reference, threads =threads)

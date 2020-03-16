@@ -18,9 +18,9 @@ import pathlib
 import sys
 import os
 import shutil
-from SnpDetection import RunSnpDetection
-# from bohra.Utils import Nulla2bohra, UpdateBohra, CheckDeps
-from version import version
+from bohra.SnpDetection import RunSnpDetection
+from bohra.Utils import Nulla2bohra, UpdateBohra, CheckDeps
+from bohra.version import version
 
 
 #logging.basicConfig(filename='job.log',level=logging.INFO, format='[%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')

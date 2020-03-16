@@ -56,7 +56,7 @@ def main(inputs, isolate, output, minaln):
         data = check_snippy(minaln = minaln,data = data, aln = s[isolate]['snippy']['alignment'], isolate = isolate)
     else:
         data[isolate]['qc_snippy']['Quality'] = 'FAILED sequence QC will not be included in further analysis.'
-    print(f'Alignment assessment has been performed for isolate {isolate} and is now being written tot toml.')
+    print(f'Alignment assessment has been performed for isolate {isolate} and is now being written to toml.')
     write_toml(data = data, output = f"{isolate}/snippy_qc.toml") 
 
    

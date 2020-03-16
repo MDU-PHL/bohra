@@ -95,8 +95,8 @@ class RunSnpDetection(object):
         if isinstance(args.prefillpath, str):
             self.prefillpath = args.prefillpath
         elif self.mdu:
-            self.use_singularity = True
-            self.logger.info(f"You are running bohra on mdu business - so singularity containers will be used automatically {self.use_singularity}")
+            # self.use_singularity = True
+            # self.logger.info(f"You are running bohra on mdu business - so singularity containers will be used automatically {self.use_singularity}")
             self.prefillpath = f"{pathlib.Path('/', 'home', 'seq', 'MDU', 'QC')}/"
         else:
             self.prefillpath = ''

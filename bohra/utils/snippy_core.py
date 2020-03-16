@@ -26,7 +26,7 @@ def core_stats(inputs):
             df = df.append(d)
 
     # for core.txt
-    tab = pandas.read_csv(f"core.txt", sep = '\t')
+    tab = pandas.read_csv("core.txt", sep = '\t')
     tab['% USED'] = 100 * (tab['LENGTH'] - tab['UNALIGNED'])/ tab['LENGTH']
     tab['% USED'] = tab['% USED'].round(2)
     tab = tab.rename(columns={'ID':'Isolate'})
