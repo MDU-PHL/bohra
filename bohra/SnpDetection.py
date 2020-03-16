@@ -546,7 +546,7 @@ class RunSnpDetection(object):
             :unzipped: unzipped path
         '''
         self.logger.info(f"Checking if reference needs to be unzipped")
-        target = self.workdir / path.name.strip(suffix)
+        target = self.workdir / pathlib.Path(path).name.strip(suffix)
         
         if suffix == '.zip':
             cmd = f"unzip {path} -d {target}"
@@ -605,11 +605,31 @@ class RunSnpDetection(object):
         
         return  path.name
 
+    def check_ref_type(self, ref):
+
+        lst = []
+        record = SeqIO.parse(ref, 'genbank')
+        for r in record:
+            lst.append(r)
+        if lst != []:
+            return 'genbank'
+        else:
+            record = SeqIO.parse(ref, 'fasta')
+            for r in record:
+                lst.append(r)
+            if lst != []:
+                return 'fasta'
+            else:
+                self.logger.info(f"It seems your reference file is not a genbank or fasta file format. Please check your inputs and try again.")
+        
     def index_reference(self):
 
         ref = pathlib.Path(self.job_id , 'ref.fa')
         idx = pathlib.Path(self.job_id , 'ref.fa.fai')
-        if '.fa' not in self.ref:
+        if f"{pathlib.Path(self.ref).suffix}" in ['.gz','zip']:
+                    self.ref = pathlib.Path(self.unzip_files(self.ref, f"{self.ref.suffix}"))
+        ref_type = self.check_ref_type(ref = self.ref)
+        if ref_type == 'genbank':
             self.logger.info(f"converting {self.ref} to fasta format.")
             SeqIO.convert(f"{self.ref}", 'genbank', f"{ref}", 'fasta')
         else:
