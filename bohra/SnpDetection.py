@@ -70,8 +70,8 @@ class RunSnpDetection(object):
         # self.source_log_path = pathlib.Path(self.workdir, 'source.log')
         # job id
         
-        self.check_rerun()
         self.keep = True if args.keep == 'Y' else False
+        self.check_rerun()
         self.gubbins = args.gubbins 
         # other variables
         # min aln 
@@ -462,7 +462,7 @@ class RunSnpDetection(object):
 
         '''
         self.logger.info(f'Checking if job is a rerun of existing job.')
-        report_path = self.workdir / self.job_id / 'report' / 'report.html'
+        report_path = self.workdir / self.job_id / 'report' / 'index.html'
         preview_path = self.workdir / self.job_id / 'report' / 'preview_distances.tab'
         # if the path is a string convert to Path
         if isinstance(report_path, str):

@@ -9,19 +9,25 @@ def generate_mlst_cmd(assembly, isolate):
 def extract_mlst(isolate):
 
     jsn = json.load(open(f"{isolate}/{isolate}.json"))
-    isolate = jsn[0]['id']
+    print(json)
+    if isinstance(jsn, list):
+        pos = 0
+    else:
+        pos = isolate
+    # isolate = jsn[0]['id']
     alleles = []
-    ax = zip(jsn[0]['alleles'].keys(), jsn[0]['alleles'].values())
-    for a in ax:
-        alleles.append(f"{a[0]}({a[1]})")
-    alleles = sorted(alleles)
+    if jsn[pos]['alleles']:
+        ax = zip(jsn[pos]['alleles'].keys(), jsn[pos]['alleles'].values())
+        for a in ax:
+            alleles.append(f"{a[0]}({a[1]})")
+        alleles = sorted(alleles)
 
     d = {
         'Isolate':isolate,
         'alleles': alleles,
         'len_alleles': len(alleles),
-        'scheme':jsn[0]['scheme'],
-        'ST':jsn[0]['sequence_type']
+        'scheme':jsn[pos]['scheme'],
+        'ST':jsn[pos]['sequence_type']
     }
     return d
 

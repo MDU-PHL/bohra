@@ -1,6 +1,6 @@
-import toml, pathlib, subprocess, sys
+import toml, pathlib, subprocess, sys, snakemake
 from snakemake import shell
-
+print(snakemake.__doc__)
 def generate_snippy_cmd(r1, r2, isolate, reference, threads):
     
     print(r1)
