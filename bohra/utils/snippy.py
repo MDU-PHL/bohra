@@ -1,6 +1,8 @@
-import toml, pathlib, subprocess, sys, snakemake
+import toml, pathlib, subprocess, sys
 from snakemake import shell
-print(snakemake.__doc__)
+
+
+
 def generate_snippy_cmd(r1, r2, isolate, reference, threads):
     
     print(r1)
@@ -76,6 +78,7 @@ def main(inputs, isolate, output, reference, threads):
     print('Saving toml file for snippy.')
     write_toml(data = data, output = f"{isolate}/snippy.toml") 
 
+print('Hello from snippy.py :D')
 inputs = snakemake.input
 isolate = snakemake.wildcards.sample
 output = snakemake.output

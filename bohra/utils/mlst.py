@@ -9,7 +9,6 @@ def generate_mlst_cmd(assembly, isolate):
 def extract_mlst(isolate):
 
     jsn = json.load(open(f"{isolate}/{isolate}.json"))
-    print(json)
     if isinstance(jsn, list):
         pos = 0
     else:
@@ -54,6 +53,7 @@ def write_toml(data, output):
     
 def main(inputs, isolate, seqdata):
     
+    print(f"Hello from mlst. Inputs are : {inputs}")
     data = {}
     data[isolate] = {}
     data[isolate]['mlst'] = {}

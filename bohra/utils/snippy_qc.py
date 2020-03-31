@@ -7,27 +7,32 @@ def check_snippy(data, isolate, minaln, aln):
     
     p = pathlib.Path(aln)
     fasta = p.open()
+    length = 0
+    nocov = 0
+    lowcov = 0
+    het = 0
+    unaln = 0
     for i in SeqIO.parse(fasta,'fasta'): # use BioPython to determine percent alignment
-        length = len(i.seq)
-        nocov = i.seq.count('-')
-        lowcov = i.seq.count('N')
-        het = i.seq.count('n')
-        unaln = nocov + lowcov + het
-        perc_aln = 100*(length - unaln) / length
-        data[isolate]['qc_snippy']['length'] = length
-        data[isolate]['qc_snippy']['nocov'] = nocov
-        data[isolate]['qc_snippy']['lowcov'] = lowcov
-        data[isolate]['qc_snippy']['het'] = het
-        data[isolate]['qc_snippy']['unaln'] = unaln
-        data[isolate]['qc_snippy']['pecr_aln'] = perc_aln
-        # if the percent alignement is greater than the min alignment
-        if perc_aln > float(minaln):
-            data[isolate]['qc_snippy']['Quality'] = 'PASS'
-            print(f'Isolate {isolate} will be included in core analysis')
-        else:
-            data[isolate]['qc_snippy']['Quality'] = f'Alignment < {float(minaln)} - isolate will not be included in core'
-            print(f'Isolate {isolate} did not meet the {minaln} threshold for alignment and will not be included in the core analysis.')
-        return data
+        length = length + len(i.seq)
+        nocov = nocov + i.seq.count('-')
+        lowcov = lowcov + i.seq.count('N')
+        het = het + i.seq.count('n')
+    unaln = unaln + nocov + lowcov + het
+    perc_aln = 100*(length - unaln) / length
+    data[isolate]['qc_snippy']['length'] = length
+    data[isolate]['qc_snippy']['nocov'] = nocov
+    data[isolate]['qc_snippy']['lowcov'] = lowcov
+    data[isolate]['qc_snippy']['het'] = het
+    data[isolate]['qc_snippy']['unaln'] = unaln
+    data[isolate]['qc_snippy']['pecr_aln'] = perc_aln
+    # if the percent alignement is greater than the min alignment
+    if perc_aln > float(minaln):
+        data[isolate]['qc_snippy']['Quality'] = 'PASS'
+        print(f'Isolate {isolate} will be included in core analysis')
+    else:
+        data[isolate]['qc_snippy']['Quality'] = f'Alignment < {float(minaln)} - isolate will not be included in core'
+        print(f'Isolate {isolate} did not meet the {minaln} threshold for alignment and will not be included in the core analysis.')
+    return data
                                         
 
 def open_toml(tml):
