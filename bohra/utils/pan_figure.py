@@ -4,7 +4,10 @@ from snakemake import shell
 def get_roary(inputs):
 
     tml = open_toml(inputs)
-    return tml['roary']['csv']
+    if 'csv' in tml['roary']:
+        return tml['roary']['csv']
+    else:
+        return False
 
 def generate_svg_cmd(csv, output):
 
@@ -33,13 +36,18 @@ def main(inputs):
     csv = get_roary(inputs)
     data = {}
     data['pan_figure'] = {}
-    data['pan_figure']['figure'] = "pan_genome.svg"   
-    print("Generating pan genome figure")
-    fig = run_cmd(generate_svg_cmd(csv = csv, output = data['pan_figure']['figure']))
-    if fig == 0:
-        data['pan_figure']['done'] = True
-    else:
-        data['pan_figure']['done'] = False
+    if csv != False:
+        data = {}
+        data['pan_figure'] = {}
+        data['pan_figure']['done'] = 'yes'
+        data['pan_figure']['figure'] = "pan_genome.svg"   
+        print("Generating pan genome figure")
+        fig = run_cmd(generate_svg_cmd(csv = csv, output = data['pan_figure']['figure']))
+        if fig == 0:
+            data['pan_figure']['done'] = True
+        else:
+            data['pan_figure']['done'] = False
+    data['pan_figure']['done'] = 'no'
     write_toml(data = data, output= f'pan_genome.toml')
 
 

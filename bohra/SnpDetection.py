@@ -334,7 +334,7 @@ class RunSnpDetection(object):
         # os.chdir(self.workdir)
         
         p1 = pathlib.Path(self.workdir, self.job_id, 'report')
-        p2 = pathlib.Path(self.workdir, self.job_id, f"report_{self.orignal_date}")
+        p2 = pathlib.Path(self.workdir, self.job_id, f"report_archived_{self.day}")
         if self.keep:
             self.logger.info(f"Archiving previous report files")
             cmd = f"mv {p1} {p2}"
