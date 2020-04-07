@@ -1,4 +1,4 @@
-import toml, pathlib, subprocess, sys, datetime, pandas, re, numpy
+import toml, pathlib, subprocess, sys, datetime, pandas, re, numpy, jinja2
 from snakemake import shell
 
 def write_tables(table):
@@ -434,7 +434,15 @@ def write_toml(data, output):
     with open(output, 'wt') as f:
         toml.dump(data, f)
     
-def main(inputs, pipeline,job_id, assembler = ''):
+def main(inputs, pipeline,job_id, resources, assembler = ''):
+
+    p = pathlib.Path('.')
+    print(p)
+    reporthtml = pathlib.Path('report.html')
+    print(reporthtml)
+    # path to html template
+    indexhtml = pathlib.Path(resources,'index.html') # replace with template
+    print(indexhtml)
     # initialise dictionary
     # print(pipeline)
     print(inputs)
@@ -474,20 +482,31 @@ def main(inputs, pipeline,job_id, assembler = ''):
         data['newick'] = get_tree_string(pipeline = pipeline)
     elif pipeline in ['s', 'sa', 'preview', 'all']:
         data['newick'] = get_tree_string(pipeline = pipeline)
+
     
 
 # newick = newick, display = display,tables = tables,td = td, job_id = job_id, pipeline = pipeline, snpdistances=snpdistances, snpdensity = snpdensity, modaltables = modaltables, date = date
     td = fill_vals(td=td, pipeline = pipeline)
     data['td'] = td
+    report_template = jinja2.Template(pathlib.Path(indexhtml).read_text())
+    reporthtml.write_text(report_template.render(data))
     # print(data)
     write_toml(data = data, output = 'report.toml')    
 
 pipeline = snakemake.params.pipeline
+print(pipeline)
 job_id = snakemake.params.job_id
 assembler = snakemake.params.assembler
 inputs = snakemake.input
+resources = snakemake.params.template_path
+
+# pipeline = 'preview'
+# job_id = 'test'
+# assembler = ''
+# inputs = 'preview.toml'
+# resources = '/home/khhor/dev/bohra/bohra/templates'
 # {params.pipeline} {params.job_id} {params.assembler} {input}
-main(pipeline = pipeline, inputs = inputs, job_id= job_id, assembler= assembler)
+main(pipeline = pipeline, inputs = inputs, job_id= job_id, assembler= assembler, resources = resources)
 # mash triangle -C *.msh
 
 # mash sketch -m 5 -s 10000 -r -o 2019-12803-6/sketch -I 2019-12803-6 -C 2019-12803-6/R1.fq.gz 2019-12803-6/R1.fq.gz

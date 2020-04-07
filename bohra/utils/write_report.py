@@ -36,17 +36,31 @@ class Report:
         
         # set up paths variables
         p = pathlib.Path('.')
+        print(p)
         reporthtml = pathlib.Path('report.html')
+        print(reporthtml)
         # path to html template
         indexhtml = pathlib.Path(resources,'index.html') # replace with template
-        tml =  self.open_toml(inputs)
+        print(indexhtml)
+        print(inputs)
+        tml = {}
+        with open(inputs, 'r') as t:
+            for line in t.readlines():
+                if 'td' not in line:
+                    d = toml.loads(line)
+                    print(len(d))
+                    for k in d:
+                        print(k)
+                        tml[k] = d[k]
+            
+
+        # tml = toml.loads(tml_string) 
+        # print(tml)
         report_template = jinja2.Template(pathlib.Path(indexhtml).read_text())
         reporthtml.write_text(report_template.render(tml))
     
 
-# {input} {params.work_dir} {params.template_path}
+{input} {params.work_dir} {params.template_path}
 inputs = snakemake.input
 resources = snakemake.params.template_path
 workdir = snakemake.params.work_dir
-report = Report()
-report.main(inputs = inputs, resources=resources, workdir=workdir)

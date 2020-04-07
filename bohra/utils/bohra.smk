@@ -79,11 +79,11 @@ REFERENCE = config['reference']
 GUBBINS = config['gubbins']
 PIPELINE = config['pipeline']
 ALL_TOMLS = get_collation_input(pipeline = PIPELINE)
-# print(ALL_TOMLS)
+print(ALL_TOMLS)
 REPORT_TOMLS = get_report_tomls(pipeline = PIPELINE)
-# print(REPORT_TOMLS)
+print(REPORT_TOMLS)
 FINAL_OUTPUT = final_output(tomls = REPORT_TOMLS)
-# print(FINAL_OUTPUT)
+print(FINAL_OUTPUT)
 WORKDIR = config['workdir']
 JOB_ID = config['job_id']
 ASSEMBLER = config['assembler']
@@ -161,11 +161,12 @@ if PREVIEW:
 		input:
 			"preview.toml"
 		output: #this is where I stopped
-			"report.toml"
+			"report.toml", "report.html"
 		params:
 			pipeline = 'preview',
 			script_path = SCRIPT_PATH,
 			job_id = JOB_ID,
+			template_path = TEMPLATE_PATH,
 			assembler = ASSEMBLER
 		script:
 			"compile.py"
@@ -422,33 +423,21 @@ else:
 		input:
 			REPORT_TOMLS
 		output:
+			"report.html", 
 			"report.toml"
 		params:
 			pipeline = PIPELINE,
-			script_path = SCRIPT_PATH,
+			template_path = TEMPLATE_PATH,
 			assembler = ASSEMBLER, 
 			job_id = JOB_ID
 		script:
 			"compile.py"
 
-rule write_html_report:
-	input:
-		"report.toml"
-	output:
-		'report.html'
-	params:
-		work_dir = WORKDIR,
-		jobid = JOB_ID,
-		assembler = ASSEMBLER,
-		template_path = TEMPLATE_PATH,
-		script_path = SCRIPT_PATH,
-		pipeline = PIPELINE
-	script:
-		"write_report.py"
 
 rule move_outputs:
 	input:
-		REPORT_TOMLS, 'report.html', 'report.toml'
+		"report.html",
+		REPORT_TOMLS
 	output:
 		FINAL_OUTPUT
 	params:
