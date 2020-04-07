@@ -57,7 +57,7 @@ def get_report_tomls(pipeline):
 		for z in r:
 			output.append(z)
 	elif pipeline == 'preview':
-		output = ['report.toml']
+		output = ['report.toml', 'preview.toml']
 	
 	return output
 
