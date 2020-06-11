@@ -21,6 +21,9 @@ import shutil
 from bohra.SnpDetection import RunSnpDetection
 from bohra.Utils import Nulla2bohra, UpdateBohra, CheckDeps
 from bohra.version import version
+# from SnpDetection import RunSnpDetection
+# from Utils import Nulla2bohra, UpdateBohra, CheckDeps
+# from version import version
 
 
 

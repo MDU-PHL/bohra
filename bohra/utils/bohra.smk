@@ -325,6 +325,7 @@ else:
 			"{sample}/prokka.toml"
 		params:
 			script_path = SCRIPT_PATH
+		threads: 4
 		script:
 			"prokka.py"
 	

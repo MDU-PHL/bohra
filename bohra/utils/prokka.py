@@ -1,9 +1,9 @@
 import toml, pathlib, subprocess, sys
 from snakemake import shell
 
-def generate_prokka_cmd(isolate, assembly):
+def generate_prokka_cmd(isolate, assembly, threads):
     
-    cmd =  f"prokka --outdir {isolate} --prefix {isolate} --mincontiglen 500 --notrna --fast --force {assembly} --cpus 4"
+    cmd =  f"prokka --outdir {isolate} --prefix {isolate} --mincontiglen 500 --notrna --fast --force {assembly} --cpus {threads}"
 
     return cmd
 
@@ -30,7 +30,7 @@ def write_toml(data, output):
     with open(output, 'wt') as f:
         toml.dump(data, f)
     
-def main(inputs, isolate, seqdata):
+def main(inputs, isolate, seqdata, threads):
     
     # set up data dict
     data = open_toml(inputs)
@@ -39,7 +39,7 @@ def main(inputs, isolate, seqdata):
     # run kraken
     assembly = f"{isolate}/contigs.fa"
     seqdata = open_toml(seqdata)
-    cmd = generate_prokka_cmd(isolate = isolate, assembly = assembly)
+    cmd = generate_prokka_cmd(isolate = isolate, assembly = assembly, threads)
     if seqdata[isolate]['seqdata']['data']['Quality'] == 'PASS':
         print(f"Isolate {isolate} has passed quality checks, prokka will be used to annotate assembly.")
         p = run_cmd(cmd)
@@ -60,7 +60,7 @@ def main(inputs, isolate, seqdata):
 inputs = snakemake.input.assembly
 isolate = snakemake.wildcards.sample
 seqdata = snakemake.input.seqdata
-
-main(inputs = inputs, isolate = isolate, seqdata = seqdata)
+threads = snakemake.threads
+main(inputs = inputs, isolate = isolate, seqdata = seqdata, threads = threads)
     
 
