@@ -39,7 +39,7 @@ def main(inputs, isolate, seqdata, threads):
     # run kraken
     assembly = f"{isolate}/contigs.fa"
     seqdata = open_toml(seqdata)
-    cmd = generate_prokka_cmd(isolate = isolate, assembly = assembly, threads)
+    cmd = generate_prokka_cmd(isolate = isolate, assembly = assembly, threads = threads)
     if seqdata[isolate]['seqdata']['data']['Quality'] == 'PASS':
         print(f"Isolate {isolate} has passed quality checks, prokka will be used to annotate assembly.")
         p = run_cmd(cmd)
