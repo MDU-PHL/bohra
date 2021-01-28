@@ -17,7 +17,7 @@ def get_top_3(isolate):
 
     return top_three
 
-def generate_cmd(prefill, r1, r2, isolate, db, data):
+def generate_cmd(prefill, r1, r2, isolate, db, threads, data):
     
     prfl = pathlib.Path(prefill, isolate, 'kraken2.tab')
     if prfl.exists():
@@ -25,7 +25,7 @@ def generate_cmd(prefill, r1, r2, isolate, db, data):
         data[isolate]['kraken']['kraken_db'] = f"Prefilled from: {prfl}"
         print(f"Species id will be determined from results retrieved from {prfl}")
     else:
-        cmd = f"kraken2 --paired {r1} {r2} --minimum-base-quality 13 --report {isolate}/kraken2.tab --memory-mapping --db {db}"
+        cmd = f"kraken2 --paired {r1} {r2} --threads {threads} --minimum-base-quality 13 --report {isolate}/kraken2.tab --memory-mapping --db {db}"
         data[isolate]['kraken']['kraken_db'] = f"{db}"
         print(f"Species id will be determined from {db}")
     return cmd, data
@@ -63,7 +63,7 @@ def main(r1, r2, isolate, kraken_db,prefill):
     data[isolate]['kraken'] = {}
     # run kraken
     print(f"Identifying species of isolate {isolate}")
-    cmd, data = generate_cmd(prefill = prefill, r1 = r1, r2 = r2, isolate = isolate, db = kraken_db, data = data)
+    cmd, data = generate_cmd(prefill = prefill, r1 = r1, r2 = r2, isolate = isolate, db = kraken_db, kraken_threads = kraken_threads, data = data)
     kraken_returncode = run_cmd(cmd)
     if kraken_returncode == 0:
         # add to data dict
@@ -87,6 +87,7 @@ r1 = snakemake.input.r1
 r2 = snakemake.input.r2
 isolate = snakemake.wildcards.sample
 kraken_db = snakemake.params.kraken_db
+kraken_threads = snakemake.threads
 prefill = snakemake.params.prefill_path
 
-main(r1 = r1, r2 = r2, isolate = isolate, kraken_db = kraken_db, prefill = prefill)
+main(r1 = r1, r2 = r2, isolate = isolate, kraken_db = kraken_db, kraken_threads = kraken_threads, prefill = prefill)

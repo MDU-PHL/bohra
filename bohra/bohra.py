@@ -78,6 +78,7 @@ def main():
     parser_sub_run.add_argument('--reference','-r',help='Path to reference (.gbk or .fa)', default = '')
     parser_sub_run.add_argument('--mask','-m',default = False, help='Path to mask file if used (.bed)')
     parser_sub_run.add_argument('--kraken_db', '-k', env_var="KRAKEN2_DEFAULT_DB", help="Path to DB for use with kraken2, if no DB present speciation will not be performed.")
+    parser_sub_run.add_argument('--kraken_threads', '-kt', help="Number of threads for each kraken2", default=16)
     parser_sub_run.add_argument('--pipeline','-p', default = 'preview', choices=['preview','sa','all'], help=f"The pipeline to run. Preview (--preview - default) will calculate mash-distances and a mash-tree for quick inspection of your dataset. SNPs and ASSEMBLIES ('sa') will perform SNPs and ASSEMBLIES. ALL ('all') will perform SNPS, ASSEMBLIES and ROARY for pan-genome analysis")
     parser_sub_run.add_argument('--assembler','-a', default = 'shovill', choices=['shovill','skesa','spades'], help=f"Assembler to use.")
     parser_sub_run.add_argument('--cpus','-c',help='Number of CPU cores to run, will define how many rules are run at a time', default=16)

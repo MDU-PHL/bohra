@@ -92,6 +92,7 @@ SCRIPT_PATH = config['script_path']
 MASK_STRING = config['mask_string'] if config['mask_string'] != '' else 'nomask'
 PREVIEW = config['preview']	
 KRAKEN_DB=config['kraken_db']
+KRAKEN_THREADS = int(config['kraken_threads'])
 MIN_COV = config['min_cov']
 
 rule all:
@@ -180,7 +181,9 @@ else:
 		params:
 			prefill_path = PREFILLPATH,
 			kraken_db = KRAKEN_DB,
-			script_path = SCRIPT_PATH
+			script_path = SCRIPT_PATH,
+		threads:
+			KRAKEN_THREADS
 		script:
 			"kraken.py"
 

@@ -106,6 +106,7 @@ class RunSnpDetection(object):
         self.cpus = args.cpus
         # kraken db settings
         self.kraken_db = args.kraken_db
+        self.kraken_threads = args.kraken_threads
         self.run_kraken = False
         self.assembler = args.assembler
         self.snippy_version = ''
@@ -865,6 +866,7 @@ class RunSnpDetection(object):
             'pipeline': self.pipeline,
             'min_cov': self.mincov,
             'kraken_db': f"{self.kraken_db}",
+            'kraken_threads': self.kraken_threads,
             'preview': self.preview, 
             'prefill_path': self.prefillpath if self.prefillpath != '' else 'nopath',
             'snippy_singularity': self.snippy_singularity,
