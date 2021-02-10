@@ -30,6 +30,8 @@ preview:
         {{preview}}
 kraken_db:
         "{{kraken_db}}"
+kraken_threads:
+        "{{kraken_threads}}"
 min_cov:
         {{min_cov}}
 # snippy_singularity:
