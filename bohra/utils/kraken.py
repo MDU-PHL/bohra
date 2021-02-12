@@ -1,4 +1,5 @@
 import toml, pathlib, subprocess, sys, pandas
+
 from snakemake import shell
 
 def get_top_3(isolate):
@@ -28,6 +29,7 @@ def generate_cmd(prefill, r1, r2, isolate, db, threads, data):
         cmd = f"kraken2 --paired {r1} {r2} --threads {threads} --minimum-base-quality 13 --report {isolate}/kraken2.tab --memory-mapping --db {db}"
         data[isolate]['kraken']['kraken_db'] = f"{db}"
         print(f"Species id will be determined from {db}")
+    print(cmd)
     return cmd, data
 
 def run_cmd(cmd):
@@ -54,7 +56,7 @@ def write_toml(data, output):
     with open(output, 'wt') as f:
         toml.dump(data, f)
     
-def main(r1, r2, isolate, kraken_db,prefill):
+def main(r1, r2, isolate, kraken_db,prefill, kraken_threads):
     
     # set up data dict
     tml = f"{pathlib.Path(isolate, 'kraken.toml')}"
@@ -63,7 +65,7 @@ def main(r1, r2, isolate, kraken_db,prefill):
     data[isolate]['kraken'] = {}
     # run kraken
     print(f"Identifying species of isolate {isolate}")
-    cmd, data = generate_cmd(prefill = prefill, r1 = r1, r2 = r2, isolate = isolate, db = kraken_db, kraken_threads = kraken_threads, data = data)
+    cmd, data = generate_cmd(prefill = prefill, r1 = r1, r2 = r2, isolate = isolate, db = kraken_db, threads = kraken_threads, data = data)
     kraken_returncode = run_cmd(cmd)
     if kraken_returncode == 0:
         # add to data dict
@@ -77,17 +79,21 @@ def main(r1, r2, isolate, kraken_db,prefill):
         print(f"Somthing went wrong with species identification, please check your inputs.")
 
 
+print("Running kraken")
+
+r1 = snakemake.input[0]
+r2 = snakemake.input[1]
+isolate = snakemake.wildcards.sample
+kraken_db = snakemake.params.kraken_db
+kraken_threads = snakemake.threads
+prefill = snakemake.params.prefill_path
+# print(kraken_threads)
+
+main(r1 = r1, r2 = r2, isolate = isolate, kraken_db = kraken_db, kraken_threads = kraken_threads, prefill = prefill)
+
 
 # if __name__ == '__main__':
     
 #     main(r1 = f"{sys.argv[1]}", r2 = f"{sys.argv[2]}", isolate = f"{sys.argv[3]}", kraken_db = f"{sys.argv[4]}", prefill = f"{sys.argv[5]}")
     
 # {input.r1} {input.r2} {wildcards.sample} {params.kraken_db} {params.prefill_path}
-r1 = snakemake.input.r1
-r2 = snakemake.input.r2
-isolate = snakemake.wildcards.sample
-kraken_db = snakemake.params.kraken_db
-kraken_threads = snakemake.threads
-prefill = snakemake.params.prefill_path
-
-main(r1 = r1, r2 = r2, isolate = isolate, kraken_db = kraken_db, kraken_threads = kraken_threads, prefill = prefill)

@@ -94,7 +94,7 @@ PREVIEW = config['preview']
 KRAKEN_DB=config['kraken_db']
 KRAKEN_THREADS = int(config['kraken_threads'])
 MIN_COV = config['min_cov']
-
+print(f"Kraken threads {KRAKEN_THREADS}")
 rule all:
 	input:
 		FINAL_OUTPUT,
@@ -172,19 +172,18 @@ if PREVIEW:
 		script:
 			"compile.py"
 else:
-	rule run_kraken:
-		input:
-			r1='{sample}/R1.fq.gz',
-			r2='{sample}/R2.fq.gz'
-		output:
-			"{sample}/kraken.toml"
+	rule kraken:
+		input: 
+			'{sample}/R1.fq.gz','{sample}/R2.fq.gz'
+		output: 
+			'{sample}/kraken.toml'
 		params:
 			prefill_path = PREFILLPATH,
 			kraken_db = KRAKEN_DB,
 			script_path = SCRIPT_PATH,
 		threads:
 			KRAKEN_THREADS
-		script:
+		script:	
 			"kraken.py"
 
 	rule combine_kraken:

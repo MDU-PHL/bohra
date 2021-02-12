@@ -5,11 +5,11 @@ from snakemake import shell
 
 def generate_snippy_cmd(r1, r2, isolate, reference, threads):
     
-    print(r1)
-    print(r2)
-    print(isolate)
-    print(reference)
-    print(threads)
+    # print(r1)
+    # print(r2)
+    # print(isolate)
+    # print(reference)
+    # print(threads)
     cmd = f'snippy --outdir {isolate} --ref {reference} --R1 {r1} --R2 {r2} --force --cpus {threads}'
     print(cmd)
     return cmd
