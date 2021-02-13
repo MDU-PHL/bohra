@@ -81,12 +81,18 @@ def main(r1, r2, isolate, kraken_db,prefill, kraken_threads):
 
 print("Running kraken")
 
-r1 = snakemake.input[0]
-r2 = snakemake.input[1]
+r1 = snakemake.input.r1
+# r1 = 'test2/2012-09771-B/R1.fq.gz'
+r2 = snakemake.input.r2
+# r2 = 'test2/2012-09771-B/R2.fq.gz'
 isolate = snakemake.wildcards.sample
+# isolate = '2012-09771-B'
 kraken_db = snakemake.params.kraken_db
+# kraken_db = '/home/linuxbrew/db/kraken2/microbe'
 kraken_threads = snakemake.threads
+# kraken_threads = 16
 prefill = snakemake.params.prefill_path
+# prefill = ''
 # print(kraken_threads)
 
 main(r1 = r1, r2 = r2, isolate = isolate, kraken_db = kraken_db, kraken_threads = kraken_threads, prefill = prefill)

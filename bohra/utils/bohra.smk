@@ -174,7 +174,8 @@ if PREVIEW:
 else:
 	rule kraken:
 		input: 
-			'{sample}/R1.fq.gz','{sample}/R2.fq.gz'
+			r1='{sample}/R1.fq.gz',
+			r2='{sample}/R2.fq.gz'
 		output: 
 			'{sample}/kraken.toml'
 		params:
