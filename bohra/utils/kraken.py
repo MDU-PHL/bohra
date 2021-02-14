@@ -21,7 +21,7 @@ def get_top_3(isolate):
 def generate_cmd(prefill, r1, r2, isolate, db, threads, data):
     
     prfl = pathlib.Path(prefill, isolate, 'kraken2.tab')
-    if prfl.exists():
+    if prfl.exists() and os.access(f"{prfl}", os.R_OK):
         cmd = f"cp {prfl} {isolate}/kraken2.tab"
         data[isolate]['kraken']['kraken_db'] = f"Prefilled from: {prfl}"
         print(f"Species id will be determined from results retrieved from {prfl}")
@@ -36,13 +36,6 @@ def run_cmd(cmd):
     
     p = subprocess.run(cmd, shell = True, capture_output=True, encoding = 'utf-8')
     return p.returncode
-
-def extract_metrics(mash_string):
-    
-    for m in mash_string:
-        if 'Estimated coverage' in m:
-            d = m.split(':')[-1].strip()
-    return d
     
 
 def open_toml(tml):
