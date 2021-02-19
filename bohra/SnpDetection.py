@@ -488,12 +488,13 @@ class RunSnpDetection(object):
             returns True (or fails with FileNotFoundError)
         '''
         
-        if not path.exists():
-            self.logger.warning(f"The {path.name} does not exist.")
-            raise FileNotFoundError(f"{path.name}")
-        else:
+        if path.exists() and and os.access(path, os.R_OK):
             if v == True:
                 self.logger.info(f"Found {path.name}.")
+            
+        else:
+            self.logger.warning(f"The {path.name} does not exist or is not accessible.")
+            raise FileNotFoundError(f"{path.name}")
 
             return True
     
@@ -528,7 +529,7 @@ class RunSnpDetection(object):
         if f"{read_source}"[0] != '/':
             read_source = self.workdir / read_source
         
-        if read_source.exists():
+        if read_source.exists() and os.access(read_source, os.R_OK):
             I = R / f"{isolate_id}" # the directory where reads will be stored for the isolate
             if not I.exists():
                 I.mkdir()
