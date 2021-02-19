@@ -488,7 +488,7 @@ class RunSnpDetection(object):
             returns True (or fails with FileNotFoundError)
         '''
         
-        if path.exists() and and os.access(path, os.R_OK):
+        if path.exists() and os.access(path, os.R_OK):
             if v == True:
                 self.logger.info(f"Found {path.name}.")
             
