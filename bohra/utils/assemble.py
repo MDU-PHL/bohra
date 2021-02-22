@@ -16,7 +16,7 @@ def generate_asm_cmd(assembler, r1, r2, isolate, threads = 4, memory = 8):
 
 def generate_cmd(prefill, r1, r2, isolate, assembler, data):
     
-    prfl = pathlib.Path(prefill, isolate, 'contigs.fa')s
+    prfl = pathlib.Path(prefill, isolate, 'contigs.fa')
     if prfl.exists() and os.access(f"{prfl}", os.R_OK):
         cmd = f"cp {prfl} {isolate}/contigs.fa"
         data[isolate]['assembly']['source'] = f"Prefilled from: {prfl}"
