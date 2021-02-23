@@ -434,7 +434,8 @@ else:
 			pipeline = PIPELINE,
 			template_path = TEMPLATE_PATH,
 			assembler = ASSEMBLER, 
-			job_id = JOB_ID
+			job_id = JOB_ID,
+			run_kraken = RUN_KRAKEN
 		script:
 			"compile.py"
 

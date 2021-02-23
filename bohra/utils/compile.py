@@ -8,6 +8,7 @@ def write_tables(table):
     # TODO add class isolate id to <tr>
     # TODO add class distances-isolate to tr if matrix and head-isolate to head td
     path =  f"{table}"
+    
     data = open(path).readlines()
     # for header
     header = data[0].split('\t')
@@ -232,11 +233,12 @@ def all_dict(td):
 
     return td
 
-def get_dict(pipeline):
+def get_dict(pipeline, run_kraken):
 
-    td = [{'file':'seqdata.tab', 'title':'Sequence Data', 'link': 'sequence-data', 'type' : 'table'}, {'file':'species_identification.tab', 'title': 'Species Identification', 'type': 'table', 'link':'species-identification'},{'file':'summary_table.tab','title':'Summary', 'link':'summary', 'type':'summary'},{'file': 'software_versions.tab', 'title': 'Tools', 'type': 'versions', 'link':'versions'}]
+    td = [{'file':'seqdata.tab', 'title':'Sequence Data', 'link': 'sequence-data', 'type' : 'table'}, {'file':'summary_table.tab','title':'Summary', 'link':'summary', 'type':'summary'},{'file': 'software_versions.tab', 'title': 'Tools', 'type': 'versions', 'link':'versions'}]
     
-    
+    if run_kraken == 'speciation':
+        td.append({'file':'species_identification.tab', 'title': 'Species Identification', 'type': 'table', 'link':'species-identification'})
     if pipeline == 's':
         td = snps_dict(td)
     elif pipeline == 'a':
@@ -434,7 +436,7 @@ def write_toml(data, output):
     with open(output, 'wt') as f:
         toml.dump(data, f)
     
-def main(inputs, pipeline,job_id, resources, assembler = ''):
+def main(inputs, pipeline,job_id, resources, run_kraken, assembler = ''):
 
     p = pathlib.Path('.')
     print(p)
@@ -469,7 +471,7 @@ def main(inputs, pipeline,job_id, resources, assembler = ''):
         isos = generate_summary()
         # print(isos)
         get_software_file(pipeline = pipeline, assembler = assembler)  
-        td = get_dict(pipeline = pipeline)
+        td = get_dict(pipeline = pipeline, run_kraken = run_kraken)
         tables, modaltables, display = return_tables(pipeline = pipeline)
         data['tables'] = tables
         data['modaltables'] = modaltables
@@ -494,19 +496,11 @@ def main(inputs, pipeline,job_id, resources, assembler = ''):
     write_toml(data = data, output = 'report.toml')    
 
 pipeline = snakemake.params.pipeline
-print(pipeline)
+# print(pipeline)
 job_id = snakemake.params.job_id
 assembler = snakemake.params.assembler
 inputs = snakemake.input
 resources = snakemake.params.template_path
+run_kraken = snakemake.params.run_kraken
 
-# pipeline = 'preview'
-# job_id = 'test'
-# assembler = ''
-# inputs = 'preview.toml'
-# resources = '/home/khhor/dev/bohra/bohra/templates'
-# {params.pipeline} {params.job_id} {params.assembler} {input}
-main(pipeline = pipeline, inputs = inputs, job_id= job_id, assembler= assembler, resources = resources)
-# mash triangle -C *.msh
-
-# mash sketch -m 5 -s 10000 -r -o 2019-12803-6/sketch -I 2019-12803-6 -C 2019-12803-6/R1.fq.gz 2019-12803-6/R1.fq.gz
+main(pipeline = pipeline, inputs = inputs, job_id= job_id, assembler= assembler, resources = resources, run_kraken = run_kraken)
