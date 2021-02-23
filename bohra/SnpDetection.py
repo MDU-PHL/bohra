@@ -306,9 +306,7 @@ class RunSnpDetection(object):
                 self.logger.info(f"{self.kraken_db} has been found.")
                 self.check_kraken2_files(k2db = self.kraken_db)
             else:
-                self.logger.warning(f"It seems that your settings for the kraken DB are incorrect.")
-        elif "KRAKEN2_DEFAULT_DB" in os.environ:
-            
+                self.logger.warning(f"It seems that your settings for the kraken DB are incorrect.")           
         
         if self.run_kraken:
             self.logger.info(f"Congratulations your kraken database is present")  
