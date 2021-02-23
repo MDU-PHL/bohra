@@ -290,22 +290,30 @@ class RunSnpDetection(object):
         ensure that DB is present and not emtpy
         '''
         self.logger.info(f'Searching for kraken2 DB {self.kraken_db}')
-        if self.kraken_db != f"{pathlib.Path(os.environ['KRAKEN2_DEFAULT_DB'])}":
+        if self.kraken_db == 'KRAKEN2_DEFAULT_DB':
+            try: # check that there is an environment value set for kraken2 db
+                k2db = pathlib.Path(os.environ["KRAKEN2_DEFAULT_DB"])
+                if self.check_kraken2_files(k2db = self.kraken_db):
+                    self.kraken_db = f"{k2db}"
+                    self.logger.info(f"You are using the deafult kraken2 database at : {os.environ['KRAKEN2_DEFAULT_DB']}")
+
+            except KeyError:
+                self.run_kraken = False # don't run kraken
+        
+        else:
             self.logger.info('You are attempting to use a custom kraken2 DB. This is pretty advanced, good luck!')
             if pathlib.Path(self.kraken_db).exists():
                 self.logger.info(f"{self.kraken_db} has been found.")
                 self.check_kraken2_files(k2db = self.kraken_db)
             else:
-                self.logger.warning(f"It seems that your settings for the kraken DB are incorrect. Bohra will check for the presence of a default kraken2 DB.")
+                self.logger.warning(f"It seems that your settings for the kraken DB are incorrect.")
         elif "KRAKEN2_DEFAULT_DB" in os.environ:
-            k2db = pathlib.Path(os.environ["KRAKEN2_DEFAULT_DB"])
-            if self.check_kraken2_files(k2db = self.kraken_db):
-                self.kraken_db = f"{k2db}"
+            
         
         if self.run_kraken:
             self.logger.info(f"Congratulations your kraken database is present")  
         else:
-            self.logger.warning(f"Your kraken DB is not installed in the expected path. Please re-read bohra installation instructions.")
+            self.logger.warning(f"kraken DB is not installed in the expected path. Speciation will not be performed.")
             raise SystemExit
 
         
@@ -866,6 +874,7 @@ class RunSnpDetection(object):
             'gubbins': self.gubbins,
             'pipeline': self.pipeline,
             'min_cov': self.mincov,
+            'run_kraken': 'speciation' if self.run_kraken else 'no_speciation'
             'kraken_db': f"{self.kraken_db}",
             'kraken_threads': self.kraken_threads,
             'preview': self.preview, 

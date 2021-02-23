@@ -3,11 +3,11 @@ import pathlib
 configfile: 'config.yaml'
 localrules: all,combine_seqdata, qc_snippy, index_reference, calculate_iqtree_command_core,combine_assembly_metrics,assembly_statistics,collate_report,write_html_report
 
-def get_collation_input(pipeline):
+def get_collation_input(pipeline, run_kraken):
 	
 	s = "{sample}/seqdata.toml"
 	k = "{sample}/kraken.toml"
-	output = [s,k]
+	output = [s,k] if run_kraken else [s]
 	a = [
 		"{sample}/mlst.toml",
 		"{sample}/assembly.toml",
@@ -34,9 +34,9 @@ def get_collation_input(pipeline):
 	return output
 
 
-def get_report_tomls(pipeline):
+def get_report_tomls(pipeline, run_kraken):
 	output = ["seqdata.toml",
-		"kraken.toml"]
+		"kraken.toml"] if run_kraken else ["seqdata.toml"]
 	a = ["mlst.toml", 
 		"assembly.toml", 
 		"resistome.toml"]
@@ -78,6 +78,9 @@ MIN_ALN = int(config['min_perc'])
 REFERENCE = config['reference']
 GUBBINS = config['gubbins']
 PIPELINE = config['pipeline']
+KRAKEN_DB=config['kraken_db']
+RUN_KRAKEN=config['run_kraken']
+KRAKEN_THREADS = int(config['kraken_threads'])
 ALL_TOMLS = get_collation_input(pipeline = PIPELINE)
 print(ALL_TOMLS)
 REPORT_TOMLS = get_report_tomls(pipeline = PIPELINE)
@@ -91,10 +94,8 @@ TEMPLATE_PATH = config['template_path']
 SCRIPT_PATH = config['script_path']
 MASK_STRING = config['mask_string'] if config['mask_string'] != '' else 'nomask'
 PREVIEW = config['preview']	
-KRAKEN_DB=config['kraken_db']
-KRAKEN_THREADS = int(config['kraken_threads'])
 MIN_COV = config['min_cov']
-print(f"Kraken threads {KRAKEN_THREADS}")
+
 rule all:
 	input:
 		FINAL_OUTPUT,
@@ -171,7 +172,7 @@ if PREVIEW:
 			assembler = ASSEMBLER
 		script:
 			"compile.py"
-else:
+if RUN_KRAKEN:
 	rule kraken:
 		input: 
 			r1='{sample}/R1.fq.gz',
@@ -196,7 +197,7 @@ else:
 			script_path = SCRIPT_PATH
 		script:
 			"combine_kraken.py"
-	
+else:	
 	rule snippy:
 		input:
 			'{sample}/seqdata.toml'	
