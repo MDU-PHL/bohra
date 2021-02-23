@@ -24,7 +24,7 @@ class RunSnpDetection(object):
         self.logger = logging.getLogger(__name__)
         self.logger.setLevel(logging.INFO)
         # create file handler which logs even debug messages
-        fh = logging.FileHandler('bohra.log')
+        fh = logging.FileHandler('bohra.setup.log')
         fh.setLevel(logging.INFO)
         # create console handler with a higher log level
         ch = logging.StreamHandler()
@@ -73,6 +73,7 @@ class RunSnpDetection(object):
         self.keep = True if args.keep == 'Y' else False
         self.check_rerun()
         self.gubbins = args.gubbins 
+        self.verbose = '--verbose' if args.verbose else ''
         # other variables
         # min aln 
         self.minaln = args.minaln
@@ -88,7 +89,7 @@ class RunSnpDetection(object):
         
         self.user = getpass.getuser()
         
-        self.gubbins = False
+        # self.gubbins = False
         self.use_singularity = False
         self.mdu = args.mdu
         # self.logger.info(f"{self.mdu}")
@@ -921,7 +922,7 @@ class RunSnpDetection(object):
         if self.cluster:
             cmd = f"{self.cluster_cmd()} -s {snake_name} -d {wd} {force} {singularity_string} --latency-wait 1200"
         else:
-            cmd = f"snakemake {dry} -s {snake_name} {singularity_string} -j {self.cpus} -d {self.job_id} {force} --verbose 2>&1"
+            cmd = f"snakemake {dry} -s {snake_name} {singularity_string} -j {self.cpus} -d {self.job_id} {force} {self.verbose} 2>&1 | tee bohra.log"
             # cmd = f"snakemake -s {snake_name} --cores {self.cpus} {force} "
         self.logger.info(f"Running job : {self.job_id} with {cmd} this may take some time. We appreciate your patience.")
         wkf = subprocess.run(cmd, shell = True)

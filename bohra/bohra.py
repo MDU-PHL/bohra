@@ -95,7 +95,7 @@ def main():
     parser_sub_run.add_argument('--queue',help='Type of queue (sbatch or qsub currently supported) - required if --cluster is set.', default='')
     parser_sub_run.add_argument('--gubbins', '-g', action = 'store_true', help = 'Set to use gubbins for recombination correction.')
     parser_sub_run.add_argument('--keep', default = 'N', choices= ['Y', 'N'], help = 'If you are rerunning bohra over an exisiting directory set --keep to \'Y\' to archive report files - otherwise previous reprot files will be removed.')
-    
+    parser_sub_run.add_argument('--verbose', action = 'store_true', help = 'Output verbose snakemake')
     # parser for update
     parser_sub_nulla2bohra = subparsers.add_parser('nulla2bohra', help='Ensure that bohra can be rerun over an existing nullarbor folder. Can also be used to update older bohra directories. Must supply name of nullarbor directory, and your isolates.tab file', formatter_class=configargparse.ArgumentDefaultsHelpFormatter,default_config_files=[f"{pathlib.Path.cwd().absolute() / 'bohra.conf'}"])
 
