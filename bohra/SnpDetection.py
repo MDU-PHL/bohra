@@ -872,7 +872,7 @@ class RunSnpDetection(object):
             'gubbins': self.gubbins,
             'pipeline': self.pipeline,
             'min_cov': self.mincov,
-            'run_kraken': 'speciation' if self.run_kraken else 'no_speciation'
+            'run_kraken': 'speciation' if self.run_kraken else 'no_speciation',
             'kraken_db': f"{self.kraken_db}",
             'kraken_threads': self.kraken_threads,
             'preview': self.preview, 
