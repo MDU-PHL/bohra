@@ -7,7 +7,7 @@ def get_collation_input(pipeline, run_kraken):
 	
 	s = "{sample}/seqdata.toml"
 	k = "{sample}/kraken.toml"
-	output = [s,k] if run_kraken else [s]
+	output = [s,k] if run_kraken == 'speciation' else [s]
 	a = [
 		"{sample}/mlst.toml",
 		"{sample}/assembly.toml",
@@ -36,7 +36,7 @@ def get_collation_input(pipeline, run_kraken):
 
 def get_report_tomls(pipeline, run_kraken):
 	output = ["seqdata.toml",
-		"kraken.toml"] if run_kraken else ["seqdata.toml"]
+		"kraken.toml"] if  run_kraken == 'speciation' else ["seqdata.toml"]
 	a = ["mlst.toml", 
 		"assembly.toml", 
 		"resistome.toml"]
@@ -62,8 +62,9 @@ def get_report_tomls(pipeline, run_kraken):
 	return output
 
 def final_output(tomls):
-
+	# print(tomls)
 	output = [f"{pathlib.Path('report', t)}" for t in tomls]
+	# print(output)
 	output.append(f"{pathlib.Path('report', 'index.html')}")
 	# if 'report.html' not in output:
 	# 	output.append(f"{pathlib.Path('report', 'report.toml')}")
@@ -81,12 +82,9 @@ PIPELINE = config['pipeline']
 KRAKEN_DB=config['kraken_db']
 RUN_KRAKEN=config['run_kraken']
 KRAKEN_THREADS = int(config['kraken_threads'])
-ALL_TOMLS = get_collation_input(pipeline = PIPELINE)
-print(ALL_TOMLS)
-REPORT_TOMLS = get_report_tomls(pipeline = PIPELINE)
-print(REPORT_TOMLS)
+ALL_TOMLS = get_collation_input(pipeline = PIPELINE, run_kraken = RUN_KRAKEN)
+REPORT_TOMLS = get_report_tomls(pipeline = PIPELINE, run_kraken = RUN_KRAKEN)
 FINAL_OUTPUT = final_output(tomls = REPORT_TOMLS)
-print(FINAL_OUTPUT)
 WORKDIR = config['workdir']
 JOB_ID = config['job_id']
 ASSEMBLER = config['assembler']
@@ -116,7 +114,7 @@ rule estimate_coverage:
 rule seqdata:
 	input:
 		r1 = '{sample}/R1.fq.gz',
-		r2 = '{sample}/R2.fq.gz',
+		r2 = '{sample}/R2.fq.gz'
 		# mash = '{sample}/mash.toml'
 	output:
 		"{sample}/seqdata.toml"
@@ -172,32 +170,34 @@ if PREVIEW:
 			assembler = ASSEMBLER
 		script:
 			"compile.py"
-if RUN_KRAKEN:
-	rule kraken:
-		input: 
-			r1='{sample}/R1.fq.gz',
-			r2='{sample}/R2.fq.gz'
-		output: 
-			'{sample}/kraken.toml'
-		params:
-			prefill_path = PREFILLPATH,
-			kraken_db = KRAKEN_DB,
-			script_path = SCRIPT_PATH,
-		threads:
-			KRAKEN_THREADS
-		script:	
-			"kraken.py"
 
-	rule combine_kraken:
-		input:
-			expand("{sample}/kraken.toml", sample = SAMPLE)
-		output:
-			"kraken.toml"
-		params:
-			script_path = SCRIPT_PATH
-		script:
-			"combine_kraken.py"
-else:	
+else:
+	if RUN_KRAKEN == 'speciation':
+		rule kraken:
+			input: 
+				r1='{sample}/R1.fq.gz',
+				r2='{sample}/R2.fq.gz'
+			output: 
+				'{sample}/kraken.toml'
+			params:
+				prefill_path = PREFILLPATH,
+				kraken_db = KRAKEN_DB,
+				script_path = SCRIPT_PATH,
+			threads:
+				KRAKEN_THREADS
+			script:	
+				"kraken.py"
+
+		rule combine_kraken:
+			input:
+				expand("{sample}/kraken.toml", sample = SAMPLE)
+			output:
+				"kraken.toml"
+			params:
+				script_path = SCRIPT_PATH
+			script:
+				"combine_kraken.py"
+	
 	rule snippy:
 		input:
 			'{sample}/seqdata.toml'	

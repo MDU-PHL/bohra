@@ -28,7 +28,7 @@ script_path:
         "{{script_path}}"
 preview:
         {{preview}}
-run_kraken"
+run_kraken:
         "{{run_kraken}}"
 kraken_db:
         "{{kraken_db}}"

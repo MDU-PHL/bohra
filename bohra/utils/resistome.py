@@ -4,7 +4,7 @@ from snakemake import shell
 def generate_abritamr_cmd(input_file, isolate, wd, job_id):
     
     w = pathlib.Path(wd, isolate)
-    cmd = f"abriTAMR -c {input_file} -pfx {isolate} -w {w}"
+    cmd = f"abritamr -c {input_file} -pfx {isolate} -w {w}"
     return cmd
 
 def generate_dict(isolate):

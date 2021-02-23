@@ -275,6 +275,8 @@ class RunSnpDetection(object):
         '''
         ensure that kraken2 DB is not empty
         '''
+        self.logger.info(f'Checking that {k2db} is a directory, checking that files are not empty')
+        print(pathlib.Path(k2db))
         if pathlib.Path(k2db).is_dir():
                 self.logger.info(f'Found {k2db}, checking that files are not empty')
                 kmerfiles = sorted(pathlib.Path(k2db).glob('*'))
@@ -283,6 +285,10 @@ class RunSnpDetection(object):
                     s.append(self.check_size_file(pathlib.Path(k2db) / kmerfiles[k]))
                 if 0 not in s:
                     self.run_kraken = True
+                    return True
+        else:
+            self.logger.info(f'{k2db} is not a directory.')
+            return False
         
 
     def check_kraken2DB(self):
@@ -293,9 +299,10 @@ class RunSnpDetection(object):
         if self.kraken_db == 'KRAKEN2_DEFAULT_DB':
             try: # check that there is an environment value set for kraken2 db
                 k2db = pathlib.Path(os.environ["KRAKEN2_DEFAULT_DB"])
-                if self.check_kraken2_files(k2db = self.kraken_db):
+                self.logger.info(f"You are using the deafult kraken2 database at : {os.environ['KRAKEN2_DEFAULT_DB']}")
+                if self.check_kraken2_files(k2db = k2db):
                     self.kraken_db = f"{k2db}"
-                    self.logger.info(f"You are using the deafult kraken2 database at : {os.environ['KRAKEN2_DEFAULT_DB']}")
+                    # self.logger.info(f"You are using the deafult kraken2 database at : {os.environ['KRAKEN2_DEFAULT_DB']}")
 
             except KeyError:
                 self.run_kraken = False # don't run kraken
@@ -312,7 +319,6 @@ class RunSnpDetection(object):
             self.logger.info(f"Congratulations your kraken database is present")  
         else:
             self.logger.warning(f"kraken DB is not installed in the expected path. Speciation will not be performed.")
-            raise SystemExit
 
         
     def run_with_gubbins(self):
