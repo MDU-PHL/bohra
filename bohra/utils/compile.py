@@ -288,7 +288,7 @@ def get_software_versions(software):
     else:
         vs = '--version'
     cmd = f"{software} {vs} 2>&1"
-    
+    print(f"Checking software with {cmd}")
     p = subprocess.run(cmd, shell = True, capture_output=True, encoding = "utf-8")
     sft = p.stdout
     
@@ -321,7 +321,7 @@ def get_software_file(pipeline, assembler = ''):
         :assembler: the assembler used in the pipeline
     '''
     snippy_tools = ['snippy', 'snippy-core', 'snp-dists', 'iqtree']
-    assembly_tools = ['mlst', 'kraken2', 'prokka', 'abricate', assembler]
+    assembly_tools = ['mlst', 'kraken2', 'prokka', 'abritamr', assembler]
     
     if pipeline == 's':
         tool_dict = make_dict_versions(snippy_tools)

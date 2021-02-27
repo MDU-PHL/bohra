@@ -922,7 +922,7 @@ class RunSnpDetection(object):
         if self.cluster:
             cmd = f"{self.cluster_cmd()} -s {snake_name} -d {wd} {force} {singularity_string} --latency-wait 1200"
         else:
-            cmd = f"snakemake {dry} -s {snake_name} {singularity_string} -j {self.cpus} -d {self.job_id} {force} {self.verbose} 2>&1 | tee bohra.log"
+            cmd = f"snakemake {dry} -s {snake_name} {singularity_string} -j {self.cpus} -d {self.job_id} {force} {self.verbose} 2>&1 | tee -a bohra.log"
             # cmd = f"snakemake -s {snake_name} --cores {self.cpus} {force} "
         self.logger.info(f"Running job : {self.job_id} with {cmd} this may take some time. We appreciate your patience.")
         wkf = subprocess.run(cmd, shell = True)
