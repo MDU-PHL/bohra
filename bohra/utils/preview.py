@@ -8,7 +8,7 @@ def generate_triangle_cmd():
 
 def generate_tree_cmd():
 
-    cmd = f"quicktree -in m -out t preview_distances.tab  | nw_order -c n - > preview.newick"
+    cmd = f"quicktree -in m -out t preview_distances.tab  > preview.newick"
     return cmd
 
 def run_cmd(cmd):
