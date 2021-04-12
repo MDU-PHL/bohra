@@ -4,13 +4,14 @@ include { initOptions; saveFiles; getSoftwareName } from './functions'
 params.options = [:]
 def options    = initOptions(params.options)
 
-process SEQTK {
+process SKESA {
     tag "$meta.id"
     label 'process_medium'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     
+    cpus options.args2// args2 needs to be cpus for shovill
     cache 'lenient'
     // conda (params.enable_conda ? 'bioconda::shovill=1.1.0' : null)
     // if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
@@ -23,7 +24,9 @@ process SEQTK {
     tuple val(meta), path(reads)
 
     output:
-    tuple val(meta), path('seqtk_stats.txt'), emit: seqtk_stats
+    tuple val(meta), path('contigs.fa'), emit: contigs
+    tuple val(meta), path('spades.log'), emit: log
+    path '*.version.txt'                  , emit: version
 
     script:
     // Added soft-links to original fastqs for consistent naming in MultiQC
@@ -32,8 +35,15 @@ process SEQTK {
     """
     [ ! -f  ${prefix}_1.fastq.gz ] && ln -s ${reads[0]} ${prefix}_1.fastq.gz
     [ ! -f  ${prefix}_2.fastq.gz ] && ln -s ${reads[1]} ${prefix}_2.fastq.gz
-    echo -e Bases'\t'C%'\t'G%'\t'AvgQ > seqtk_stats.txt
-    cat ${prefix}_1.fastq.gz ${prefix}_2.fastq.gz | seqtk fqchk -q0 -  | grep ALL | cut -f2,4,5,8 >>seqtk_stats.txt
+    skesa --fastq ${prefix}_1.fastq.gz,${prefix}_2.fastq.gz --cores $task.cpus --vector_percent 1.0 --contigs_out ${prefix}/contigs.fa
+    cp ${prefix}/contigs.fa contigs.fa
+    cp ${prefix}/spades.log spades.log
+    echo \$(spades.py --version 2>&1) | sed -e "s/spades //g" > ${software}.version.txt
     """
     
 }
+skesa --fastq "$read1,$read2" \
+      --cores "$cpus" \
+      --vector_percent 1.0 \
+      $opts \
+      --contigs_out "$outdir/contigs

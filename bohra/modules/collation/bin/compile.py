@@ -1,19 +1,20 @@
-import toml, pathlib, subprocess, sys, datetime, pandas, re, numpy, jinja2
-from snakemake import shell
+#!/usr/bin/env python3
+import pathlib, subprocess, sys, datetime, pandas, re, numpy, jinja2
 
-def write_tables(table):
+
+def write_tables(table, wd, job_id):
     '''
     Write a table, given a tab delimited file generate a html string
     '''
     # TODO add class isolate id to <tr>
     # TODO add class distances-isolate to tr if matrix and head-isolate to head td
-    path =  f"{table}"
+    path =  f"{pathlib.Path(wd, job_id,table)}"
     
     data = open(path).readlines()
     # for header
     header = data[0].split('\t')
     
-    if 'distances.tab' in table:
+    if 'distances.tab' == table:
         tablehead = [f"<th class='{column}-head'>{column}</th>" for column in header]
     else:
         tablehead = [f"<th>{column}</th>" for column in header]
@@ -21,35 +22,35 @@ def write_tables(table):
     body = []
     for i in range(1,len(data)):
         raw = data[i].split('\t')
-        # print(raw)
+        raw = [r.strip() for r in raw]
+        print(raw)
         if 'summary_table.tab' in table:
             row = [f"<tr class='{raw[0]} tiplab'>"]
         elif 'distances.tab' in table:
             row = [f"<tr class='distances-{raw[0]}'>"]
-        elif 'assembly.tab' in table:
+        elif 'assembly' in table:
             row = [f"<tr class='{raw[0]}-assembly'>"]
         elif 'species' in table:
             row = [f"<tr class='{raw[0]}-species-identification'>"]
-        elif 'core_genome.tab' in table:
+        elif 'core_genome' in table:
             row = [f"<tr class='{raw[0]}-core-genome'>"]
-        elif 'mlst.tab' in table:
+        elif 'mlst' in table:
             row = [f"<tr class='{raw[0]}-mlst'>"]
-        elif 'resistome.tab' in table:
+        elif 'resistome' in table:
             row = [f"<tr class='{raw[0]}-resistome'>"]
-        elif 'seqdata.tab' in table:
+        elif 'seqdata' in table:
             row = [f"<tr class='{raw[0]}-sequence-data'>"]
         else:
             row = [f"<tr>"] # TODO add class isolate id to <tr>
-        if 'distances.tab' in table:
+        if 'distances.tab' == table:
                 for d in range(len(raw)):
-                    # print(d)  
-                    row.append(f"<td align=\"center\" class = \"{raw[0]}_{header[d]}\">{raw[d]}</td>")    
+                    row.append(f"<td align=\"center\" class = \"{raw[0]}_{header[d].strip()}\">{raw[d]}</td>")    
         else:
             for d in raw:
                 row.append(f"<td align=\"center\">{d}</td>")
         row.append(f"</tr>")
         body = body + row
-    
+        
     return('\n'.join(tablehead),'\n'.join(body))
 
 def get_isolates_preview(table):
@@ -81,7 +82,7 @@ def preview_distances_tab(table):
     tablehead = [f"<th class='{column}-head'>{column}</th>" for column in header]
     return('\n'.join(tablehead),'\n'.join(body))
 
-def get_tree_string(pipeline):
+def get_tree_string(pipeline, wd, job_id):
     '''
     Generate a tree image from a newick
     input:
@@ -89,7 +90,7 @@ def get_tree_string(pipeline):
     output:
         string reporesentation of the path to the tree image
     '''
-    tree_file = 'preview.newick' if pipeline == 'preview' else 'core.treefile'
+    tree_file = f"{pathlib.Path(wd, job_id,'preview.newick')}" if pipeline == 'preview' else f"{pathlib.Path(wd, job_id,'core.treefile')}"
     with open(f"{tree_file}", 'r') as t:
         tree = t.read().strip()
 
@@ -177,11 +178,11 @@ def plot_distances():
     # return dictionary
     return(list(melted_df['value']))
 
-def get_preview_dict():
-
-    td = [{'title': 'Preview', 'link':'preview-tree', 'file': 'preview.newick', 'type': 'tree'},
-               {'file': 'preview_distances.tab', 'title':'Mash distances', 'type':'matrix', 'link':'mash-distances'}
-        ]
+def get_preview_dict(run_kraken):
+    print(run_kraken)
+    td = [{'title': 'Preview', 'link':'preview-tree', 'file': 'preview.newick', 'type': 'tree'},{'file':'seqdata.txt', 'title':'Sequence Data', 'link': 'sequence-data', 'type' : 'table'}]
+    if run_kraken == 'speciation':
+        td.append({'file':'species.txt', 'title': 'Species Identification', 'type': 'table', 'link':'species-identification'})
     return td
 
 def snps_dict(td):
@@ -198,10 +199,10 @@ def snps_dict(td):
 
 def assembly_dict(td):
     for_td = []
-    mlst_td = {'file':'mlst.tab', 'title':'MLST', 'type':'table', 'link':'mlst'}
-    resistome_td = {'file':'resistome.tab', 'title':'Resistome', 'type':'table', 'link':'resistome'}
+    mlst_td = {'file':'mlst.txt', 'title':'MLST', 'type':'table', 'link':'mlst'}
+    resistome_td = {'file':'resistome.txt', 'title':'Resistome', 'type':'table', 'link':'resistome'}
     # list of assembly tasks
-    assembly_stat_td = {'file': 'assembly.tab', 'title':'Assembly', 'type':'table', 'link':'assembly'}
+    assembly_stat_td = {'file': 'assembly.txt', 'title':'Assembly', 'type':'table', 'link':'assembly'}
     a_td = [assembly_stat_td, mlst_td, resistome_td]
     for a in a_td:
         if pathlib.Path(a['file']).exists():
@@ -235,10 +236,10 @@ def all_dict(td):
 
 def get_dict(pipeline, run_kraken):
 
-    td = [{'file':'seqdata.tab', 'title':'Sequence Data', 'link': 'sequence-data', 'type' : 'table'}, {'file':'summary_table.tab','title':'Summary', 'link':'summary', 'type':'summary'},{'file': 'software_versions.tab', 'title': 'Tools', 'type': 'versions', 'link':'versions'}]
+    td = [{'file':'seqdata.txt', 'title':'Sequence Data', 'link': 'sequence-data', 'type' : 'table'}, {'file':'summary_table.txt','title':'Summary', 'link':'summary', 'type':'summary'},{'file': 'software_versions.txt', 'title': 'Tools', 'type': 'versions', 'link':'versions'}]
     
     if run_kraken == 'speciation':
-        td.append({'file':'species_identification.tab', 'title': 'Species Identification', 'type': 'table', 'link':'species-identification'})
+        td.append({'file':'species.txt', 'title': 'Species Identification', 'type': 'table', 'link':'species-identification'})
     if pipeline == 's':
         td = snps_dict(td)
     elif pipeline == 'a':
@@ -250,25 +251,25 @@ def get_dict(pipeline, run_kraken):
     # print(td)
     return td
 
-def fill_vals(td, pipeline):
+def fill_vals(td, pipeline, wd, job_id):
 
     for t in range(len(td)):
     
         # TODO if table add a modal modal + link and link will be title lowercase with hyphen
         if td[t]['type'] == 'table':
-            td[t]['head'], td[t]['body'] = write_tables(table=td[t]['file'])
+            td[t]['head'], td[t]['body'] = write_tables(table=td[t]['file'], wd = wd, job_id=job_id)
         if td[t]['type'] == 'pan':
-            td[t]['head'], td[t]['body'] = write_tables(table=td[t]['file'])
+            td[t]['head'], td[t]['body'] = write_tables(table=td[t]['file'], wd = wd, job_id=job_id)
         if td[t]['type'] == 'matrix':
-            td[t]['head'], td[t]['body'] = write_tables(table=td[t]['file'])
+            td[t]['head'], td[t]['body'] = write_tables(table=td[t]['file'], wd = wd, job_id=job_id)
             # snpdistances = plot_distances()
         # if td[t]['link'] == 'snp-density':
             # snpdensity= plot_snpdensity()
         if td[t]['type'] == 'versions':
-            td[t]['head'], td[t]['body'] = write_tables(table=td[t]['file'])
+            td[t]['head'], td[t]['body'] = write_tables(table=td[t]['file'], wd = wd, job_id=job_id)
         if td[t]['type'] == 'summary':
             # generate_summary()
-            td[t]['head'], td[t]['body'] = write_tables(table = td[t]['file'])
+            td[t]['head'], td[t]['body'] = write_tables(table = td[t]['file'], wd = wd, job_id=job_id)
     return td
 
 def get_software_versions(software):
@@ -401,9 +402,9 @@ def return_tables(pipeline):
 
     if pipeline == 'preview':
         
-        tables =['sequence-data','species-identification','mash-distances']
-        modaltables =['sequence-data','species-identification','mash-distances']
-        display = f"display:inline;"
+        tables =['sequence-data','species-identification']
+        modaltables =['sequence-data','species-identification']
+        display = f""
     elif pipeline == 'a':
         
         tables =['mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
@@ -425,18 +426,8 @@ def return_tables(pipeline):
 
     return tables, modaltables, display
 
-def open_toml(tml):
-
-    data = toml.load(tml)
-
-    return data
     
-def write_toml(data, output):
-    
-    with open(output, 'wt') as f:
-        toml.dump(data, f)
-    
-def main(inputs, pipeline,job_id, resources, run_kraken, assembler = ''):
+def main(wd, pipeline,job_id, resources, run_kraken, assembler = ''):
 
     p = pathlib.Path('.')
     print(p)
@@ -447,7 +438,7 @@ def main(inputs, pipeline,job_id, resources, run_kraken, assembler = ''):
     print(indexhtml)
     # initialise dictionary
     # print(pipeline)
-    print(inputs)
+    # print(inputs)
     data = {
         'newick' :'',
         'snpdensity':'',
@@ -462,10 +453,10 @@ def main(inputs, pipeline,job_id, resources, run_kraken, assembler = ''):
         }
     # print(data)
     if pipeline == 'preview':
-        td = get_preview_dict()
-        data['tree_height'] = get_isolates_preview('preview_distances.tab') * 25
+        td = get_preview_dict(run_kraken = run_kraken)
+        data['tree_height'] = get_isolates_preview(f"{pathlib.Path(wd,job_id,'preview_distances.tab')}") * 25
         tables, modaltables, display = return_tables(pipeline = pipeline)
-        data['tables'] = table
+        data['tables'] = tables
         data['modaltables'] = modaltables
         data['display'] = display
         # print(td)
@@ -483,26 +474,33 @@ def main(inputs, pipeline,job_id, resources, run_kraken, assembler = ''):
     if pipeline not in ['a', 'preview']:
         data['snpdensity']= plot_snpdensity()
         data['snpdistances']= plot_distances()
-        data['newick'] = get_tree_string(pipeline = pipeline)
+        data['newick'] = get_tree_string(pipeline = pipeline, wd = wd, job_id = job_id)
     elif pipeline in ['s', 'sa', 'preview', 'all']:
-        data['newick'] = get_tree_string(pipeline = pipeline)
+        data['newick'] = get_tree_string(pipeline = pipeline, wd = wd, job_id= job_id)
 
     
 
 # newick = newick, display = display,tables = tables,td = td, job_id = job_id, pipeline = pipeline, snpdistances=snpdistances, snpdensity = snpdensity, modaltables = modaltables, date = date
-    td = fill_vals(td=td, pipeline = pipeline)
+    td = fill_vals(td=td, pipeline = pipeline, wd = wd, job_id=job_id)
     data['td'] = td
+    print(data)
+    print("rendering html")
     report_template = jinja2.Template(pathlib.Path(indexhtml).read_text())
     reporthtml.write_text(report_template.render(data))
     # print(data)
-    write_toml(data = data, output = 'report.toml')    
+    # write_toml(data = data, output = 'report.toml')    
 
-pipeline = snakemake.params.pipeline
-# print(pipeline)
-job_id = snakemake.params.job_id
-assembler = snakemake.params.assembler
-inputs = snakemake.input
-resources = snakemake.params.template_path
-run_kraken = snakemake.params.run_kraken
+pipeline = sys.argv[1]
+print(pipeline)
+job_id = sys.argv[2]
+resources = sys.argv[3]
+wd = sys.argv[4]
+print(wd)
+print(sys.argv[5])
+run_kraken = 'speciation' if sys.argv[5]=='true' else ''
 
-main(pipeline = pipeline, inputs = inputs, job_id= job_id, assembler= assembler, resources = resources, run_kraken = run_kraken)
+if pipeline != 'preview':
+    assembler = sys.argv[5]
+else:
+    assembler = ''
+main(pipeline = pipeline,wd = wd, job_id= job_id, assembler= assembler, resources = resources, run_kraken = run_kraken)

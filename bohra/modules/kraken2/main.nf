@@ -47,7 +47,7 @@ process KRAKEN2 {
         """
         [ ! -f  ${prefix}_1.fastq.gz ] && ln -s ${reads[0]} ${prefix}_1.fastq.gz
         [ ! -f  ${prefix}_2.fastq.gz ] && ln -s ${reads[1]} ${prefix}_2.fastq.gz
-        kraken2 --paired ${prefix}_1.trim.fastq.gz  ${prefix}_2.trim.fastq.gz  --threads $task.cpus  --minimum-base-quality 13 --report kraken2.tab --memory-mapping $options.args
+        kraken2 --paired ${prefix}_1.fastq.gz  ${prefix}_2.fastq.gz  --threads $task.cpus  --minimum-base-quality 13 --report kraken2.tab --memory-mapping $options.args
         echo \$(kraken2 --version 2>&1) | sed -e "s/kraken2 //g" > ${software}.version.txt
         """
     }

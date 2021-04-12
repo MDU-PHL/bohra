@@ -4,7 +4,7 @@ include { initOptions; saveFiles; getSoftwareName } from './functions'
 params.options = [:]
 def options    = initOptions(params.options)
 
-process MASH_TRIANGLE {
+process QUICKTREE {
 
     label 'process_medium'
     publishDir "${params.outdir}",
@@ -13,17 +13,15 @@ process MASH_TRIANGLE {
     cache 'lenient'
     
     input:
-    val(sketches)
+    path(preview_distances)
 
     output:
-    path('preview_distances.tab'), emit: mash_distances
+    path('preview.newick'), emit: preveiw_tree
 
     script:
-    // Added soft-links to original fastqs for consistent naming in MultiQC
     def software = getSoftwareName(task.process)
-    def input_files = sketches.join(' ')
     """
-    mash triangle -C $input_files $params.reference_fasta > preview_distances.tab
+    quicktree -in m -out t $preview_distances  | nw_order -c n - > preview.newick
     """
         
 }

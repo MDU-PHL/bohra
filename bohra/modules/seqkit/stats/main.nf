@@ -4,7 +4,7 @@ include { initOptions; saveFiles; getSoftwareName } from './functions'
 params.options = [:]
 def options    = initOptions(params.options)
 
-process SEQKIT {
+process SEQKIT_STATS {
     tag "$meta.id"
     label 'process_medium'
     publishDir "${params.outdir}",

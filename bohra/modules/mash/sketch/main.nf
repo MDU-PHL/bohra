@@ -23,7 +23,7 @@ process MASH_SKETCH {
     tuple val(meta), path(reads)
 
     output:
-    tuple val(meta), path('*.sketch'), emit: sketch
+    tuple val(meta), path('*.msh'), emit: sketch
 
     script:
     // Added soft-links to original fastqs for consistent naming in MultiQC
@@ -31,7 +31,7 @@ process MASH_SKETCH {
     def prefix   = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
     """
     [ ! -f  ${prefix}_1.fastq.gz ] && ln -s ${reads[0]} ${prefix}_1.fastq.gz
-    mash sketch -r ${prefix}_1.fastq.gz -m 5 -k 21 -C $meta.id -o ${meta.id}.sketch
+    mash sketch -r ${prefix}_1.fastq.gz -m 5 -k 21 -C $meta.id -o ${meta.id}
     """
     
 }
