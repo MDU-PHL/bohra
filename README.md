@@ -5,22 +5,15 @@
 
 # Bohra 
 
-Bohra has a new look! 
-* A new preview mode for 'sneak peak' at your dataset. 
-* `rerun` has been deprecated. If you would like to rerun a job etc; use the run command.
-* If rerunning a job, a new --keep flag to archive previous report files.
-* Built in filtering features to automatically remove isolates with low average coverage or alignment to your reference.
-* Provide a standardised config file for commonly used settings.
-
 Bohra is microbial genomics pipeline, designed predominantly for use in public health, but may also be useful in research settings. The pipeline takes as input a tab-delimited file with the isolate IDs followed by the path to READ1 and READ2, a reference for alignment and a unique identifier, where reads are illumina reads (other platforms are not supported at this stage).
 
 ### Motivation
 
-Bohra was inspired by Nullarbor (https://github.com/tseemann/nullarbor) to be used in public health microbiology labs for analysis of short reads from microbiological samples. The pipeline is written in [Snakemake](https://snakemake.readthedocs.io/en/stable/). 
+Bohra was inspired by Nullarbor (https://github.com/tseemann/nullarbor) to be used in public health microbiology labs for analysis of short reads from microbiological samples. The pipeline is written in [Snakemake](https://snakemake.readthedocs.io/en/stable/).
 
 ### Etymology
 
-Bohra the name of an exinct species of tree kangaroo that lived on the nullarbor. The name was chosen to reflect the fact that it will be predominantly used to build *trees*, relies on *snippy* (named for a very famous kangaroo) and was inspired by *nullarbor*. 
+Bohra the name of an exinct species of tree kangaroo that lived on the Nullarbor plain in Australia. The name was chosen to reflect the fact that it will be predominantly used to build *trees*, relies on *snippy* (named for a very famous kangaroo) and was inspired by *nullarbor*. 
 
 
 ## Pipeline
@@ -32,16 +25,17 @@ Bohra can be run in four modes
 1. Preview (DEFAULT)
 * Calculate mash-distances
 * Build a mash-tree
+* Report sequencing statistics
+* Species identification (providing you have kraken2 database setup properly ;) )
 
 2. SNPs, species ID and Assembly based tools (MLST, Resistome and annotation)
-* Clean reads
 * Call variants
 * Generate a phylogenetic tree
 * Assemble
-* Species identification
 * MLST
 * Resistome
 * Annotate
+* Species identification
 
 4. SNPs, Phylogeny, PanGenome and  Typing and Species Identification
 * Clean reads
