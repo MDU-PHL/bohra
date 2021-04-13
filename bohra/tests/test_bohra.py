@@ -108,13 +108,13 @@ def test_structure():
                 assert detect_obj.check_input_structure(tab) == True
 
 
-def test_path_exists():
-        '''
-        test that path_exists returns True
-        '''
-        with patch.object(RunSnpDetection, "__init__", lambda x: None):
-                p = pathlib.Path('bohra','tests', 'test_file.txt')
-                detect_obj = RunSnpDetection()
-                detect_obj.logger = logging.getLogger(__name__)
-                assert detect_obj.path_exists(p)
+# def test_path_exists():
+#         '''
+#         test that path_exists returns True
+#         '''
+#         with patch.object(RunSnpDetection, "__init__", lambda x: None):
+#                 p = pathlib.Path('bohra','tests', 'test_file.txt')
+#                 detect_obj = RunSnpDetection()
+#                 detect_obj.logger = logging.getLogger(__name__)
+#                 assert detect_obj.path_exists(p)
 
