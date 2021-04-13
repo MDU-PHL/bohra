@@ -45,6 +45,7 @@ workflow {
     include { PREVIEW_ANALYSIS;PREVIEW_NEWICK;RUN_KRAKEN } from './workflows/preview'
     include { COLLATE_KRAKEN;COLLATE_SEQS;WRITE_HTML } from './workflows/collation'
     include { RUN_SNIPPY } from './workflows/snps'
+    include { ASSEMBLE } from './workflows/assemble'
 
     PREVIEW_ANALYSIS ( reads )
     PREVIEW_NEWICK ( PREVIEW_ANALYSIS.out.skch.map { cfg, sketch -> sketch }.collect() )
@@ -59,10 +60,11 @@ workflow {
     
     if (params.mode == 'sa'){
         RUN_SNIPPY ( reads )
+        ASSEMBLE ( reads )
         // ABRITAMR ( contigs )
     }
 
-    WRITE_HTML ( preview_results.collect() )
+    // WRITE_HTML ( preview_results.collect() )
     
     
     

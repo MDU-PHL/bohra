@@ -24,10 +24,10 @@ process SNIPPY {
     tuple val(meta), path(reads)
 
     output:
-    tuple val(meta), path('*/snps.aligned.fa'), emit: aln
-    tuple val(meta), path('*/snps.raw.vcf'), emit: raw_vcf
-    tuple val(meta), path('*/snps.vcf'), emit: vcf
-    tuple val(meta), path('*/snps.log'), emit: log
+    tuple val(meta), path('snps.aligned.fa'), emit: aln
+    tuple val(meta), path('snps.raw.vcf'), emit: raw_vcf
+    tuple val(meta), path('snps.vcf'), emit: vcf
+    tuple val(meta), path('snps.log'), emit: log
     path '*.version.txt'                  , emit: version
 
     script:
@@ -38,6 +38,7 @@ process SNIPPY {
     [ ! -f  ${prefix}_1.fastq.gz ] && ln -s ${reads[0]} ${prefix}_1.fastq.gz
     [ ! -f  ${prefix}_2.fastq.gz ] && ln -s ${reads[1]} ${prefix}_2.fastq.gz
     snippy --outdir ${prefix} --R1 ${prefix}_1.fastq.gz --R2 ${prefix}_2.fastq.gz --ref ${params.reference_fasta} --force --cpus $task.cpus
+    cp ${prefix}/snps.* .
     echo \$(snippy --version 2>&1) | sed -e "s/snippy //g" > ${software}.version.txt
     """
     

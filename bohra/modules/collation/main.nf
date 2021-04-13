@@ -49,6 +49,30 @@ process COLLATE_STATS_ISOLATE {
     
 }
 
+
+process SNIPPY_QC {
+    tag "$meta.id"
+    label 'process_medium'
+    publishDir "${params.outdir}",
+        mode: params.publish_dir_mode,
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
+    cache 'lenient' 
+    
+    input:
+    tuple val(meta), path(aln)
+    
+    output:
+    tuple val(meta), path('snippy_qc.txt'), emit: snippy_qc
+
+    script:
+    def prefix   = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
+    """
+    $module_dir/snippy_qc.py $meta.id $aln snippy_qc.txt ${params.min_aln}
+    """
+    
+}
+
+
 process COLLATE_KRAKENS {
     
     publishDir "${params.outdir}",
@@ -86,7 +110,30 @@ process COLLATE_SEQDATA {
     """
     csvtk concat -t -T $seqs > seqdata.txt
     """
+
 }
+
+
+process COLLATE_SNIPPY_QCS {
+    
+    publishDir "${params.outdir}",
+        mode: params.publish_dir_mode
+        
+    cache 'lenient'
+
+    input:
+    val(snippy_qcs) 
+
+    output:
+    path "core_genome.txt", emit: core_genome
+    
+    script:
+    def sq = snippy_qcs.join(' ')
+    """
+    csvtk concat -t -T $sq > core_genome.txt
+    """
+}
+
 
 process COMPILE {
     
