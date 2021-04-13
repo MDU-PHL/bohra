@@ -1,0 +1,43 @@
+// Import generic module functions
+include { initOptions; saveFiles; getSoftwareName } from './functions'
+
+params.options = [:]
+def options    = initOptions(params.options)
+
+process SNIPPY_CORE {
+    
+    label 'process_medium'
+    publishDir "${params.outdir}",
+        mode: params.publish_dir_mode
+    
+    cpus options.args2// args2 needs to be cpus for shovill
+    cache 'lenient'
+    // conda (params.enable_conda ? 'bioconda::shovill=1.1.0' : null)
+    // if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
+    //     container 'https://depot.galaxyproject.org/singularity/fastp:0.20.1--h8b12597_0'
+    // } else {
+    //     container 'quay.io/biocontainers/fastp:0.20.1--h8b12597_0'
+    // }
+
+    input:
+    val(alns) // this needs to be a list of sample! not .aln since snippy core uses relative path and the name of the folder to name results!
+
+    output:
+    path('core.aln'), emit: core_aln
+    path('core.full.aln'), emit: core_full_aln
+    path('core.vcf'), emit: core_vcf
+    path('core.txt'), emit: core_stats
+    path '*.version.txt'                  , emit: version
+
+    script:
+    // Added soft-links to original fastqs for consistent naming in MultiQC
+    def software = getSoftwareName(task.process)
+    def mask_string = options.args ? "--mask ${options.args}" : ""
+    def core = alns.join(' ')
+    """
+    ln -sf $launchDir/${params.outdir}/* .
+    snippy-core --ref ${params.reference_fasta} ${mask_string} $core
+    echo \$(snippy --version 2>&1) | sed -e "s/snippy //g" > ${software}.version.txt
+    """
+    
+}

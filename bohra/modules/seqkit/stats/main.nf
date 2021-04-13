@@ -32,7 +32,7 @@ process SEQKIT_STATS {
     def input_type = options.args2
     if ( input_type == 'contigs'){
     """
-    seqkit stats -T $input_files > assembly_statistics.txt
+    seqkit stats --all -T $input_files > assembly_statistics.txt
     """
     } else {   
     """

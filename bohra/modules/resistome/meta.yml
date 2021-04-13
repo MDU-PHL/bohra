@@ -1,12 +1,12 @@
-name: abritamr
-description: in silico AMR detection implementing AMRfinderplus
+name: shovill
+description: Assemble bacterial isolate genomes from Illumina paired-end reads
 keywords:
-  - amr
+  - assembly
 tools:
   - shovill:
       description: |
-        in silico AMR detection implementing AMRfinderplus for application in public health reporting
-      documentation: https://github.com/mdu-phl/abritamr
+        Assemble bacterial isolate genomes from Illumina paired-end reads
+      documentation: https://github.com/tseemann/shovill
       doi: 
 params:
   - outdir:
@@ -36,7 +36,7 @@ input:
       description: |
         Groovy Map containing sample information
         e.g. [ id:'test', single_end:false ]
-  - contigs:
+  - reads:
       type: file
       description: |
         List of input FastQ files of size 1 and 2 for single-end and paired-end data,
@@ -48,10 +48,14 @@ output:
       description: |
         Groovy Map containing sample information
         e.g. [ id:'test', single_end:false ]
-  - amr:
+  - contigs:
       type: file
-      description: The report file from amrfinder
-      pattern: "amrfinder.out"
+      description: The report file from kraken2
+      pattern: "*.contigs.fa"
+  - log:
+      type: file
+      description: fastq log file
+      pattern: "*.shovill.log"
   - version:
       type: file
       description: File containing software version
