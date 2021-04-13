@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 include { SNIPPY_CORE } from './../modules/snippy_core/main' 
-// include { IQTREE } from './../modules/iqtree/main' 
+include { IQTREE } from './../modules/iqtree/main' addParams( options: [args2: params.iqtree_cpus] )
 
 workflow RUN_CORE {   
 
@@ -9,10 +9,14 @@ workflow RUN_CORE {
         alns
     main:
         SNIPPY_CORE ( alns )       
-        // SNIPPY_QC ( SNIPPY.out.aln )
-    // emit:
-    //     aln = SNIPPY.out.aln
-    //     qual = SNIPPY_QC.out.snippy_qc
+        IQTREE ( SNIPPY_CORE.out.core_aln )
+    emit:
+        core_aln = SNIPPY_CORE.out.core_aln
+        core_full_aln = SNIPPY_CORE.out.core_full_aln
+        core_vcf = SNIPPY_CORE.out.core_vcf
+        core_stats = SNIPPY_CORE.out.core_stats
+        newick = IQTREE.out.newick
+
 
 }
 

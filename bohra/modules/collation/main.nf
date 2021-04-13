@@ -134,6 +134,26 @@ process COLLATE_SNIPPY_QCS {
     """
 }
 
+process COLLATE_ASM {
+    
+    tag "$meta.id"
+    label 'process_medium'
+    publishDir "${params.outdir}",
+        mode: params.publish_dir_mode,
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
+    cache 'lenient' 
+    input:
+    tuple val(meta), path(stats)
+    output:
+    tuple val(meta), path ("assembly.txt"), emit: assembly
+    
+    script:
+    """
+    ${module_dir}/collate_stats.py $meta.id $stats $seqtk_stats  ${params.reference_fasta} ${params.min_qscore} ${params.min_cov} read_assessment.txt
+    """
+
+
+}
 
 process COMPILE {
     

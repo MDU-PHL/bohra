@@ -12,13 +12,7 @@ process SNIPPY_CORE {
     
     cpus options.args2// args2 needs to be cpus for shovill
     cache 'lenient'
-    // conda (params.enable_conda ? 'bioconda::shovill=1.1.0' : null)
-    // if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-    //     container 'https://depot.galaxyproject.org/singularity/fastp:0.20.1--h8b12597_0'
-    // } else {
-    //     container 'quay.io/biocontainers/fastp:0.20.1--h8b12597_0'
-    // }
-
+    
     input:
     val(alns) // this needs to be a list of sample! not .aln since snippy core uses relative path and the name of the folder to name results!
 

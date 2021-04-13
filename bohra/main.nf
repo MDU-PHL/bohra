@@ -24,6 +24,8 @@ params.publish_dir_mode = 'copy'
 params.snippy_threads = 4
 params.kraken_threads = 16
 params.assembler_threads = 8
+params.prokka_threads = 8
+params.iqtree_cpus = 20
 // mode
 params.mode = 'sa'
 // template_dir
@@ -46,7 +48,8 @@ workflow {
     include { COLLATE_KRAKEN;COLLATE_SEQS;WRITE_HTML } from './workflows/collation'
     include { RUN_SNIPPY } from './workflows/snps'
     include { RUN_CORE } from './workflows/core'
-    include { RUN_ASSEMBLE } from './workflows/assemble_typing'
+    include { RUN_ASSEMBLE;CONCAT_MLST;CONCAT_RESISTOMES } from './workflows/assemble_typing'
+    
 
     PREVIEW_ANALYSIS ( reads )
     PREVIEW_NEWICK ( PREVIEW_ANALYSIS.out.skch.map { cfg, sketch -> sketch }.collect() )
@@ -63,7 +66,13 @@ workflow {
         RUN_SNIPPY ( reads )
         // println RUN_SNIPPY.out.aln.map { cfg, aln -> cfg.id }.collect().view()
         RUN_CORE ( RUN_SNIPPY.out.aln.map { cfg, aln -> cfg.id }.collect() )
-        RUN_ASSEMBLE ( reads )   
+        RUN_ASSEMBLE ( reads )
+        println RUN_ASSEMBLE.out.assembly_stats.map { cfg, assembly_stats -> assembly_stats }.collect().map { files -> tuple("assembly", files)}.view()
+        // println Channel.value("assembly").view()
+        CONCAT_MLST ( RUN_ASSEMBLE.out.mlst.map { cfg, mlst -> mlst }.collect().map { files -> tuple("mlst", files)} )
+        CONCAT_RESISTOMES ( RUN_ASSEMBLE.out.resistome.map { cfg, resistome -> resistome }.collect().map { files -> tuple("resistome", files)} )
+        // COLLATE_MLST ( RUN_ASSEMBLE.out.mlst )
+        // COLLA
     }
 
     // WRITE_HTML ( preview_results.collect() )
