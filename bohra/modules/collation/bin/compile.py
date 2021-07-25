@@ -357,7 +357,7 @@ def generate_summary():
     function to generate a summary table
     '''
     p = pathlib.Path('.')
-    tabs = [t for t in p.iterdir() if f"{t.suffix}" == '.tab']
+    tabs = [t for t in p.iterdir() if f"{t.suffix}" == '.txt']
     # print(tabs)
     summary_df = pandas.DataFrame()
     df_list = []
@@ -393,7 +393,7 @@ def generate_summary():
     # print(mlst)
     # print(summary_df)
     summary_df = summary_df.fillna('NA')
-    summary_file = 'summary_table.tab'
+    summary_file = 'summary_table.txt'
     summary_df.to_csv(summary_file, sep = '\t', index = False)
 
     return isolates

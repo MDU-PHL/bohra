@@ -143,13 +143,13 @@ process COLLATE_ASM {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     cache 'lenient' 
     input:
-    tuple val(meta), path(stats)
+    tuple val(meta), path(prokka), path(stats)
     output:
     tuple val(meta), path ("assembly.txt"), emit: assembly
     
     script:
     """
-    ${module_dir}/collate_stats.py $meta.id $stats $seqtk_stats  ${params.reference_fasta} ${params.min_qscore} ${params.min_cov} read_assessment.txt
+    ${module_dir}/collate_asm.py $meta.id $prokka $stats assembly.txt
     """
 
 

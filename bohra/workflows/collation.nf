@@ -28,6 +28,7 @@ workflow COLLATE_SEQS {
 
 }
 
+
 workflow WRITE_HTML {
     take:
         results

@@ -1,74 +1,44 @@
 #!/usr/bin/env python3
-import sys, json, datetime, subprocess, pathlib
-from Bio import SeqIO
+import pathlib, subprocess, sys, pandas, numpy
 
-# Isolate\tMatch 1\t%\tMatch 2\t%\tMatch 3\t%
+import pandas, pathlib
 
-STATS_TEXT = ["Isolate\tbp\t# Contigs\tNs\tMin contigs size\tAvg contigs size\tMax contigs size\tN50\tCDS\trRNA"]
+HEADER = [f"Isolate\tbp\t# Contigs\t# Gaps\tMin Contig size\tMax Contig size\tAvg Contig size\tN50\tCDS\trRNA"]
 
+def combine(prokka, asm, isolate, output):
 
-def get_vals_seqtk(f):
+    gff = pandas.read_csv(prokka, sep = ':', header = None, names = ['cond', isolate])
+    print(gff)
+    df = pandas.read_csv(asm, sep = '\t')
+    gff = gff[gff['cond'].isin(['CDS', 'rRNA'])]
+    print(gff)
+    rrna = gff[gff['cond'] == 'rRNA'][isolate].values[0]
+    cds = gff[gff['cond'] == 'CDS'][isolate].values[0]
+    print(rrna)
+    print(cds)
+    print(df)
+    bp = df['sum_len'].values[0]
+    contigs = df['num_seqs'].values[0]
+    mincontigs = df['min_len'].values[0]
+    avgcontigs = df['avg_len'].values[0]
+    maxcontigs = df['max_len'].values[0]
+    gaps= df['sum_gap'].values[0]
+    n50 = df['N50'].values[0]
 
-    with open(f, 'r') as inputfile:
-        lines = inputfile.read().split('\n')
-        qscore = lines[1].split('\t')[3]
-        bases = lines[1].split('\t')[0]
-        gc= float(lines[1].split('\t')[1]) + float(lines[1].split('\t')[2])
-        return float(qscore), int(bases), gc
+    result = f"{isolate}\t{bp}\t{contigs}\t{gaps}\t{mincontigs}\t{avgcontigs}\t{maxcontigs}\t{n50}\t{cds}\t{rrna}"
+    HEADER.append(result)
+    out = pathlib.Path(output)
+    out.write_text('\n'.join(HEADER))
 
-def sum_stats(f,cmd,col):
-
-    p = subprocess.run(f"cat {f} | datamash {cmd} --header-in {col}", shell = True, capture_output = True, encoding= 'utf-8')
-
-    return p.stdout
-
-def get_vals_kit(f):
-
-    reads = sum_stats(f, 'sum', 4)
-    minval = sum_stats(f, 'mean', 6)
-    avgval = sum_stats(f, 'mean', 7)
-    maxval = sum_stats(f, 'mean', 8)
-
-    return int(reads.strip()), float(minval.strip()), float(avgval.strip()), float(maxval.strip())
-
-def get_length(ref):
-
-    length = 0
-    for i in SeqIO.parse(ref,'fasta'): # use BioPython to determine percent alignment
-        l = len(i.seq)
-        length = length + l
-        
-    return length
-
-def get_dpth(ref,bases):
-    length = get_length(ref)
-    dpth = int(bases)/length
+def main(isolate,asm,prokka, output):
+    combine(prokka=prokka, asm = asm, isolate=isolate, output = output)
     
-    return round(dpth, 2)
-
-def get_qual(min_qscore, min_dpth, qscore, dpth):
-
-    if dpth > min_dpth and qscore > min_qscore:
-        return 'PASS'
-    else:
-        return 'FAIL'
-
-
-qscore, bases, gc = get_vals_seqtk(f = sys.argv[2])
-reads, minval, avgval, maxval = get_vals_kit(f = sys.argv[3])
-dpth = get_dpth(ref = sys.argv[4], bases = bases)
-qual = get_qual(min_qscore=float(sys.argv[5]), qscore=float(qscore), min_dpth=float(sys.argv[6]), dpth = dpth)
-ROW = [sys.argv[1], reads, bases, gc, minval, avgval, maxval, qscore, dpth, qual]
-ROW = [f"{r}" for r in ROW]
-ROW = '\t'.join(ROW)
-STATS_TEXT.append(ROW)
-output = pathlib.Path(sys.argv[7])
-output.write_text('\n'.join(STATS_TEXT))
-# print(ROW)
-
-
-
-
     
 
+isolate = sys.argv[1]
+prokka = sys.argv[2]
+asm = sys.argv[3]
+output = sys.argv[4]
+main(prokka = prokka, isolate=isolate, asm = asm, output = output)
+    
 

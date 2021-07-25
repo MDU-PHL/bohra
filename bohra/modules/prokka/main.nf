@@ -25,8 +25,8 @@ process PROKKA {
 
     output:
     tuple val(meta), path('*.gff'), emit: gff
-    tuple val(meta), path('*.txt'), emit: txt
-    path '*.version.txt'                  , emit: version
+    tuple val(meta), path('*.txt'), emit: prokka_txt
+    // path '*.version.txt'                  , emit: version
 
     script:
     // Added soft-links to original fastqs for consistent naming in MultiQC
@@ -35,8 +35,7 @@ process PROKKA {
     """
     prokka --outdir $meta.id --prefix $meta.id --mincontiglen 500 --notrna --fast --force $contigs --cpus $task.cpus
     cp ${prefix}/${prefix}.gff ${prefix}.gff
-    cp ${prefix}/${prefix}.gff ${prefix}.txt
-    echo \$(prokka --version 2>&1) | sed -e "s/prokka //g" > ${software}.version.txt
+    grep -v '^##' ${prefix}/${prefix}.txt > ${prefix}.txt
     """
     
 }

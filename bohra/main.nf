@@ -39,30 +39,25 @@ params.mask_string = ""
 
 reads = Channel.fromFilePairs("${params.outdir}/*/*_R{1,2}.fq.gz")
                                                                 .map { sample, files -> tuple([id: sample, single_end:false], files)}
-// println reads.view()
+println reads.view()
 
 
 workflow {
     
-    include { PREVIEW_ANALYSIS;PREVIEW_NEWICK;RUN_KRAKEN } from './workflows/preview'
+    include { READ_ANALYSIS;RUN_KRAKEN } from './workflows/common'
+    include { PREVIEW_NEWICK } from './workflows/preview'
     include { COLLATE_KRAKEN;COLLATE_SEQS;WRITE_HTML } from './workflows/collation'
-    include { RUN_SNIPPY } from './workflows/snps'
-    include { RUN_CORE } from './workflows/core'
-    include { RUN_ASSEMBLE;CONCAT_MLST;CONCAT_RESISTOMES } from './workflows/assemble_typing'
+    // include { RUN_SNIPPY } from './workflows/snps'
+    // include { RUN_CORE } from './workflows/core'
+    include { RUN_ASSEMBLE;CONCAT_MLST;CONCAT_RESISTOMES;COLLATE_ASM_PROKKA;CONCAT_ASM;RUN_SNIPPY;RUN_CORE } from './workflows/snps'
     
 
-    PREVIEW_ANALYSIS ( reads )
-    PREVIEW_NEWICK ( PREVIEW_ANALYSIS.out.skch.map { cfg, sketch -> sketch }.collect() )
-    COLLATE_SEQS ( PREVIEW_ANALYSIS.out.stats.map { cfg, stats -> stats }.collect() )
-    preview_results = PREVIEW_NEWICK.out.nwk.concat( COLLATE_SEQS.out.collated_seqdata )
-    if ( params.run_kraken ) {
-        RUN_KRAKEN ( reads )
-        // println RUN_KRAKEN.out.species.map { cfg, species -> species }.collect().view()
-        COLLATE_KRAKEN ( RUN_KRAKEN.out.species.map { cfg, species -> species }.collect() )
-        preview_results = preview_results.concat( COLLATE_KRAKEN.out.collated_species )
-    }
-    
-    if (params.mode == 'sa'){
+    READ_ANALYSIS ( reads )
+    if (params.mode == 'preview') {
+        PREVIEW_NEWICK ( PREVIEW_ANALYSIS.out.skch.map { cfg, sketch -> sketch }.collect() )
+        COLLATE_SEQS ( PREVIEW_ANALYSIS.out.stats.map { cfg, stats -> stats }.collect() )
+        results = PREVIEW_NEWICK.out.nwk.concat( COLLATE_SEQS.out.collated_seqdata )
+    } else if (params.mode == 'sa'){
         RUN_SNIPPY ( reads )
         // println RUN_SNIPPY.out.aln.map { cfg, aln -> cfg.id }.collect().view()
         RUN_CORE ( RUN_SNIPPY.out.aln.map { cfg, aln -> cfg.id }.collect() )
@@ -71,11 +66,21 @@ workflow {
         // println Channel.value("assembly").view()
         CONCAT_MLST ( RUN_ASSEMBLE.out.mlst.map { cfg, mlst -> mlst }.collect().map { files -> tuple("mlst", files)} )
         CONCAT_RESISTOMES ( RUN_ASSEMBLE.out.resistome.map { cfg, resistome -> resistome }.collect().map { files -> tuple("resistome", files)} )
-        // COLLATE_MLST ( RUN_ASSEMBLE.out.mlst )
-        // COLLA
+        // combined asm and prokka stats
+        APS = RUN_ASSEMBLE.out.prokka_txt.join( RUN_ASSEMBLE.out.assembly_stats )
+        COLLATE_ASM_PROKKA ( APS )
+        CONCAT_ASM ( COLLATE_ASM_PROKKA.out.collated_asm.map { cfg, asm -> asm }.collect().map { files -> tuple("assembly", files)} )
+        results = CONCAT_ASM.out.collated_assembly.concat( CONCAT_RESISTOMES.out.collated_resistomes, CONCAT_MLST.out.collated_mlst, RUN_CORE.out.newick )
+
     }
 
-    // WRITE_HTML ( preview_results.collect() )
+    if ( params.run_kraken ) {
+            RUN_KRAKEN ( reads )
+            // println RUN_KRAKEN.out.species.map { cfg, species -> species }.collect().view()
+            COLLATE_KRAKEN ( RUN_KRAKEN.out.species.map { cfg, species -> species }.collect() )
+            results = preview_results.concat( COLLATE_KRAKEN.out.collated_species )
+        }
+    WRITE_HTML ( results.collect() )
     
     
     
