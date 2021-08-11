@@ -38,6 +38,8 @@ def write_tables(table, wd, job_id):
             row = [f"<tr class='{raw[0]}-mlst'>"]
         elif 'resistome' in table:
             row = [f"<tr class='{raw[0]}-resistome'>"]
+        elif 'virulome' in table:
+            row = [f"<tr class='{raw[0]}-virulome'>"]
         elif 'seqdata' in table:
             row = [f"<tr class='{raw[0]}-sequence-data'>"]
         else:
@@ -45,6 +47,18 @@ def write_tables(table, wd, job_id):
         if 'distances.tab' == table:
                 for d in range(len(raw)):
                     row.append(f"<td align=\"center\" class = \"{raw[0]}_{header[d].strip()}\">{raw[d]}</td>")    
+        elif 'resistome' in table:
+            for d in raw:
+                # 
+                dr = d.split(';')
+                drs = []
+                for i in dr:
+                    if '^' in i:
+                        drs.append(f"<span style=\"color:#3483eb\">{i.strip('^')}</span>")
+                    else:
+                        drs.append(i)
+                x = ';'.join(drs)
+                row.append(f"<td align=\"center\">{x}</td>")
         else:
             for d in raw:
                 row.append(f"<td align=\"center\">{d}</td>")
@@ -102,6 +116,7 @@ def adjust_offset(row, d):
         return(int(row['POS']))
 
 def generate_dict(idx_file):
+
     d = {}
     pos = 0
     offset = 0

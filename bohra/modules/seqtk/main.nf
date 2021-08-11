@@ -26,14 +26,9 @@ process SEQTK {
     tuple val(meta), path('seqtk_stats.txt'), emit: seqtk_stats
 
     script:
-    // Added soft-links to original fastqs for consistent naming in MultiQC
-    def software = getSoftwareName(task.process)
-    def prefix   = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
     """
-    [ ! -f  ${prefix}_1.fastq.gz ] && ln -s ${reads[0]} ${prefix}_1.fastq.gz
-    [ ! -f  ${prefix}_2.fastq.gz ] && ln -s ${reads[1]} ${prefix}_2.fastq.gz
     echo -e Bases'\t'C%'\t'G%'\t'AvgQ > seqtk_stats.txt
-    cat ${prefix}_1.fastq.gz ${prefix}_2.fastq.gz | seqtk fqchk -q0 -  | grep ALL | cut -f2,4,5,8 >>seqtk_stats.txt
+    cat ${reads[0]} ${reads[1]} | seqtk fqchk -q0 -  | grep ALL | cut -f2,4,5,8 >>seqtk_stats.txt
     """
     
 }

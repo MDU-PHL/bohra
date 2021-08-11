@@ -39,7 +39,8 @@ params.mask_string = ""
 
 reads = Channel.fromFilePairs("${params.outdir}/*/*_R{1,2}.fq.gz")
                                                                 .map { sample, files -> tuple([id: sample, single_end:false], files)}
-println reads.view()
+
+
 
 
 workflow {
@@ -62,10 +63,11 @@ workflow {
         // println RUN_SNIPPY.out.aln.map { cfg, aln -> cfg.id }.collect().view()
         RUN_CORE ( RUN_SNIPPY.out.aln.map { cfg, aln -> cfg.id }.collect() )
         RUN_ASSEMBLE ( reads )
-        println RUN_ASSEMBLE.out.assembly_stats.map { cfg, assembly_stats -> assembly_stats }.collect().map { files -> tuple("assembly", files)}.view()
+        // println RUN_ASSEMBLE.out.assembly_stats.map { cfg, assembly_stats -> assembly_stats }.collect().map { files -> tuple("assembly", files)}.view()
         // println Channel.value("assembly").view()
         CONCAT_MLST ( RUN_ASSEMBLE.out.mlst.map { cfg, mlst -> mlst }.collect().map { files -> tuple("mlst", files)} )
         CONCAT_RESISTOMES ( RUN_ASSEMBLE.out.resistome.map { cfg, resistome -> resistome }.collect().map { files -> tuple("resistome", files)} )
+        CONCAT_VIRULOMES ( RUN_ASSEMBLE.out.virulome.map { cfg, resistome -> resistome }.collect().map { files -> tuple("virulome", files)} )
         // combined asm and prokka stats
         APS = RUN_ASSEMBLE.out.prokka_txt.join( RUN_ASSEMBLE.out.assembly_stats )
         COLLATE_ASM_PROKKA ( APS )

@@ -19,7 +19,6 @@ process QUICKTREE {
     path('preview.newick'), emit: preveiw_tree
 
     script:
-    def software = getSoftwareName(task.process)
     """
     quicktree -in m -out t $preview_distances  | nw_order -c n - > preview.newick
     """

@@ -9,22 +9,19 @@ def module_dir = moduleDir + "/bin"
 
 process IQTREE {
 
-    label 'process_medium'
+    label 'process_high'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode
     
     cache 'lenient'
-    cpus options.args2
+        
     input:
-    path(aln)
+        path(aln)
 
     output:
-    path('core.newick'), emit: newick
+        path('core.newick'), emit: newick
 
-    script:
-    // Added soft-links to original fastqs for consistent naming in MultiQC
-    def software = getSoftwareName(task.process)
-    
+    script:    
     """
     $module_dir/iqtree_generator.sh ${params.reference_fasta} $aln core $task.cpus
     cp core.treefile core.newick

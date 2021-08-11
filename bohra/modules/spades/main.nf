@@ -26,19 +26,14 @@ process SPADES {
     output:
     tuple val(meta), path('contigs.fa'), emit: contigs
     tuple val(meta), path('spades.log'), emit: log
-    path '*.version.txt'                  , emit: version
 
     script:
-    // Added soft-links to original fastqs for consistent naming in MultiQC
-    def software = getSoftwareName(task.process)
-    def prefix   = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
     """
-    [ ! -f  ${prefix}_1.fastq.gz ] && ln -s ${reads[0]} ${prefix}_1.fastq.gz
-    [ ! -f  ${prefix}_2.fastq.gz ] && ln -s ${reads[1]} ${prefix}_2.fastq.gz
-    spades.py -1 ${prefix}_1.fastq.gz -2 ${prefix}_2.fastq.gz -o ${prefix} -t $task.cpus
-    cp ${prefix}/contigs.fasta contigs.fa
-    cp ${prefix}/spades.log spades.log
-    echo \$(spades.py --version 2>&1) | sed -e "s/spades //g" > ${software}.version.txt
+    tmp_dir=\$(mktemp -d)
+    spades.py -1 ${reads[0]} -2 ${reads[1]} -o current -t $task.cpus --isolate --tmp-dir \$tmp_dir
+    cp current/scaffolds.fasta contigs.fa
+    cp current/spades.log .
+    rm -rf \$tmp_dir
     """
     
 }

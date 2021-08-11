@@ -26,12 +26,8 @@ process MASH_SKETCH {
     tuple val(meta), path('*.msh'), emit: sketch
 
     script:
-    // Added soft-links to original fastqs for consistent naming in MultiQC
-    def software = getSoftwareName(task.process)
-    def prefix   = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
     """
-    [ ! -f  ${prefix}_1.fastq.gz ] && ln -s ${reads[0]} ${prefix}_1.fastq.gz
-    mash sketch -r ${prefix}_1.fastq.gz -m 5 -k 21 -C $meta.id -o ${meta.id}
+    mash sketch -r ${reads[0]} -m 5 -k 21 -C $meta.id -o ${meta.id}
     """
     
 }

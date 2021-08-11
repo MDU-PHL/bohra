@@ -21,15 +21,10 @@ process MLST {
     output:
     tuple val(meta), path('mlst.tab'), emit: mlst
     tuple val(meta), path('mlst.json'), emit: json
-    path '*.version.txt'                  , emit: version
 
     script:
-    // Added soft-links to original fastqs for consistent naming in MultiQC
-    def software = getSoftwareName(task.process)
-    def prefix   = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
     """
     mlst --json mlst.json --nopath $contigs > mlst.tab
-    echo \$(mlst --version 2>&1) | sed -e "s/mlst //g" > ${software}.version.txt
     """
     
 }

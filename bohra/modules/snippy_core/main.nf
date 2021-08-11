@@ -21,17 +21,14 @@ process SNIPPY_CORE {
     path('core.full.aln'), emit: core_full_aln
     path('core.vcf'), emit: core_vcf
     path('core.txt'), emit: core_stats
-    path '*.version.txt'                  , emit: version
 
     script:
-    // Added soft-links to original fastqs for consistent naming in MultiQC
-    def software = getSoftwareName(task.process)
+    
     def mask_string = options.args ? "--mask ${options.args}" : ""
     def core = alns.join(' ')
     """
     ln -sf $launchDir/${params.outdir}/* .
     snippy-core --ref ${params.reference_fasta} ${mask_string} $core
-    echo \$(snippy --version 2>&1) | sed -e "s/snippy //g" > ${software}.version.txt
     """
     
 }

@@ -26,19 +26,14 @@ process SEQKIT_STATS {
     tuple val(meta), path('*_statistics.txt'), emit: stats
 
     script:
-    // Added soft-links to original fastqs for consistent naming in MultiQC
-    def software = getSoftwareName(task.process)
-    def prefix   = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
     def input_type = options.args2
     if ( input_type == 'contigs'){
     """
-    seqkit stats --all -T $input_files > assembly_statistics.txt
+    cat $input_files | seqkit stats --all -T  > assembly_statistics.txt
     """
     } else {   
     """
-    [ ! -f  ${prefix}_1.fastq.gz ] && ln -s ${input_files[0]} ${prefix}_1.fastq.gz
-    [ ! -f  ${prefix}_2.fastq.gz ] && ln -s ${input_files[1]} ${prefix}_2.fastq.gz
-    seqkit stats -T ${prefix}_1.fastq.gz  ${prefix}_2.fastq.gz > read_statistics.txt
+    cat ${input_files[0]} ${input_files[1]} | seqkit stats -T --all > read_statistics.txt
     """ 
     }
     

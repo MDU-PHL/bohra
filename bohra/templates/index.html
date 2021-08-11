@@ -120,7 +120,7 @@
   <body>
     <header>
       <h1 class="left">{{job_id}}</h1>
-        <p class ="right"> Generated using Bohra microbial genomics pipeline {{date}} </p>
+        <p class ="right"> Generated using Bohra microbial genomics pipeline {{date}} but {{user}} </p>
         <hr>
     </header>
   <!-- Modals - individual isolates -->
@@ -378,7 +378,8 @@ var tree = Phylocanvas.createTree('phylocanvas', {
   showInternalNodeLabels: true,
   alignLabels: true,
   lineWidth: 2,
-  disableZoom: true,    
+  disableZoom: true, 
+  fillCanvas:true,   
   scalebar: { active: true, position: { bottom: 10, centre: 10 } },
 });  
 tree.internalLabelStyle.colour = '#adf0ad';

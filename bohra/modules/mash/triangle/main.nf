@@ -19,8 +19,6 @@ process MASH_TRIANGLE {
     path('preview_distances.tab'), emit: mash_distances
 
     script:
-    // Added soft-links to original fastqs for consistent naming in MultiQC
-    def software = getSoftwareName(task.process)
     def input_files = sketches.join(' ')
     """
     mash triangle -C $input_files $params.reference_fasta > preview_distances.tab
