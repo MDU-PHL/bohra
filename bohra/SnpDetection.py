@@ -77,6 +77,7 @@ class RunSnpDetection(object):
         self.kraken_db = args.kraken_db
         self.run_kraken = False
         self.assembler = args.assembler
+        self.no_phylo = args.no_phylo
 
             
     # def run_with_gubbins(self):
@@ -501,7 +502,21 @@ class RunSnpDetection(object):
         else:
             LOGGER.info(f"No valid contigs file has been supplied. Assemblies will be generated.")
             return False
-    
+    def _check_phylo(self, isolates_list):
+
+        if self.pipeline == 'preivew' and len(isolates_list) > 2:
+            LOGGER.info(f"You are running in preview mode, a mash tree will be output")
+        elif len(isolates_list) < 3 and self.pipeline in ['default', 'all']:
+            LOGGER.warning(f"You have less than 3 isolates in your dataset, no phylogenetic tree will be generated.")
+            self.no_phylo = True
+        elif self.pipeline == 'all' and len(isolates_list) < 4:
+            LOGGER.warning(f"You can not run roary with less the 4 isolates.")
+            self.pipeline = 'default'
+        elif self.no_phylo:
+            LOGGER.info(f"You have selected no_phylo option so no phylogenetic tree will be generated.")
+        else:
+            LOGGER.info(f"A phylogenetic tree will be generated.")
+
     def _setup_directory(self, reads):
         isolates_list = []
         if not pathlib.Path(self.job_id).exists():
@@ -522,17 +537,18 @@ class RunSnpDetection(object):
                     elif not read.exists():
                         LOGGER.critical(f"{read} is not a valid path. All read files must be valid path. Please try again.")
                         raise SystemExit
-
+        
+        self._check_phylo(isolates_list = isolates_list)
         LOGGER.info(f"Updating isolate list.")
         pathlib.Path(f"isolates.list").write_text('\n'.join(isolates_list))
         return f"isolates.list"
         
 
     def _generate_cmd(self, min_cov, min_aln,min_qscore, mode, run_kraken, kraken2_db,assembler, mask_string, reference, 
-                        outdir, isolates, user, day, contigs):
+                        outdir, isolates, user, day, contigs, run_iqtree):
         
         stub = f"nextflow {self.script_path}/main.nf"
-        parameters = f"--min_cov {min_cov} --min_qscore {min_qscore} --min_aln {min_aln} --mode {mode} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} \
+        parameters = f"--min_cov {min_cov} --min_qscore {min_qscore} --min_aln {min_aln} --mode {mode} --run_iqtree {run_iqtree} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} \
 --mask_string {mask_string} --reference_fasta {reference} --contigs_file {contigs} --outdir {outdir} --isolates {isolates} --user {user} --day {day}"
         options = f"-with-report {self.job_id}_seqgen_report.html -with-trace -resume"
 
@@ -582,9 +598,9 @@ class RunSnpDetection(object):
             contigs_file = self.contigs
         else:
             contigs_file = 'no contigs'
-
+        run_iqtree = False if self.no_phylo else True
         cmd = self._generate_cmd(min_cov = self.mincov, min_aln = self.minaln, min_qscore = self.minqual, mode = self.pipeline, 
                         run_kraken = self.run_kraken, kraken2_db = self.kraken_db,contigs = contigs_file,
-                        assembler = self.assembler, mask_string = self.mask, reference = self.ref, 
+                        assembler = self.assembler, mask_string = self.mask, reference = self.ref, run_iqtree = run_iqtree,
                         outdir = self.job_id, isolates = isolates_list, day = self.day, user = self.user)
         self._run_cmd(cmd)

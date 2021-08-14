@@ -35,16 +35,23 @@ workflow RUN_CORE {
         alns
     main:
         SNIPPY_CORE ( alns )       
-        IQTREE ( SNIPPY_CORE.out.core_aln )
+        
     emit:
         core_aln = SNIPPY_CORE.out.core_aln
         core_full_aln = SNIPPY_CORE.out.core_full_aln
         core_vcf = SNIPPY_CORE.out.core_vcf
         core_stats = SNIPPY_CORE.out.core_stats
-        newick = IQTREE.out.newick
+        
 }
 
-
+workflow RUN_IQTREE {
+    take:
+        core_aln
+    main:
+        IQTREE ( core_aln )
+    emit:
+        newick = IQTREE.out.newick
+}
 workflow RUN_ASSEMBLE {   
 
     take:

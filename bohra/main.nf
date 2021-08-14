@@ -8,6 +8,8 @@ println "Welcome to bohra - microbial genomics pipeline!"
 println "Setting up some variables for pipeline."
 println "The pipeline will be run in $launchDir"
 println "Job directory is ${params.outdir}"
+println params.run_kraken
+println params.run_iqtree
 // params.prefill_path = '/home/seq/MDU/QC'
 // SAMPLE = config['isolates'].split()
 // SNIPPY_SINGULARITY = config['snippy_singularity']
@@ -67,50 +69,55 @@ reads = Channel.fromFilePairs("${params.outdir}/*/*_R{1,2}*.f*q.gz")
 
 // println reads.view()
 
-workflow {
+// workflow {
     
-    include { READ_ANALYSIS;RUN_KRAKEN } from './workflows/common'
-    include { PREVIEW_NEWICK } from './workflows/preview'
-    include { COLLATE_KRAKEN;COLLATE_SEQS;WRITE_HTML } from './workflows/collation'
-    // include { RUN_SNIPPY } from './workflows/snps'
-    // include { RUN_CORE } from './workflows/core'
-    include { RUN_ASSEMBLE;CONCAT_MLST;CONCAT_RESISTOMES;COLLATE_ASM_PROKKA;CONCAT_ASM;RUN_SNIPPY;RUN_CORE;CONCAT_VIRULOMES } from './workflows/snps'
+//     include { READ_ANALYSIS;RUN_KRAKEN } from './workflows/common'
+//     include { PREVIEW_NEWICK } from './workflows/preview'
+//     include { COLLATE_KRAKEN;COLLATE_SEQS;WRITE_HTML } from './workflows/collation'
+//     // include { RUN_SNIPPY } from './workflows/snps'
+//     // include { RUN_CORE } from './workflows/core'
+//     include { RUN_ASSEMBLE;CONCAT_MLST;CONCAT_RESISTOMES;COLLATE_ASM_PROKKA;CONCAT_ASM;RUN_SNIPPY;RUN_CORE;CONCAT_VIRULOMES } from './workflows/default'
     
 
-    READ_ANALYSIS ( reads )
-    if (params.mode == 'preview') {
-        PREVIEW_NEWICK ( READ_ANALYSIS.out.skch.map { cfg, sketch -> sketch }.collect() )
-        COLLATE_SEQS ( READ_ANALYSIS.out.stats.map { cfg, stats -> stats }.collect() )
-        results = PREVIEW_NEWICK.out.nwk.concat( COLLATE_SEQS.out.collated_seqdata )
-    } else if (params.mode == 'default'){
-        RUN_SNIPPY ( reads )
-        // println RUN_SNIPPY.out.aln.map { cfg, aln -> cfg.id }.collect().view()
-        RUN_CORE ( RUN_SNIPPY.out.aln.map { cfg, aln -> cfg.id }.collect() )
-        RUN_ASSEMBLE ( reads )
-        // println RUN_ASSEMBLE.out.assembly_stats.map { cfg, assembly_stats -> assembly_stats }.collect().map { files -> tuple("assembly", files)}.view()
-        // println Channel.value("assembly").view()
-        CONCAT_MLST ( RUN_ASSEMBLE.out.mlst.map { cfg, mlst -> mlst }.collect().map { files -> tuple("mlst", files)} )
-        CONCAT_RESISTOMES ( RUN_ASSEMBLE.out.resistome.map { cfg, resistome -> resistome }.collect().map { files -> tuple("resistome", files)} )
-        CONCAT_VIRULOMES ( RUN_ASSEMBLE.out.virulome.map { cfg, resistome -> resistome }.collect().map { files -> tuple("virulome", files)} )
-        // combined asm and prokka stats
-        APS = RUN_ASSEMBLE.out.prokka_txt.join( RUN_ASSEMBLE.out.assembly_stats )
-        COLLATE_ASM_PROKKA ( APS )
-        CONCAT_ASM ( COLLATE_ASM_PROKKA.out.collated_asm.map { cfg, asm -> asm }.collect().map { files -> tuple("assembly", files)} )
-        results = CONCAT_ASM.out.collated_assembly.concat( RUN_CORE.out.core_stats, CONCAT_VIRULOMES.out.collated_virulomes, CONCAT_RESISTOMES.out.collated_resistomes, CONCAT_MLST.out.collated_mlst, RUN_CORE.out.newick )
+//     READ_ANALYSIS ( reads )
+//     if (params.mode == 'preview') {
+//         PREVIEW_NEWICK ( READ_ANALYSIS.out.skch.map { cfg, sketch -> sketch }.collect() )
+//         COLLATE_SEQS ( READ_ANALYSIS.out.stats.map { cfg, stats -> stats }.collect() )
+//         results = PREVIEW_NEWICK.out.nwk.concat( COLLATE_SEQS.out.collated_seqdata )
+//     } else if (params.mode == 'default'){
+//         RUN_SNIPPY ( reads )
+//         // println RUN_SNIPPY.out.aln.map { cfg, aln -> cfg.id }.collect().view()
+//         RUN_CORE ( RUN_SNIPPY.out.aln.map { cfg, aln -> cfg.id }.collect() )
+//         if (params.run_iqtree ){
+//             tree = RUN_IQTREE ( RUN_CORE.out.core_aln)
+//         } else {
+//             tree = Channel.empty().ifEmpty('EmptyFile')
+//         }
+//         RUN_ASSEMBLE ( reads )
+//         // println RUN_ASSEMBLE.out.assembly_stats.map { cfg, assembly_stats -> assembly_stats }.collect().map { files -> tuple("assembly", files)}.view()
+//         // println Channel.value("assembly").view()
+//         CONCAT_MLST ( RUN_ASSEMBLE.out.mlst.map { cfg, mlst -> mlst }.collect().map { files -> tuple("mlst", files)} )
+//         CONCAT_RESISTOMES ( RUN_ASSEMBLE.out.resistome.map { cfg, resistome -> resistome }.collect().map { files -> tuple("resistome", files)} )
+//         CONCAT_VIRULOMES ( RUN_ASSEMBLE.out.virulome.map { cfg, resistome -> resistome }.collect().map { files -> tuple("virulome", files)} )
+//         // combined asm and prokka stats
+//         APS = RUN_ASSEMBLE.out.prokka_txt.join( RUN_ASSEMBLE.out.assembly_stats )
+//         COLLATE_ASM_PROKKA ( APS )
+//         CONCAT_ASM ( COLLATE_ASM_PROKKA.out.collated_asm.map { cfg, asm -> asm }.collect().map { files -> tuple("assembly", files)} )
+//         results = CONCAT_ASM.out.collated_assembly.concat( tree, RUN_CORE.out.core_stats, CONCAT_VIRULOMES.out.collated_virulomes, CONCAT_RESISTOMES.out.collated_resistomes, CONCAT_MLST.out.collated_mlst, RUN_CORE.out.newick )
 
-    }
+//     }
 
-    if ( params.run_kraken ) {
-            RUN_KRAKEN ( reads )
-            // println RUN_KRAKEN.out.species.map { cfg, species -> species }.collect().view()
-            COLLATE_KRAKEN ( RUN_KRAKEN.out.species.map { cfg, species -> species }.collect() )
-            results = results.concat( COLLATE_KRAKEN.out.collated_species )
-        }
-    println results.collect().view()
-    // WRITE_HTML ( results.collect() )
+//     if ( params.run_kraken ) {
+//             RUN_KRAKEN ( reads )
+//             // println RUN_KRAKEN.out.species.map { cfg, species -> species }.collect().view()
+//             COLLATE_KRAKEN ( RUN_KRAKEN.out.species.map { cfg, species -> species }.collect() )
+//             results = results.concat( COLLATE_KRAKEN.out.collated_species )
+//         }
+//     println results.collect().view()
+//     // WRITE_HTML ( results.collect() )
     
     
     
                                 
                 
-}
+// }
