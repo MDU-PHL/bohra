@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import pathlib, subprocess, sys, datetime, pandas, re, numpy, jinja2
+import pathlib, subprocess, sys, datetime, pandas, re, numpy, jinja2, json
 
 
 def write_tables(table, wd, job_id):
@@ -336,25 +336,7 @@ def get_software_file(pipeline, assembler = ''):
         :pipeline: the type of pipeline
         :assembler: the assembler used in the pipeline
     '''
-    snippy_tools = ['snippy', 'snippy-core', 'snp-dists', 'iqtree']
-    assembly_tools = ['mlst', 'kraken2', 'prokka', 'abritamr', assembler]
     
-    if pipeline == 's':
-        tool_dict = make_dict_versions(snippy_tools)
-    elif pipeline == 'a':
-        tool_dict = make_dict_versions(assembly_tools)
-    elif pipeline == 'sa':
-        snippy_tools.extend(assembly_tools)
-        tool_dict = make_dict_versions(snippy_tools)
-    elif pipeline == 'all':
-        snippy_tools.extend(assembly_tools)
-        snippy_tools.append('roary')
-        tool_dict = make_dict_versions(snippy_tools)
-    
-    
-    versions = ['Software versions']
-    for t in tool_dict:
-        versions.append(tool_dict[t])
     
     p = pathlib.Path('software_versions.tab')
 
@@ -367,43 +349,50 @@ def merge_dfs(start, added):
         start = start.merge(added, how = 'outer')
     return(start)
 
-def generate_summary():
+def generate_summary(wd, job_id):
     '''
     function to generate a summary table
     '''
-    p = pathlib.Path('.')
+    p = pathlib.Path(wd, job_id, 'report')
     tabs = [t for t in p.iterdir() if f"{t.suffix}" == '.txt']
-    # print(tabs)
+    print(tabs)
     summary_df = pandas.DataFrame()
     df_list = []
     
     # print(tabs)
     for tab in tabs:
         # print(df)
-        # print(tab)
+        print(tab)
         if 'species' in f"{tab.name}":
             species = pandas.read_csv(tab, sep = '\t')
-            species = species[['Isolate', 'Match #1']]
+            print(species)
+            species = species[['Isolate', 'Match 1']]
             summary_df = merge_dfs(summary_df, species)
-            summary_df = summary_df.rename(columns={'Match #1': 'Species'})
+            summary_df = summary_df.rename(columns={'Match 1': 'Species'})
         elif 'seqdata' in f"{tab.name}":
             seq = pandas.read_csv(tab, sep = '\t')
-            seq = seq[['Isolate', 'Estimated depth']]
+            print(seq)
+            seq = seq[['Isolate', 'Estimated average depth']]
+            
             summary_df = merge_dfs(summary_df, seq)
         elif 'assembly' in f"{tab.name}":
             assembly = pandas.read_csv(tab, sep = '\t')
             assembly = assembly[['Isolate', '# Contigs']]
+            print(assembly)
             summary_df = merge_dfs(summary_df, assembly)
         elif 'mlst' in f"{tab.name}":
-            mlst = pandas.read_csv(tab, sep = '\t', skiprows=1, header=None)
+            mlst = pandas.read_csv(tab, sep = '\t', header=None)
+            print(mlst)
             mlst = mlst.rename(columns = {0:'Isolate', 2:'ST'})
             mlst = mlst[['Isolate', 'ST']]
+            print(mlst)
             summary_df = merge_dfs(summary_df, mlst)
         elif 'core_genome' in f"{tab.name}":
             core = pandas.read_csv(tab, sep = '\t')
-            # print(core)
+            print(core)
             core = core[['Isolate', '% USED']]
             summary_df = merge_dfs(summary_df, core)
+    print(summary_df)
     isolates = len(summary_df['Isolate'])
     # print(mlst)
     # print(summary_df)
@@ -420,12 +409,8 @@ def return_tables(pipeline):
         tables =['sequence-data','species-identification']
         modaltables =['sequence-data','species-identification']
         display = f""
-    elif pipeline == 'a':
-        
-        tables =['mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
-        modaltables = ['mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
-        display = f"display:none;"
-    elif pipeline == 'sa':
+    
+    elif pipeline == 'default':
         
         tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
         modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
@@ -442,8 +427,11 @@ def return_tables(pipeline):
     return tables, modaltables, display
 
     
-def main(wd, pipeline,job_id, resources, run_kraken, assembler = ''):
+def main(wd, pipeline,job_id, resources, run_kraken, day, user,assembler = ''):
 
+    # get analysis dict
+    _dict = json.load(open(f"{pathlib.Path(resources,'report_analysis.json')}"), 'r')
+    
     p = pathlib.Path('.')
     print(p)
     reporthtml = pathlib.Path('report.html')
@@ -452,7 +440,7 @@ def main(wd, pipeline,job_id, resources, run_kraken, assembler = ''):
     indexhtml = pathlib.Path(resources,'index.html') # replace with template
     print(indexhtml)
     # initialise dictionary
-    # print(pipeline)
+    print(pipeline)
     # print(inputs)
     data = {
         'newick' :'',
@@ -461,7 +449,8 @@ def main(wd, pipeline,job_id, resources, run_kraken, assembler = ''):
         'display':'',
         'job_id':job_id,
         'pipeline':pipeline,
-        'date':datetime.datetime.today().strftime("%d_%m_%y"), 
+        'date':day,
+        'user':user,
         'tree_heigth':0,
         'modaltables':'',
         'tables':''
@@ -476,9 +465,9 @@ def main(wd, pipeline,job_id, resources, run_kraken, assembler = ''):
         data['display'] = display
         # print(td)
     else:
-        isos = generate_summary()
+        isos = generate_summary(wd = wd, job_id = job_id)
         # print(isos)
-        get_software_file(pipeline = pipeline, assembler = assembler)  
+        # get_software_file(pipeline = pipeline, assembler = assembler)  
         td = get_dict(pipeline = pipeline, run_kraken = run_kraken)
         tables, modaltables, display = return_tables(pipeline = pipeline)
         data['tables'] = tables
@@ -486,11 +475,11 @@ def main(wd, pipeline,job_id, resources, run_kraken, assembler = ''):
         data['display'] = display
         data['tree_heigth'] = isos * 25
 
-    if pipeline not in ['a', 'preview']:
+    if pipeline not in ['preview']:
         data['snpdensity']= plot_snpdensity()
         data['snpdistances']= plot_distances()
         data['newick'] = get_tree_string(pipeline = pipeline, wd = wd, job_id = job_id)
-    elif pipeline in ['s', 'sa', 'preview', 'all']:
+    elif pipeline in ['default', 'preview', 'all']:
         data['newick'] = get_tree_string(pipeline = pipeline, wd = wd, job_id= job_id)
 
     
@@ -498,24 +487,23 @@ def main(wd, pipeline,job_id, resources, run_kraken, assembler = ''):
 # newick = newick, display = display,tables = tables,td = td, job_id = job_id, pipeline = pipeline, snpdistances=snpdistances, snpdensity = snpdensity, modaltables = modaltables, date = date
     td = fill_vals(td=td, pipeline = pipeline, wd = wd, job_id=job_id)
     data['td'] = td
-    print(data)
     print("rendering html")
     report_template = jinja2.Template(pathlib.Path(indexhtml).read_text())
     reporthtml.write_text(report_template.render(data))
-    # print(data)
-    # write_toml(data = data, output = 'report.toml')    
+    
 
 pipeline = sys.argv[1]
-print(pipeline)
 job_id = sys.argv[2]
 resources = sys.argv[3]
 wd = sys.argv[4]
-print(wd)
-print(sys.argv[5])
+day = sys.argv[6]
+user = sys.argv[7]
 run_kraken = 'speciation' if sys.argv[5]=='true' else ''
 
 if pipeline != 'preview':
     assembler = sys.argv[5]
 else:
     assembler = ''
-main(pipeline = pipeline,wd = wd, job_id= job_id, assembler= assembler, resources = resources, run_kraken = run_kraken)
+main(pipeline = pipeline,wd = wd, job_id= job_id, 
+    assembler= assembler, day = day, user=user, 
+    resources = resources, run_kraken = run_kraken)

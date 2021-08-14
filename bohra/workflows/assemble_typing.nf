@@ -2,14 +2,13 @@
 
 include { CSVTK_CONCAT } from './../modules/csvtk/main'
 include { COLLATE_ASM } from './../modules/collation/main'
-include { SHOVILL } from './../modules/shovill/main' addParams( options: [args2: params.assembler_threads] )
-include { SPADES } from './../modules/spades/main' addParams( options: [args2: params.assembler_threads] )
-include { SKESA } from './../modules/skesa/main' addParams( options: [args2: params.assembler_threads] )
+include { SHOVILL } from './../modules/shovill/main' 
+include { SPADES } from './../modules/spades/main' 
+include { SKESA } from './../modules/skesa/main' 
 include { SEQKIT_STATS } from './../modules/seqkit/stats/main' addParams( options: [args2: 'contigs'] )
 include { ABRITAMR;COMBINE_AMR } from './../modules/resistome/main' addParams( options: [args2: 4] )
 include { MLST } from './../modules/mlst/main' addParams( options: [args2: 4] )
-include { PROKKA } from './../modules/prokka/main' addParams( options: [args2: params.prokka_threads] )
-
+include { PROKKA } from './../modules/prokka/main' 
 
 workflow RUN_ASSEMBLE {   
 

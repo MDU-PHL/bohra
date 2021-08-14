@@ -11,6 +11,7 @@ process MASH_SKETCH {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     
+    scratch true
     cache 'lenient'
     // conda (params.enable_conda ? 'bioconda::shovill=1.1.0' : null)
     // if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {

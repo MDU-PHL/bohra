@@ -11,6 +11,7 @@ process MASH_TRIANGLE {
         mode: params.publish_dir_mode
     
     cache 'lenient'
+    scratch true
     
     input:
     val(sketches)
@@ -21,7 +22,7 @@ process MASH_TRIANGLE {
     script:
     def input_files = sketches.join(' ')
     """
-    mash triangle -C $input_files $params.reference_fasta > preview_distances.tab
+    mash triangle -C $input_files > preview_distances.tab
     """
         
 }

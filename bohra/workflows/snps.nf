@@ -1,16 +1,18 @@
 #!/usr/bin/env nextflow
 
 include { SNIPPY } from './../modules/snippy/main' 
+include { SNIPPY_CORE } from './../modules/snippy_core/main' 
 include { SNIPPY_QC } from './../modules/collation/main' 
 include { CSVTK_CONCAT } from './../modules/csvtk/main'
 include { COLLATE_ASM } from './../modules/collation/main'
-include { SHOVILL } from './../modules/shovill/main' addParams( options: [args2: params.assembler_threads] )
-include { SPADES } from './../modules/spades/main' addParams( options: [args2: params.assembler_threads] )
-include { SKESA } from './../modules/skesa/main' addParams( options: [args2: params.assembler_threads] )
+include { SHOVILL } from './../modules/shovill/main' 
+include { SPADES } from './../modules/spades/main' 
+include { SKESA } from './../modules/skesa/main' 
 include { SEQKIT_STATS } from './../modules/seqkit/stats/main' addParams( options: [args2: 'contigs'] )
-include { ABRITAMR } from './../modules/resistome/main' addParams( options: [args2: 4] )
+include { ABRITAMR;COMBINE_AMR } from './../modules/resistome/main' addParams( options: [args2: 4] )
 include { MLST } from './../modules/mlst/main' addParams( options: [args2: 4] )
-include { PROKKA } from './../modules/prokka/main' addParams( options: [args2: params.prokka_threads] )
+include { PROKKA } from './../modules/prokka/main' 
+include { IQTREE } from './../modules/iqtree/main' 
 
 
 workflow RUN_SNIPPY {   
@@ -61,13 +63,16 @@ workflow RUN_ASSEMBLE {
         }
         SEQKIT_STATS ( contigs )
         ABRITAMR ( contigs )
+        ab = ABRITAMR.out.abritamr_matches.join( ABRITAMR.out.abritamr_partials )
+        COMBINE_AMR( ab )
         MLST ( contigs )
         PROKKA ( contigs )
-        println SEQKIT_STATS.out.stats.view()
+        // println SEQKIT_STATS.out.stats.view()
     emit:
         contigs
         assembly_stats = SEQKIT_STATS.out.stats
-        resistome = ABRITAMR.out.matches
+        resistome = COMBINE_AMR.out.resistome
+        virulome = ABRITAMR.out.abritamr_virulence
         mlst = MLST.out.mlst
         gff = PROKKA.out.gff
         prokka_txt = PROKKA.out.prokka_txt
@@ -91,6 +96,16 @@ workflow CONCAT_RESISTOMES {
         CSVTK_CONCAT ( resistomes )
     emit:
         collated_resistomes = CSVTK_CONCAT.out.collated
+
+}
+
+workflow CONCAT_VIRULOMES {
+    take:
+        virulomes
+    main:
+        CSVTK_CONCAT ( virulomes )
+    emit:
+        collated_virulomes = CSVTK_CONCAT.out.collated
 
 }
 

@@ -14,7 +14,8 @@ process IQTREE {
         mode: params.publish_dir_mode
     
     cache 'lenient'
-        
+    scratch true
+      
     input:
         path(aln)
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import sys, json, datetime, subprocess, pathlib
-from Bio import SeqIO
+
 
 # Isolate\tMatch 1\t%\tMatch 2\t%\tMatch 3\t%
 
@@ -33,11 +33,8 @@ def get_vals_kit(f):
 
 def get_length(ref):
 
-    length = 0
-    for i in SeqIO.parse(ref,'fasta'): # use BioPython to determine percent alignment
-        l = len(i.seq)
-        length = length + l
-        
+    p = subprocess.run(f"any2fasta {ref} | seqkit stats -a -T | cut -f5 | sed 1d", shell = True, capture_output = True, encoding = "utf-8")
+    length = int(p.stdout.strip())
     return length
 
 def get_dpth(ref,bases):

@@ -13,7 +13,7 @@ process MLST {
     
     cache 'lenient'
     // conda (params.enable_conda ? 'bioconda::mlst=2.19.0' : null)
-    
+    scratch true
 
     input:
     tuple val(meta), path(contigs)
@@ -24,7 +24,7 @@ process MLST {
 
     script:
     """
-    mlst --json mlst.json --nopath $contigs > mlst.tab
+    mlst --json mlst.json --label $meta.id --nopath $contigs > mlst.tab
     """
     
 }

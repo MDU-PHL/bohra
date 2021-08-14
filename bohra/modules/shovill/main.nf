@@ -23,8 +23,13 @@ process SHOVILL {
     script:
     
     """
-    shovill --R1 ${reads[0]} --R2 ${reads[1]} --outdir current --cpus $task.cpus --ram 16 
-    cp current/contigs.fa contigs.fa
+    if [ -e $meta.contigs ]
+    then
+        cp $meta.contigs contigs.fa
+    else
+        shovill --R1 ${reads[0]} --R2 ${reads[1]} --outdir current --cpus $task.cpus --ram 16 
+        cp current/contigs.fa contigs.fa
+    fi
     """
     
 }

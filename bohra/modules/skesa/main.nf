@@ -23,8 +23,13 @@ process SKESA {
     script:
     
     """
-    skesa --fastq ${reads[0]},${reads[1]} --cores $task.cpus --vector_percent 1.0 \
-    --contigs_out contigs.fa
+    if [ -e $meta.contigs ]
+    then
+        cp $meta.contigs contigs.fa
+    else
+        skesa --fastq ${reads[0]},${reads[1]} --cores $task.cpus --vector_percent 1.0 \
+        --contigs_out contigs.fa
+    fi
     """
     
 }

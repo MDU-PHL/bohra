@@ -44,7 +44,9 @@ process COLLATE_STATS_ISOLATE {
     
     script:
     """
-    ${module_dir}/collate_stats.py $meta.id $stats $seqtk_stats  ${params.reference_fasta} ${params.min_qscore} ${params.min_cov} read_assessment.txt
+    ${module_dir}/collate_stats.py $meta.id $stats $seqtk_stats  \
+    $launchDir/${params.reference_fasta} ${params.min_qscore} \
+    ${params.min_cov} read_assessment.txt
     """
     
 }
@@ -76,7 +78,8 @@ process SNIPPY_QC {
 process COLLATE_KRAKENS {
     
     publishDir "${params.outdir}",
-        mode: params.publish_dir_mode
+        mode: params.publish_dir_mode,
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
         
     cache 'lenient'
 
@@ -96,7 +99,8 @@ process COLLATE_KRAKENS {
 process COLLATE_SEQDATA {
     
     publishDir "${params.outdir}",
-        mode: params.publish_dir_mode
+        mode: params.publish_dir_mode,
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
         
     cache 'lenient'
     input:
@@ -117,7 +121,8 @@ process COLLATE_SEQDATA {
 process COLLATE_SNIPPY_QCS {
     
     publishDir "${params.outdir}",
-        mode: params.publish_dir_mode
+        mode: params.publish_dir_mode,
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
         
     cache 'lenient'
 
@@ -158,7 +163,8 @@ process COLLATE_ASM {
 process COMPILE {
     
     publishDir "${params.outdir}",
-        mode: params.publish_dir_mode
+        mode: params.publish_dir_mode,
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
         
     cache 'lenient'
     input:
@@ -170,6 +176,8 @@ process COMPILE {
     script:
     
     """
-    $module_dir/compile.py $params.mode $params.outdir $params.template_dir $launchDir $params.run_kraken -
+    $module_dir/compile.py $params.mode $params.outdir \
+    $params.template_dir $launchDir $params.run_kraken 
+    ${params.day} ${params.user}
     """
 }

@@ -56,7 +56,7 @@ process COMBINE_AMR {
     
     script:
     """
-    $module_dir/combine.py ${meta.id} $matches partials
+    $module_dir/combine.py ${meta.id} $matches $partials
     """
 
 }

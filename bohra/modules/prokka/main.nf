@@ -19,6 +19,8 @@ process PROKKA {
     //     container 'quay.io/biocontainers/fastp:0.20.1--h8b12597_0'
     // }
 
+    scratch true
+    
     input:
     tuple val(meta), path(contigs)
 
@@ -29,8 +31,8 @@ process PROKKA {
     script:
     """
     prokka --outdir $meta.id --prefix $meta.id --mincontiglen 500 --notrna --fast --force $contigs --cpus $task.cpus
-    cp ${prefix}/${prefix}.gff ${prefix}.gff
-    grep -v '^##' ${prefix}/${prefix}.txt > ${prefix}.txt
+    cp ${meta.id}/${meta.id}.gff ${meta.id}.gff
+    grep -v '^##' ${meta.id}/${meta.id}.txt > ${meta.id}.txt
     """
     
 }

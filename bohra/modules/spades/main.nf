@@ -25,15 +25,19 @@ process SPADES {
 
     output:
     tuple val(meta), path('contigs.fa'), emit: contigs
-    tuple val(meta), path('spades.log'), emit: log
+    // tuple val(meta), path('spades.log'), emit: log
 
     script:
     """
-    tmp_dir=\$(mktemp -d)
-    spades.py -1 ${reads[0]} -2 ${reads[1]} -o current -t $task.cpus --isolate --tmp-dir \$tmp_dir
-    cp current/scaffolds.fasta contigs.fa
-    cp current/spades.log .
-    rm -rf \$tmp_dir
+    if [ -e $meta.contigs ]
+    then
+        cp $meta.contigs contigs.fa
+    else
+        tmp_dir=\$(mktemp -d)
+        spades.py -1 ${reads[0]} -2 ${reads[1]} -o current -t $task.cpus --isolate --tmp-dir \$tmp_dir
+        cp current/scaffolds.fasta contigs.fa
+        rm -rf \$tmp_dir
+    fi
     """
     
 }
