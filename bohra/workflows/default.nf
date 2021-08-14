@@ -2,6 +2,7 @@
 
 include { SNIPPY } from './../modules/snippy/main' 
 include { SNIPPY_CORE } from './../modules/snippy_core/main' 
+include { SNP_DISTS } from './../modules/snp_dists/main' 
 include { SNIPPY_QC } from './../modules/collation/main' 
 include { CSVTK_CONCAT } from './../modules/csvtk/main'
 include { COLLATE_ASM } from './../modules/collation/main'
@@ -34,13 +35,15 @@ workflow RUN_CORE {
     take:
         alns
     main:
-        SNIPPY_CORE ( alns )       
+        SNIPPY_CORE ( alns )  
+        SNP_DISTS ( SNIPPY_CORE.out.core_aln )     
         
     emit:
         core_aln = SNIPPY_CORE.out.core_aln
         core_full_aln = SNIPPY_CORE.out.core_full_aln
         core_vcf = SNIPPY_CORE.out.core_vcf
         core_stats = SNIPPY_CORE.out.core_stats
+        dists = SNP_DISTS.out.distances
         
 }
 

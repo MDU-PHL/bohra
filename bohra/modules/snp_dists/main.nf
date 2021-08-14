@@ -4,29 +4,25 @@ include { initOptions; saveFiles; getSoftwareName } from './functions'
 params.options = [:]
 def options    = initOptions(params.options)
 
-def module_dir = moduleDir + "/bin"
-
-
-process IQTREE {
-
-    label 'process_high'
-   publishDir "${params.outdir}",
+process SNP_DISTS {
+    
+    label 'process_medium'
+    publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
     
     cache 'lenient'
-    scratch true
-      
+    
     input:
-        path(aln)
+    path(core) 
 
     output:
-        path('core.newick'), emit: newick
+    path('distance.tab'), emit: distances
 
-    script:    
+    script:
+    
     """
-    $module_dir/iqtree_generator.sh ${params.reference_fasta} $aln core $task.cpus
-    cp core.treefile core.newick
+    snp-dists $core > distances.tab
     """
-        
+    
 }
