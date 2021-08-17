@@ -19,12 +19,12 @@ process MLST {
     tuple val(meta), path(contigs)
 
     output:
-    tuple val(meta), path('mlst.tab'), emit: mlst
+    tuple val(meta), path('mlst.csv'), emit: mlst
     tuple val(meta), path('mlst.json'), emit: json
 
     script:
     """
-    mlst --json mlst.json --label $meta.id --nopath $contigs > mlst.tab
+    mlst --csv --json mlst.json --label $meta.id --nopath $contigs > mlst.csv
     """
     
 }

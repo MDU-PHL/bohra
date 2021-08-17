@@ -53,6 +53,7 @@ def main():
     parser.add_argument('--job_id','-j',help='Job ID, will be the name of the output directory', default='')
     parser.add_argument('--reference','-r',help='Path to reference (.gbk or .fa)', default = '')
     parser.add_argument('--mask','-m',default = '', help='Path to mask file if used (.bed)')
+    parser.add_argument("--abritamr_args",default="",help="Set if you would like to use point mutations, please provide a valid species.",       choices= ['Acinetobacter_baumannii', "Campylobacter", "Enterococcus_faecalis", "Enterococcus_faecium", "Escherichia", "Klebsiella", "Salmonella", "Staphylococcus_aureus", "Staphylococcus_pseudintermedius", "Streptococcus_agalactiae", "Streptococcus_pneumoniae", "Streptococcus_pyogenes", "Vibrio_cholerae"])
     parser.add_argument('--kraken_db', '-k', default="KRAKEN2_DEFAULT_DB", help="Path to DB for use with kraken2, if no DB present speciation will not be performed.")
     parser.add_argument('--pipeline','-p', default = 'preview', choices=['preview','default','all'], help=f"The pipeline to run. `preview` - generates a rapid tree using mash distances | `default` - runs snippy, phylogenetic tree (if > 3 sequences), assemblies, mlst and amr gene detection | `all` - same as default but includes roary pangenome analysis")
     parser.add_argument('--assembler','-a', default = 'spades', choices=['shovill','skesa','spades'], help=f"Assembler to use.")
@@ -63,7 +64,7 @@ def main():
     parser.add_argument('--workdir','-w', default = f"{pathlib.Path.cwd().absolute()}", help='The directory where Bohra will be run, default is current directory') # don't need this
     parser.add_argument('--force','-f', action="store_true", help = "Add if you would like to force a complete restart of the pipeline. All previous logs will be lost.")
     parser.add_argument('--no_phylo',action="store_true", help = "Set if you do NOT want to generate a phylogentic tree.")
-    parser.add_argument('--dry-run','-n', action="store_true", help = "If you would like to see a dry run of commands to be executed.")
+    # parser.add_argument('--dry-run','-n', action="store_true", help = "If you would like to see a dry run of commands to be executed.")
     parser.add_argument('--executor',help='Type of queue (sbatch or qsub currently supported) - required if --cluster is set.', default='')
     # parser.add_argument('--gubbins', '-g', action = 'store_true', help = 'Set to use gubbins for recombination correction.')
     parser.add_argument('--keep', default = 'N', choices= ['Y', 'N'], help = 'If you are rerunning bohra over an exisiting directory set --keep to \'Y\' to archive report files - otherwise previous reprot files will be removed.')

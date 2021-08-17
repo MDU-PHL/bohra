@@ -23,9 +23,8 @@ process CSVTK_CONCAT {
     script:
     // Added soft-links to original fastqs for consistent naming in MultiQC
     def input_files = input.join(' ')
-    def header = output_name =~ "mlst" ? "--no-header-row" : ""
     """
-    csvtk concat $header -t -T $input_files > ${output_name}.txt
+    csvtk concat -t -T $input_files > ${output_name}.txt
     """
         
 }

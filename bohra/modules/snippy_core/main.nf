@@ -27,8 +27,7 @@ process SNIPPY_CORE {
     def mask_string = options.args ? "--mask ${options.args}" : ""
     def core = alns.join(' ')
     """
-    ln -sf $launchDir/${params.outdir}/* .
-    snippy-core --ref ${params.reference_fasta} ${mask_string} $core
+    snippy-core --ref $launchDir/${params.reference} ${mask_string} $core
     """
     
 }

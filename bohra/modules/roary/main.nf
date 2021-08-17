@@ -8,7 +8,7 @@ process ROARY {
     label 'process_high'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"report", publish_id:meta.id) }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"report", publish_id:'report') }
     
     cache 'lenient'
     scratch true
@@ -18,14 +18,14 @@ process ROARY {
     val(gffs)
 
     output:
-    tuple val(meta), path('summary_statistics.txt'), emit: roary_summary
-    tuple val(meta), path('gene_presence_absence.csv'), emit: roary_pres_abs
+    path('summary_statistics.txt'), emit: roary_summary
+    path('gene_presence_absence.csv'), emit: roary_csv
 
     script:
     def gffs_str = gffs.join(' ')
     """
     roary -p 36 -f roary $gffs_str
-    cp roary/summary_statistics.txt .
+    csvtk add-header -t -T -n 'Genes,Range,Total' roary/summary_statistics.txt > summary_statistics.txt
     cp roary/gene_presence_absence.csv .
     """
 }

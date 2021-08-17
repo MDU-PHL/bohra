@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import sys, json, datetime, subprocess, pathlib
-
+from Bio import SeqIO
 
 # Isolate\tMatch 1\t%\tMatch 2\t%\tMatch 3\t%
 
@@ -14,7 +14,7 @@ def get_vals_seqtk(f):
         qscore = lines[1].split('\t')[3]
         bases = lines[1].split('\t')[0]
         gc= float(lines[1].split('\t')[1]) + float(lines[1].split('\t')[2])
-        return float(qscore), int(bases), gc
+        return float(qscore), int(bases), round(gc,1)
 
 def sum_stats(f,cmd,col):
 
@@ -35,13 +35,14 @@ def get_length(ref):
 
     p = subprocess.run(f"any2fasta {ref} | seqkit stats -a -T | cut -f5 | sed 1d", shell = True, capture_output = True, encoding = "utf-8")
     length = int(p.stdout.strip())
+    print(p)
     return length
 
 def get_dpth(ref,bases):
     length = get_length(ref)
     dpth = int(bases)/length
     
-    return round(dpth, 2)
+    return round(dpth, 1)
 
 def get_qual(min_qscore, min_dpth, qscore, dpth):
 

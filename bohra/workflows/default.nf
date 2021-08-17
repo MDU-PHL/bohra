@@ -3,7 +3,7 @@
 include { SNIPPY } from './../modules/snippy/main' 
 include { SNIPPY_CORE } from './../modules/snippy_core/main' 
 include { SNP_DISTS } from './../modules/snp_dists/main' 
-include { SNIPPY_QC } from './../modules/collation/main' 
+include { SNIPPY_QC;ADD_HEADER_MLST;MOBSUITE_WRANGLE;COLLATE_MOBSUITE } from './../modules/collation/main' 
 include { CSVTK_CONCAT } from './../modules/csvtk/main'
 include { COLLATE_ASM } from './../modules/collation/main'
 include { SHOVILL } from './../modules/shovill/main' 
@@ -14,6 +14,7 @@ include { ABRITAMR;COMBINE_AMR } from './../modules/resistome/main' addParams( o
 include { MLST } from './../modules/mlst/main' addParams( options: [args2: 4] )
 include { PROKKA } from './../modules/prokka/main' 
 include { IQTREE } from './../modules/iqtree/main' 
+include { MOBSUITE } from './../modules/mobsuite/main' 
 
 
 workflow RUN_SNIPPY {   
@@ -36,7 +37,7 @@ workflow RUN_CORE {
         alns
     main:
         SNIPPY_CORE ( alns )  
-        SNP_DISTS ( SNIPPY_CORE.out.core_aln )     
+        SNP_DISTS ( SNIPPY_CORE.out.core_full_aln )     
         
     emit:
         core_aln = SNIPPY_CORE.out.core_aln
@@ -76,16 +77,22 @@ workflow RUN_ASSEMBLE {
         ab = ABRITAMR.out.abritamr_matches.join( ABRITAMR.out.abritamr_partials )
         COMBINE_AMR( ab )
         MLST ( contigs )
+        ADD_HEADER_MLST ( MLST.out.mlst)
         PROKKA ( contigs )
+        // add new processes that generate outputs
+        MOBSUITE ( contigs )
+        MOBSUITE_WRANGLE ( MOBSUITE.out.mobs )
         // println SEQKIT_STATS.out.stats.view()
     emit:
         contigs
         assembly_stats = SEQKIT_STATS.out.stats
         resistome = COMBINE_AMR.out.resistome
         virulome = ABRITAMR.out.abritamr_virulence
-        mlst = MLST.out.mlst
+        mlst = ADD_HEADER_MLST.out.mlst
         gff = PROKKA.out.gff
         prokka_txt = PROKKA.out.prokka_txt
+        // add the result file emmitted by new rule
+        plasmid = MOBSUITE_WRANGLE.out.plasmid
 }
 
 workflow CONCAT_MLST {
@@ -119,6 +126,16 @@ workflow CONCAT_VIRULOMES {
 
 }
 
+workflow CONCAT_PLASMID {
+    take:
+        plasmids
+    main:
+        COLLATE_MOBSUITE ( plasmids )
+    emit:
+        collated_plasmids = COLLATE_MOBSUITE.out.collated_plasmid
+
+}
+
 
 workflow CONCAT_ASM {
     take:
@@ -140,3 +157,25 @@ workflow COLLATE_ASM_PROKKA {
         collated_asm = COLLATE_ASM.out.assembly
 
 }
+
+
+workflow CONCAT_STATS {
+    take:
+        stats
+    main:
+        CSVTK_CONCAT ( stats )
+    emit:
+        collated_stats = CSVTK_CONCAT.out.collated
+
+}
+
+workflow CONCAT_CORE_STATS {
+    take:
+        stats
+    main:
+        CSVTK_CONCAT ( stats )
+    emit:
+        collated_core = CSVTK_CONCAT.out.collated
+
+}
+

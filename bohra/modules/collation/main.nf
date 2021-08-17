@@ -45,7 +45,7 @@ process COLLATE_STATS_ISOLATE {
     script:
     """
     ${module_dir}/collate_stats.py $meta.id $stats $seqtk_stats  \
-    $launchDir/${params.reference_fasta} ${params.min_qscore} \
+    $launchDir/${params.reference} ${params.min_qscore} \
     ${params.min_cov} read_assessment.txt
     """
     
@@ -117,6 +117,72 @@ process COLLATE_SEQDATA {
 
 }
 
+process ADD_HEADER_MLST {
+    
+    tag "$meta.id"
+    label 'process_medium'
+    publishDir "${params.outdir}",
+        mode: params.publish_dir_mode,
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
+    
+    cache 'lenient'
+    input:
+    tuple val(meta), path(mlst)
+    
+    output:
+    tuple val(meta), path('mlst.txt'), emit: mlst
+
+    script:
+    
+    """
+    $module_dir/add_header_mlst.py $mlst 
+    """
+}
+
+
+process MOBSUITE_WRANGLE {
+    
+    tag "$meta.id"
+    label 'process_medium'
+    publishDir "${params.outdir}",
+        mode: params.publish_dir_mode,
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
+    
+    cache 'lenient'
+    input:
+    tuple val(meta), path(mobs)
+    
+    output:
+    tuple val(meta), path('plasmid.txt'), emit: plasmid
+
+    script:
+    
+    """
+    $module_dir/wrangle_mobsuite.py $mobs $meta.id
+    """
+}
+
+
+process COLLATE_MOBSUITE {
+    
+    publishDir "${params.outdir}",
+        mode: params.publish_dir_mode,
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
+        
+    cache 'lenient'
+    input:
+    tuple val(output_name), val(input)
+
+    output:
+    path "plasmid.txt", emit: collated_plasmid
+    
+    script:
+    def plasmids = input.join(' ')
+    """
+    $module_dir/collate_plasmids.py $output_name $plasmids
+    """
+
+}
 
 process COLLATE_SNIPPY_QCS {
     
@@ -160,6 +226,7 @@ process COLLATE_ASM {
 
 }
 
+
 process COMPILE {
     
     publishDir "${params.outdir}",
@@ -178,6 +245,6 @@ process COMPILE {
     """
     $module_dir/compile.py --pipeline $params.mode --launchdir $launchDir \
     --template_dir $params.template_dir  --day ${params.day} --user ${params.user} \
-    --isolates $params.isolates --files $res --reference $params.reference --job_id $params.outdir
+    --isolates $params.isolates --reference $params.reference --job_id $params.outdir
     """
 }

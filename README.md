@@ -1,44 +1,59 @@
 [![CircleCI](https://circleci.com/gh/MDU-PHL/bohra.svg?style=svg&circle-token=530799cb0764519fc65966ab48bac7e0d02f3688)](https://circleci.com/gh/MDU-PHL/bohra)
 [![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/)
 
-![Image](https://github.com/kristyhoran/bohra/blob/master/bohra.png)
 
-# Bohra 
 
-Bohra is microbial genomics pipeline, designed predominantly for use in public health, but may also be useful in research settings. The pipeline takes as input a tab-delimited file with the isolate IDs followed by the path to READ1 and READ2, a reference for alignment and a unique identifier, where reads are illumina reads (other platforms are not supported at this stage).
+# Bohra
+
+Bohra is microbial genomics pipeline, designed predominantly for use in public health, but may also be useful in research settings. At a minimum the pipeline takes as input a tab-delimited file with the isolate IDs followed by the path to READ1 and READ2, a reference for alignment and a unique identifier, where reads are illumina reads (other platforms are not supported at this stage).
+
+## Bohra has a new look! Welcome to Bohra-NF
+
+**New features**
+
+* Pipeline written in [Nextflow](https://www.nextflow.io)
+* Default mode
+    * Can be run on a single isolate (phylogenetic tree will not be generated if fewer than three sequences)
+    * MobSuite integration.
+    * Updated [abriTAMR] with support for point mutations and virulence factors.
+* Roary with visualisation of pan-genome.
+* Improved support for different computing environments.
+
+_snippy and snippy-core version 4.4.5 are NATA accredited for accurate detection of SNPs for reporting of genomic relationships at [MDU](https://biomedicalsciences.unimelb.edu.au/departments/microbiology-Immunology/research/services/microbiological-diagnostic-unit-public-health-laboratory#about-mdu-phl) Victoria Australia_ 
 
 ### Motivation
 
-Bohra was inspired by Nullarbor (https://github.com/tseemann/nullarbor) to be used in public health microbiology labs for analysis of short reads from microbiological samples. The pipeline is written in [Snakemake](https://snakemake.readthedocs.io/en/stable/).
+Bohra was inspired by Nullarbor (https://github.com/tseemann/nullarbor) to be used in public health microbiology labs for analysis of short reads from microbiological samples. The pipeline is written in [Nextflow](https://www.nextflow.io).
 
 ### Etymology
 
-Bohra the name of an exinct species of tree kangaroo that lived on the Nullarbor plain in Australia. The name was chosen to reflect the fact that it will be predominantly used to build *trees*, relies on *snippy* (named for a very famous kangaroo) and was inspired by *nullarbor*. 
+Bohra the name of an exinct species of tree kangaroo that lived on the Nullarbor plain in Australia. The name was chosen to reflect the fact that it will be predominantly used to build *trees*, relies on [*snippy*](https://github.com/tseemann/snippy) (named for a very famous kangaroo) and was inspired by *nullarbor*. 
 
 
 ## Pipeline
 
-Bohra takes raw sequencing reads and produces a standalone html file for simple distribution of reports.
+Bohra takes raw sequencing reads and produces a standalone html file for simple distribution of reports. An addtional file can be porvided with the paths to any assemblies that have already been generated. This is a helpful saver of time.
+
 ![Image](https://github.com/MDU-PHL/bohra/blob/master/workflow.png)
 
 Bohra can be run in four modes
-1. Preview (DEFAULT)
+1. Preview
 * Calculate mash-distances
 * Build a mash-tree
 * Report sequencing statistics
 * Species identification (providing you have kraken2 database setup properly ;) )
 
-2. SNPs, species ID and Assembly based tools (MLST, Resistome and annotation)
+2. Default SNPs, species ID, assemly, MLST, Resistome and annotation)
 * Call variants
 * Generate a phylogenetic tree
-* Assemble
+* Assemble 
 * MLST
 * Resistome
 * Annotate
+* Plasmid prediction
 * Species identification
 
-4. SNPs, Phylogeny, PanGenome and  Typing and Species Identification
-* Clean reads
+3. SNPs, Phylogeny, PanGenome and  Typing and Species Identification
 * Call variants
 * Generate a phylogenetic tree
 * Assemble
@@ -75,8 +90,7 @@ If installing with `pip` you will need to ensure other dependencies are also ins
 ```
 pip3 install bohra
 ```
-* [snakemake](https://snakemake.readthedocs.io/en/stable/getting_started/installation.html)
-* [Snippy](https://github.com/tseemann/snippy)
+* [Snippy (v4.4.5 recommended)](https://github.com/tseemann/snippy)
 * [Shovill (skesa and spades.py)](https://github.com/tseemann/shovill)
 * [Roary](https://sanger-pathogens.github.io/Roary/)
 * [Prokka](https://github.com/tseemann/prokka)
@@ -87,6 +101,7 @@ pip3 install bohra
 * [seqtk](https://github.com/lh3/seqtk)
 * [snp-dists](https://github.com/tseemann/snp-dists)
 * [mash](https://github.com/lskatz/mashtree)
+* [mob_suite](https://github.com/phac-nml/mob-suite)
 
 
 #### Check installation
@@ -94,7 +109,7 @@ pip3 install bohra
 Check that all dependencies are installed.
 
 ```
-bohra check
+bohra --check
 ```
 
 *IMPORTANT*
@@ -201,7 +216,7 @@ optional arguments:
 
 ```
 
-#### Using a config file 
+## Executors
 Arguments that start with '--' (eg. --input_file) can also be set in a config file. Please put your config file in the working directory and name it 'bohra.conf'
 Config file syntax allows: key=value, flag=true,
 stuff=[a,b,c] (for details, see syntax at https://goo.gl/R74nmi). If an arg is

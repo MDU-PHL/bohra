@@ -65,6 +65,11 @@
             "title":"Assembly", 
             "type":"table", 
             "link":"assembly"
+        },
+        {   "file": "plasmid.txt", 
+            "title":"Plasmid", 
+            "type":"table", 
+            "link":"plasmid"
         }
     ],
     "all":[
@@ -84,7 +89,7 @@
             "type": "table", 
             "link":"species-identification"
         },
-        {   "file": "core_genome.tab", 
+        {   "file": "core_genome.txt", 
             "title": "Core Genome", 
             "link":"core-genome", 
             "type":"table"
@@ -122,6 +127,11 @@
             "title":"Assembly", 
             "type":"table", 
             "link":"assembly"
+        },
+        {   "file": "plasmid.txt", 
+            "title":"Plasmid", 
+            "type":"table", 
+            "link":"plasmid"
         }
     ]
         

@@ -17,7 +17,7 @@ process SNP_DISTS {
     path(core) 
 
     output:
-    path('distance.tab'), emit: distances
+    path('distances.tab'), emit: distances
 
     script:
     

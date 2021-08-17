@@ -78,6 +78,7 @@ class RunSnpDetection(object):
         self.run_kraken = False
         self.assembler = args.assembler
         self.no_phylo = args.no_phylo
+        self.abritamr_args = args.abritamr_args
 
             
     # def run_with_gubbins(self):
@@ -441,7 +442,7 @@ class RunSnpDetection(object):
         }
         just_install = ['roary', 'mash', 'seqtk', 'quicktree']
 
-        software_versions = [] # a list of versions for output
+        software_versions = [f"Software"] # a list of versions for output
         LOGGER.info(f"Checking that dependencies are installed and recording version.")
         version_pat_3 = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
         for sft in software:
@@ -457,12 +458,15 @@ class RunSnpDetection(object):
                 raise SystemExit
         for j in just_install:
             self._check_installation(j)
+            software_versions.append(f"{j}")
         LOGGER.info(f"Now checking kraken2 DB")
         self._check_kraken2DB()
         software_versions.append(f"kraken2 DB {self.kraken_db}")
         # write software_versions.tab
         LOGGER.info(f"Writing software_versions.txt")
-        pathlib.Path('software_versions.txt').write_text('\n'.join(software_versions))
+        if not pathlib.Path(self.job_id, 'report').exists():
+            pathlib.Path(self.job_id, 'report').mkdir()
+        pathlib.Path(self.job_id, 'report','software_versions.txt').write_text('\n'.join(software_versions))
 
         return True
 
@@ -545,11 +549,11 @@ class RunSnpDetection(object):
         
 
     def _generate_cmd(self, min_cov, min_aln,min_qscore, mode, run_kraken, kraken2_db,assembler, mask_string, reference, 
-                        outdir, isolates, user, day, contigs, run_iqtree):
+                        outdir, isolates, user, day, contigs, run_iqtree, species):
         
         stub = f"nextflow {self.script_path}/main.nf"
         parameters = f"--min_cov {min_cov} --min_qscore {min_qscore} --min_aln {min_aln} --mode {mode} --run_iqtree {run_iqtree} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} \
---mask_string {mask_string} --reference_fasta {reference} --contigs_file {contigs} --outdir {outdir} --isolates {isolates} --user {user} --day {day}"
+--mask_string {mask_string} --reference {reference} --contigs_file {contigs} --species {species if species != '' else 'no_species'} --outdir {outdir} --isolates {isolates} --user {user} --day {day}"
         options = f"-with-report {self.job_id}_seqgen_report.html -with-trace -resume"
 
         cmd = f"{stub} {parameters} {options}"
@@ -602,5 +606,5 @@ class RunSnpDetection(object):
         cmd = self._generate_cmd(min_cov = self.mincov, min_aln = self.minaln, min_qscore = self.minqual, mode = self.pipeline, 
                         run_kraken = self.run_kraken, kraken2_db = self.kraken_db,contigs = contigs_file,
                         assembler = self.assembler, mask_string = self.mask, reference = self.ref, run_iqtree = run_iqtree,
-                        outdir = self.job_id, isolates = isolates_list, day = self.day, user = self.user)
+                        outdir = self.job_id, isolates = isolates_list, day = self.day, user = self.user, species = self.abritamr_args)
         self._run_cmd(cmd)

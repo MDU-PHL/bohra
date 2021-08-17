@@ -10,7 +10,7 @@ process ROARY2SVG {
     label 'process_high'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"report", publish_id:meta.id) }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"report", publish_id:'report') }
     
     cache 'lenient'
     scratch true
@@ -20,7 +20,7 @@ process ROARY2SVG {
     path(csv)
 
     output:
-    tuple val(meta), path('pan_genome.svg'), emit: pan_genome
+    path('pan_genome.svg'), emit: pan_genome
 
     script:
     

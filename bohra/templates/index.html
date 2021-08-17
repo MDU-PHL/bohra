@@ -120,7 +120,7 @@
   <body>
     <header>
       <h1 class="left">{{job_id}}</h1>
-        <p class ="right"> Generated using Bohra microbial genomics pipeline {{date}} but {{user}} </p>
+        <p class ="right"> Generated using Bohra microbial genomics pipeline {{date}} by {{user}} </p>
         <hr>
     </header>
   <!-- Modals - individual isolates -->
@@ -177,7 +177,7 @@
         <div class="modal-content">
           <h2 class="modal-title" style= "color: #3973ac; margin:3px;"> Information </h2>
           <hr>
-          <<h3 style="margin:6px;"> Download tree</h3>
+          <h3 style="margin:6px;"> Download tree</h3>
           <p style="margin:10px;"> To download a newick file right click on tree and select export as newick</p>
           <h3 style="margin:6px;"> Isolate details</h3>
           <p style="margin:10px;"> Select an isolate node from the tree to see isolate specific details</p>
@@ -187,8 +187,40 @@
       </div>
     </div>
 
+    <!-- software versions -->
+
+    <div class="modal fade" id="myModalversions" role="dialog">
+      <div class="modal-dialog modal-dialog-centered modal" >
+        <div class="modal-content">
+          <h2 class="modal-title" style= "color: #3973ac; margin:3px;"> Versions </h2>
+          <hr>
+          
+    <!-- these tables are hidden until needed - then placed in the current table div above -->
+          <div class="table-responsive">
+            <!-- buttons for dowload -->
+            <div id = "version-modal" > 
+              <table class="table table-striped table-bordered table-sortable detail-table">
+                
+                <thead>
+                  <tr><!-- header of table -->
+                    {{version_head}}
+                  </tr>
+                </thead>
+                <tbody>
+                  {{version_body}}
+                </tbody>
+                          <!-- end of table body -->
+              </table>
+            <!-- end of table -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
 <div id="help-button" style = "float:right;">
   <button type="button" class="btn btn-sm btn-outline-secondary zoom-button" id = "help" data-toggle="modal" data-target="#myModal3" data-placement="top" title="Select"> Helpful tips </button>    
+  <button type="button" class="btn btn-sm btn-outline-secondary zoom-button" id = "version" data-toggle="modal" data-target="#myModalversions" data-placement="top" title="Select"> Software versions </button>    
   <button type="button" class="btn btn-sm btn-outline-secondary" id = "nwk" ><span data-feather="arrow-down"> Download newick </button>        
 </div>
 <!-- div for summary table and phylogenetic tree -->
@@ -277,6 +309,9 @@
       <!-- buttons for dowload -->
       <div id = "{{t.link}}" style = "display: none;">
         <h3>{{t.title}}</h3>  
+        {% if t.check == 'no_data' %} 
+          <h4>No data to display</h4>
+        {% endif %} 
         <table class="table table-striped table-bordered table-sortable detail-table">
           <thead>
             <tr><!-- header of table -->
@@ -296,7 +331,10 @@
     <div class="table-responsive" >
       <!-- buttons for dowload -->
       <div id = "{{t.link}}" style="display:none;">
-        <h3>{{t.title}}</h3>  
+        <h3>{{t.title}}</h3>
+        {% if t.check == 'no_data' %} 
+          <h4>No data to display</h4>
+        {% endif %} 
         <table class="table table-striped table-bordered table-sortable detail-table">
           <thead>
             <tr><!-- header of table -->
@@ -456,6 +494,10 @@ $("#change-tree").on("click", function (e) {
 $("button.help").click(function(){
   $("#myModal3").modal();
 });
+
+$("button.version").click(function(){
+  $("#myModalversions").modal();
+});
 // remove lines from table
 $(function(){  
         $('#myModal').on('hidden.bs.modal', function (e) {
@@ -548,23 +590,20 @@ $('button.detail-button').click(function(){
             $('#snp-density-graph').html("");     
         } else if (section == 'core-genome'){
           // put snp-density in here
-            var x = {{ snpdensity | tojson}};
+            var x = {{ snpdensity_x | tojson}};
+            var y = {{ snpdensity_y | tojson}};
             
             // var y = {{genomebreaks | safe}};
-            var max_x = Math.max(x);
-            var bin_size = max_x / 100;
+            
             var trace = {
                 x: x,
-                type: 'histogram',
-                xbins : {
-                  end:max_x,
-                  size: bin_size,
-                  start:0
-                }
+                y: y,
+                type: 'bar',
+    
               };
             var layout = {
               xaxis:{
-                title:"Genome Position (MB)"
+                title:"Genome Position"
               },
               yaxis:{
                 title:"Count"

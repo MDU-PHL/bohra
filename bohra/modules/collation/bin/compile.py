@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import pathlib, subprocess, sys, datetime, pandas, re, numpy, jinja2, json, csv
+import pathlib, subprocess, argparse, datetime, pandas, re, numpy, jinja2, json, csv
 from Bio import SeqIO
 
 def _write_tables(table, wd, job_id, link):
@@ -13,44 +13,46 @@ def _write_tables(table, wd, job_id, link):
     data = open(path).readlines()
     # for header
     header = data[0].split('\t')
-    
-    if 'distances.tab' == table:
-        tablehead = [f"<th class='{column}-head'>{column}</th>" for column in header]
-    else:
-        tablehead = [f"<th>{column}</th>" for column in header]
-    # for body seqtablebody
-    body = []
-    for i in range(1,len(data)):
-        raw = data[i].split('\t')
-        raw = [r.strip() for r in raw]
-        if 'distances' in table:
-            row = [f"<tr class='distances-{raw[0]}'>"]
-        else:
-            row = [f"<tr class='{raw[0]}-{link}'>"]
+    if len(header) >1:
         if 'distances.tab' == table:
-            # to allow for display on tree
-                for d in range(len(raw)):
-                    row.append(f"<td align=\"center\" class = \"{raw[0]}_{header[d].strip()}\">{raw[d]}</td>")    
-        elif 'resistome' in table:
-            # to allow for coloring of partials
-            for d in raw:
-                # 
-                dr = d.split(';')
-                drs = []
-                for i in dr:
-                    if '^' in i:
-                        drs.append(f"<span style=\"color:#3483eb\">{i.strip('^')}</span>")
-                    else:
-                        drs.append(i)
-                x = ';'.join(drs)
-                row.append(f"<td align=\"center\">{x}</td>")
-        else: #default
-            for d in raw:
-                row.append(f"<td align=\"center\">{d}</td>")
-        row.append(f"</tr>")
-        body = body + row
-        
-    return('\n'.join(tablehead),'\n'.join(body))
+            tablehead = [f"<th class='{column}-head'>{column}</th>" for column in header]
+        else:
+            tablehead = [f"<th>{column}</th>" for column in header]
+        # for body seqtablebody
+        body = []
+        for i in range(1,len(data)):
+            raw = data[i].split('\t')
+            raw = [r.strip() for r in raw]
+            if 'distances' in table:
+                row = [f"<tr class='distances-{raw[0]}'>"]
+            else:
+                row = [f"<tr class='{raw[0]}-{link}'>"]
+            if 'distances.tab' == table:
+                # to allow for display on tree
+                    for d in range(len(raw)):
+                        row.append(f"<td align=\"center\" class = \"{raw[0]}_{header[d].strip()}\">{raw[d]}</td>")    
+            elif 'resistome' in table:
+                # to allow for coloring of partials
+                for d in raw:
+                    # 
+                    dr = d.split(';')
+                    drs = []
+                    for i in dr:
+                        if '^' in i:
+                            drs.append(f"<span style=\"color:#3483eb\">{i.strip('^')}</span>")
+                        else:
+                            drs.append(i)
+                    x = ';'.join(drs)
+                    row.append(f"<td align=\"center\">{x}</td>")
+            else: #default
+                for d in raw:
+                    row.append(f"<td align=\"center\">{d}</td>")
+            row.append(f"</tr>")
+            body = body + row
+            
+        return('\n'.join(tablehead),'\n'.join(body))
+    else:
+        return f"<th>No results to display</th>",f"<tr><td></td></tr>"
 
 def _get_tree_string(pipeline, wd, job_id):
     '''
@@ -60,7 +62,7 @@ def _get_tree_string(pipeline, wd, job_id):
     output:
         string reporesentation of the path to the tree image
     '''
-    tree_file = pathlib.Path(wd, job_id,'preview.newick') if pipeline == 'preview' else pathlib.Path(wd, job_id,'core.treefile')
+    tree_file = pathlib.Path(wd, job_id,'preview.newick') if pipeline == 'preview' else pathlib.Path(wd, job_id,'core.newick')
     if tree_file.exists():
         with open(f"{tree_file}", 'r') as t:
             tree = t.read().strip()
@@ -70,7 +72,7 @@ def _get_tree_string(pipeline, wd, job_id):
 
 
 def _get_offset(reference):
-
+    print(reference)
     d = {}
     offset = 0
     records = list(SeqIO.parse(reference, "genbank"))
@@ -78,9 +80,9 @@ def _get_offset(reference):
         records = list(SeqIO.parse(reference, "fasta"))
     if records != []:
         for record in records:
-            d[record.id] = {'offset' : offset, 'length': len(record.seq)}
+            d[record.id.split('.')[0]] = {'offset' : offset, 'length': len(record.seq)}
             offset += len(record.seq)
-    
+    # print(d)
     return d, offset
 
 def _plot_snpdensity(reference,wd, job_id, isos):
@@ -95,40 +97,44 @@ def _plot_snpdensity(reference,wd, job_id, isos):
     '''
     # helper functions for getting the data into the right format.
     
-    _dict,offset = _get_offset(reference = reference)
+    _dict,offset = _get_offset(reference = f"{pathlib.Path(wd,reference)}")
     _all_pos = list(range(1,offset+1))
+    print(_dict)
     _snp_dict = {}
     # collate all snps in snps.tab
     for i in isos:
         # open snps.tab
-        snps = pathlib.Path(wd, job_id, 'report', i, 'snps.tab')
+        snps = pathlib.Path(wd, job_id, i, 'snps.tab')
         if snps.exists():
             with open(snps, 'r') as s:
                 reader = csv.DictReader(s, delimiter = '\t')
                 for row in reader:
-                    chrom = row['CHROM']
+                    # print(row)
+                    chrom = row['CHROM'].split('.')[0]
                     ofs = _dict[chrom]['offset'] # offset value of this chromosome
                     pos = int(row['POS']) + ofs #get the position in the genome (with offset)
                     if pos in _snp_dict: 
+                        # print(i)
                         # if the pos is in the dict already, it has been found in another sample so increment
                         _snp_dict[pos] = _snp_dict[pos] + 1
                     else:
+                        # print(i)
                         _snp_dict[pos] = 1
     # now generate list for x value in graph
     _density = []
+    
     for a in _all_pos:
+        
         if a in _snp_dict:
-            _density[a].append(_snp_dict[a])
+            _density.append(_snp_dict[a])
         else:
-            _density[a].append(0)
-    # open fai file and generate the dictionary
-    
-    
+            _density.append(0)
+    print(max(_snp_dict.values()))
     # return dictionary
-    return(_density)
+    return list(_snp_dict.keys()), list(_snp_dict.values())
 
 
-def _plot_distances():
+def _plot_distances(wd, job_id):
 
     '''
     generate a snp-density plot - using the distacnes.tab file
@@ -138,7 +144,7 @@ def _plot_distances():
         :distancescript: the javascript string for insert into html
         :distancesdiv: the html div for inster in html doc
     '''
-    distance = 'distances.tab'
+    distance = f"{pathlib.Path(wd, job_id, 'report','distances.tab')}"
 
     df = pandas.read_csv(distance, sep = '\t')
     # get a list of isolate names
@@ -155,6 +161,7 @@ def _plot_distances():
 
 def _get_pan_genome(image, wd, job_id):
     path = pathlib.Path(wd, job_id, 'report', image)
+    print(path)
     if path.exists():
         with open(f"{path}", 'r') as f:
             return f.read().strip()
@@ -168,12 +175,22 @@ def _fill_vals(td, pipeline, wd, job_id):
         # TODO if table add a modal modal + link and link will be title lowercase with hyphen
         if td[t]['type'] == 'table':
             td[t]['head'], td[t]['body'] = _write_tables(table=td[t]['file'], wd = wd, job_id=job_id, link = td[t]['link'])
+            # if td[t]['body'] == 'No data':
+            #     to_remove.append(t)
         if td[t]['type'] == 'pan':
             td[t]['head'], td[t]['body'] = _write_tables(table=td[t]['file'], wd = wd, job_id=job_id, link = td[t]['link'])
-            td[t]['image'] = _get_pan_genome(image = td[t]['file'], wd = wd, job_id=job_id)
+            td[t]['image'] = _get_pan_genome(image = td[t]['image'], wd = wd, job_id=job_id)
         if td[t]['type'] == 'matrix':
             td[t]['head'], td[t]['body'] = _write_tables(table=td[t]['file'], wd = wd, job_id=job_id, link = td[t]['link'])
             # snpdistances = plot_distances()
+    # print(to_remove)
+    # print(td[9])
+    # print(td[11])
+    # for i in to_remove:
+    #     print(td[i])
+    #     # print(td)
+    #     del td[i]
+
     return td
 
 
@@ -188,13 +205,13 @@ def _return_tables(pipeline):
     
     elif pipeline == 'default':
         
-        tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
+        tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data','species-identification', 'plasmid', 'virulome']
         modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
         display = f""
         # td.extend(s_td)
     elif pipeline == 'all':
         # a_ll = td.extend()
-        tables =['core-genome', 'species-identification','snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data', 'pan-genome']
+        tables =['core-genome', 'species-identification','snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data', 'pan-genome', 'plasmid', 'virulome']
         modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data']
         display = f""
     
@@ -202,23 +219,37 @@ def _return_tables(pipeline):
 
     return tables, modaltables, display
 
-def _get_isos(isolates):
-
-    with open(isolates, 'r') as f:
+def _get_isos(wd, iso_list):
+    p = pathlib.Path(wd, iso_list)
+    with open(p, 'r') as f:
         isos = f.read().strip().split('\n')
     
     return isos
+def _get_versions(wd, job_id):
 
-def main(args):
+    p = pathlib.Path(wd, job_id, 'report', 'software_versions.txt')
+    if p.exists():
+        with open(f"{p}", 'r') as f:
+            data = f.read().strip().split('\n')
+            _head = f"<th class='version-head'>{data[0]}</th>"
+            body = []
+            for d in data[1:]:
+                body.append(f"<tr><td>{d}</td></tr>")
+        return _head,'\n'.join(body)
+    else:
+        return f"<th class='version-head'>Nothing to display</th>",""
+
+def _compile(args):
 
     # get analysis dict
     _dict = json.load(open(f"{pathlib.Path(args.template_dir, 'report_analysis.json')}", 'r'))
-    isos = _get_isos(args.isolates)
+    isos = _get_isos(wd = args.launchdir, iso_list=args.isolates)
     reporthtml = pathlib.Path('report.html')
     # path to html template
     indexhtml = pathlib.Path(args.template_dir,'index.html') 
     # initialise dictionary
     # data is the dictionary passed to jinja2 to fill html
+    versions_head,versions_body = _get_versions(wd = args.launchdir, job_id = args.job_id)
     data = {
         'newick' :'',
         'snpdensity':'',
@@ -230,29 +261,33 @@ def main(args):
         'user':args.user,
         'tree_heigth':0,
         'modaltables':'',
-        'tables':''
+        'tables':'',
+        'version_head': versions_head,
+        'version_body':versions_body
         }
     # print(data)
-    td = _dict[pipeline]
+
+    td = _dict[args.pipeline]
     tables, modaltables, display = _return_tables(pipeline = args.pipeline)
     data['tree_height'] = len(isos) * 25
     data['tables'] = tables
     data['modaltables'] = modaltables
     data['display'] = display
+    
     data['newick'] = _get_tree_string(pipeline = args.pipeline, wd = args.launchdir, job_id = args.job_id)
         # print(td)
     # generate_summary(wd = wd, job_id = job_id)
         # print(isos)
         # get_software_file(pipeline = pipeline, assembler = assembler)  
-    if pipeline not in ['preview']:
-        data['snpdensity']= _plot_snpdensity(reference = args.reference,wd = args.launchdir, job_id = args.job_id, isos = isos)
+    if args.pipeline not in ['preview']:
+        data['snpdensity_x'],data['snpdensity_y']= _plot_snpdensity(reference = args.reference,wd = args.launchdir, job_id = args.job_id, isos = isos)
         
-    if isos > 1:
-        data['snpdistances']= _plot_distances()
+    if len(isos) > 1:
+        data['snpdistances']= _plot_distances(wd = args.launchdir, job_id = args.job_id)
     
 
 # newick = newick, display = display,tables = tables,td = td, job_id = job_id, pipeline = pipeline, snpdistances=snpdistances, snpdensity = snpdensity, modaltables = modaltables, date = date
-    td = _fill_vals(td=td, pipeline = pipeline, wd = wd, job_id=job_id)
+    td = _fill_vals(td=td, pipeline = args.pipeline, wd = args.launchdir, job_id=args.job_id)
     data['td'] = td
     print("rendering html")
     report_template = jinja2.Template(pathlib.Path(indexhtml).read_text())
@@ -289,7 +324,7 @@ def set_parsers():
     
     
     
-    parser.set_defaults(func=main)
+    parser.set_defaults(func=_compile)
     args = parser.parse_args()
     
     if vars(args) == {}:

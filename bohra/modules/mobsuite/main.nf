@@ -4,14 +4,13 @@ include { initOptions; saveFiles; getSoftwareName } from './functions'
 params.options = [:]
 def options    = initOptions(params.options)
 
-process SNIPPY {
+process MOBSUITE {
     tag "$meta.id"
     label 'process_medium'
     publishDir "${params.outdir}",
-        mode: params.publish_dir_mode
-        // saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
+        mode: params.publish_dir_mode,
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     
-    // scratch true
     cache 'lenient'
     // conda (params.enable_conda ? 'bioconda::shovill=1.1.0' : null)
     // if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
@@ -21,19 +20,19 @@ process SNIPPY {
     // }
 
     input:
-    tuple val(meta), path(reads)
+    tuple val(meta), path(asm)
 
     output:
-    tuple val(meta), path("${meta.id}/snps.aligned.fa"), emit: aln
-    tuple val(meta), path("${meta.id}/snps.raw.vcf"), emit: raw_vcf
-    tuple val(meta), path("${meta.id}/snps.vcf"), emit: vcf
-    tuple val(meta), path("${meta.id}/snps.log"), emit: log
-    tuple val(meta), path("${meta.id}/snps.tab"), emit: tab
-    
+    tuple val(meta), path('contig_report.txt'), emit: mobs
+    tuple val(meta), path('mobtyper_results.txt') optional true
+    tuple val(meta), path('*.fasta') optional true
+
+    // tuple val(meta), path('spades.log'), emit: log
 
     script:
     """
-    snippy --outdir ${meta.id} --R1 ${reads[0]} --R2 ${reads[0]} --reference $launchDir/${params.reference} --force --cpus $task.cpus
+    mob_recon -i $asm -s $meta.id -n $task.cpus -o mob
+    cp mob/* .
     """
     
 }

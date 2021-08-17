@@ -31,7 +31,7 @@ process ABRITAMR {
 
     script:
     
-    def organism = params.species_options.any { it.contains(meta.species_exp) } ? "-sp $meta.species_exp": ""
+    def organism = params.species_options.any { it.contains(params.species) } ? "-sp $params.species": ""
     """
     abritamr run -c $contigs -px ${meta.id} -j $task.cpus $organism
     cp ${meta.id}/*.txt .
