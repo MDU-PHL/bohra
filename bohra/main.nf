@@ -49,7 +49,7 @@ input_file = file(params.isolates) // need to make this an input file
 // println samples
 def contigs = [:]
 // open the distribution table
-
+if (params.contigs_file != 'no_contigs'){
 contigs_file = file(params.contigs_file) // need to make this an input file 
 contigs_reader =   contigs_file.newReader()
 // read the file
@@ -59,7 +59,7 @@ contigs_reader.eachLine { line ->
         contigs[line.split('\t')[0]] = line.split('\t')[1]
         }
     }
-
+} 
 
 
 reads = Channel.fromFilePairs("${params.outdir}/*/*_R{1,2}*.f*q.gz")

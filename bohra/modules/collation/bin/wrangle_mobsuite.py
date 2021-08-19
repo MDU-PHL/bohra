@@ -14,7 +14,7 @@ with open(_file, 'r') as f:
             if row['mash_nearest_neighbor'] not in results:
                 results[row['mash_nearest_neighbor']] = f"{row['contig_id']}"
             else:
-                results[row['mash_nearest_neighbor']] = f"{results[row['mash_nearest_neighbor']]},{row['contig_id']}"
+                results[row['mash_nearest_neighbor']] = f"{results[row['mash_nearest_neighbor']]}, {row['contig_id']}"
 
 header = []
 

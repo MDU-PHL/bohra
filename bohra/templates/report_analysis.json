@@ -17,6 +17,11 @@
         }
         ],
     "default":[
+        {   "title": "Phylogeny", 
+            "link":"phylogeny", 
+            "file": "core.newick", 
+            "type": "tree"
+        },
         {   "file":"seqdata.txt", 
             "title":"Sequence Data", 
             "link": "sequence-data", 
@@ -31,15 +36,6 @@
             "title": "Core Genome", 
             "link":"core-genome", 
             "type":"table"
-        },
-        {   "title": "SNP density", 
-            "link":"snp-density", 
-            "type":"graph"
-        },
-        {   "title": "Phylogeny", 
-            "link":"phylogeny", 
-            "file": "core.newick", 
-            "type": "tree"
         },
         {   "file": "distances.tab", 
             "title":"SNP distances", 
@@ -73,6 +69,11 @@
         }
     ],
     "all":[
+        {   "title": "Phylogeny", 
+            "link":"phylogeny", 
+            "file": "core.newick", 
+            "type": "tree"
+        },
         {   "file":"summary_statistics.txt", 
             "title":"Pan Genome", 
             "type": "pan", 
@@ -93,15 +94,6 @@
             "title": "Core Genome", 
             "link":"core-genome", 
             "type":"table"
-        },
-        {   "title": "SNP density", 
-            "link":"snp-density", 
-            "type":"graph"
-        },
-        {   "title": "Phylogeny", 
-            "link":"phylogeny", 
-            "file": "core.newick", 
-            "type": "tree"
         },
         {   "file": "distances.tab", 
             "title":"SNP distances", 

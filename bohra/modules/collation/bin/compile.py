@@ -205,13 +205,13 @@ def _return_tables(pipeline):
     
     elif pipeline == 'default':
         
-        tables =['core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data','species-identification', 'plasmid', 'virulome']
+        tables =['phylogeny', 'core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data','species-identification', 'plasmid', 'virulome']
         modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
         display = f""
         # td.extend(s_td)
     elif pipeline == 'all':
         # a_ll = td.extend()
-        tables =['core-genome', 'species-identification','snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data', 'pan-genome', 'plasmid', 'virulome']
+        tables =['phylogeny','core-genome', 'species-identification','snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data', 'pan-genome', 'plasmid', 'virulome']
         modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data']
         display = f""
     
@@ -289,6 +289,8 @@ def _compile(args):
 # newick = newick, display = display,tables = tables,td = td, job_id = job_id, pipeline = pipeline, snpdistances=snpdistances, snpdensity = snpdensity, modaltables = modaltables, date = date
     td = _fill_vals(td=td, pipeline = args.pipeline, wd = args.launchdir, job_id=args.job_id)
     data['td'] = td
+    for t in td:
+        print(t['title'])
     print("rendering html")
     report_template = jinja2.Template(pathlib.Path(indexhtml).read_text())
     reporthtml.write_text(report_template.render(data))

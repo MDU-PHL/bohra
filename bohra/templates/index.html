@@ -57,6 +57,9 @@
           color:#3973ac;
           font-size: x-small;
         }
+        .hidden-graph{
+          margin: 2em;
+        }
         .activeisolate {
           fill:#3973ac;
           font-size: larger;
@@ -176,13 +179,14 @@
       <div class="modal-dialog modal-dialog-centered modal" >
         <div class="modal-content">
           <h2 class="modal-title" style= "color: #3973ac; margin:3px;"> Information </h2>
-          <hr>
-          <h3 style="margin:6px;"> Download tree</h3>
+          <ul>
+          <li><h3 style="margin:6px;"> Download tree</h3></li>
           <p style="margin:10px;"> To download a newick file right click on tree and select export as newick</p>
-          <h3 style="margin:6px;"> Isolate details</h3>
+          <li><h3 style="margin:6px;"> Isolate details</h3></li>
           <p style="margin:10px;"> Select an isolate node from the tree to see isolate specific details</p>
-          <h3 style="margin:6px;"> SNP distances </h3>
-          <p style="margin:10px;"> Select the parent node to display pariwise SNP distances</p>
+          <li><h3 style="margin:6px;"> SNP distances </h3></li>
+          <p style="margin:10px;">Select the parent node to display pariwise SNP distances</p>
+        </ul>
         </div>
       </div>
     </div>
@@ -221,94 +225,40 @@
 <div id="help-button" style = "float:right;">
   <button type="button" class="btn btn-sm btn-outline-secondary zoom-button" id = "help" data-toggle="modal" data-target="#myModal3" data-placement="top" title="Select"> Helpful tips </button>    
   <button type="button" class="btn btn-sm btn-outline-secondary zoom-button" id = "version" data-toggle="modal" data-target="#myModalversions" data-placement="top" title="Select"> Software versions </button>    
-  <button type="button" class="btn btn-sm btn-outline-secondary" id = "nwk" ><span data-feather="arrow-down"> Download newick </button>        
+  <!-- <button type="button" class="btn btn-sm btn-outline-secondary" id = "nwk" ><span data-feather="arrow-down"> Download newick </button>         -->
 </div>
 <!-- div for summary table and phylogenetic tree -->
 <div class= "container-fluid">
-    
-    
-      <!-- <h2 style = "color: #3973ac">Phylogeny and summary of isolates</h2> -->
-      {% for t in td %}
-      {% if t.type == 'summary' %}
-      <!-- <h2 style= "color: #3973ac; float:left;" class='summary-table-header'>Summary Table</h2> -->
-      <button type="button" class="btn btn-primary btn-xlg btn-outline-primary btn-lg summary-table-button" >{{t.title}}</button>
-      {% elif t.type == 'tree' %}
-      <!-- <h2 style= "color: #3973ac; float:right;" class='phylogeny-table-header'>Phylogeny</h2> -->
-      <button type="button" class="btn btn-primary btn-xlg btn-outline-primary btn-lg phylogeny-button" >{{t.title}}</button>
-      
-      {% endif %}
-      {% endfor %}
-      
-          
-          <hr>
-        {% for t in td %}
-        
-        {% if t.type == 'summary' %}
-        <div id="tablediv" style = "display:none;"  >
-          <table id="summary-table" class="table table-striped table-bordered table-sortable summary-table" style="width: 100%;">
-              
-              <thead>
-                <tr>{{t.head}}</tr>
-              </thead>
-              <tbody>{{t.body}}</tbody>
-                  <!-- end of table body -->
-          </table>
-        </div>
-      </div>
-      {% elif t.type == 'tree' %}
-      <div id = "treediv" >
-      <div id="tree_string" style="display: none;">{{newick}}</div>
-      <div id="phylocanvas" style="width: 100%;" >
-      
-        <!-- <p>{{message}}</p> -->
-        
-        <hr>
-        <!-- button div -->
-        <div class = "radial-div">
-          <button id="change-tree" type="button" class="btn btn-sm btn-outline-secondary">Circular</button>
-      </div>
-        
-        {% endif %}
-        {% endfor %}
-      
-      
-      
-    </div>
+<!-- buttons -->
+{% for t in td %}
+  <button type="button" class="btn btn-primary btn-xlg btn-outline-primary btn-lg detail-button {{t.link}}-button" >{{t.title}}</button>
+{% endfor %}
+<div id = "snp-distances-graph" class = "hidden-graph">  <!-- placeholder for graphs  --> </div>
+<div id = "snp-density-graph" class = "hidden-graph">  <!-- placeholder for graphs  --> </div>
+
+  <div id="current-table">
+    <!-- placeholder for selected table = put selected table in this div -->    
   </div>
-  </div>
-  <!-- full width for detail tables and graphs-->
-  <div class="container-fluid">
-    <!-- button row -->
-    <h2 id="detail-tables" style= "color: #3973ac;">Details</h2>
-    <!-- buttons to select data for display -->
-    <div id="detail-selection-buttons">
-    {% for t in td %}
-    {% if t.type == 'table' %}
-      <button type="button" class="btn btn-primary btn-lg btn-outline-primary detail-button" >{{t.title}}</button>
-    {% elif t.type == 'matrix' %}
-      <button type="button" class="btn btn-primary btn-lg btn-outline-primary detail-button" >{{t.title}}</button>
-    {% elif t.type == 'pan' %}
-    <button type="button" class="btn btn-primary btn-lg btn-outline-primary detail-button" >{{t.title}}</button>
-    
-    {% endif %}
-    {% endfor %}
-    </div>
-
-    <div id = "snp-distances-graph" class = "hidden-graph">  <!-- placeholder for graphs  --> </div>
-    <div id = "snp-density-graph" class = "hidden-graph">  <!-- placeholder for graphs  --> </div>
-
-    <div id="current-table">
-            <!-- placeholder for selected table = put selected table in this div -->    
-    </div>
-    <br>
-
-    {% for t in td %}
-    {% if t.type == 'table' %}
+    <hr>
+          {% for t in td %}
+          {% if t.type == 'tree' %}
+          <div id = "phylogeny" >
+            <div id="tree_string" style="display: none;">{{newick}}</div>
+            <div id="phylocanvas" style="width: 100%;" >
+              <!-- <p></p> -->
+              <hr>
+              <!-- button div -->
+              <div class = "radial-div">
+              <button id="change-tree" type="button" class="btn btn-sm btn-outline-secondary">Circular</button>
+            </div>
+          </div>
+        </div> 
+        {% elif t.type == 'table' %}
     <!-- these tables are hidden until needed - then placed in the current table div above -->
     <div class="table-responsive">
       <!-- buttons for dowload -->
       <div id = "{{t.link}}" style = "display: none;">
-        <h3>{{t.title}}</h3>  
+        <!-- <h3>{{t.title}}</h3>   -->
         {% if t.check == 'no_data' %} 
           <h4>No data to display</h4>
         {% endif %} 
@@ -326,12 +276,13 @@
       <!-- end of table -->
       </div>
     </div>
+    
     {% elif t.type == 'matrix' %}
     <!-- these tables are hidden until needed - then placed in the current table div above -->
     <div class="table-responsive" >
       <!-- buttons for dowload -->
       <div id = "{{t.link}}" style="display:none;">
-        <h3>{{t.title}}</h3>
+        <!-- <h3>{{t.title}}</h3> -->
         {% if t.check == 'no_data' %} 
           <h4>No data to display</h4>
         {% endif %} 
@@ -354,7 +305,7 @@
     <div class="table-responsive" >
       <!-- buttons for dowload -->
       <div id = "{{t.link}}" style = "display:none;">
-        <h3>{{t.title}}</h3>  
+        <!-- <h3>{{t.title}}</h3>   -->
         <table class="table table-striped table-bordered table-sortable detail-table">
           <thead>
             <tr><!-- header of table -->
@@ -370,14 +321,10 @@
       {{t.image}}  
       </div>
     </div>
-    
-
-    
-  
-</div>
     {% endif %}
-    {% endfor %}
-  </div>
+  </div>         
+    {% endfor %}  
+</div>
         
 <!-- Datatables (to sort tables) -->
 <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
@@ -549,9 +496,13 @@ $('button.detail-button').click(function(){
           if (section == value){
             console.log('showing #' + value);
             $('#' + value).show(); 
+            $("." + value+"-button").css('background-color','#3973ac');
+			      $("." + value+"-button").css('color','white');
           } else {
             console.log('hiding #' + value);
             $('#' + value).hide();
+            $("." + value+"-button").css('background-color','white');
+			      $("." + value+"-button").css('color','#3973ac');
         }
          });
         

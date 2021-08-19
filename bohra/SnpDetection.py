@@ -40,45 +40,48 @@ class RunSnpDetection(object):
         self.day = datetime.datetime.today().strftime('%Y-%m-%d')
         self.script_path = f"{pathlib.Path(__file__).parent}"
         # get the working directory
-        self.workdir = pathlib.Path(args.workdir)
-        LOGGER.info(f"\033[1mBohra is being run in {self.workdir} by {self.user} on {self.day}.\033[0m")
-        # path to pipeline resources
-        self.pipeline = args.pipeline
-        self.no_phylo = args.no_phylo
-        self.preview = True if self.pipeline == 'preview' else False
-        LOGGER.info(f"You are running bohra in {self.pipeline} mode.")
-        self.job_id = self._name_exists(args.job_id)
-        LOGGER.info(f"Job ID is set {self.job_id}")
-        # path to reference and mask
-        self.ref = pathlib.Path(args.reference)
-        # LOGGER.info(f"The reference is {self.ref}")
-        # self.link_file(self.ref)
-        self.mask = args.mask
-        # path to input file
-        if args.input_file == '':
-            LOGGER.critical('`read` file can not be empty, please set -r path_to_input to try again')
-            raise SystemExit()
-        else:
-            self.reads = pathlib.Path(args.input_file)
-        self.contigs = args.contigs
-
-        self.keep = True if args.keep == 'Y' else False
-        # self.gubbins = args.gubbins 
-        # other variables
-        # min aln 
-        self.minaln = args.minaln
-        self.mincov = args.mincov
-        self.minqual = args.minqual
-        # cluster settings        
-        # self.gubbins = False
-        self.force = args.force        
-        self.cpus = args.cpus
-        # kraken db settings
-        self.kraken_db = args.kraken_db
-        self.run_kraken = False
         self.assembler = args.assembler
-        self.no_phylo = args.no_phylo
-        self.abritamr_args = args.abritamr_args
+        self.kraken_db = args.kraken_db
+        self.workdir = pathlib.Path(args.workdir)
+        self.check = args.check
+        if not self.check:
+            LOGGER.info(f"\033[1mBohra is being run in {self.workdir} by {self.user} on {self.day}.\033[0m")
+            
+            # path to pipeline resources
+            self.pipeline = args.pipeline
+            self.no_phylo = args.no_phylo
+            self.preview = True if self.pipeline == 'preview' else False
+            LOGGER.info(f"You are running bohra in {self.pipeline} mode.")
+            self.job_id = self._name_exists(args.job_id)
+            LOGGER.info(f"Job ID is set {self.job_id}")
+            # path to reference and mask
+            self.ref = pathlib.Path(args.reference)
+            # LOGGER.info(f"The reference is {self.ref}")
+            # self.link_file(self.ref)
+            self.mask = args.mask
+            # path to input file
+            if args.input_file == '':
+                LOGGER.critical('`read` file can not be empty, please set -r path_to_input to try again')
+                raise SystemExit()
+            else:
+                self.reads = pathlib.Path(args.input_file)
+            self.contigs = args.contigs
+
+            self.keep = True if args.keep == 'Y' else False
+            # self.gubbins = args.gubbins 
+            # other variables
+            # min aln 
+            self.minaln = args.minaln
+            self.mincov = args.mincov
+            self.minqual = args.minqual
+            # cluster settings        
+            # self.gubbins = False
+            self.force = args.force        
+            self.cpus = args.cpus
+            # kraken db settings
+            self.run_kraken = False
+            self.no_phylo = args.no_phylo
+            self.abritamr_args = args.abritamr_args
 
             
     # def run_with_gubbins(self):
@@ -346,13 +349,6 @@ class RunSnpDetection(object):
                 self.link_reads(pathlib.Path(r2), isolate_id=f"{i[1].strip()}", r_pair='R2.fq.gz')
         return True
 
-        
-    
-    
-    
-
-    
-    
     
     def _check_size_file(self, path):
         '''
@@ -463,12 +459,13 @@ class RunSnpDetection(object):
         self._check_kraken2DB()
         software_versions.append(f"kraken2 DB {self.kraken_db}")
         # write software_versions.tab
-        LOGGER.info(f"Writing software_versions.txt")
-        if not pathlib.Path(self.job_id, 'report').exists():
-            pathlib.Path(self.job_id, 'report').mkdir()
-        pathlib.Path(self.job_id, 'report','software_versions.txt').write_text('\n'.join(software_versions))
-
-        return True
+        if not self.check:
+            LOGGER.info(f"Writing software_versions.txt")
+            if not pathlib.Path(self.job_id, 'report').exists():
+                pathlib.Path(self.job_id, 'report').mkdir()
+            pathlib.Path(self.job_id, 'report','software_versions.txt').write_text('\n'.join(software_versions))
+        LOGGER.info(f"\033[1mCongratulations all dependencies are installed.\033[0m")
+        return True 
 
     def _check_shape(self, val, reads = True):
         if reads and val == 3:
@@ -552,9 +549,10 @@ class RunSnpDetection(object):
                         outdir, isolates, user, day, contigs, run_iqtree, species):
         
         stub = f"nextflow {self.script_path}/main.nf"
+        resume = '' if self.force else "-resume"
         parameters = f"--min_cov {min_cov} --min_qscore {min_qscore} --min_aln {min_aln} --mode {mode} --run_iqtree {run_iqtree} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} \
 --mask_string {mask_string} --reference {reference} --contigs_file {contigs} --species {species if species != '' else 'no_species'} --outdir {outdir} --isolates {isolates} --user {user} --day {day}"
-        options = f"-with-report {self.job_id}_seqgen_report.html -with-trace -resume"
+        options = f"-with-report {self.job_id}_seqgen_report.html -with-trace {resume}"
 
         cmd = f"{stub} {parameters} {options}"
         return cmd
@@ -601,7 +599,7 @@ class RunSnpDetection(object):
         if contigs:
             contigs_file = self.contigs
         else:
-            contigs_file = 'no contigs'
+            contigs_file = 'no_contigs'
         run_iqtree = False if self.no_phylo else True
         cmd = self._generate_cmd(min_cov = self.mincov, min_aln = self.minaln, min_qscore = self.minqual, mode = self.pipeline, 
                         run_kraken = self.run_kraken, kraken2_db = self.kraken_db,contigs = contigs_file,

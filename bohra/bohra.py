@@ -32,8 +32,12 @@ def run_pipeline(args):
     '''
     Run the pipeline for the first time
     '''
+    
     R = RunSnpDetection(args)
-    return(R.run_pipeline())
+    if args.check:
+        return(R.check_dependencies())
+    else:
+        return(R.run_pipeline())
 
 def check_deps(args):
     """
@@ -48,6 +52,7 @@ def main():
     parser = configargparse.ArgumentParser(description=f'Bohra - a bacterial genomics pipeline - version {version}',formatter_class=configargparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + version)
     # options for running
+    parser.add_argument('--check',action="store_true", help = "Check that dependencies are installed correctly.")
     parser.add_argument('--input_file','-i',help='Path to reads file, which is a tab-delimited with 3 columns <isolatename>  <path_to_read1> <path_to_read2>. REQUIRED', default='')
     parser.add_argument('--contigs','-c',help='Path to contigs file, which is a tab-delimited with 3 columns <isolatename>  <path_to_contigs>. OPTIONAL if you already have assemblies.', default='')
     parser.add_argument('--job_id','-j',help='Job ID, will be the name of the output directory', default='')
