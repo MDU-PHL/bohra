@@ -18,10 +18,10 @@ if [ "x$FASTA" == "x" ]; then
   echo "Usage: $EXE genome.fasta core.aln prefix max_cpus"
   exit 1
 fi
-
+any2fasta $FASTA > ref.fa
 RESULT="-fconst "
 for L in Aa Cc Gg Tt ; do
-  NUM=$(grep -v '>' "$FASTA" | tr -d -c "[$L]" | wc -c)
+  NUM=$(grep -v '>' ref.fa | tr -d -c "[$L]" | wc -c)
   if [ "x$NUM" == "x" ]; then
     echo "Error: could not count '$L' chars in $FASTA"
     exit 2

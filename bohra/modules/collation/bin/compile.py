@@ -46,6 +46,8 @@ def _write_tables(table, wd, job_id, link):
                     row.append(f"<td align=\"center\">{x}</td>")
             else: #default
                 for d in raw:
+                    if 'assembly' in table:
+                        print(d)
                     row.append(f"<td align=\"center\">{d}</td>")
             row.append(f"</tr>")
             body = body + row
@@ -62,7 +64,7 @@ def _get_tree_string(pipeline, wd, job_id):
     output:
         string reporesentation of the path to the tree image
     '''
-    tree_file = pathlib.Path(wd, job_id,'preview.newick') if pipeline == 'preview' else pathlib.Path(wd, job_id,'core.newick')
+    tree_file = pathlib.Path(wd, job_id,'preview.newick') if pipeline == 'preview' else pathlib.Path(wd, job_id, 'report','core.newick')
     if tree_file.exists():
         with open(f"{tree_file}", 'r') as t:
             tree = t.read().strip()
@@ -171,7 +173,7 @@ def _get_pan_genome(image, wd, job_id):
 def _fill_vals(td, pipeline, wd, job_id):
 
     for t in range(len(td)):
-    
+        print(td[t])
         # TODO if table add a modal modal + link and link will be title lowercase with hyphen
         if td[t]['type'] == 'table':
             td[t]['head'], td[t]['body'] = _write_tables(table=td[t]['file'], wd = wd, job_id=job_id, link = td[t]['link'])
@@ -276,6 +278,7 @@ def _compile(args):
     
     data['newick'] = _get_tree_string(pipeline = args.pipeline, wd = args.launchdir, job_id = args.job_id)
         # print(td)
+    
     # generate_summary(wd = wd, job_id = job_id)
         # print(isos)
         # get_software_file(pipeline = pipeline, assembler = assembler)  
@@ -289,8 +292,6 @@ def _compile(args):
 # newick = newick, display = display,tables = tables,td = td, job_id = job_id, pipeline = pipeline, snpdistances=snpdistances, snpdensity = snpdensity, modaltables = modaltables, date = date
     td = _fill_vals(td=td, pipeline = args.pipeline, wd = args.launchdir, job_id=args.job_id)
     data['td'] = td
-    for t in td:
-        print(t['title'])
     print("rendering html")
     report_template = jinja2.Template(pathlib.Path(indexhtml).read_text())
     reporthtml.write_text(report_template.render(data))

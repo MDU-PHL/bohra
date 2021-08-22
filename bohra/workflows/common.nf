@@ -3,20 +3,23 @@
 include { SEQTK } from './../modules/seqtk/main' 
 include { COLLATE_KRAKEN2_ISOLATE; COLLATE_STATS_ISOLATE} from './../modules/collation/main'
 include { SEQKIT_STATS } from './../modules/seqkit/stats/main' addParams( options: [args: '-Q -L -g', args2: 'reads'] )
-include { MASH_SKETCH } from './../modules/mash/sketch/main' addParams( options: [args2: 16] )
+include { SEQKIT_GC } from './../modules/seqkit/fx2tab/main' 
+include { MASH_SKETCH } from './../modules/mash/sketch/main' 
 include { MASH_TRIANGLE } from './../modules/mash/triangle/main'
 include { QUICKTREE } from './../modules/quicktree/main' 
-include { KRAKEN2 } from './../modules/kraken2/main' addParams( options: [args: "-db ${params.kraken2_db}", args2: 16] )
+include { KRAKEN2 } from './../modules/kraken2/main' 
 
 workflow READ_ANALYSIS {   
 
     take:
         preview
+        reference
     main:
-        SEQTK ( preview )
+        
         SEQKIT_STATS ( preview )
-        COMBD = SEQTK.out.seqtk_stats.join( SEQKIT_STATS.out.stats )
-        COLLATE_STATS_ISOLATE ( COMBD )
+        SEQKIT_GC ( preview )
+        COMBD = SEQKIT_STATS.out.stats.join( SEQKIT_GC.out.stats )
+        COLLATE_STATS_ISOLATE ( COMBD.combine(reference) )
         MASH_SKETCH ( preview )       
         
 

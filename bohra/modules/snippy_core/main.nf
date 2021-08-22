@@ -15,7 +15,7 @@ process SNIPPY_CORE {
     
     input:
     val(alns) // this needs to be a list of sample! not .aln since snippy core uses relative path and the name of the folder to name results!
-
+    path(reference)
     output:
     path('core.aln'), emit: core_aln
     path('core.full.aln'), emit: core_full_aln
@@ -27,7 +27,7 @@ process SNIPPY_CORE {
     def mask_string = options.args ? "--mask ${options.args}" : ""
     def core = alns.join(' ')
     """
-    snippy-core --ref $launchDir/${params.reference} ${mask_string} $core
+    snippy-core --ref $reference ${mask_string} $core
     """
     
 }

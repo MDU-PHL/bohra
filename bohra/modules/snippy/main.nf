@@ -21,9 +21,10 @@ process SNIPPY {
     // }
 
     input:
-    tuple val(meta), path(reads)
+    tuple val(meta), path(reads), path(reference)
 
     output:
+    // tuple val(meta), path("${meta.id}/*"), emit: snippy_dir
     tuple val(meta), path("${meta.id}/snps.aligned.fa"), emit: aln
     tuple val(meta), path("${meta.id}/snps.raw.vcf"), emit: raw_vcf
     tuple val(meta), path("${meta.id}/snps.vcf"), emit: vcf
@@ -33,7 +34,7 @@ process SNIPPY {
 
     script:
     """
-    snippy --outdir ${meta.id} --R1 ${reads[0]} --R2 ${reads[0]} --reference $launchDir/${params.reference} --force --cpus $task.cpus
+    snippy --outdir ${meta.id} --R1 ${reads[0]} --R2 ${reads[0]} --reference $reference --force --cpus $task.cpus
     """
     
 }

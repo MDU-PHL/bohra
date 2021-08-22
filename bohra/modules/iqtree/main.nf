@@ -19,13 +19,14 @@ process IQTREE {
       
     input:
         path(aln)
+        path(reference)
 
     output:
         path('core.newick'), emit: newick
 
     script:    
     """
-    $module_dir/iqtree_generator.sh ${params.reference_fasta} $aln core $task.cpus
+    $module_dir/iqtree_generator.sh $reference $aln core $task.cpus
     cp core.treefile core.newick
     """
         

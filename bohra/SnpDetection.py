@@ -78,6 +78,8 @@ class RunSnpDetection(object):
             # self.gubbins = False
             self.force = args.force        
             self.cpus = args.cpus
+            self.config = args.config
+            self.profile = args.profile
             # kraken db settings
             self.run_kraken = False
             self.no_phylo = args.no_phylo
@@ -119,7 +121,31 @@ class RunSnpDetection(object):
     #         LOGGER.info("Removing previous report files.")
     #         cmd = f"if [ -d {p1} ];then rm -r {p1}; fi"
     #     subprocess.run(cmd, shell = True)
-    
+    def _set_cpu_limit_local(self, cpus):
+
+        total_cores = os.cpu_count()
+        one,five,fifteen = psutil.getloadavg()
+        avail = total_cores - max(one,five,fifteen)
+
+        if int(cpus) < avail:
+            return cpus
+        else:
+            return avail
+
+    def _check_config(self, config):
+
+        if self._path_exists(config):
+            with open(config, 'r') as c:
+                data = c.read()
+                if self.profile in data:
+                    LOGGER.info(f"Profile : {self.profile}.")
+                else:
+                    LOGGER.warning(f"Profile : {self.profile} is not found in {config}. I hope you know what you are doing!")
+                return config
+        else:
+            LOGGER.critical(f"You have provided the path to an alternative config file, which does not exist. Please try again.")
+            raise SystemExit
+
     def _remove_core(self):
         '''
         Need to remove core_isolates.txt to get snakemake to redo snippy core step
@@ -307,26 +333,6 @@ class RunSnpDetection(object):
                 return 'fasta'
             else:
                 LOGGER.info(f"It seems your reference file is not a genbank or fasta file format. Please check your inputs and try again.")
-        
-    # def index_reference(self):
-
-    #     ref = pathlib.Path(self.job_id , 'ref.fa')
-    #     idx = pathlib.Path(self.job_id , 'ref.fa.fai')
-    #     if f"{pathlib.Path(self.ref).suffix}" in ['.gz','zip']:
-    #                 self.ref = pathlib.Path(self.unzip_files(self.ref, f"{self.ref.suffix}"))
-    #     ref_type = self.check_ref_type(ref = self.ref)
-    #     if ref_type == 'genbank':
-    #         LOGGER.info(f"converting {self.ref} to fasta format.")
-    #         SeqIO.convert(f"{self.ref}", 'genbank', f"{ref}", 'fasta')
-    #     else:
-    #         subprocess.run(f"cp {self.ref} {ref}", shell = True)
-    #     record = SeqIO.parse(f"{ref}", "fasta")
-    #     for r in record:
-    #         r.description = ''
-    #         SeqIO.write(r, f"{ref}", "fasta")
-    #     LOGGER.info(f"Indexing reference.")
-    #     subprocess.run(f"samtools faidx {ref}", shell =True)
-
     
 
 
@@ -546,13 +552,15 @@ class RunSnpDetection(object):
         
 
     def _generate_cmd(self, min_cov, min_aln,min_qscore, mode, run_kraken, kraken2_db,assembler, mask_string, reference, 
-                        outdir, isolates, user, day, contigs, run_iqtree, species):
+                        outdir, isolates, user, day, contigs, run_iqtree, species, cpus, config, profile):
         
         stub = f"nextflow {self.script_path}/main.nf"
         resume = '' if self.force else "-resume"
+        cpu = f'-e.cpus {cpus}' if cpus != '' else ''
+        config = f'-c {config}' if config != '' else ''
         parameters = f"--min_cov {min_cov} --min_qscore {min_qscore} --min_aln {min_aln} --mode {mode} --run_iqtree {run_iqtree} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} \
 --mask_string {mask_string} --reference {reference} --contigs_file {contigs} --species {species if species != '' else 'no_species'} --outdir {outdir} --isolates {isolates} --user {user} --day {day}"
-        options = f"-with-report {self.job_id}_seqgen_report.html -with-trace {resume}"
+        options = f"-with-report {self.job_id}_seqgen_report.html -with-trace -profile {profile} {resume} {cpu} {config}"
 
         cmd = f"{stub} {parameters} {options}"
         return cmd
@@ -601,8 +609,16 @@ class RunSnpDetection(object):
         else:
             contigs_file = 'no_contigs'
         run_iqtree = False if self.no_phylo else True
+
+        if self.config == '':
+            cpus = self._set_cpu_limit_local(self.cpus)
+            config = ''
+        else:
+            config = self._check_config(self.config)
+            cpus = ''
+
         cmd = self._generate_cmd(min_cov = self.mincov, min_aln = self.minaln, min_qscore = self.minqual, mode = self.pipeline, 
-                        run_kraken = self.run_kraken, kraken2_db = self.kraken_db,contigs = contigs_file,
-                        assembler = self.assembler, mask_string = self.mask, reference = self.ref, run_iqtree = run_iqtree,
+                        run_kraken = self.run_kraken, kraken2_db = self.kraken_db,contigs = contigs_file, cpus = cpus, config = config,
+                        assembler = self.assembler, mask_string = self.mask, reference = self.ref, run_iqtree = run_iqtree,profile = self.profile,
                         outdir = self.job_id, isolates = isolates_list, day = self.day, user = self.user, species = self.abritamr_args)
         self._run_cmd(cmd)

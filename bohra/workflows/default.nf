@@ -22,7 +22,7 @@ workflow RUN_SNIPPY {
     take:
         reads
     main:
-        SNIPPY ( reads )       
+        SNIPPY ( reads )  
         SNIPPY_QC ( SNIPPY.out.aln )
     emit:
         aln = SNIPPY.out.aln
@@ -35,8 +35,9 @@ workflow RUN_CORE {
 
     take:
         alns
+        reference
     main:
-        SNIPPY_CORE ( alns )  
+        SNIPPY_CORE ( alns, reference )  
         SNP_DISTS ( SNIPPY_CORE.out.core_full_aln )     
         
     emit:
@@ -51,8 +52,9 @@ workflow RUN_CORE {
 workflow RUN_IQTREE {
     take:
         core_aln
+        reference
     main:
-        IQTREE ( core_aln )
+        IQTREE ( core_aln,reference )
     emit:
         newick = IQTREE.out.newick
 }

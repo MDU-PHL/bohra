@@ -10,11 +10,9 @@ results = {'Isolate': sys.argv[2]}
 with open(_file, 'r') as f:
     reader = csv.DictReader(f, delimiter = '\t')
     for row in reader:
-        if row['molecule_type'] == 'plasmid':
-            if row['mash_nearest_neighbor'] not in results:
-                results[row['mash_nearest_neighbor']] = f"{row['contig_id']}"
-            else:
-                results[row['mash_nearest_neighbor']] = f"{results[row['mash_nearest_neighbor']]}, {row['contig_id']}"
+        if row['mash_nearest_neighbor'] not in results:
+            results[row['mash_nearest_neighbor']] = f"Contigs: {row['num_contigs']}, Mash_distance: {row['mash_neighbor_distance']}"
+            
 
 header = []
 

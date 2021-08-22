@@ -36,16 +36,17 @@ process COLLATE_STATS_ISOLATE {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     cache 'lenient' 
+
     input:
-    tuple val(meta), path(stats), path(seqtk_stats)
+    tuple val(meta), path(seqkit_stats), path(seqkit_qual), path(reference)
 
     output:
     tuple val(meta), path ("read_assessment.txt"), emit: read_assessment
     
     script:
     """
-    ${module_dir}/collate_stats.py $meta.id $stats $seqtk_stats  \
-    $launchDir/${params.reference} ${params.min_qscore} \
+    ${module_dir}/collate_stats.py $meta.id $seqkit_stats  \
+    $seqkit_qual $launchDir/$params.reference ${params.min_qscore} \
     ${params.min_cov} read_assessment.txt
     """
     

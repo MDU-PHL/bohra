@@ -128,41 +128,6 @@
     </header>
   <!-- Modals - individual isolates -->
     <!-- Modal for tables for each isolate -->
-    <div class="modal fade" id="myModal" role="dialog">
-      <div class="modal-dialog modal-dialog-centered modal-xl" >
-      <!-- Modal content-->
-        <div class="modal-content">
-            <h2 class="modal-title"> <!-- placeholder for isolate id --></h2>
-            <h3 style= "color: #3973ac;">Summary Table</h3>
-              <table id="" class="table table-striped table-bordered  modal-summary-table">
-                  <thead>
-                    <tr><!-- header of table -->
-                          <th>Isolate</th>
-                          <th>% Used</th>
-                          <th>Coverage</th>
-                          <th># Contigs</th>
-                          <th>MLST</th>
-                          <th>Species</th>
-                    </tr>
-                  </thead>
-                  <tbody class='modal-body-summary-table'>
-
-                  </tbody>
-              </table>
-            {% for t in td %}
-            {% if t.type == 'table' %}
-            <h3 style= "color: #3973ac;">{{ t.title }}</h3>
-                <table id="" class="table table-striped table-bordered  modal-{{t.link}}">
-                  <thead>{{ t.head }}</thead>
-                  <tbody class='modal-body-{{t.link}}'>
-                    
-                  </tbody>
-                </table>
-            {% endif %}
-            {% endfor %}          
-          </div>
-        </div>
-      </div>
       <!-- modal for snp-distances -->
       <div class="modal fade" id="myModal2" role="dialog">
         <div class="modal-dialog modal-dialog-centered modal-xl" >

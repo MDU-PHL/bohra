@@ -4,7 +4,7 @@ include { initOptions; saveFiles; getSoftwareName } from './functions'
 params.options = [:]
 def options    = initOptions(params.options)
 
-process MOBSUITE {
+process SEQKIT_GC {
     tag "$meta.id"
     label 'process_medium'
     publishDir "${params.outdir}",
@@ -20,22 +20,18 @@ process MOBSUITE {
     // }
 
     input:
-    tuple val(meta), path(asm)
+    tuple val(meta), path(input_files)
 
     output:
-    tuple val(meta), path('contig_report.txt'), emit: contig_report
-    tuple val(meta), path('mobtyper_results.txt'), emit: mobs
-    tuple val(meta), path('*.fasta') optional true
-
-    // tuple val(meta), path('spades.log'), emit: log
+    tuple val(meta), path('read_qual.txt'), emit: stats
 
     script:
     """
-    mob_recon -i $asm -s $meta.id -n $task.cpus -o mob
-    cp mob/* .
-    if [ ! -f mobtyper_results.txt ];then
-        touch mobtyper_results.txt
-    fi
+    cat ${input_files[0]} ${input_files[1]} \
+    | seqkit fx2tab -H --name --only-id --avg-qual --gc \
+    | csvtk summary -t -i -f 2:mean,3:mean > read_qual.txt
     """
+
+    
     
 }

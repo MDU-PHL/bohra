@@ -16,7 +16,7 @@ process KRAKEN2 {
     // afterScript "rm -fr /tmp/\$USER/*"
     
     input:
-    tuple val(meta), path(reads)
+    tuple val(meta), path(reads), path(kraken)
 
     output:
     tuple val(meta), path('kraken2.tab'), emit: kraken2
@@ -28,6 +28,7 @@ process KRAKEN2 {
     --threads $task.cpus \
     --report kraken2.tab \
     --memory-mapping \
+    -db $kraken \
     $options.args
     """
 }

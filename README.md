@@ -197,18 +197,6 @@ optional arguments:
 
 ```
 
-## Executors
-Arguments that start with '--' (eg. --input_file) can also be set in a config file. Please put your config file in the working directory and name it 'bohra.conf'
-Config file syntax allows: key=value, flag=true,
-stuff=[a,b,c] (for details, see syntax at https://goo.gl/R74nmi). If an arg is
-specified in more than one place, then commandline values override environment
-variables which override config file values which override defaults.
-
-### Preview mode
-
-Bohra's preview mode (default mode) uses `mash` to calculate mash distances between isolates and generate a mash tree to rapidly identify outliers in your dataset or identify clades of interest for a more focused analysis.
-
-### Set up
 
 **Input file**
 
@@ -229,85 +217,36 @@ The choice of reference is important for the accuracy of SNP detection and there
 Phage masking is important for to prevent the inflation of SNPs that can be introduced by horizontal transfer as opposed to vertical transfer. For closed genomes or those that are publicly available `phaster-query.pl` can be used to identify regions for masking. If a denovo assembly is used the website `phaster.ca` can be used. Regions for masking should be provided in `.bed` format.
 
 
-### Run
 
-**Minimal command to run in preview mode**
+### Preview mode
 
-To use alternative modes, use `-p` with one of the following arguments.
-
-`sa` phylogeny and assembly associated tools
-
-`all` all functions (`sa` plus pan-genome analysis)
-
-
-`bohra run -r path/to/reference -i path/to/inputfile -j unique_id -m path/to/maskfile (optional)`
-
-### Running Bohra in a HPC environment
-Bohra can be run in a HPC environment (currently only sbatch and qsub are supported). To do this some knowledge and experience in such environments is assumed. You will need to provide a file called `cluster.json`. This file will contain rule specifc and default settings for running the pipeline. An template is shown below (it is recommended that you use this template, settings have been established using a slurm queueing system), in addition you can see further documentation [here](https://snakemake.readthedocs.io/en/stable/snakefiles/configuration.html#cluster-configuration).
-
-*example command*
-```
-bohra run -r <reference> -i <input_tab> -j <jobname> --cluster --json cluster.json --queue sbatch
-```
+`bohra` preview mode uses `mash` to calculate mash distances between isolates and generate a mash tree to rapidly identify outliers in your dataset or identify clades of interest for a more focused analysis.
 
 ```
-bohra rerun --cluster --queue sbatch
+bohra -i input.tab -r ref.fa -p preview -j job_id
 ```
 
-*cluster.json*
-```
-{
-    "__default__" :
-    {
-        "account" : "AccountName",
-        "time" : "0-0:5:00",
-        "cpus-per-task": "2",
-        "partition" : "cloud",
-        "mem" : "2G",
-        "ntasks" : "4",
-        "job" : "{rule}"
-    },
-    "snippy" :
-    {
-        
-        "cpus-per-task" : "4",
-        "time" : "0-0:5:00",
-        "mem" : "8G" 
-    },
-    "assemble":
-    {
-        "cpus-per-task" : "4",
-        "time" : "0-0:20:00",
-        "mem" : "32G"
+### Default
 
-    },
-    "kraken" :
-    {
-        "cpus-per-task" : "8",
-        "time" : "0-0:20:00",
-        "mem"  : "32G"
-    },
-    "run_iqtree_core" :
-    {
-        "time": "0-0:20:00"
-    },
-    "roary" : 
-    {
-        "cpus-per-task" : "36",
-        "time" : "0-0:25:00",
-        "mem": "8G"
-    },
-    "run_prokka" :
-    {
-        "cpus-per-task" : "8",
-        "time" : "0-0:10:00"
-    },
-    "run_snippy_core" :
-    {
-        "time" : "0-0:15:00"
-    }
-}
+Default mode will perform SNP detection, assemblies (if contigs file not provided), mlst, abritamr and phylogeny (unless `--no_phylo` or < 4 samples used as input).
+
 ```
+bohra -i input.tab -c contigs.tab -r ref.fa -p default -j job_id
+```
+
+
+### All
+
+In addition to the default mode above, `all` will also run `roary` . If less than 4 samples are provided, roary will not be run and pipeline will revert to `default`
+
+```
+bohra -i input.tab -c contigs.tab -r ref.fa -p all -j job_id
+```
+
+### Profile
+
+You can provide a specific profile for running `bohra` on various computing platforms (see https://www.nextflow.io/docs/latest/executor.html for available platforms). You will need to specify a `--profile`, which MUST be the same as the name of the profile in your `--config` file. An example structure is provided in `example.config` 
+
 
 
 

@@ -12,8 +12,8 @@ def combine(prokka, asm, isolate, output):
     df = pandas.read_csv(asm, sep = '\t')
     gff = gff[gff['cond'].isin(['CDS', 'rRNA'])]
     print(gff)
-    rrna = gff[gff['cond'] == 'rRNA'][isolate].values[0].strip("\"")
-    cds = gff[gff['cond'] == 'CDS'][isolate].values[0].strip("\"")
+    rrna = gff[gff['cond'] == 'rRNA'][isolate].values[0].replace("\"","").strip()
+    cds = gff[gff['cond'] == 'CDS'][isolate].values[0].replace("\"","").strip()
     print(rrna)
     print(cds)
     print(df)
@@ -26,6 +26,7 @@ def combine(prokka, asm, isolate, output):
     n50 = df['N50'].values[0]
 
     result = f"{isolate}\t{bp}\t{contigs}\t{gaps}\t{mincontigs}\t{avgcontigs}\t{maxcontigs}\t{n50}\t{cds}\t{rrna}"
+    print(result)
     HEADER.append(result)
     out = pathlib.Path(output)
     out.write_text('\n'.join(HEADER))
