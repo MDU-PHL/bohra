@@ -3,7 +3,8 @@
             "title":"Preview",
             "link":"preview-tree", 
             "file": "preview.newick", 
-            "type": "tree"
+            "type": "tree",
+            "style": ""
         },
         {   "file":"seqdata.txt", 
             "title":"Sequence Data", 
@@ -20,7 +21,8 @@
         {   "title": "Phylogeny", 
             "link":"phylogeny", 
             "file": "core.newick", 
-            "type": "tree"
+            "type": "tree",
+            "style": ""
         },
         {   "file":"seqdata.txt", 
             "title":"Sequence Data", 
@@ -72,7 +74,8 @@
         {   "title": "Phylogeny", 
             "link":"phylogeny", 
             "file": "core.newick", 
-            "type": "tree"
+            "type": "tree",
+            "style": ""
         },
         {   "file":"summary_statistics.txt", 
             "title":"Pan Genome", 

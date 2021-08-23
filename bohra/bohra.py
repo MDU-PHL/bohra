@@ -70,7 +70,7 @@ def main():
     parser.add_argument('--force','-f', action="store_true", help = "Add if you would like to force a complete restart of the pipeline. All previous logs will be lost.")
     parser.add_argument('--no_phylo',action="store_true", help = "Set if you do NOT want to generate a phylogentic tree.")
     parser.add_argument('--config', default = f"", help='An additional config file, required if running on a non-local machine, ie slurm, cloud. For help see documentation at https://github.com/MDU-PHL/bohra or https://www.nextflow.io/docs/latest/executor.html') # don't need this
-    parser.add_argument('--profile', default = f"default", help='The resource profile to use. Defaults to local, if using an alternative config file, this calue should represent the name of a profile provided') # don't need this
+    parser.add_argument('--profile', default = f"lcl", help='The resource profile to use. Defaults to local, if using an alternative config file, this calue should represent the name of a profile provided') # don't need this
     # parser.add_argument('--dry-run','-n', action="store_true", help = "If you would like to see a dry run of commands to be executed.")
     parser.add_argument('--gubbins', '-g', action = 'store_true', help = 'Set to use gubbins for recombination correction.')
     parser.add_argument('--keep', default = 'N', choices= ['Y', 'N'], help = 'If you are rerunning bohra over an exisiting directory set --keep to \'Y\' to archive report files - otherwise previous reprot files will be removed.')

@@ -34,7 +34,7 @@
     <!-- Datatables -->
     <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.css" rel="stylesheet">
-    <link href="https//cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css" rel = "stylesheet">
+    <link href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css" rel = "stylesheet">
     <!-- drag select jquery -->
     <script src="https://thibaultjanbeyer.github.io/DragSelect/ds.min.js"></script>
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -196,7 +196,7 @@
 <div class= "container-fluid">
 <!-- buttons -->
 {% for t in td %}
-  <button type="button" class="btn btn-primary btn-xlg btn-outline-primary btn-lg detail-button {{t.link}}-button" >{{t.title}}</button>
+  <button type="button" class="btn btn-primary btn-xlg btn-outline-primary btn-lg detail-button {{t.link}}-button" {{t.style}}>{{t.title}}</button>
 {% endfor %}
 <div id = "snp-distances-graph" class = "hidden-graph">  <!-- placeholder for graphs  --> </div>
 <div id = "snp-density-graph" class = "hidden-graph">  <!-- placeholder for graphs  --> </div>
@@ -207,7 +207,7 @@
     <hr>
           {% for t in td %}
           {% if t.type == 'tree' %}
-          <div id = "phylogeny" >
+          <div id = "phylogeny"  {{t.style}}>
             <div id="tree_string" style="display: none;">{{newick}}</div>
             <div id="phylocanvas" style="width: 100%;" >
               <!-- <p></p> -->
@@ -287,9 +287,9 @@
       </div>
     </div>
     {% endif %}
-  </div>         
     {% endfor %}  
-</div>
+  </div>         
+  
         
 <!-- Datatables (to sort tables) -->
 <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>

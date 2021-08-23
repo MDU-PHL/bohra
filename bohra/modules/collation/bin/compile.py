@@ -56,7 +56,7 @@ def _write_tables(table, wd, job_id, link):
     else:
         return f"<th>No results to display</th>",f"<tr><td></td></tr>"
 
-def _get_tree_string(pipeline, wd, job_id):
+def _get_tree_string(pipeline, wd, job_id, phylo):
     '''
     Generate a tree image from a newick
     input:
@@ -65,7 +65,7 @@ def _get_tree_string(pipeline, wd, job_id):
         string reporesentation of the path to the tree image
     '''
     tree_file = pathlib.Path(wd, job_id,'preview.newick') if pipeline == 'preview' else pathlib.Path(wd, job_id, 'report','core.newick')
-    if tree_file.exists():
+    if tree_file.exists() and phylo == 'true':
         with open(f"{tree_file}", 'r') as t:
             tree = t.read().strip()
     else:
@@ -242,9 +242,10 @@ def _get_versions(wd, job_id):
         return f"<th class='version-head'>Nothing to display</th>",""
 
 def _compile(args):
-
+    
     # get analysis dict
     _dict = json.load(open(f"{pathlib.Path(args.template_dir, 'report_analysis.json')}", 'r'))
+    
     isos = _get_isos(wd = args.launchdir, iso_list=args.isolates)
     reporthtml = pathlib.Path('report.html')
     # path to html template
@@ -270,13 +271,14 @@ def _compile(args):
     # print(data)
 
     td = _dict[args.pipeline]
+    
     tables, modaltables, display = _return_tables(pipeline = args.pipeline)
     data['tree_height'] = len(isos) * 25
     data['tables'] = tables
     data['modaltables'] = modaltables
     data['display'] = display
     
-    data['newick'] = _get_tree_string(pipeline = args.pipeline, wd = args.launchdir, job_id = args.job_id)
+    data['newick'] = _get_tree_string(pipeline = args.pipeline, wd = args.launchdir, job_id = args.job_id, phylo = args.iqtree)
         # print(td)
     
     # generate_summary(wd = wd, job_id = job_id)
@@ -291,6 +293,10 @@ def _compile(args):
 
 # newick = newick, display = display,tables = tables,td = td, job_id = job_id, pipeline = pipeline, snpdistances=snpdistances, snpdensity = snpdensity, modaltables = modaltables, date = date
     td = _fill_vals(td=td, pipeline = args.pipeline, wd = args.launchdir, job_id=args.job_id)
+    if f"{args.iqtree}" == 'false':
+        for t in td:
+            if t['title'] == "Phylogeny":
+                t['style'] = "style='display:none;'"
     data['td'] = td
     print("rendering html")
     report_template = jinja2.Template(pathlib.Path(indexhtml).read_text())
@@ -324,6 +330,10 @@ def set_parsers():
     parser.add_argument('--reference',
         help = '',
         default = '')
+    parser.add_argument('--iqtree',
+        help = '',
+        default = '')
+    
     
     
     
