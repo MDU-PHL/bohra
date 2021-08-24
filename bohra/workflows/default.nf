@@ -15,7 +15,7 @@ include { MLST } from './../modules/mlst/main' addParams( options: [args2: 4] )
 include { PROKKA } from './../modules/prokka/main' 
 include { IQTREE } from './../modules/iqtree/main' 
 include { MOBSUITE } from './../modules/mobsuite/main' 
-
+include { GUBBINS } from './../modules/gubbins/main' 
 
 workflow RUN_SNIPPY {   
 
@@ -47,6 +47,15 @@ workflow RUN_CORE {
         core_stats = SNIPPY_CORE.out.core_stats
         dists = SNP_DISTS.out.distances
         
+}
+
+workflow RUN_GUBBINS {
+    take:
+        core_full
+    main:
+        GUBBINS ( core_full )
+    emit:
+        core_aln = GUBBINS.out.gubbins
 }
 
 workflow RUN_IQTREE {

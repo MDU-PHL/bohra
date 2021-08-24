@@ -37,7 +37,7 @@ reference = Channel.fromPath( "${params.reference}")
 reads = Channel.fromFilePairs("${params.outdir}/*/*_R{1,2}*.f*q.gz")
                 .filter { sample, files -> samples.contains(files[0].getParent().getName())}
                 .map { sample, files -> tuple([id: sample, single_end:false, contigs: contigs[sample]], files)}
-                
+ 
 workflow {
     
     include { READ_ANALYSIS;RUN_KRAKEN } from './workflows/common'
@@ -45,7 +45,7 @@ workflow {
     include { COLLATE_KRAKEN;COLLATE_SEQS;WRITE_HTML } from './workflows/collation'
     // include { RUN_SNIPPY } from './workflows/snps'
     include { RUN_ROARY } from './workflows/roary'
-    include { RUN_ASSEMBLE;CONCAT_STATS;CONCAT_MLST;CONCAT_RESISTOMES;COLLATE_ASM_PROKKA;CONCAT_ASM;RUN_SNIPPY;RUN_CORE;RUN_IQTREE;CONCAT_VIRULOMES;CONCAT_CORE_STATS;CONCAT_PLASMID } from './workflows/default'
+    include { RUN_ASSEMBLE;CONCAT_STATS;CONCAT_MLST;CONCAT_RESISTOMES;COLLATE_ASM_PROKKA;CONCAT_ASM;RUN_SNIPPY;RUN_CORE;RUN_IQTREE;CONCAT_VIRULOMES;CONCAT_CORE_STATS;CONCAT_PLASMID;RUN_GUBBINS } from './workflows/default'
     
 
     READ_ANALYSIS ( reads,reference )
@@ -56,8 +56,13 @@ workflow {
     } else if (params.mode != 'preview'){
         RUN_SNIPPY ( reads.combine( reference ) )
         RUN_CORE ( RUN_SNIPPY.out.aln.map { cfg, aln -> aln.getParent() }.collect(), reference )
+        core_aln =  RUN_CORE.out.core_aln
+        if ( params.gubbins ){
+            RUN_GUBBINS( RUN_CORE.out.core_full_aln )
+            core_aln = RUN_GUBBINS.out.core_aln
+        }
         if (params.run_iqtree ){
-            RUN_IQTREE ( RUN_CORE.out.core_aln,reference)
+            RUN_IQTREE ( core_aln,reference)
             tree = RUN_IQTREE.out.newick
         } else {
             tree = Channel.empty().ifEmpty('EmptyFile')

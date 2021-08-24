@@ -28,7 +28,7 @@ def check_snippy(isolate, minaln, aln):
 def main(inputs, isolate, output, minaln):
 
     length, aln, nocov, lowcov, het, unaln, perc_aln, quality = check_snippy(minaln = minaln, aln = inputs, isolate = isolate)
-    data = [isolate, length, aln, unaln,het,lowcov,perc_aln,quality]
+    data = [isolate, length, aln, unaln,het,lowcov,round(perc_aln, 2),quality]
     data = [f"{d}" for d in data]
     data = "\t".join(data)
     HEADER.append(data)

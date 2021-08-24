@@ -11,7 +11,7 @@ with open(_file, 'r') as f:
     reader = csv.DictReader(f, delimiter = '\t')
     for row in reader:
         if row['mash_nearest_neighbor'] not in results:
-            results[row['mash_nearest_neighbor']] = f"Contigs: {row['num_contigs']}, Mash_distance: {row['mash_neighbor_distance']}"
+            results[row['mash_nearest_neighbor']] = f"Contigs: {row['num_contigs']} - total length {row['size']}; Mash_distance: {row['mash_neighbor_distance']}"
             
 
 header = []

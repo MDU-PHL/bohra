@@ -74,8 +74,8 @@ class RunSnpDetection(object):
             self.minaln = args.minaln
             self.mincov = args.mincov
             self.minqual = args.minqual
-            # cluster settings        
-            # self.gubbins = False
+            
+            self.gubbins = args.gubbins
             self.force = args.force        
             self.cpus = args.cpus
             self.config = args.config
@@ -435,18 +435,21 @@ class RunSnpDetection(object):
             'kraken2': 'kraken2 -v 2>&1',
             'seqkit': 'seqkit version 2>&1',
             'any2fasta': 'any2fasta -v',
-            # 'mash': 'mash --version 2>&1',
+            'gubbins': 'run_gubbins.py --version 2>&1',
             'csvtk':'csvtk version 2>&1',
+            'roary': 'roary -a 2>&1 | tail -n1',
             self.assembler: f"{self.assembler}.py -v 2>&1" if self.assembler == 'spades' else f"{self.assembler} -v 2>&1",
             'abritamr': 'abritamr -v 2>&1',
             'mlst': 'mlst -v 2>&1',
-            'prokka': 'prokka -v 2>&1'
+            'prokka': 'prokka -v 2>&1',
+            'mash': 'mash --version 2>&1',
+            'quicktree': 'quicktree -v 2>&1'
         }
-        just_install = ['roary', 'mash', 'seqtk', 'quicktree']
 
         software_versions = [f"Software"] # a list of versions for output
         LOGGER.info(f"Checking that dependencies are installed and recording version.")
-        version_pat_3 = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+))?\b')
+        version_pat_3 = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)(\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+)*))?\b')
+        
         for sft in software:
             try:
                 p = subprocess.run(software[sft], capture_output=True, encoding = "utf-8", shell = True)
@@ -458,9 +461,6 @@ class RunSnpDetection(object):
             except FileNotFoundError:
                 LOGGER.critical(f"{sft} is not installed.")
                 raise SystemExit
-        for j in just_install:
-            self._check_installation(j)
-            software_versions.append(f"{j}")
         LOGGER.info(f"Now checking kraken2 DB")
         self._check_kraken2DB()
         software_versions.append(f"kraken2 DB {self.kraken_db}")
@@ -552,14 +552,15 @@ class RunSnpDetection(object):
         
 
     def _generate_cmd(self, min_cov, min_aln,min_qscore, mode, run_kraken, kraken2_db,assembler, mask_string, reference, 
-                        outdir, isolates, user, day, contigs, run_iqtree, species, cpus, config, profile):
+                        outdir, isolates, user, day, contigs, run_iqtree, species, cpus, config, profile, gubbins):
         
         stub = f"nextflow {self.script_path}/main.nf"
         resume = '' if self.force else "-resume"
         cpu = f'-e.cpus={int(cpus)}' if cpus != '' else ''
         config = f'-c {config}' if config != '' else ''
         parameters = f"--min_cov {min_cov} --min_qscore {min_qscore} --min_aln {min_aln} --mode {mode} --run_iqtree {run_iqtree} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} \
---mask_string {mask_string} --reference {reference} --contigs_file {contigs} --species {species if species != '' else 'no_species'} --outdir {outdir} --isolates {isolates} --user {user} --day {day}"
+--mask_string {mask_string} --reference {reference} --contigs_file {contigs} --species {species if species != '' else 'no_species'} --outdir {outdir} --isolates {isolates} --user {user} --day {day} \
+--gubbins {gubbins}"
         options = f"-with-report {self.job_id}_seqgen_report.html -with-trace -profile {profile} {resume} {cpu} {config}"
 
         cmd = f"{stub} {parameters} {options}"
@@ -616,9 +617,9 @@ class RunSnpDetection(object):
         else:
             config = self._check_config(self.config)
             cpus = ''
-
+        
         cmd = self._generate_cmd(min_cov = self.mincov, min_aln = self.minaln, min_qscore = self.minqual, mode = self.pipeline, 
                         run_kraken = self.run_kraken, kraken2_db = self.kraken_db,contigs = contigs_file, cpus = cpus, config = config,
                         assembler = self.assembler, mask_string = self.mask, reference = self.ref, run_iqtree = run_iqtree,profile = self.profile,
-                        outdir = self.job_id, isolates = isolates_list, day = self.day, user = self.user, species = self.abritamr_args)
+                        outdir = self.job_id, isolates = isolates_list, day = self.day, user = self.user, species = self.abritamr_args, gubbins = self.gubbins)
         self._run_cmd(cmd)
