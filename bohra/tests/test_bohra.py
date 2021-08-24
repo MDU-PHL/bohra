@@ -37,6 +37,7 @@ def test_name_empty_string():
                 with pytest.raises(SystemExit):
                         detect_obj._name_exists('')
               
+<<<<<<< HEAD
 
 #       '''
 #         return False when wrong number of columns present
@@ -63,6 +64,8 @@ def test_name_empty_string():
 #         return false when less than 4 rows are present
 #         '''
 #         with patch.object(RunSnpDetection, "__init__", lambda x: None):
+=======
+>>>>>>> 40fb91995564ae6f066af44f6f914e7f0f15fe65
 #                 detect_obj = RunSnpDetection()
 #                 detect_obj.logger = logging.getLogger(__name__)
 #                 tab = pandas.DataFrame({'A':[1,2,3]})
@@ -95,8 +98,12 @@ def test_name_empty_string():
 #                 detect_obj.logger = logging.getLogger(__name__)
 #                 tab = pandas.DataFrame({'A':[1,2,3,4], 'B':[5,6,7,8], 'C':[9,10,11,12]})
 #                 assert detect_obj.check_input_structure(tab) == True
+<<<<<<< HEAD
 
 
+=======
+=======
+>>>>>>> 40fb91995564ae6f066af44f6f914e7f0f15fe65
 
 # def test_path_exists():
 #         '''

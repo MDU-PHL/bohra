@@ -15,9 +15,15 @@ Bohra is microbial genomics pipeline, designed predominantly for use in public h
 * Default mode
     * Can be run on a single isolate (phylogenetic tree will not be generated if fewer than three sequences included in dataset)
     * MobSuite integration.
-    * Updated [abriTAMR] with support for point mutations and virulence factors (beta).
+    * Updated [abriTAMR](https://github.com/MDU-PHL/abritamr) with support for point mutations and virulence factors (beta).
 * Roary with visualisation of pan-genome.
 * Improved support for different computing environments.
+
+**Comming soon**
+
+* Improved report structure
+* Option to add your own modules
+
 
 **Accreditation**
 
@@ -67,6 +73,8 @@ Bohra can be run in three modes
 * Pan Genome
 
 ### Installation
+
+**New installation instructions comming soon**
 
 Bohra requires >=python3.7
 
@@ -139,8 +147,7 @@ $ bohra -h
 
 Bohra - a bacterial genomics pipeline - version 2.0.0
 
-optional arguments:
-  -h, --help            show this help message and exit
+ -h, --help            show this help message and exit
   -v, --version         show program's version number and exit
   --check               Check that dependencies are installed correctly.
                         (default: False)
@@ -174,7 +181,7 @@ optional arguments:
   --assembler {shovill,skesa,spades}, -a {shovill,skesa,spades}
                         Assembler to use. (default: spades)
   --cpus CPUS           Number of max CPU cores to run, will define how many
-                        rules are run at a time (default: 16)
+                        rules are run at a time (default: 72)
   --minaln MINALN, -ma MINALN
                         Minimum percent alignment. Isolates which do not align
                         to reference at this threshold will not be included in
@@ -187,13 +194,24 @@ optional arguments:
                         included further analysis. (default: 0)
   --workdir WORKDIR, -w WORKDIR
                         The directory where Bohra will be run, default is
-                        current directory.
+                        current directory (default:
+                        /home/khhor/sandbox/bohra/weird_bugs)
   --force, -f           Add if you would like to force a complete restart of
                         the pipeline. All previous logs will be lost.
                         (default: False)
   --no_phylo            Set if you do NOT want to generate a phylogentic tree.
                         (default: False)
-  --executor EXECUTOR   Type of queue
+  --config CONFIG       An additional config file, required if running on a
+                        non-local machine, ie slurm, cloud. For help see
+                        documentation at https://github.com/MDU-PHL/bohra or
+                        https://www.nextflow.io/docs/latest/executor.html
+                        (default: )
+  --profile PROFILE     The resource profile to use. Defaults to local, if
+                        using an alternative config file, this calue should
+                        represent the name of a profile provided (default:
+                        lcl)
+  --gubbins             Set to use gubbins for recombination correction.
+                        (default: False)
   --keep {Y,N}          If you are rerunning bohra over an exisiting directory
                         set --keep to 'Y' to archive report files - otherwise
                         previous reprot files will be removed. (default: N)
