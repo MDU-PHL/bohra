@@ -13,20 +13,13 @@ Bohra is modular allowing the user to choose between calling SNPs and generating
 
 import logging
 import argparse
-import configargparse
 import pathlib
 import sys
 import os
 import shutil
 from bohra.SnpDetection import RunSnpDetection
 from bohra.version import version
-# from SnpDetection import RunSnpDetection
-# from Utils import Nulla2bohra, UpdateBohra, CheckDeps
-# from version import version
 
-
-
-#logging.basicConfig(filename='job.log',level=logging.INFO, format='[%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
 
 def run_pipeline(args):
     '''
@@ -49,7 +42,7 @@ def check_deps(args):
 def main():
     # setup the parser
   
-    parser = configargparse.ArgumentParser(description=f'Bohra - a bacterial genomics pipeline - version {version}',formatter_class=configargparse.ArgumentDefaultsHelpFormatter)
+    parser = argparse.ArgumentParser(description=f'Bohra - a bacterial genomics pipeline - version {version}',formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + version)
     # options for running
     parser.add_argument('--check',action="store_true", help = "Check that dependencies are installed correctly.")
