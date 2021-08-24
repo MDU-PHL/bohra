@@ -593,7 +593,7 @@ class RunSnpDetection(object):
         if self.ref == '':
             LOGGER.critical(f"Reference file must be provided. Please try again.")
             raise SystemExit
-        elif not self._path_exists(self.ref, v = False):
+        elif not self._path_exists(self.ref, v = True):
             LOGGER.critical(f"A valid reference file must be provided. Please try again.")
             raise SystemExit
         else:
