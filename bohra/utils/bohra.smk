@@ -167,7 +167,8 @@ if PREVIEW:
 			script_path = SCRIPT_PATH,
 			job_id = JOB_ID,
 			template_path = TEMPLATE_PATH,
-			assembler = ASSEMBLER
+			assembler = ASSEMBLER,
+			run_kraken = RUN_KRAKEN
 		script:
 			"compile.py"
 
@@ -447,6 +448,6 @@ rule move_outputs:
 	output:
 		FINAL_OUTPUT
 	params:
-		script_path= SCRIPT_PATH
+		script_path= SCRIPT_PATH,
 	script:
 		"move_outputs.py"
