@@ -399,10 +399,10 @@ def generate_summary():
 
 def return_tables(pipeline):
 
-    if pipeline == 's':
+    if pipeline == 'preview':
         
-        tables =['core-genome', 'snp-distances', 'sequence-data','species-identification']
-        modaltables =['core-genome',  'sequence-data','species-identification']
+        tables =['sequence-data','species-identification','mash-distances']
+        modaltables =['sequence-data','species-identification','mash-distances']
         display = f"display:inline;"
     elif pipeline == 'a':
         
@@ -464,8 +464,10 @@ def main(inputs, pipeline,job_id, resources, run_kraken, assembler = ''):
     if pipeline == 'preview':
         td = get_preview_dict()
         data['tree_height'] = get_isolates_preview('preview_distances.tab') * 25
-        data['tables'] = ['mash-distances']
-        data['modaltables'] = ['mash-distances']
+        tables, modaltables, display = return_tables(pipeline = pipeline)
+        data['tables'] = table
+        data['modaltables'] = modaltables
+        data['display'] = display
         # print(td)
     else:
         isos = generate_summary()

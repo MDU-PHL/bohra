@@ -1,0 +1,134 @@
+{  "preview": [
+        {
+            "title":"Preview",
+            "link":"preview-tree", 
+            "file": "preview.newick", 
+            "type": "tree",
+            "style": ""
+        },
+        {   "file":"seqdata.txt", 
+            "title":"Sequence Data", 
+            "link": "sequence-data", 
+            "type" : "table"
+        },
+        {   "file":"species.txt", 
+            "title": "Species Identification", 
+            "type": "table", 
+            "link":"species-identification"
+        }
+        ],
+    "default":[
+        {   "title": "Phylogeny", 
+            "link":"phylogeny", 
+            "file": "core.newick", 
+            "type": "tree",
+            "style": ""
+        },
+        {   "file":"seqdata.txt", 
+            "title":"Sequence Data", 
+            "link": "sequence-data", 
+            "type" : "table"
+        },
+        {   "file":"species.txt", 
+            "title": "Species Identification", 
+            "type": "table", 
+            "link":"species-identification"
+        },
+        {   "file": "core_genome.tab", 
+            "title": "Core Genome", 
+            "link":"core-genome", 
+            "type":"table"
+        },
+        {   "file": "distances.tab", 
+            "title":"SNP distances", 
+            "type":"matrix", 
+            "link":"snp-distances"
+        },
+        {   "file":"mlst.txt", 
+            "title":"MLST", 
+            "type":"table", 
+            "link":"mlst"
+        },
+        {   "file":"resistome.txt", 
+            "title":"Resistome", 
+            "type":"table", 
+            "link":"resistome"
+        },
+        {   "file":"virulome.txt", 
+            "title":"Virulome", 
+            "type":"table", 
+            "link":"virulome"
+        },
+        {   "file": "assembly.txt", 
+            "title":"Assembly", 
+            "type":"table", 
+            "link":"assembly"
+        },
+        {   "file": "plasmid.txt", 
+            "title":"Plasmid", 
+            "type":"table", 
+            "link":"plasmid"
+        }
+    ],
+    "all":[
+        {   "title": "Phylogeny", 
+            "link":"phylogeny", 
+            "file": "core.newick", 
+            "type": "tree",
+            "style": ""
+        },
+        {   "file":"summary_statistics.txt", 
+            "title":"Pan Genome", 
+            "type": "pan", 
+            "image": "pan_genome.svg", 
+            "link":"pan-genome"
+        },
+        {   "file":"seqdata.txt", 
+            "title":"Sequence Data", 
+            "link": "sequence-data", 
+            "type" : "table"
+        },
+        {   "file":"species.txt", 
+            "title": "Species Identification", 
+            "type": "table", 
+            "link":"species-identification"
+        },
+        {   "file": "core_genome.txt", 
+            "title": "Core Genome", 
+            "link":"core-genome", 
+            "type":"table"
+        },
+        {   "file": "distances.tab", 
+            "title":"SNP distances", 
+            "type":"matrix", 
+            "link":"snp-distances"
+        },
+        {   "file":"mlst.txt", 
+            "title":"MLST", 
+            "type":"table", 
+            "link":"mlst"
+        },
+        {   "file":"resistome.txt", 
+            "title":"Resistome", 
+            "type":"table", 
+            "link":"resistome"
+        },
+        {   "file":"virulome.txt", 
+            "title":"Virulome", 
+            "type":"table", 
+            "link":"virulome"
+        },
+        {   "file": "assembly.txt", 
+            "title":"Assembly", 
+            "type":"table", 
+            "link":"assembly"
+        },
+        {   "file": "plasmid.txt", 
+            "title":"Plasmid", 
+            "type":"table", 
+            "link":"plasmid"
+        }
+    ]
+        
+}
+    
