@@ -443,7 +443,10 @@ class RunSnpDetection(object):
             'mlst': 'mlst -v 2>&1',
             'prokka': 'prokka -v 2>&1',
             'mash': 'mash --version 2>&1',
-            'quicktree': 'quicktree -v 2>&1'
+            'quicktree': 'quicktree -v 2>&1',
+            'amrfinderplus': 'amrfinder --version 2>&1',
+            'abritamr': 'abritamr -v 2>&1',
+            'mob_recon': 'mob_recon -V 2>&1'
         }
 
         software_versions = [f"Software"] # a list of versions for output
