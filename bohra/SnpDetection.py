@@ -454,14 +454,14 @@ class RunSnpDetection(object):
         version_pat_3 = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)(\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+)*))?\b')
         
         for sft in software:
-            try:
-                p = subprocess.run(software[sft], capture_output=True, encoding = "utf-8", shell = True)
-                p = p.stdout.strip()
-                v = version_pat_3.search(p.strip())
+            p = subprocess.run(software[sft], capture_output=True, encoding = "utf-8", shell = True)
+            p = p.stdout.strip()
+            v = version_pat_3.search(p.strip())
+            if v:
                 v = v.group(0)
-                LOGGER.info(f"{sft} version {v} detected.")
                 software_versions.append(f"{sft} {v}")
-            except FileNotFoundError:
+                LOGGER.info(f"{sft} version {v} detected.")              
+            else:
                 LOGGER.critical(f"{sft} is not installed.")
                 raise SystemExit
         LOGGER.info(f"Now checking kraken2 DB")

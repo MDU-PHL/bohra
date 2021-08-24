@@ -23,6 +23,7 @@ Bohra is microbial genomics pipeline, designed predominantly for use in public h
 
 * _snippy and snippy-core version 4.4.5 are NATA accredited for accurate detection of SNPs for reporting of genomic relationships at [MDU](https://biomedicalsciences.unimelb.edu.au/departments/microbiology-Immunology/research/services/microbiological-diagnostic-unit-public-health-laboratory#about-mdu-phl) Victoria Australia_ 
 * _abritamr is accredited for detection of AMR genes at [MDU](https://biomedicalsciences.unimelb.edu.au/departments/microbiology-Immunology/research/services/microbiological-diagnostic-unit-public-health-laboratory#about-mdu-phl) Victoria Australia_ 
+
 ### Motivation
 
 Bohra was inspired by Nullarbor (https://github.com/tseemann/nullarbor) to be used in public health microbiology labs for analysis of short reads from microbiological samples. The pipeline is written in [Nextflow](https://www.nextflow.io).
@@ -207,6 +208,11 @@ The input file needs to be a tab-delimited file with three columns IsolateID, pa
 Isolate-ID    /path/to/reads/R1.fq.gz    /path/to/reads/R2.fq.gz
 ```
 
+In addition a file of contigs may also be provided if you have already generated assemblies you wish to use. This is also a tab-delimited file. 
+
+```
+Isolate-ID    /path/to/asm.fasta
+```
 **Reference**
 
 The choice of reference is important for the accuracy of SNP detection and therefore the investigation of genomic relatedness. Appropriate references should be chosen following the guidelines below.
