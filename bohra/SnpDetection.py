@@ -471,7 +471,7 @@ class RunSnpDetection(object):
         if not self.check:
             LOGGER.info(f"Writing software_versions.txt")
             if not pathlib.Path(self.job_id, 'report').exists():
-                pathlib.Path(self.job_id, 'report').mkdir()
+                subprocess.run(f"mkdir -p {self.job_id}/report", shell = True)
             pathlib.Path(self.job_id, 'report','software_versions.txt').write_text('\n'.join(software_versions))
         LOGGER.info(f"\033[1mCongratulations all dependencies are installed.\033[0m")
         return True 
