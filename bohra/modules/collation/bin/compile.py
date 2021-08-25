@@ -64,7 +64,7 @@ def _get_tree_string(pipeline, wd, job_id, phylo):
     output:
         string reporesentation of the path to the tree image
     '''
-    tree_file = pathlib.Path(wd, job_id,'preview.newick') if pipeline == 'preview' else pathlib.Path(wd, job_id, 'report','core.newick')
+    tree_file = pathlib.Path(wd, job_id,'report',preview.newick') if pipeline == 'preview' else pathlib.Path(wd, job_id, 'report','core.newick')
     if tree_file.exists() and phylo == 'true':
         with open(f"{tree_file}", 'r') as t:
             tree = t.read().strip()
@@ -255,8 +255,8 @@ def _compile(args):
     versions_head,versions_body = _get_versions(wd = args.launchdir, job_id = args.job_id)
     data = {
         'newick' :'',
-        'snpdensity':'',
-        'snpdistances':'',
+        'snpdensity':{},
+        'snpdistances':{},
         'display':'',
         'job_id':args.job_id,
         'pipeline':args.pipeline,
@@ -286,7 +286,7 @@ def _compile(args):
         # get_software_file(pipeline = pipeline, assembler = assembler)  
     if args.pipeline not in ['preview']:
         data['snpdensity_x'],data['snpdensity_y']= _plot_snpdensity(reference = args.reference,wd = args.launchdir, job_id = args.job_id, isos = isos)
-        
+    
     if len(isos) > 1 and args.pipeline != 'preview':
         data['snpdistances']= _plot_distances(wd = args.launchdir, job_id = args.job_id)
     
@@ -298,6 +298,7 @@ def _compile(args):
             if t['title'] == "Phylogeny":
                 t['style'] = "style='display:none;'"
     data['td'] = td
+
     print("rendering html")
     report_template = jinja2.Template(pathlib.Path(indexhtml).read_text())
     reporthtml.write_text(report_template.render(data))
