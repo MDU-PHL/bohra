@@ -10,7 +10,7 @@ def module_dir = moduleDir + "/bin"
 process IQTREE {
 
     label 'process_high'
-   publishDir "${params.outdir}",
+    publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
     
