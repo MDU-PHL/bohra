@@ -287,7 +287,7 @@ def _compile(args):
     if args.pipeline not in ['preview']:
         data['snpdensity_x'],data['snpdensity_y']= _plot_snpdensity(reference = args.reference,wd = args.launchdir, job_id = args.job_id, isos = isos)
         
-    if len(isos) > 1:
+    if len(isos) > 1 and args.pipeline != 'preview':
         data['snpdistances']= _plot_distances(wd = args.launchdir, job_id = args.job_id)
     
 
