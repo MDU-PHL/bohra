@@ -37,7 +37,6 @@ def test_name_empty_string():
                 with pytest.raises(SystemExit):
                         detect_obj._name_exists('')
               
-<<<<<<< HEAD
 
 #       '''
 #         return False when wrong number of columns present
