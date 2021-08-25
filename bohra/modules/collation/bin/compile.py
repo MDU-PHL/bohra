@@ -64,7 +64,7 @@ def _get_tree_string(pipeline, wd, job_id, phylo):
     output:
         string reporesentation of the path to the tree image
     '''
-    tree_file = pathlib.Path(wd, job_id,'report',preview.newick') if pipeline == 'preview' else pathlib.Path(wd, job_id, 'report','core.newick')
+    tree_file = pathlib.Path(wd, job_id,'report','preview.newick') if pipeline == 'preview' else pathlib.Path(wd, job_id, 'report','core.newick')
     if tree_file.exists() and phylo == 'true':
         with open(f"{tree_file}", 'r') as t:
             tree = t.read().strip()
