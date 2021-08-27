@@ -1,5 +1,6 @@
 include bohra/tests/*
 include bohra/*.nf
+include bohra/nextflow.config
 include bohra/modules/*
 include bohra/modules/*/*
 include bohra/modules/*/*/*
