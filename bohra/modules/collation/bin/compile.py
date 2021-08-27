@@ -256,6 +256,8 @@ def _compile(args):
     data = {
         'newick' :'',
         'snpdensity':{},
+        'snpdensity_x':{},
+        'snpdensity_y':{},
         'snpdistances':{},
         'display':'',
         'job_id':args.job_id,
@@ -263,7 +265,7 @@ def _compile(args):
         'date':args.day,
         'user':args.user,
         'tree_heigth':0,
-        'modaltables':'',
+        'modaltables':{},
         'tables':'',
         'version_head': versions_head,
         'version_body':versions_body
