@@ -34,7 +34,7 @@
             "type": "table", 
             "link":"species-identification"
         },
-        {   "file": "core_genome.tab", 
+        {   "file": "core_genome.txt", 
             "title": "Core Genome", 
             "link":"core-genome", 
             "type":"table"
