@@ -559,7 +559,7 @@ class RunSnpDetection(object):
         
         stub = f"nextflow {self.script_path}/main.nf"
         resume = '' if self.force else "-resume"
-        cpu = f'-e.cpus={int(cpus)}' if cpus != '' else ''
+        cpu = f'-executor.cpus={int(cpus)}' if cpus != '' else ''
         config = f'-c {config}' if config != '' else ''
         parameters = f"--min_cov {min_cov} --min_qscore {min_qscore} --min_aln {min_aln} --mode {mode} --run_iqtree {run_iqtree} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} \
 --mask_string {mask_string} --reference {reference} --contigs_file {contigs} --species {species if species != '' else 'no_species'} --outdir {outdir} --isolates {isolates} --user {user} --day {day} \
