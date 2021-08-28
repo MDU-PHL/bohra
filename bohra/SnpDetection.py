@@ -49,7 +49,6 @@ class RunSnpDetection(object):
             
             # path to pipeline resources
             self.pipeline = args.pipeline
-            self.no_phylo = args.no_phylo
             self.preview = True if self.pipeline == 'preview' else False
             LOGGER.info(f"You are running bohra in {self.pipeline} mode.")
             self.job_id = self._name_exists(args.job_id)
@@ -373,20 +372,23 @@ class RunSnpDetection(object):
         else:
             LOGGER.info(f"No valid contigs file has been supplied. Assemblies will be generated.")
             return False
-    def _check_phylo(self, isolates_list):
 
+    def _check_phylo(self, isolates_list):
+        LOGGER.info(f"Checking if phylo needs to be run.")
+        LOGGER.info(f"Your analysis contains {len(isolates_list)}")
         if self.pipeline == 'preivew' and len(isolates_list) > 2:
             LOGGER.info(f"You are running in preview mode, a mash tree will be output")
-        elif len(isolates_list) < 3 and self.pipeline in ['default', 'all']:
+        if len(isolates_list) < 3 and self.pipeline in ['default', 'all']:
             LOGGER.warning(f"You have less than 3 isolates in your dataset, no phylogenetic tree will be generated.")
             self.no_phylo = True
-        elif self.pipeline == 'all' and len(isolates_list) < 4:
+        elif not self.no_phylo:
+            LOGGER.info(f"A phylogenetic tree will be generated.")
+        if self.pipeline == 'all' and len(isolates_list) < 4:
             LOGGER.warning(f"You can not run roary with less the 4 isolates.")
             self.pipeline = 'default'
-        elif self.no_phylo:
-            LOGGER.info(f"You have selected no_phylo option so no phylogenetic tree will be generated.")
-        else:
-            LOGGER.info(f"A phylogenetic tree will be generated.")
+        # if self.no_phylo:
+        #     LOGGER.info(f"You have selected no_phylo option so no phylogenetic tree will be generated.")
+        
     def _copy_files(self, _file):
 
         p = pathlib.Path(_file)
@@ -487,6 +489,7 @@ class RunSnpDetection(object):
             contigs_file = self.contigs
         else:
             contigs_file = 'no_contigs'
+            
         run_iqtree = False if self.no_phylo else True
 
         if self.config == '':
