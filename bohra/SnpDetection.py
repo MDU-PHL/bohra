@@ -317,44 +317,17 @@ class RunSnpDetection(object):
         
         return  path.name
 
-    def check_ref_type(self, ref):
+    def _check_ref(self, ref):
 
-        lst = []
-        record = SeqIO.parse(ref, 'genbank')
-        for r in record:
-            lst.append(r)
-        if lst != []:
-            return 'genbank'
+        LOGGER.info(f"Checking if reference is a valid reference file.")
+        p = subprocess.run(f"any2fasta {ref}", shell = True, capture_output = True, encoding = "utf-8")
+        if p.returncode == 0:
+            LOGGER.info(f"Reference is in a valid format.")
         else:
-            record = SeqIO.parse(ref, 'fasta')
-            for r in record:
-                lst.append(r)
-            if lst != []:
-                return 'fasta'
-            else:
-                LOGGER.info(f"It seems your reference file is not a genbank or fasta file format. Please check your inputs and try again.")
+            LOGGER.critical(f"There is something wrong with your reference file. Valid file types are .fasta, .gbk, .fasta.gz, .gbk.gz. Please check your inputs and try again.")
+            raise SystemExit
+
     
-
-
-    def check_reads_exists(self, tab):
-        '''
-        check that the correct paths have been given
-        if reads not present path_exists will cause a FileNotFound error and warn user
-        :input
-            :tab: dataframe of the input file
-        '''
-        LOGGER.info(f"Checking that all the read files exist.")
-        for i in tab.itertuples():
-            
-            if not '#' in i[1]:
-                r1 = i[2]
-                r2 = i[3]
-                self.path_exists(pathlib.Path(r1), v = False)
-                self.link_reads(pathlib.Path(r1), isolate_id=f"{i[1].strip()}", r_pair='R1.fq.gz')
-                self.path_exists(pathlib.Path(r2), v = False)
-                self.link_reads(pathlib.Path(r2), isolate_id=f"{i[1].strip()}", r_pair='R2.fq.gz')
-        return True
-
     
     def _check_size_file(self, path):
         '''
@@ -526,6 +499,18 @@ class RunSnpDetection(object):
             LOGGER.info(f"You have selected no_phylo option so no phylogenetic tree will be generated.")
         else:
             LOGGER.info(f"A phylogenetic tree will be generated.")
+    def _copy_files(self, _file):
+
+        p = pathlib.Path(_file)
+        name = p.name
+        if pathlib.Path(self.workdir, name).exists():
+            LOGGER.info(f"The file : {name} already exists in the current directory")
+        else:
+            cmd = f"cp {p} {pathlib.Path(self.workdir, name)}"
+            LOGGER.info(f"Running : {cmd}")
+            subprocess.run(cmd, shell = True)
+
+        return f"{pathlib.Path(self.workdir, name)}"
 
     def _setup_directory(self, reads):
         isolates_list = []
@@ -597,7 +582,9 @@ class RunSnpDetection(object):
             LOGGER.critical(f"A valid reference file must be provided. Please try again.")
             raise SystemExit
         else:
-            LOGGER.info(f"Reference {self.ref} has been found.")
+            LOGGER.info(f"Reference {self.ref} has been found. Will now copy to running directory.")
+            reference = self._copy_files(_file = self.ref)
+            self._check_ref(ref = reference)
         # mask
         if self.mask != '' and not self._path_exists(pathlib.Path(self.mask)):
             LOGGER.critical(f"{self.mask} is not a valid path please try again.")
@@ -623,6 +610,6 @@ class RunSnpDetection(object):
         
         cmd = self._generate_cmd(min_cov = self.mincov, min_aln = self.minaln, min_qscore = self.minqual, mode = self.pipeline, 
                         run_kraken = self.run_kraken, kraken2_db = self.kraken_db,contigs = contigs_file, cpus = cpus, config = config,
-                        assembler = self.assembler, mask_string = self.mask, reference = self.ref, run_iqtree = run_iqtree,profile = self.profile,
+                        assembler = self.assembler, mask_string = self.mask, reference = reference, run_iqtree = run_iqtree,profile = self.profile,
                         outdir = self.job_id, isolates = isolates_list, day = self.day, user = self.user, species = self.abritamr_args, gubbins = self.gubbins)
         self._run_cmd(cmd)
