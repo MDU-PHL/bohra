@@ -33,11 +33,12 @@ contigs_reader.eachLine { line ->
 } 
 
 reference = Channel.fromPath( "${params.reference}")
-
 reads = Channel.fromFilePairs("${params.outdir}/*/*_R{1,2}*.f*q.gz")
                 .filter { sample, files -> samples.contains(files[0].getParent().getName())}
                 .map { sample, files -> tuple([id: files[0].getParent().getName(), single_end:false, contigs: contigs[files[0].getParent().getName()]], files)}
- 
+
+
+
 workflow {
     
     include { READ_ANALYSIS;RUN_KRAKEN } from './workflows/common'

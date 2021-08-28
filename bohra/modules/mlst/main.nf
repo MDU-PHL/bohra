@@ -23,8 +23,10 @@ process MLST {
     tuple val(meta), path('mlst.json'), emit: json
 
     script:
+    def _blast_db = params.blast_db  ? "--blastdb ${params.blast_db}" : ""
+    def _datadir = params.data_dir  ? "--datadir ${params.data_dir}" : ""
     """
-    mlst --csv --json mlst.json --label $meta.id --nopath $contigs > mlst.csv
+    mlst --csv --json mlst.json --label $meta.id --nopath $contigs $_blast_db $_datadir > mlst.csv
     """
     
 }

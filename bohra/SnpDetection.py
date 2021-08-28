@@ -42,6 +42,8 @@ class RunSnpDetection(object):
         # get the working directory
         self.assembler = args.assembler
         self.kraken_db = args.kraken_db
+        self.blast_db = args.blast_db
+        self.data_dir = args.data_dir
         self.workdir = pathlib.Path(args.workdir)
         self.check = args.check
         if not self.check:
@@ -271,6 +273,33 @@ class RunSnpDetection(object):
         else:
             LOGGER.warning(f"kraken DB is not installed in the expected path. Speciation will not be performed.")
 
+    def _get_db(self, _type):
+
+        p = subprocess.run(f"mlst -h", shell = True, capture_output = True, encoding = "utf-8")
+        db = [d for d in p.stdout.strip().split('\n') if _type in d]
+        db = db[0].split('\'').strip('\'')
+        if db != '':
+            LOGGER.info(f"Found : {db}")
+            return db[0].split('\'').strip('\'')
+        else:
+
+            LOGGER.critical(f"There seems to be something wrong with your mlst setup. Please check and try again.")
+            raise SystemExit
+
+    def _check_mlstdb(self):
+
+        if self.blast_db == "" or self.data_dir == "":
+            LOGGER.info(f"Getting path to installed blast db for mlst")
+            self.blast_db = self._get_db('--blastdb')
+            self.data_dir = self._get_db('--datadir')
+        elif self._path_exists(pathlib.Path(self.blast_db)) and self._path_exists(pathlib.Path(self.data_dir)):
+            LOGGER.info(f"Your mlst databases have been found.")
+        else:
+            LOGGER.critical(f"There seems to be something wrong with your mlst setup. Please check and try again.")
+            raise SystemExit
+        
+        return True
+
 
     def _check_installation(self,software):
         '''
@@ -326,7 +355,11 @@ class RunSnpDetection(object):
                 raise SystemExit
         LOGGER.info(f"Now checking kraken2 DB")
         self._check_kraken2DB()
-        software_versions.append(f"kraken2 DB {self.kraken_db}")
+        software_versions.append(f"kraken2 DB: {self.kraken_db}")
+
+        self._check_mlstdb()
+        software_versions.append(f"mlst blast db: {self.blast_db}")
+        software_versions.append(f"mlst data dir: {self.data_dir}")
         # write software_versions.tab
         if not self.check:
             LOGGER.info(f"Writing software_versions.txt")
@@ -358,6 +391,7 @@ class RunSnpDetection(object):
         else:
             LOGGER.critical(f"Something is wrong with {reads}. Please try again.")
             raise SystemExit
+
 
     def _check_contigs(self, contigs):
 
@@ -430,15 +464,13 @@ class RunSnpDetection(object):
         
 
     def _generate_cmd(self, min_cov, min_aln,min_qscore, mode, run_kraken, kraken2_db,assembler, mask_string, reference, 
-                        outdir, isolates, user, day, contigs, run_iqtree, species, cpus, config, profile, gubbins):
+                        outdir, isolates, user, day, contigs, run_iqtree, species, cpus, config, profile, gubbins,blast_db,data_dir):
         
         stub = f"nextflow {self.script_path}/main.nf"
         resume = '' if self.force else "-resume"
         cpu = f'-executor.cpus={int(cpus)}' if cpus != '' else ''
         config = f'-c {config}' if config != '' else ''
-        parameters = f"--min_cov {min_cov} --min_qscore {min_qscore} --min_aln {min_aln} --mode {mode} --run_iqtree {run_iqtree} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} \
---mask_string {mask_string} --reference {reference} --contigs_file {contigs} --species {species if species != '' else 'no_species'} --outdir {outdir} --isolates {isolates} --user {user} --day {day} \
---gubbins {gubbins}"
+        parameters = f"--min_cov {min_cov} --min_qscore {min_qscore} --min_aln {min_aln} --mode {mode} --run_iqtree {run_iqtree} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} --mask_string {mask_string} --reference {reference} --contigs_file {contigs} --species {species if species != '' else 'no_species'} --outdir {outdir} --isolates {isolates} --user {user} --day {day} --gubbins {gubbins} --blast_db {blast_db} --data_dir {data_dir}"
         options = f"-with-report {self.job_id}_seqgen_report.html -with-trace -profile {profile} {resume} {cpu} {config}"
 
         cmd = f"{stub} {parameters} {options}"
@@ -499,8 +531,11 @@ class RunSnpDetection(object):
             config = self._check_config(self.config)
             cpus = ''
         
-        cmd = self._generate_cmd(min_cov = self.mincov, min_aln = self.minaln, min_qscore = self.minqual, mode = self.pipeline, 
-                        run_kraken = self.run_kraken, kraken2_db = self.kraken_db,contigs = contigs_file, cpus = cpus, config = config,
-                        assembler = self.assembler, mask_string = self.mask, reference = reference, run_iqtree = run_iqtree,profile = self.profile,
-                        outdir = self.job_id, isolates = isolates_list, day = self.day, user = self.user, species = self.abritamr_args, gubbins = self.gubbins)
+         
+        cmd = self._generate_cmd(min_cov = self.mincov, min_aln = self.minaln, min_qscore = self.minqual, 
+                        mode = self.pipeline, run_kraken = self.run_kraken, kraken2_db = self.kraken_db,
+                        contigs = contigs_file, cpus = cpus, config = config, assembler = self.assembler, 
+                        mask_string = self.mask, reference = reference, run_iqtree = run_iqtree,profile = self.profile,
+                        outdir = self.job_id, isolates = isolates_list, day = self.day, user = self.user, 
+                        species = self.abritamr_args, gubbins = self.gubbins, blast_db = self.blast_db, data_dir = self.data_dir)
         self._run_cmd(cmd)
