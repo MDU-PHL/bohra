@@ -8,7 +8,7 @@ def options    = initOptions(params.options)
 
 process COLLATE_KRAKEN2_ISOLATE {
     tag "$meta.id"
-    label 'process_high'
+    label 'process_medium'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
@@ -31,7 +31,7 @@ process COLLATE_KRAKEN2_ISOLATE {
 process COLLATE_STATS_ISOLATE {
     
     tag "$meta.id"
-    label 'process_high'
+    label 'process_medium'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
@@ -55,7 +55,7 @@ process COLLATE_STATS_ISOLATE {
 
 process SNIPPY_QC {
     tag "$meta.id"
-    label 'process_high'
+    label 'process_medium'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
@@ -77,7 +77,7 @@ process SNIPPY_QC {
 
 
 process COLLATE_KRAKENS {
-    label 'process_high'
+    label 'process_medium'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
@@ -98,7 +98,7 @@ process COLLATE_KRAKENS {
 }
 
 process COLLATE_SEQDATA {
-    label 'process_high'
+    label 'process_medium'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
@@ -121,7 +121,7 @@ process COLLATE_SEQDATA {
 process ADD_HEADER_MLST {
     
     tag "$meta.id"
-    label 'process_high'
+    label 'process_medium'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
@@ -144,7 +144,7 @@ process ADD_HEADER_MLST {
 process MOBSUITE_WRANGLE {
     
     tag "$meta.id"
-    label 'process_high'
+    label 'process_medium'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
@@ -165,7 +165,7 @@ process MOBSUITE_WRANGLE {
 
 
 process COLLATE_MOBSUITE {
-    label 'process_high'
+    label 'process_medium'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
@@ -186,7 +186,7 @@ process COLLATE_MOBSUITE {
 }
 
 process COLLATE_SNIPPY_QCS {
-    label 'process_high'
+    label 'process_medium'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
@@ -207,7 +207,7 @@ process COLLATE_SNIPPY_QCS {
 }
 
 process COLLATE_ASM {
-    label 'process_high'
+    label 'process_medium'
     tag "$meta.id"
     label 'process_medium'
     publishDir "${params.outdir}",
@@ -229,7 +229,7 @@ process COLLATE_ASM {
 
 
 process COMPILE {
-    label 'process_high'
+    label 'process_medium'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
