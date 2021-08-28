@@ -168,26 +168,6 @@ class RunSnpDetection(object):
             LOGGER.info(f"Removing previous report files")
             subprocess.run(cmd, shell = True, encoding = "utf-8", capture_output= True)
 
-    # def check_rerun(self):
-    #     '''
-    #     Check if the job is a rerun of an existing job, if so print message informing user and exit it is considered a rerun if there is a report directory present 
-
-    #     '''
-    #     LOGGER.info(f'Checking if job is a rerun of existing job.')
-    #     report_path = self.workdir / self.job_id / 'report' / 'index.html'
-    #     preview_path = self.workdir / self.job_id / 'report' / 'preview_distances.tab'
-    #     # if the path is a string convert to Path
-    #     if isinstance(report_path, str):
-    #         report_path = pathlib.Path(report_path)
-    #     if report_path.exists() and not preview_path.exists():
-    #         LOGGER.info(f"This appears to be a rerun of an existing job. Previous result will be removed unless you use --keep.")  
-    #         self.rerun_report()
-    #         self.remove_core()        
-    #         return True
-    #     elif preview_path.exists():
-    #         self.setup_for_rerun()
-    #         return False
-
 
     def _path_exists(self,path, v = True):
         '''
@@ -223,99 +203,7 @@ class RunSnpDetection(object):
         else:
             LOGGER.warning('Job id ca not be empty, please set -j job_id to try again')
             raise SystemExit()
-
-    def link_reads(self, read_source, isolate_id, r_pair):
-        '''
-        check if read source exists if so check if target exists - if not create isolate dir and link. If already exists report that a dupilcation may have occured in input and procedd
-
-        '''
-        # check that job directory exists
-        # LOGGER.info(f"Checking that reads are present.")
-        R = pathlib.Path(self.workdir, self.job_id)
-        if not R.exists():
-            R.mkdir()
-        # check that READS exists
-             
-        if f"{read_source}"[0] != '/':
-            read_source = self.workdir / read_source
-        
-        if read_source.exists() and os.access(read_source, os.R_OK):
-            I = R / f"{isolate_id}" # the directory where reads will be stored for the isolate
-            if not I.exists():
-                I.mkdir()
-            read_target = I / f"{r_pair}"
-            if not read_target.exists():
-                read_target.symlink_to(read_source)
-        else:
-            LOGGER.warning(f"{read_source} does not seem to a valid path. Please check your input and try again.")
-            raise SystemExit()
-
-    def unzip_files(self,path, suffix):
-        '''
-        if a zipped reference is provided try to unzip and then return the unzipped pathname. If unable to unzip then supply message and exit
-        input:
-            :path: pathname  of file to unzip string
-            :unzipped: unzipped path
-        '''
-        LOGGER.info(f"Checking if reference needs to be unzipped")
-        target = self.workdir / pathlib.Path(path).name.strip(suffix)
-        
-        if suffix == '.zip':
-            cmd = f"unzip {path} -d {target}"
-        elif suffix == '.gz':   
-            cmd = f"gzip -d -c {path} > {target}"
-        else:
-            LOGGER.warning(f"{path} can not be unzipped. This may be due to file permissions, please provide path to either an uncompressed reference or a file you have permissions to.")
-            raise SystemExit
-
-        try:
-            LOGGER.info(f"Trying to unzip reference.")
-            subprocess.run(cmd, shell = True)
-            return target.name
-        except:
-            LOGGER.warning(f"{path} can not be unzipped. This may be due to file permissions, please provide path to either an uncompressed reference or a file you have permissions to.")
-            raise SystemExit            
-
-        
-
-
-    def link_file(self, path):
-        '''
-        check if file exists and copy to workingdir
-        input:
-            :path: path to file
-        if path does not exist then return false (calling function will request path). 
-        if it does exist, then create symlink to the working dir 
-        output:
-            returns path.name (str)   
-        '''
-        J = self.workdir / self.job_id
-        if not J.exists():
-            J.mkdir()
-        LOGGER.info(f"Getting input files from {path}.") 
-        if path.exists():
-            if f"{path.suffix}" in ['.gz','zip']:
-                    path = pathlib.Path(self.unzip_files(path, f"{path.suffix}"))
-                    if not path.exists():
-                        LOGGER.warning(f"{path} does not exist. Please try again.")
-                        raise SystemExit
-            else:
-                target = J /  path.name
-                # LOGGER.info(f"Target is {target}")
-                # use rename to copy reference to working directory
-                # if the reference is not already in the working directory symlink it to working dir
-                if not target.exists():
-                    LOGGER.info(f"Copying {path.name} to {J}")
-                    # target.symlink_to(path)
-                    subprocess.run(f"cp {path} {target}", shell = True)
-                    found = True
-                    
-        else:
-            LOGGER.warning(f"Path to {path} does not exist or is not a valid file type (.gbk, .fa, .fasta, .gbk.gz, .fa.gz, .fasta.gz). Please provide a valid path to a file and try again")
-            raise SystemExit
-            # path = pathlib.Path(path)
-        
-        return  path.name
+   
 
     def _check_ref(self, ref):
 
@@ -510,7 +398,7 @@ class RunSnpDetection(object):
             LOGGER.info(f"Running : {cmd}")
             subprocess.run(cmd, shell = True)
 
-        return f"{pathlib.Path(self.workdir, name)}"
+        return f"{name}"
 
     def _setup_directory(self, reads):
         isolates_list = []
