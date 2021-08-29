@@ -65,11 +65,12 @@ Bohra can be run in three modes
 3. SNPs, Phylogeny, PanGenome and  Typing and Species Identification
 * Call variants
 * Generate a phylogenetic tree
-* Assemble
-* Species identification
+* Assemble 
 * MLST
 * Resistome
 * Annotate
+* Plasmid prediction
+* Species identification
 * Pan Genome
 
 ### Installation
