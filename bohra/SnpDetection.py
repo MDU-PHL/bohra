@@ -277,10 +277,10 @@ class RunSnpDetection(object):
 
         p = subprocess.run(f"mlst -h", shell = True, capture_output = True, encoding = "utf-8")
         db = [d for d in p.stdout.strip().split('\n') if _type in d]
-        db = db[0].split('\'').strip('\'')
+        db = db[0].split('\'')[-2].strip('\'')
         if db != '':
             LOGGER.info(f"Found : {db}")
-            return db[0].split('\'').strip('\'')
+            return db
         else:
 
             LOGGER.critical(f"There seems to be something wrong with your mlst setup. Please check and try again.")
