@@ -141,6 +141,13 @@ export KRAKEN_DEFAULT_DB=$HOME/minikraken2_v2_8GB_201904_UPDATE
 
 ### Running bohra
 
+**A word on resources**
+
+* A minimum of 8 cpus is required for running `bohra`
+* `bohra` has default settings for running at MDU (both on research and service systems). These ensure optimal running on these systems.
+* Whether you are running `bohra` on MDU systems or not, you can override the default max cpus, by providing an upper limit for your job using the `--cpus` flag.
+* If you are running on a queue or in the cloud you will need to provide an additional config file with details of your profile requirements.
+
 #### Using CLI
 
 ```
