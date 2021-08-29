@@ -80,12 +80,14 @@ class RunSnpDetection(object):
             self.force = args.force        
             self.cpus = args.cpus
             self.config = args.config
-            self.profile = args.profile
+            self.profile_config = os.getenv('BOHRA_PROFILES','')
+            self.profile = self._get_profile() if args.profile == '' else args.profile
             # kraken db settings
             self.run_kraken = False
             self.no_phylo = args.no_phylo
             self.abritamr_args = args.abritamr_args
-
+            # profile presets
+            
             
     # def run_with_gubbins(self):
     #     '''
@@ -122,13 +124,36 @@ class RunSnpDetection(object):
     #         LOGGER.info("Removing previous report files.")
     #         cmd = f"if [ -d {p1} ];then rm -r {p1}; fi"
     #     subprocess.run(cmd, shell = True)
+    
+    def _get_profile(self):
+
+        # get hostname
+        LOGGER.info(f"Tyring to find your profile.")
+        profile = 'lcl'
+        if self.profile_config != '' and self._path_exists(pathlib.Path(self.profile_config)):
+            with open(self.profile_config, 'r') as j:
+                _cfg = json.load(j)
+
+            p = subprocess.run('hostname', shell = True, capture_output = True, encoding = "utf-8")
+            host = p.stdout.strip()
+            LOGGER.info(f"Host is : {host}")
+            if host in _cfg:
+                profile = _cfg[host]
+        if profile == 'no_config':
+            LOGGER.critical(f"It seems you on an MDU system and trying to run on a head node. Please move to a compute node and try again.")
+            raise SystemExit
+        LOGGER.info(f"You are running bohra with the {profile} profile.")
+        return profile
+            
     def _set_cpu_limit_local(self, cpus):
 
         total_cores = os.cpu_count()
         one,five,fifteen = psutil.getloadavg()
         avail = total_cores - max(one,five,fifteen)
 
-        if int(cpus) < avail:
+        if int(cpus) == 0:
+            return avail
+        elif int(cpus) < avail:
             return cpus
         else:
             return avail
@@ -288,6 +313,7 @@ class RunSnpDetection(object):
 
     def _check_mlstdb(self):
 
+        LOGGER.info(f"Checking mlst setup.")
         if self.blast_db == "" or self.data_dir == "":
             LOGGER.info(f"Getting path to installed blast db for mlst")
             self.blast_db = self._get_db('--blastdb')

@@ -55,7 +55,7 @@ def main():
     parser.add_argument('--kraken_db', '-k', default="KRAKEN2_DEFAULT_DB", help="Path to DB for use with kraken2, if no DB present speciation will not be performed.")
     parser.add_argument('--pipeline','-p', default = 'preview', choices=['preview','default','all'], help=f"The pipeline to run. `preview` - generates a rapid tree using mash distances | `default` - runs snippy, phylogenetic tree (if > 3 sequences), assemblies, mlst and amr gene detection | `all` - same as default but includes roary pangenome analysis")
     parser.add_argument('--assembler','-a', default = 'spades', choices=['shovill','skesa','spades'], help=f"Assembler to use.")
-    parser.add_argument('--cpus',help='Number of max CPU cores to run, will define how many rules are run at a time', default=72) # need to change
+    parser.add_argument('--cpus',help='Number of max CPU cores to run, will define how many rules are run at a time, if 0 then the avail cpus will be determined at time of launch', default=0) # need to change
     parser.add_argument('--minaln','-ma',help='Minimum percent alignment. Isolates which do not align to reference at this threshold will not be included in core phylogeny.', default=0)
     parser.add_argument('--minqual','-mq',help='Minimum Avg quality of reads', default=0)
     parser.add_argument('--mincov','-mc',help='Minimum percent alignment. Isolates which do not have average read coverage above this threshold will not be included further analysis.', default=0)
@@ -63,9 +63,9 @@ def main():
     parser.add_argument('--force','-f', action="store_true", help = "Add if you would like to force a complete restart of the pipeline. All previous logs will be lost.")
     parser.add_argument('--no_phylo',action="store_true", help = "Set if you do NOT want to generate a phylogentic tree.")
     parser.add_argument('--config', default = f"", help='An additional config file, required if running on a non-local machine, ie slurm, cloud. For help see documentation at https://github.com/MDU-PHL/bohra or https://www.nextflow.io/docs/latest/executor.html') # don't need this
-    parser.add_argument('--profile', default = f"lcl", help='The resource profile to use. Defaults to local, if using an alternative config file, this calue should represent the name of a profile provided') 
-    parser.add_argument('--blast_db', default = f"{os.getenv('BLAST_DB','')}", help='Path to the mlst blast_db, defaults to what is installed in the environment.') 
-    parser.add_argument('--data_dir', default = f"{os.getenv('PUBMLST_DB', '')}", help='Path to the mlst datadir, defaults to what is installed in the environment.') 
+    parser.add_argument('--profile', default = f"", help='The resource profile to use. Defaults to local, if using an alternative config file, this calue should represent the name of a profile provided') 
+    parser.add_argument('--blast_db', default = f"{os.getenv('BLAST_DB')}", help='Path to the mlst blast_db, defaults to what is installed in the environment.') 
+    parser.add_argument('--data_dir', default = f"{os.getenv('PUBMLST_DB')}", help='Path to the mlst datadir, defaults to what is installed in the environment.') 
     # parser.add_argument('--dry-run','-n', action="store_true", help = "If you would like to see a dry run of commands to be executed.")
     parser.add_argument('--gubbins',  action = 'store_true', help = 'Set to use gubbins for recombination correction.')
     parser.add_argument('--keep', default = 'N', choices= ['Y', 'N'], help = 'If you are rerunning bohra over an exisiting directory set --keep to \'Y\' to archive report files - otherwise previous reprot files will be removed.')

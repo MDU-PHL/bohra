@@ -24,7 +24,7 @@ process ROARY {
     script:
     def gffs_str = gffs.join(' ')
     """
-    roary -p 36 -f roary $gffs_str
+    roary -p $task.cpus -f roary $gffs_str
     csvtk add-header -t -T -n 'Genes,Range,Total' roary/summary_statistics.txt > summary_statistics.txt
     cp roary/gene_presence_absence.csv .
     """
