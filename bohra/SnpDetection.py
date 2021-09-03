@@ -53,7 +53,7 @@ class RunSnpDetection(object):
             self.pipeline = args.pipeline
             self.preview = True if self.pipeline == 'preview' else False
             LOGGER.info(f"You are running bohra in {self.pipeline} mode.")
-            self.job_id = self._name_exists(args.job_id)
+            self.job_id =args.job_id
             LOGGER.info(f"Job ID is set {self.job_id}")
             # path to reference and mask
             self.ref = pathlib.Path(args.reference)
@@ -86,7 +86,7 @@ class RunSnpDetection(object):
             self.run_kraken = False
             self.no_phylo = args.no_phylo
             self.abritamr_args = args.abritamr_args
-            # profile presets
+            self.proceed = args.proceed
             
             
     # def run_with_gubbins(self):
@@ -389,9 +389,9 @@ class RunSnpDetection(object):
         # write software_versions.tab
         if not self.check:
             LOGGER.info(f"Writing software_versions.txt")
-            if not pathlib.Path(self.job_id, 'report').exists():
-                subprocess.run(f"mkdir -p {self.job_id}/report", shell = True)
-            pathlib.Path(self.job_id, 'report','software_versions.txt').write_text('\n'.join(software_versions))
+            if not pathlib.Path('report').exists():
+                subprocess.run(f"mkdir -p report", shell = True)
+            pathlib.Path('report','software_versions.txt').write_text('\n'.join(software_versions))
         LOGGER.info(f"\033[1mCongratulations all dependencies are installed.\033[0m")
         return True 
 
@@ -464,14 +464,14 @@ class RunSnpDetection(object):
 
     def _setup_directory(self, reads):
         isolates_list = []
-        if not pathlib.Path(self.job_id).exists():
-            LOGGER.info(f"Creating job directory")
-            subprocess.run(f"mkdir {self.workdir / self.job_id}", shell = True)
+        # if not pathlib.Path(self.job_id).exists():
+        #     LOGGER.info(f"Creating job directory")
+        #     subprocess.run(f"mkdir {self.workdir}", shell = True)
         LOGGER.info(f"Setting up isolate directories.")
         for row in reads.iterrows():
             if not row[1][0].startswith('#'):
                 isolates_list.append(row[1][0])
-                iso_dir = self.workdir/ f"{self.job_id}" /f"{row[1][0]}" 
+                iso_dir = self.workdir/ f"{row[1][0]}" 
                 if not iso_dir.exists():
                     subprocess.run(f"mkdir {iso_dir}", shell = True)
                 for r in [row[1][1],row[1][2]]:
@@ -490,14 +490,14 @@ class RunSnpDetection(object):
         
 
     def _generate_cmd(self, min_cov, min_aln,min_qscore, mode, run_kraken, kraken2_db,assembler, mask_string, reference, 
-                        outdir, isolates, user, day, contigs, run_iqtree, species, cpus, config, profile, gubbins,blast_db,data_dir):
+                        isolates, user, day, contigs, run_iqtree, species, cpus, config, profile, gubbins,blast_db,data_dir, job_id):
         
         stub = f"nextflow {self.script_path}/main.nf"
         resume = '' if self.force else "-resume"
         cpu = f'-executor.cpus={int(cpus)}' if cpus != '' else ''
         config = f'-c {config}' if config != '' else ''
-        parameters = f"--min_cov {min_cov} --min_qscore {min_qscore} --min_aln {min_aln} --mode {mode} --run_iqtree {run_iqtree} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} --mask_string {mask_string} --reference {reference} --contigs_file {contigs} --species {species if species != '' else 'no_species'} --outdir {outdir} --isolates {isolates} --user {user} --day {day} --gubbins {gubbins} --blast_db {blast_db} --data_dir {data_dir}"
-        options = f"-with-report {self.job_id}_seqgen_report.html -with-trace -profile {profile} {resume} {cpu} {config}"
+        parameters = f"--job_id {job_id} --min_cov {min_cov} --min_qscore {min_qscore} --min_aln {min_aln} --mode {mode} --run_iqtree {run_iqtree} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} --mask_string {mask_string} --reference {reference} --contigs_file {contigs} --species {species if species != '' else 'no_species'} --outdir {self.workdir} --isolates {isolates} --user {user} --day {day} --gubbins {gubbins} --blast_db {blast_db} --data_dir {data_dir}"
+        options = f"-with-report bohra_{day}_report.html -with-trace -profile {profile} {resume} {cpu} {config}"
 
         cmd = f"{stub} {parameters} {options}"
         return cmd
@@ -505,11 +505,18 @@ class RunSnpDetection(object):
         
     def _run_cmd(self, cmd):
         
-        try:
-            LOGGER.info(f"Please paste the following command to run the pipeline:\n\033[1m{cmd}\033[0m")
-        except NameError:
-            LOGGER.critical(f"It seems something has gone wrong with your inputs.")
-            raise SystemExit
+        if self.proceed:
+            LOGGER.info(f"Running:\n\033[1m{cmd}\033[0m")
+            p = subprocess.run(cmd, shell = True)
+            return p
+        else:
+
+            try:
+                LOGGER.info(f"Please paste the following command to run the pipeline:\n\033[1m{cmd}\033[0m")
+            except NameError:
+                LOGGER.critical(f"It seems something has gone wrong with your inputs. \
+Please select a mode to run, choices are 'analysis' or 'finish'")
+                raise SystemExit
 
 
     def run_pipeline(self):
@@ -562,6 +569,6 @@ class RunSnpDetection(object):
                         mode = self.pipeline, run_kraken = self.run_kraken, kraken2_db = self.kraken_db,
                         contigs = contigs_file, cpus = cpus, config = config, assembler = self.assembler, 
                         mask_string = self.mask, reference = reference, run_iqtree = run_iqtree,profile = self.profile,
-                        outdir = self.job_id, isolates = isolates_list, day = self.day, user = self.user, 
-                        species = self.abritamr_args, gubbins = self.gubbins, blast_db = self.blast_db, data_dir = self.data_dir)
+                        isolates = isolates_list, day = self.day, user = self.user, 
+                        species = self.abritamr_args, gubbins = self.gubbins, blast_db = self.blast_db, data_dir = self.data_dir, job_id = self.job_id)
         self._run_cmd(cmd)

@@ -2,13 +2,13 @@
 import pathlib, subprocess, argparse, datetime, pandas, re, numpy, jinja2, json, csv
 from Bio import SeqIO
 
-def _write_tables(table, wd, job_id, link):
+def _write_tables(table, wd, link):
     '''
     Write a table, given a tab delimited file generate a html string
     '''
     # TODO add class isolate id to <tr>
     # TODO add class distances-isolate to tr if matrix and head-isolate to head td
-    path =  f"{pathlib.Path(wd, job_id,'report', table)}"
+    path =  f"{pathlib.Path(wd, 'report', table)}"
     
     data = open(path).readlines()
     # for header
@@ -56,7 +56,7 @@ def _write_tables(table, wd, job_id, link):
     else:
         return f"<th>No results to display</th>",f"<tr><td></td></tr>"
 
-def _get_tree_string(pipeline, wd, job_id, phylo):
+def _get_tree_string(pipeline, wd,phylo):
     '''
     Generate a tree image from a newick
     input:
@@ -64,7 +64,7 @@ def _get_tree_string(pipeline, wd, job_id, phylo):
     output:
         string reporesentation of the path to the tree image
     '''
-    tree_file = pathlib.Path(wd, job_id,'report','preview.newick') if pipeline == 'preview' else pathlib.Path(wd, job_id, 'report','core.newick')
+    tree_file = pathlib.Path(wd, 'report','preview.newick') if pipeline == 'preview' else pathlib.Path(wd, 'report','core.newick')
     if tree_file.exists() and phylo == 'true':
         with open(f"{tree_file}", 'r') as t:
             tree = t.read().strip()
@@ -87,7 +87,7 @@ def _get_offset(reference):
     # print(d)
     return d, offset
 
-def _plot_snpdensity(reference,wd, job_id, isos):
+def _plot_snpdensity(reference,wd, isos):
 
     '''
     generate a snp-density accross the genome plot - using the core.tab file
@@ -106,7 +106,7 @@ def _plot_snpdensity(reference,wd, job_id, isos):
     # collate all snps in snps.tab
     for i in isos:
         # open snps.tab
-        snps = pathlib.Path(wd, job_id, i, 'snps.tab')
+        snps = pathlib.Path(wd, i, 'snps.tab')
         if snps.exists():
             with open(snps, 'r') as s:
                 reader = csv.DictReader(s, delimiter = '\t')
@@ -136,7 +136,7 @@ def _plot_snpdensity(reference,wd, job_id, isos):
     return list(_snp_dict.keys()), list(_snp_dict.values())
 
 
-def _plot_distances(wd, job_id):
+def _plot_distances(wd):
 
     '''
     generate a snp-density plot - using the distacnes.tab file
@@ -146,7 +146,7 @@ def _plot_distances(wd, job_id):
         :distancescript: the javascript string for insert into html
         :distancesdiv: the html div for inster in html doc
     '''
-    distance = f"{pathlib.Path(wd, job_id, 'report','distances.tab')}"
+    distance = f"{pathlib.Path(wd, 'report','distances.tab')}"
 
     df = pandas.read_csv(distance, sep = '\t')
     # get a list of isolate names
@@ -161,8 +161,8 @@ def _plot_distances(wd, job_id):
     
     return(list(melted_df['value']))
 
-def _get_pan_genome(image, wd, job_id):
-    path = pathlib.Path(wd, job_id, 'report', image)
+def _get_pan_genome(image, wd):
+    path = pathlib.Path(wd, 'report', image)
     print(path)
     if path.exists():
         with open(f"{path}", 'r') as f:
@@ -170,20 +170,20 @@ def _get_pan_genome(image, wd, job_id):
     else:
         return ''
 
-def _fill_vals(td, pipeline, wd, job_id):
+def _fill_vals(td, pipeline, wd):
 
     for t in range(len(td)):
         print(td[t])
         # TODO if table add a modal modal + link and link will be title lowercase with hyphen
         if td[t]['type'] == 'table':
-            td[t]['head'], td[t]['body'] = _write_tables(table=td[t]['file'], wd = wd, job_id=job_id, link = td[t]['link'])
+            td[t]['head'], td[t]['body'] = _write_tables(table=td[t]['file'], wd = wd, link = td[t]['link'])
             # if td[t]['body'] == 'No data':
             #     to_remove.append(t)
         if td[t]['type'] == 'pan':
-            td[t]['head'], td[t]['body'] = _write_tables(table=td[t]['file'], wd = wd, job_id=job_id, link = td[t]['link'])
-            td[t]['image'] = _get_pan_genome(image = td[t]['image'], wd = wd, job_id=job_id)
+            td[t]['head'], td[t]['body'] = _write_tables(table=td[t]['file'], wd = wd,  link = td[t]['link'])
+            td[t]['image'] = _get_pan_genome(image = td[t]['image'], wd = wd)
         if td[t]['type'] == 'matrix':
-            td[t]['head'], td[t]['body'] = _write_tables(table=td[t]['file'], wd = wd, job_id=job_id, link = td[t]['link'])
+            td[t]['head'], td[t]['body'] = _write_tables(table=td[t]['file'], wd = wd, link = td[t]['link'])
             # snpdistances = plot_distances()
     # print(to_remove)
     # print(td[9])
@@ -227,9 +227,9 @@ def _get_isos(wd, iso_list):
         isos = f.read().strip().split('\n')
     
     return isos
-def _get_versions(wd, job_id):
+def _get_versions(wd):
 
-    p = pathlib.Path(wd, job_id, 'report', 'software_versions.txt')
+    p = pathlib.Path(wd, 'report', 'software_versions.txt')
     if p.exists():
         with open(f"{p}", 'r') as f:
             data = f.read().strip().split('\n')
@@ -252,7 +252,8 @@ def _compile(args):
     indexhtml = pathlib.Path(args.template_dir,'index.html') 
     # initialise dictionary
     # data is the dictionary passed to jinja2 to fill html
-    versions_head,versions_body = _get_versions(wd = args.launchdir, job_id = args.job_id)
+    versions_head,versions_body = _get_versions(wd = args.launchdir
+    )
     data = {
         'newick' :'',
         'snpdensity':{},
@@ -280,21 +281,16 @@ def _compile(args):
     data['modaltables'] = modaltables
     data['display'] = display
     
-    data['newick'] = _get_tree_string(pipeline = args.pipeline, wd = args.launchdir, job_id = args.job_id, phylo = args.iqtree)
+    data['newick'] = _get_tree_string(pipeline = args.pipeline, wd = args.launchdir, phylo = args.iqtree)
         # print(td)
     
-    # generate_summary(wd = wd, job_id = job_id)
-        # print(isos)
-        # get_software_file(pipeline = pipeline, assembler = assembler)  
     if args.pipeline not in ['preview']:
-        data['snpdensity_x'],data['snpdensity_y']= _plot_snpdensity(reference = args.reference,wd = args.launchdir, job_id = args.job_id, isos = isos)
+        data['snpdensity_x'],data['snpdensity_y']= _plot_snpdensity(reference = args.reference,wd = args.launchdir,  isos = isos)
     
     if len(isos) > 1 and args.pipeline != 'preview':
-        data['snpdistances']= _plot_distances(wd = args.launchdir, job_id = args.job_id)
-    
+        data['snpdistances']= _plot_distances(wd = args.launchdir)
 
-# newick = newick, display = display,tables = tables,td = td, job_id = job_id, pipeline = pipeline, snpdistances=snpdistances, snpdensity = snpdensity, modaltables = modaltables, date = date
-    td = _fill_vals(td=td, pipeline = args.pipeline, wd = args.launchdir, job_id=args.job_id)
+    td = _fill_vals(td=td, pipeline = args.pipeline, wd = args.launchdir)
     if f"{args.iqtree}" == 'false':
         for t in td:
             if t['title'] == "Phylogeny":
@@ -326,7 +322,8 @@ def set_parsers():
         default = '')
     parser.add_argument('--job_id',
         help='',
-        default = '')
+        default = '',
+        nargs='+')
     parser.add_argument('--isolates',
         help = '',
         default = '')
