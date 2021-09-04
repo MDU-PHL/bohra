@@ -147,19 +147,21 @@ def _plot_distances(wd):
         :distancesdiv: the html div for inster in html doc
     '''
     distance = f"{pathlib.Path(wd, 'report','distances.tab')}"
-
-    df = pandas.read_csv(distance, sep = '\t')
-    # get a list of isolate names
-    names = list(df.columns[1:len(df.columns)])
-    col1 = df.columns[0]
-    
-    # if the there is no snp in the isolate (ie same as ref then mak na - then easy to drop)
-    
-    # collect positions to get allow for histogram and dropna (no snp)
-    melted_df = pandas.melt(df, id_vars=[col1], value_vars=names)
-    melted_df = melted_df[melted_df[col1]!= melted_df['variable']]
-    
-    return(list(melted_df['value']))
+    try:
+        df = pandas.read_csv(distance, sep = '\t')
+        # get a list of isolate names
+        names = list(df.columns[1:len(df.columns)])
+        col1 = df.columns[0]
+        
+        # if the there is no snp in the isolate (ie same as ref then mak na - then easy to drop)
+        
+        # collect positions to get allow for histogram and dropna (no snp)
+        melted_df = pandas.melt(df, id_vars=[col1], value_vars=names)
+        melted_df = melted_df[melted_df[col1]!= melted_df['variable']]
+        
+        return(list(melted_df['value']))
+    except:
+        return []
 
 def _get_pan_genome(image, wd):
     path = pathlib.Path(wd, 'report', image)

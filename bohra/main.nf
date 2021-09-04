@@ -36,8 +36,9 @@ reference = Channel.fromPath( "${params.reference}")
 reads = Channel.fromFilePairs(["${params.outdir}/*/*_R{1,2}*.f*q.gz","${params.outdir}/*/*_{1,2}.f*q.gz"])
                 .filter { sample, files -> samples.contains(files[0].getParent().getName())}
                 .map { sample, files -> tuple([id: files[0].getParent().getName(), single_end:false, contigs: contigs[files[0].getParent().getName()]], files)}
-
-
+println reads.view()
+blast_db = Channel.fromPath("${params.blast_db}")
+pubmlst_db = Channel.fromPath("${params.data_dir}")
 
 workflow {
     
@@ -68,7 +69,7 @@ workflow {
         } else {
             tree = Channel.empty().ifEmpty('EmptyFile')
         }
-        RUN_ASSEMBLE ( reads )
+        RUN_ASSEMBLE ( reads, blast_db,pubmlst_db )
         if (params.mode == 'all') {
             RUN_ROARY( RUN_ASSEMBLE.out.gff.map { cfg, gff -> gff }.collect() )
             svg = RUN_ROARY.out.svg
@@ -95,10 +96,5 @@ workflow {
             COLLATE_KRAKEN ( RUN_KRAKEN.out.species.map { cfg, species -> species }.collect() )
             results = results.concat( COLLATE_KRAKEN.out.collated_species )
         }
-    WRITE_HTML ( results.collect() )
-    
-    
-    
-                                
-                
+    WRITE_HTML ( results.collect() ) 
 }

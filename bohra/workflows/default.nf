@@ -71,6 +71,8 @@ workflow RUN_ASSEMBLE {
 
     take:
         reads
+        blast_db
+        pubmlst_db
     main:
     if ( params.assembler == 'shovill'){
         SHOVILL ( reads )   
@@ -87,7 +89,8 @@ workflow RUN_ASSEMBLE {
         ABRITAMR ( contigs )
         ab = ABRITAMR.out.abritamr_matches.join( ABRITAMR.out.abritamr_partials )
         COMBINE_AMR( ab )
-        MLST ( contigs )
+        cntg = contigs.combine( blast_db )
+        MLST ( cntg.combine( pubmlst_db ) )
         ADD_HEADER_MLST ( MLST.out.mlst)
         PROKKA ( contigs )
         // add new processes that generate outputs
