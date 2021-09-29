@@ -28,13 +28,14 @@ process ABRITAMR {
     tuple val(meta), path("summary_virulence.txt"), emit: abritamr_virulence
     tuple val(meta),path('summary_matches.txt'), emit: abritamr_matches
     tuple val(meta),path('summary_partials.txt'), emit: abritamr_partials
+    tuple val(meta),path('amrfinder.out'), emit: amrfinder_out
 
     script:
     
     def organism = params.species_options.any { it.contains(params.species) } ? "-sp $params.species": ""
     """
     abritamr run -c $contigs -px ${meta.id} -j $task.cpus $organism
-    cp ${meta.id}/*.txt .
+    cp ${meta.id}/* .
     """
 }
 
