@@ -34,7 +34,13 @@ process SNIPPY {
 
     script:
     """
-    snippy --outdir ${meta.id} --R1 ${reads[0]} --R2 ${reads[0]} --reference $reference --force --cpus $task.cpus
+    snippy --outdir ${meta.id} \\
+    --R1 ${reads[0]} --R2 ${reads[0]} \\
+    --reference $reference \\
+    --mapqual ${params.minmap} --basequal ${params.basequal} \\
+    --mincov ${params.mincov} --minfrac ${params.minfrac} \\
+    --minqual ${params.minqual} \\
+    --force --cpus $task.cpus
     """
     
 }

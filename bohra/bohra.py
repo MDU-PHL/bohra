@@ -58,11 +58,11 @@ def main():
     parser_run.add_argument('--pipeline','-p', default = 'preview', choices=['preview','default','all'], help=f"The pipeline to run. `preview` - generates a rapid tree using mash distances | `default` - runs snippy, phylogenetic tree (if > 3 sequences), assemblies, mlst and amr gene detection | `all` - same as default but includes roary pangenome analysis")
     parser_run.add_argument('--assembler','-a', default = 'spades', choices=['shovill','skesa','spades'], help=f"Assembler to use.")
     parser_run.add_argument('--cpus',help='Number of max CPU cores to run, will define how many rules are run at a time, if 0 then the avail cpus will be determined at time of launch', default=0) # need to change
-    parser_run.add_argument('--minmap','-mp',help='Snippy - minimum read mapping quality to consider.', default='snippy deafults (60)')
-    parser_run.add_argument('--basequal','-bq',help='Snippy - Minimum base quality to consider.', default='snippy deafults (13)')
-    parser_run.add_argument('--minqual','-mq',help='Snippy - minumum QUALITY in VCF column 6', default='snippy default (100)')
-    parser_run.add_argument('--minfrac','-mf',help='Snippy - minumum proportion for variant evidence ', default='snippy default (auto)')
-    parser_run.add_argument('--mincov','-mc',help='Snippy - minimum site depth to for calling alleles.', default='snippy defaults (10)')
+    parser_run.add_argument('--minmap','-mp',help='Snippy - minimum read mapping quality to consider.', default='60')
+    parser_run.add_argument('--basequal','-bq',help='Snippy - Minimum base quality to consider.', default='13')
+    parser_run.add_argument('--minqual','-mq',help='Snippy - minumum QUALITY in VCF column 6', default='100')
+    parser_run.add_argument('--minfrac','-mf',help='Snippy - minumum proportion for variant evidence ', default='0')
+    parser_run.add_argument('--mincov','-mc',help='Snippy - minimum site depth to for calling alleles.', default='10')
     parser_run.add_argument('--workdir','-w', default = f"{pathlib.Path.cwd().absolute()}", help='The directory where Bohra will be run, default is current directory') # don't need this
     parser_run.add_argument('--force','-f', action="store_true", help = "Add if you would like to force a complete restart of the pipeline. All previous logs will be lost.")
     parser_run.add_argument('--no_phylo',action="store_true", help = "Set if you do NOT want to generate a phylogentic tree.")

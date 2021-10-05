@@ -39,7 +39,7 @@ reads = Channel.fromFilePairs(["${params.outdir}/*/*_R{1,2}*.f*q.gz","${params.o
 
 blast_db = Channel.fromPath("${params.blast_db}")
 pubmlst_db = Channel.fromPath("${params.data_dir}")
-
+println params.minmap
 workflow {
     
     include { READ_ANALYSIS;RUN_KRAKEN } from './workflows/common'
