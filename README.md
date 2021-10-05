@@ -122,7 +122,7 @@ pip3 install bohra
 Check that all dependencies are installed.
 
 ```
-bohra --check
+bohra check
 ```
 
 *IMPORTANT*
@@ -151,7 +151,7 @@ export KRAKEN_DEFAULT_DB=$HOME/minikraken2_v2_8GB_201904_UPDATE
 #### Using CLI
 
 ```
-$ bohra -h
+$ bohra run -h
 
 Bohra - a bacterial genomics pipeline - version 2.0.0
 
@@ -257,7 +257,7 @@ Phage masking is important for to prevent the inflation of SNPs that can be intr
 `bohra` preview mode uses `mash` to calculate mash distances between isolates and generate a mash tree to rapidly identify outliers in your dataset or identify clades of interest for a more focused analysis.
 
 ```
-bohra -i input.tab -r ref.fa -p preview -j job_id
+bohra run -i input.tab -r ref.fa -p preview -j job_id
 ```
 
 ### Default
@@ -265,16 +265,16 @@ bohra -i input.tab -r ref.fa -p preview -j job_id
 Default mode will perform SNP detection, assemblies (if contigs file not provided), mlst, abritamr and phylogeny (unless `--no_phylo` or < 4 samples used as input).
 
 ```
-bohra -i input.tab -c contigs.tab -r ref.fa -p default -j job_id
+bohra run -i input.tab -c contigs.tab -r ref.fa -p default -j job_id
 ```
 
 
-### All
+### Plus pangenome
 
-In addition to the default mode above, `all` will also run `roary` . If less than 4 samples are provided, roary will not be run and pipeline will revert to `default`
+In addition to the default mode above, `all` will also run `panaroo` . If less than 4 samples are provided, `panaroo` will not be run and pipeline will revert to `default`
 
 ```
-bohra -i input.tab -c contigs.tab -r ref.fa -p all -j job_id
+bohra run -i input.tab -c contigs.tab -r ref.fa -p pluspan -j job_id
 ```
 
 ### Profile
