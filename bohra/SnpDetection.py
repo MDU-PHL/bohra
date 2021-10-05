@@ -1,6 +1,7 @@
 import pathlib
 import os, getpass, shutil, re, psutil
 import pandas
+# from bohra.bohra import check_deps
 import sh
 import logging
 import filecmp
@@ -40,90 +41,54 @@ class RunSnpDetection(object):
         self.day = datetime.datetime.today().strftime('%Y-%m-%d')
         self.script_path = f"{pathlib.Path(__file__).parent}"
         # get the working directory
+        
         self.assembler = args.assembler
         self.kraken_db = args.kraken_db
         self.blast_db = args.blast_db
         self.data_dir = args.data_dir
-        self.workdir = pathlib.Path(args.workdir)
-        self.check = args.check
-        if not self.check:
-            LOGGER.info(f"\033[1mBohra is being run in {self.workdir} by {self.user} on {self.day}.\033[0m")
-            
-            # path to pipeline resources
-            self.pipeline = args.pipeline
-            self.preview = True if self.pipeline == 'preview' else False
-            LOGGER.info(f"You are running bohra in {self.pipeline} mode.")
-            self.job_id =args.job_id
-            LOGGER.info(f"Job ID is set {self.job_id}")
-            # path to reference and mask
-            self.ref = pathlib.Path(args.reference)
-            # LOGGER.info(f"The reference is {self.ref}")
-            # self.link_file(self.ref)
-            self.mask = args.mask
-            # path to input file
-            if args.input_file == '':
-                LOGGER.critical('`read` file can not be empty, please set -r path_to_input to try again')
-                raise SystemExit()
-            else:
-                self.reads = pathlib.Path(args.input_file)
-            self.contigs = args.contigs
-
-            self.keep = True if args.keep == 'Y' else False
-            # self.gubbins = args.gubbins 
-            # other variables
-            # min aln 
-            self.minaln = args.minaln
-            self.mincov = args.mincov
-            self.minqual = args.minqual
-            
-            self.gubbins = args.gubbins
-            self.force = args.force        
-            self.cpus = args.cpus
-            self.config = args.config
-            self.profile_config = os.getenv('BOHRA_PROFILES','')
-            self.profile = self._get_profile() if args.profile == '' else args.profile
-            # kraken db settings
-            self.run_kraken = False
-            self.no_phylo = args.no_phylo
-            self.abritamr_args = args.abritamr_args
-            self.proceed = args.proceed
-            
-            
-    # def run_with_gubbins(self):
-    #     '''
-    #     rename core and distance files
-    #     '''
-    #     if self.gubbins:
-    #         LOGGER.info(f"You have chosen to run gubbins. Existing core files will be archived and not removed.")
-    #         corefiles = sorted(pathlib.Path(self.workdir, self.job_id).glob('core*'))
-    #         if corefiles:
-    #             for core in corefiles:
-    #                 new = f"{core}".replace('core', 'core_uncorrected')
-    #                 cmd = f"mv {core} {new}"
-    #                 subprocess.run(cmd,shell = True)
-    #         dists = pathlib.Path(self.workdir,self.job_id, 'distances.tab')
-    #         new_dists = f"{dists}".replace('distances', 'distances_uncorrected')
-    #         if dists.exists():
-    #             cmd = f"mv {dists} {new_dists}"
-    #             subprocess.run(cmd,shell = True)
-    #         self.keep = True
-    
-    # def rerun_report(self):
-    #     '''
-    #     Remove report directory from previous run 
-    #     '''
-    #     # os.chdir(self.workdir)
+        self.workdir = pathlib.Path(args.workdir)        
+        LOGGER.info(f"\033[1mBohra is being run in {self.workdir} by {self.user} on {self.day}.\033[0m")
         
-    #     p1 = pathlib.Path(self.workdir, self.job_id, 'report')
-    #     p2 = pathlib.Path(self.workdir, self.job_id, f"report_archived_{self.day}")
-    #     if self.keep:
-    #         LOGGER.info(f"Archiving previous report files")
-    #         cmd = f"mv {p1} {p2}"
-    #         self.remove_core()
-    #     else:
-    #         LOGGER.info("Removing previous report files.")
-    #         cmd = f"if [ -d {p1} ];then rm -r {p1}; fi"
-    #     subprocess.run(cmd, shell = True)
+        # path to pipeline resources
+        self.pipeline = args.pipeline
+        self.preview = True if self.pipeline == 'preview' else False
+        LOGGER.info(f"You are running bohra in {self.pipeline} mode.")
+        self.job_id =args.job_id
+        LOGGER.info(f"Job ID is set {self.job_id}")
+        # path to reference and mask
+        self.ref = pathlib.Path(args.reference)
+        # LOGGER.info(f"The reference is {self.ref}")
+        # self.link_file(self.ref)
+        self.mask = args.mask
+        # path to input file
+        if args.input_file == '':
+            LOGGER.critical('`read` file can not be empty, please set -r path_to_input to try again')
+            raise SystemExit()
+        else:
+            self.reads = pathlib.Path(args.input_file)
+        self.contigs = args.contigs
+
+        self.keep = True if args.keep == 'Y' else False
+        # self.gubbins = args.gubbins 
+        # other variables
+        # min aln 
+        self.minaln = args.minaln
+        self.mincov = args.mincov
+        self.minqual = args.minqual
+        
+        self.gubbins = args.gubbins
+        self.force = args.force        
+        self.cpus = args.cpus
+        self.config = args.config
+        self.profile_config = os.getenv('BOHRA_PROFILES','')
+        self.profile = self._get_profile() if args.profile == '' else args.profile
+        # kraken db settings
+        self.run_kraken = False
+        self.no_phylo = args.no_phylo
+        self.abritamr_args = args.abritamr_args
+        self.proceed = args.proceed
+        
+        
     
     def _get_profile(self):
 
@@ -269,34 +234,37 @@ class RunSnpDetection(object):
             return False
         
 
-    def _check_kraken2DB(self):
+    def _check_kraken2DB(self, checking = False):
         '''
         ensure that DB is present and not emtpy
         '''
-        LOGGER.info(f'Searching for kraken2 DB {self.kraken_db}')
-        if self.kraken_db == 'KRAKEN2_DEFAULT_DB':
+        
+        LOGGER.info(f'Searching for kraken2 DB:  $KRAKEN2_DEFAULT_DB')
+        if os.getenv('KRAKEN2_DEFAULT_DB'):
             try: # check that there is an environment value set for kraken2 db
                 k2db = pathlib.Path(os.environ["KRAKEN2_DEFAULT_DB"])
-                LOGGER.info(f"You are using the deafult kraken2 database at : {os.environ['KRAKEN2_DEFAULT_DB']}")
+                LOGGER.info(f"You are using the default kraken2 database at : {os.environ['KRAKEN2_DEFAULT_DB']}")
                 if self._check_kraken2_files(k2db = k2db):
                     self.kraken_db = f"{k2db}"
                     # LOGGER.info(f"You are using the deafult kraken2 database at : {os.environ['KRAKEN2_DEFAULT_DB']}")
+                LOGGER.info(f"Congratulations your kraken database is present and all files are present.")
 
             except KeyError:
+                LOGGER.critical(f"It seems that your settings for the kraken DB are incorrect, speciation will not be performed.")
                 self.run_kraken = False # don't run kraken
         
         else:
-            LOGGER.info('You are attempting to use a custom kraken2 DB. This is pretty advanced, good luck!')
-            if pathlib.Path(self.kraken_db).exists():
-                LOGGER.info(f"{self.kraken_db} has been found.")
-                self.check_kraken2_files(k2db = self.kraken_db)
+            
+            if not checking:
+                if pathlib.Path(self.kraken_db).exists():
+                    LOGGER.info(f"{self.kraken_db} has been found.")
+                    self.check_kraken2_files(k2db = self.kraken_db)
+                else:
+                    LOGGER.critical(f"It seems that your settings for the kraken DB are incorrect, speciation will not be performed.")           
+                    self.run_kraken = False
             else:
-                LOGGER.warning(f"It seems that your settings for the kraken DB are incorrect.")           
+                LOGGER.warning('You do not have a default kraken2 DB. You have 4 options \n1). bohra run --kraken_db to point to a specific directory \n2). do not perform speciation \n3). set a KRAKEN2_DEFAULT_DB environment variable or 4). use bohra krakendb_download.')
         
-        if self.run_kraken:
-            LOGGER.info(f"Congratulations your kraken database is present")  
-        else:
-            LOGGER.warning(f"kraken DB is not installed in the expected path. Speciation will not be performed.")
 
     def _get_db(self, _type):
 
@@ -340,7 +308,7 @@ class RunSnpDetection(object):
             LOGGER.critical(f"{software} is not installed, please check dependencies and try again.")
             raise SystemExit
     
-    def check_dependencies(self):
+    def check_dependencies(self, checking):
 
         
         software = {
@@ -382,14 +350,15 @@ class RunSnpDetection(object):
                 LOGGER.critical(f"{sft} is not installed.")
                 raise SystemExit
         LOGGER.info(f"Now checking kraken2 DB")
-        self._check_kraken2DB()
+        self._check_kraken2DB(checking = checking)
         software_versions.append(f"kraken2 DB: {self.kraken_db}")
-
-        self._check_mlstdb()
-        software_versions.append(f"mlst blast db: {self.blast_db}")
-        software_versions.append(f"mlst data dir: {self.data_dir}")
+        if not checking:
+            print(checking)
+            self._check_mlstdb()
+            software_versions.append(f"mlst blast db: {self.blast_db}")
+            software_versions.append(f"mlst data dir: {self.data_dir}")
         # write software_versions.tab
-        if not self.check:
+        
             LOGGER.info(f"Writing software_versions.txt")
             if not pathlib.Path('report').exists():
                 subprocess.run(f"mkdir -p report", shell = True)
@@ -526,7 +495,7 @@ Please select a mode to run, choices are 'analysis' or 'finish'")
         run pipeline, if workflow runs to completion print out a thank you message.
         '''
         # run checks for inputs
-        self.check_dependencies()
+        self.check_dependencies(checking=False)
         # input files
         reads = self._check_reads(reads = self.reads)
         contigs = self._check_contigs(contigs = self.contigs)
@@ -574,3 +543,16 @@ Please select a mode to run, choices are 'analysis' or 'finish'")
                         isolates = isolates_list, day = self.day, user = self.user, 
                         species = self.abritamr_args, gubbins = self.gubbins, blast_db = self.blast_db, data_dir = self.data_dir, job_id = self.job_id)
         self._run_cmd(cmd)
+
+class CheckBohra(RunSnpDetection):
+
+    def __init__(self):
+        
+        # user
+        self.user = getpass.getuser()
+        # get date and time
+        self.now = datetime.datetime.today().strftime("%d_%m_%y_%H")
+        self.day = datetime.datetime.today().strftime('%Y-%m-%d')
+        self.script_path = f"{pathlib.Path(__file__).parent}"
+        self.check = True
+        self.check_dependencies(checking = self.check)

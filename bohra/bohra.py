@@ -17,7 +17,7 @@ import pathlib
 import sys
 import os
 import shutil
-from bohra.SnpDetection import RunSnpDetection
+from bohra.SnpDetection import RunSnpDetection, CheckBohra
 from bohra.version import version
 
 
@@ -29,12 +29,12 @@ def run_pipeline(args):
     R = RunSnpDetection(args)
     return(R.run_pipeline())
 
-def check_deps(args):
+def check_deps():
     """
     check that dependencies are all installed
     """
-    R = RunSnpDetection(args)
-    return(R.check())
+    C = CheckBohra()
+    
     
 def main():
     # setup the parser
@@ -47,7 +47,7 @@ def main():
     # run bohra pipeline
     parser_run = subparsers.add_parser('run', help='Run bohra', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    # parser_run.add_argument('--check',action="store_true", help = "Check that dependencies are installed correctly.")
+    parser_run.add_argument('--check',action="store_true", help = "Check that dependencies are installed correctly.")
     parser_run.add_argument('--input_file','-i',help='Path to reads file, which is a tab-delimited with 3 columns <isolatename>  <path_to_read1> <path_to_read2>. REQUIRED', default='')
     parser_run.add_argument('--contigs','-c',help='Path to contigs file, which is a tab-delimited with 3 columns <isolatename>  <path_to_contigs>. OPTIONAL if you already have assemblies.', default='')
     parser_run.add_argument('--job_id','-j',help='Job ID is the name that will be displayed on your report', default='Bohra microbial genomics pipeline')
@@ -84,7 +84,8 @@ def main():
     
     if len(sys.argv) <= 2 and sys.argv[1] != 'check':
         parser.print_help(sys.stderr)
-    
+    elif sys.argv[1] == 'check':
+        check_deps()
     else:
         # logger = logging.getLogger(__name__)
         # logger.setLevel(logging.INFO)
