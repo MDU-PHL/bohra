@@ -491,7 +491,7 @@ class RunSnpDetection(object):
         
         return ' '.join(snippy_opts)
         
-    def _generate_cmd(self, min_cov, min_aln,min_qscore, mode, run_kraken, kraken2_db,assembler, mask_string, reference, 
+    def _generate_cmd(self, mode, run_kraken, kraken2_db,assembler, mask_string, reference, 
                         isolates, user, day, contigs, run_iqtree, species, cpus, config, profile, gubbins,blast_db,data_dir, job_id):
         
         stub = f"nextflow {self.script_path}/main.nf"
@@ -568,8 +568,7 @@ Please select a mode to run, choices are 'analysis' or 'finish'")
             cpus = ''
         
          
-        cmd = self._generate_cmd(min_cov = self.mincov, min_aln = self.minaln, min_qscore = self.minqual, 
-                        mode = self.pipeline, run_kraken = self.run_kraken, kraken2_db = self.kraken_db,
+        cmd = self._generate_cmd(mode = self.pipeline, run_kraken = self.run_kraken, kraken2_db = self.kraken_db,
                         contigs = contigs_file, cpus = cpus, config = config, assembler = self.assembler, 
                         mask_string = self.mask, reference = reference, run_iqtree = run_iqtree,profile = self.profile,
                         isolates = isolates_list, day = self.day, user = self.user, 

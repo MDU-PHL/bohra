@@ -19,14 +19,16 @@ process PANAROO {
 
     output:
     path('summary_statistics.txt'), emit: roary_summary
-    path('gene_presence_absence.csv'), emit: roary_csv
+    path('gene_presence_absence_roary.csv'), emit: roary_csv
+    // path('panaroo/*')
 
     script:
     def gffs_str = gffs.join(' ')
     """
     mkdir results
-    panaroo -i *.gff -o results --clean-mode strict
-    csvtk add-header -t -T -n 'Genes,Range,Total' roary/summary_statistics.txt > summary_statistics.txt
-    cp roary/gene_presence_absence.csv .
+    panaroo -i *.gff -o panaroo --clean-mode strict
+    csvtk add-header -t -T -n 'Genes,Range,Total' panaroo/summary_statistics.txt > summary_statistics.txt
+    cp panaroo/gene_presence_absence_roary.csv .
+    ln -sf panaroo $launchDir/
     """
 }
