@@ -2,12 +2,12 @@ import pathlib
 import os, getpass, shutil, re, psutil
 import pandas
 # from bohra.bohra import check_deps
-import sh
+# import sh
 import logging
-import filecmp
+# import filecmp
 import datetime
-import numpy
-import itertools
+# import numpy
+# import itertools
 import subprocess
 import json
 from packaging import version
@@ -69,12 +69,12 @@ class RunSnpDetection(object):
         self.contigs = args.contigs
 
         self.keep = True if args.keep == 'Y' else False
-        # self.gubbins = args.gubbins 
-        # other variables
-        # min aln 
-        self.minaln = args.minaln
+        # snippy args
+        self.minmap = args.minmap
         self.mincov = args.mincov
+        self.basequal = args.basequal
         self.minqual = args.minqual
+        self.minfrac = args.minfrac
         
         self.gubbins = args.gubbins
         self.force = args.force        
@@ -82,7 +82,6 @@ class RunSnpDetection(object):
         self.config = args.config
         self.profile_config = os.getenv('BOHRA_PROFILES','')
         self.profile = self._get_profile() if args.profile == '' else args.profile
-        # kraken db settings
         self.run_kraken = False
         self.no_phylo = args.no_phylo
         self.abritamr_args = args.abritamr_args
@@ -459,7 +458,39 @@ class RunSnpDetection(object):
         pathlib.Path(f"isolates.list").write_text('\n'.join(isolates_list))
         return f"isolates.list"
         
+    def _check_snippy_defaults(self, snippy_arg, val):
+        
+        _file = pathlib.Path(self.script_path, 'nextflow.config')
 
+        if _file.exists():
+            with open(f"{_file}", 'r') as fh:
+                lines = fh.readlines()
+                for line in lines:
+                    if snippy_arg in line:
+                        default_val = line.split('=')[-1].strip().strip("\"")
+                        if f"{default_val}" == f"{val}":
+                            # LOGGER.info(f"You are using default setting for {snippy_arg}")
+                            return False
+                        else:
+                            LOGGER.info(f"You have elected to set your own value for {snippy_arg}. Good luck, we hope you know what you are doing ;)")
+                            return True
+
+    def _generate_snippy_params(self):
+        _dict = {
+                'mapqual': self.minmap,
+                'basequal': self.basequal,
+                'mincov':self.mincov,
+                'minfrac':self.minfrac,
+                'minqual':self.minqual
+                }
+        snippy_opts = []
+
+        for d in _dict:
+            if self._check_snippy_defaults(snippy_arg=d, val = _dict[d]):
+                snippy_opts.append(f"--{d} {_dict[d]}")
+        
+        return ' '.join(snippy_opts)
+        
     def _generate_cmd(self, min_cov, min_aln,min_qscore, mode, run_kraken, kraken2_db,assembler, mask_string, reference, 
                         isolates, user, day, contigs, run_iqtree, species, cpus, config, profile, gubbins,blast_db,data_dir, job_id):
         
@@ -467,7 +498,8 @@ class RunSnpDetection(object):
         resume = '' if self.force else "-resume"
         cpu = f'-executor.cpus={int(cpus)}' if cpus != '' else ''
         config = f'-c {config}' if config != '' else ''
-        parameters = f"--job_id {job_id} --min_cov {min_cov} --min_qscore {min_qscore} --min_aln {min_aln} --mode {mode} --run_iqtree {run_iqtree} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} --mask_string {mask_string} --reference {reference} --contigs_file {contigs} --species {species if species != '' else 'no_species'} --outdir {self.workdir} --isolates {isolates} --user {user} --day {day} --gubbins {gubbins} --blast_db {blast_db} --data_dir {data_dir}"
+        snippy_opts = self._generate_snippy_params()
+        parameters = f"--job_id {job_id} --mode {mode} --run_iqtree {run_iqtree} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} --mask_string {mask_string} --reference {reference} --contigs_file {contigs} --species {species if species != '' else 'no_species'} --outdir {self.workdir} --isolates {isolates} --user {user} --day {day} --gubbins {gubbins} --blast_db {blast_db} --data_dir {data_dir} {snippy_opts}"
         options = f"-with-report bohra_{day}_report.html -with-trace -profile {profile} {resume} {cpu} {config}"
 
         cmd = f"{stub} {parameters} {options}"
