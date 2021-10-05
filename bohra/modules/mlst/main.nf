@@ -24,7 +24,7 @@ process MLST {
 
     script:
     // def _blast_db = blast_db  ? "--blastdb ${blast_db}" : ""
-    // def _datadir = data_dir  ? "--datadir ${data_dir}" : ""
+    def exclude = params.mlst_exclude  ? "--exclude ${params.mlst_exclude}" : ""
     """
     mlst --csv --json mlst.json --label $meta.id --nopath $contigs --blastdb $params.blast_db --datadir $params.data_dir > mlst.csv
     """
