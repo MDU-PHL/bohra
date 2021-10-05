@@ -12,7 +12,7 @@ workflow RUN_ROARY {
         ROARY2SVG ( PANAROO.out.pangenome_csv )
     emit:
         svg = ROARY2SVG.out.pan_genome
-        roary = ROARY.out.pangenome_summary
+        roary = PANAROO.out.pangenome_summary
 
 }
 
