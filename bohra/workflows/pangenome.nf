@@ -3,7 +3,7 @@
 include { PANAROO } from './../modules/panaroo/main' 
 include { ROARY2SVG } from './../modules/roary2svg/main' 
 
-workflow RUN_ROARY {   
+workflow RUN_PANAROO {   
 
     take:
         gff

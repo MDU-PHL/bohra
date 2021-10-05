@@ -3,9 +3,9 @@ import pathlib, subprocess, sys, pandas
 
 from Bio import SeqIO
                 
-HEADER = ["Isolate\tLength\tAligned\tUnaligned\tHeterozygous\tLow coverage\t% Aligned\tQuality"]
+HEADER = ["Isolate\tLength\tAligned\tUnaligned\tHeterozygous\tLow coverage\t% Aligned"]
 
-def check_snippy(isolate, minaln, aln):
+def check_snippy(isolate,aln):
     
     p = pathlib.Path(aln)
     fasta = p.open()
@@ -22,13 +22,13 @@ def check_snippy(isolate, minaln, aln):
     unaln = unaln + nocov + lowcov + het
     aln = length - unaln
     perc_aln = 100*(length - unaln) / length
-    quality = 'PASS' if perc_aln > float(minaln) else 'FAIL'
-    return length,aln, nocov, lowcov, het, unaln, perc_aln, quality
+    # quality = 'PASS' if perc_aln > float(minaln) else 'FAIL'
+    return length,aln, nocov, lowcov, het, unaln, perc_aln
 
-def main(inputs, isolate, output, minaln):
+def main(inputs, isolate, output):
 
-    length, aln, nocov, lowcov, het, unaln, perc_aln, quality = check_snippy(minaln = minaln, aln = inputs, isolate = isolate)
-    data = [isolate, length, aln, unaln,het,lowcov,round(perc_aln, 2),quality]
+    length, aln, nocov, lowcov, het, unaln, perc_aln= check_snippy(aln = inputs, isolate = isolate)
+    data = [isolate, length, aln, unaln,het,lowcov,round(perc_aln, 2)]
     data = [f"{d}" for d in data]
     data = "\t".join(data)
     HEADER.append(data)
@@ -42,4 +42,4 @@ isolate = sys.argv[1]
 output = sys.argv[3]
 minaln= sys.argv[4]
 
-main(inputs = inputs, isolate = isolate, output = output, minaln = minaln)
+main(inputs = inputs, isolate = isolate, output = output)

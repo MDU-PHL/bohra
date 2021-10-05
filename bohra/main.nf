@@ -39,14 +39,14 @@ reads = Channel.fromFilePairs(["${params.outdir}/*/*_R{1,2}*.f*q.gz","${params.o
 
 blast_db = Channel.fromPath("${params.blast_db}")
 pubmlst_db = Channel.fromPath("${params.data_dir}")
-println params.minmap
+
 workflow {
     
     include { READ_ANALYSIS;RUN_KRAKEN } from './workflows/common'
     include { PREVIEW_NEWICK } from './workflows/preview'
     include { COLLATE_KRAKEN;COLLATE_SEQS;WRITE_HTML } from './workflows/collation'
     // include { RUN_SNIPPY } from './workflows/snps'
-    include { RUN_ROARY } from './workflows/roary'
+    include { RUN_PANAROO } from './workflows/pangenome'
     include { RUN_ASSEMBLE;CONCAT_STATS;CONCAT_MLST;CONCAT_RESISTOMES;COLLATE_ASM_PROKKA;CONCAT_ASM;RUN_SNIPPY;RUN_CORE;RUN_IQTREE;CONCAT_VIRULOMES;CONCAT_CORE_STATS;CONCAT_PLASMID;RUN_GUBBINS } from './workflows/default'
     
 
@@ -70,9 +70,9 @@ workflow {
             tree = Channel.empty().ifEmpty('EmptyFile')
         }
         RUN_ASSEMBLE ( reads, blast_db,pubmlst_db )
-        if (params.mode == 'all') {
-            RUN_ROARY( RUN_ASSEMBLE.out.gff.map { cfg, gff -> gff }.collect() )
-            svg = RUN_ROARY.out.svg
+        if (params.mode == 'pluspan') {
+            RUN_PANAROO( RUN_ASSEMBLE.out.gff.map { cfg, gff -> gff }.collect() )
+            svg = RUN_PANAROO.out.svg
         } else {
             svg = Channel.empty().ifEmpty('EmptyFile')
         }

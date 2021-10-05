@@ -46,8 +46,7 @@ process COLLATE_STATS_ISOLATE {
     script:
     """
     ${module_dir}/collate_stats.py $meta.id $seqkit_stats  \
-    $seqkit_qual $launchDir/$params.reference ${params.min_qscore} \
-    ${params.min_cov} read_assessment.txt
+    $seqkit_qual $launchDir/$params.reference read_assessment.txt
     """
     
 }

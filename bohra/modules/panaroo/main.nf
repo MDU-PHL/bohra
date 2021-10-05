@@ -26,7 +26,7 @@ process PANAROO {
     def gffs_str = gffs.join(' ')
     """
     mkdir results
-    panaroo -i *.gff -o panaroo --clean-mode strict
+    panaroo -i $gffs_str -o panaroo --clean-mode strict
     csvtk add-header -t -T -n 'Genes,Range,Total' panaroo/summary_statistics.txt > summary_statistics.txt
     cp panaroo/gene_presence_absence_roary.csv .
     ln -sf panaroo $launchDir/
