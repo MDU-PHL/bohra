@@ -433,6 +433,7 @@ class RunSnpDetection(object):
         return f"{name}"
 
     def _setup_directory(self, reads):
+        
         isolates_list = []
         # if not pathlib.Path(self.job_id).exists():
         #     LOGGER.info(f"Creating job directory")
@@ -476,6 +477,7 @@ class RunSnpDetection(object):
                             return True
 
     def _generate_snippy_params(self):
+
         _dict = {
                 'mapqual': self.minmap,
                 'basequal': self.basequal,
