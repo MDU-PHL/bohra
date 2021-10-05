@@ -18,8 +18,8 @@ process PANAROO {
     val(gffs)
 
     output:
-    path('summary_statistics.txt'), emit: roary_summary
-    path('gene_presence_absence_roary.csv'), emit: roary_csv
+    path('summary_statistics.txt'), emit: pangenome_summary
+    path('gene_presence_absence_roary.csv'), emit: pangenome_csv
     // path('panaroo/*')
 
     script:
