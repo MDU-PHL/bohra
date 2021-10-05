@@ -74,7 +74,7 @@ def main():
     parser_run.add_argument('--gubbins',  action = 'store_true', help = 'Set to use gubbins for recombination correction.')
     parser_run.add_argument('--keep', default = 'N', choices= ['Y', 'N'], help = 'If you are rerunning bohra over an exisiting directory set --keep to \'Y\' to archive report files - otherwise previous reprot files will be removed.')
     
-    parser_check = subparsers.add_parser('run', help='Check bohra installation', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser_check = subparsers.add_parser('check', help='Check bohra installation', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser_run.set_defaults(func=run_pipeline)
     parser_check.set_defaults(func=check_deps)
@@ -82,7 +82,7 @@ def main():
         
     args = parser.parse_args()
     
-    if len(sys.argv) <= 2:
+    if len(sys.argv) <= 2 and sys.argv[1] != 'check':
         parser.print_help(sys.stderr)
     
     else:
