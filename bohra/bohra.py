@@ -47,7 +47,7 @@ def main():
     # run bohra pipeline
     parser_run = subparsers.add_parser('run', help='Run bohra', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-    parser_run.add_argument('--check',action="store_true", help = "Check that dependencies are installed correctly.")
+    # parser_run.add_argument('--check',action="store_true", help = "Check that dependencies are installed correctly.")
     parser_run.add_argument('--input_file','-i',help='Path to reads file, which is a tab-delimited with 3 columns <isolatename>  <path_to_read1> <path_to_read2>. REQUIRED', default='')
     parser_run.add_argument('--contigs','-c',help='Path to contigs file, which is a tab-delimited with 3 columns <isolatename>  <path_to_contigs>. OPTIONAL if you already have assemblies.', default='')
     parser_run.add_argument('--job_id','-j',help='Job ID is the name that will be displayed on your report', default='Bohra microbial genomics pipeline')
@@ -58,12 +58,14 @@ def main():
     parser_run.add_argument('--pipeline','-p', default = 'preview', choices=['preview','default','all'], help=f"The pipeline to run. `preview` - generates a rapid tree using mash distances | `default` - runs snippy, phylogenetic tree (if > 3 sequences), assemblies, mlst and amr gene detection | `all` - same as default but includes roary pangenome analysis")
     parser_run.add_argument('--assembler','-a', default = 'spades', choices=['shovill','skesa','spades'], help=f"Assembler to use.")
     parser_run.add_argument('--cpus',help='Number of max CPU cores to run, will define how many rules are run at a time, if 0 then the avail cpus will be determined at time of launch', default=0) # need to change
-    parser_run.add_argument('--minaln','-ma',help='Minimum percent alignment. Isolates which do not align to reference at this threshold will not be included in core phylogeny.', default=0)
-    parser_run.add_argument('--minqual','-mq',help='Minimum Avg quality of reads', default=0)
-    parser_run.add_argument('--mincov','-mc',help='Minimum percent alignment. Isolates which do not have average read coverage above this threshold will not be included further analysis.', default=0)
+    parser_run.add_argument('--minmap','-mp',help='Snippy - minimum read mapping quality to consider.', default='snippy deafults (60)')
+    parser_run.add_argument('--basequal','-bq',help='Snippy - Minimum base quality to consider.', default='snippy deafults (13)')
+    parser_run.add_argument('--minqual','-mq',help='Snippy - minumum QUALITY in VCF column 6', default='snippy default (100)')
+    parser_run.add_argument('--minfrac','-mf',help='Snippy - minumum proportion for variant evidence ', default='snippy default (auto)')
+    parser_run.add_argument('--mincov','-mc',help='Snippy - minimum site depth to for calling alleles.', default='snippy defaults (10)')
     parser_run.add_argument('--workdir','-w', default = f"{pathlib.Path.cwd().absolute()}", help='The directory where Bohra will be run, default is current directory') # don't need this
     parser_run.add_argument('--force','-f', action="store_true", help = "Add if you would like to force a complete restart of the pipeline. All previous logs will be lost.")
-    parser.add_argument('--no_phylo',action="store_true", help = "Set if you do NOT want to generate a phylogentic tree.")
+    parser_run.add_argument('--no_phylo',action="store_true", help = "Set if you do NOT want to generate a phylogentic tree.")
     parser_run.add_argument('--config', default = f"", help='An additional config file, required if running on a non-local machine, ie slurm, cloud. For help see documentation at https://github.com/MDU-PHL/bohra or https://www.nextflow.io/docs/latest/executor.html') # don't need this
     parser_run.add_argument('--profile', default = f"", help='The resource profile to use. Defaults to local, if using an alternative config file, this calue should represent the name of a profile provided') 
     parser_run.add_argument('--blast_db', default = f"{os.getenv('BLAST_DB', '')}", help='Path to the mlst blast_db, defaults to what is installed in the environment.') 
