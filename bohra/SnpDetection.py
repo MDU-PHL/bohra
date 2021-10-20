@@ -496,7 +496,7 @@ class RunSnpDetection(object):
     def _generate_cmd(self, mode, run_kraken, kraken2_db,assembler, mask_string, reference, 
                         isolates, user, day, contigs, run_iqtree, species, cpus, config, profile, gubbins,blast_db,data_dir, job_id):
         
-        stub = f"nextflow {self.script_path}/main.nf"
+        stub = f"nextflow -Dnxf.pool.type=sync run {self.script_path}/main.nf"
         resume = '' if self.force else "-resume"
         cpu = f'-executor.cpus={int(cpus)}' if cpus != '' else ''
         config = f'-c {config}' if config != '' else ''

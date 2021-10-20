@@ -19,14 +19,14 @@ process MLST {
     tuple val(meta), path(contigs), path(blast_db), path(pubmlst_db)
 
     output:
-    tuple val(meta), path('mlst.csv'), emit: mlst
+    tuple val(meta), path('mlst.txt'), emit: mlst
     tuple val(meta), path('mlst.json'), emit: json
 
     script:
     // def _blast_db = blast_db  ? "--blastdb ${blast_db}" : ""
     def exclude = params.mlst_exclude != '' ? "--exclude ${params.mlst_exclude}" : ""
     """
-    mlst --csv --json mlst.json --label $meta.id --nopath $contigs --blastdb $params.blast_db --datadir $params.data_dir $exclude > mlst.csv
+    mlst --json mlst.json --label $meta.id --nopath $contigs --blastdb $params.blast_db --datadir $params.data_dir $exclude > mlst.txt
     """
     
 }

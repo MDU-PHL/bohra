@@ -263,7 +263,7 @@ def _compile(args):
         'snpdensity_y':{},
         'snpdistances':{},
         'display':'',
-        'job_id':args.job_id,
+        'job_id':args.job_id[0],
         'pipeline':args.pipeline,
         'date':args.day,
         'user':args.user,

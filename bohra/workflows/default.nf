@@ -91,7 +91,7 @@ workflow RUN_ASSEMBLE {
         COMBINE_AMR( ab )
         cntg = contigs.combine( blast_db )
         MLST ( cntg.combine( pubmlst_db ) )
-        ADD_HEADER_MLST ( MLST.out.mlst)
+        ADD_HEADER_MLST ( MLST.out.json)
         PROKKA ( contigs )
         // add new processes that generate outputs
         MOBSUITE ( contigs )

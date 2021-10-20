@@ -1,15 +1,21 @@
 #!/usr/bin/env python3
-import pathlib, subprocess, sys, pandas, numpy
+import pathlib, subprocess, sys, pandas, numpy,json
 
 import pandas, pathlib
 
 
 _file = sys.argv[1]
 
-with open(_file, 'r') as f:
-    alleles = len(f.read().split(',')) - 3
+with open(_file, 'r') as j:
+    _d = json.load(j)
+    header = ['Isolate','Scheme','ST']
+    row = [_d[0]['id'],_d[0]['scheme'],_d[0]['sequence_type']]
+    als = sorted(list(_d[0]['alleles'].keys()))
+    for a in range(len(als)):
+        header.append(f'Allele {a + 1}')
+        row.append(f"{als[a]}({_d[0]['alleles'][als[a]]})")
+    
+    h = '\t'.join(header)
+    r = '\t'.join(row)
 
-allele_names = ','.join([ f"Allele {i+1}" for i in list(range(alleles))])
-
-cmd = f"csvtk add-header -T -n 'Isolate,Scheme,ST,{allele_names}' {_file} > mlst.txt"
-subprocess.run(cmd, shell = True)
+    pathlib.Path('mlst.txt').write_text('\n'.join([h,r]))
