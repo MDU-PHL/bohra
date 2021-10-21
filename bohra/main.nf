@@ -64,7 +64,7 @@ workflow {
             core_aln = RUN_GUBBINS.out.core_aln
         }
         if (params.run_iqtree ){
-            RUN_IQTREE ( core_aln,reference)
+            RUN_IQTREE ( core_aln, RUN_CORE.out.core_full_aln)
             tree = RUN_IQTREE.out.newick
         } else {
             tree = Channel.empty().ifEmpty('EmptyFile')

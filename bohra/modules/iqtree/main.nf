@@ -19,15 +19,15 @@ process IQTREE {
       
     input:
         path(aln)
-        path(reference)
+        path(full_aln)
 
     output:
         path('core.newick'), emit: newick
 
     script:    
     """
-    iqtree -fconst $(snp-sites -C $aln) \\
-    -s <(snp-sites -c $aln) -p core \\
+    iqtree -fconst \$(snp-sites -C $full_aln) \\
+    -s $aln -pre core \\
     -m GTR+G4 -bb 1000 -ntmax $task.cpus \\
     -nt AUTO -st DNA
     cp core.treefile core.newick

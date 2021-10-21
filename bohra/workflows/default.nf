@@ -61,9 +61,9 @@ workflow RUN_GUBBINS {
 workflow RUN_IQTREE {
     take:
         core_aln
-        reference
+        core_full_aln
     main:
-        IQTREE ( core_aln,reference )
+        IQTREE ( core_aln,core_full_aln )
     emit:
         newick = IQTREE.out.newick
 }
