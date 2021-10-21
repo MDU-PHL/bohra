@@ -26,7 +26,10 @@ process IQTREE {
 
     script:    
     """
-    $module_dir/iqtree_generator.sh $reference $aln core $task.cpus
+    iqtree -fconst $(snp-sites -C $aln) \\
+    -s <(snp-sites -c $aln) -p core \\
+    -m GTR+G4 -bb 1000 -ntmax $task.cpus \\
+    -nt AUTO -st DNA
     cp core.treefile core.newick
     """
         
