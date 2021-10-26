@@ -319,7 +319,7 @@ class RunSnpDetection(object):
             'any2fasta': 'any2fasta -v',
             'gubbins': 'run_gubbins.py --version 2>&1',
             'csvtk':'csvtk version 2>&1',
-            'roary': 'roary -a 2>&1 | tail -n1',
+            'panaroo': 'panaroo --version 2>&1',
             'shovill': 'shovill -v 2>&1',
             'skesa': 'skesa -v 2>&1',
             'spades': 'spades.py -v 2>&1',

@@ -213,7 +213,7 @@ def _return_tables(pipeline):
         modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
         display = f""
         # td.extend(s_td)
-    elif pipeline == 'all':
+    elif pipeline == 'pluspan':
         # a_ll = td.extend()
         tables =['phylogeny','core-genome', 'species-identification','snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data', 'pan-genome', 'plasmid', 'virulome']
         modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data']

@@ -70,7 +70,7 @@
             "link":"plasmid"
         }
     ],
-    "all":[
+    "pluspan":[
         {   "title": "Phylogeny", 
             "link":"phylogeny", 
             "file": "core.newick", 
