@@ -27,17 +27,46 @@
         {   "file":"seqdata.txt", 
             "title":"Sequence Data", 
             "link": "sequence-data", 
-            "type" : "table"
+            "type" : "table",
+            "columns" : [
+                {"title":"Isolate","field":"Isolate","headerFilter":"input","headerFilterPlaceholder":"Search isolate"},
+                {"title": "Reads", "field":"Reads","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Yield", "field":"Yield","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"GC content", "field":"GC content","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Min len", "field":"Min len","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Avg len", "field":"Avg len","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Max len", "field":"Max len","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Average quality (% >Q30)", "field":"Average quality (% >Q30)","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Estimated average depth", "field":"Estimated average depth","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="}
+                ]
         },
         {   "file":"species.txt", 
             "title": "Species Identification", 
             "type": "table", 
-            "link":"species-identification"
+            "link":"species-identification",
+            "columns" : [
+                {"title":"Isolate","field":"Isolate","headerFilter":"input","headerFilterPlaceholder":"Search isolate"},
+                {"title":"Match 1", "field":"Match 1","headerFilter":"input","headerFilterPlaceholder":"Search species"},
+                {"title": "Detected (%)", "field":"Detected_1 (%)","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Match 2", "field":"Match 2","headerFilter":"input","headerFilterPlaceholder":"Search species"},
+                {"title": "Detected (%)", "field":"Detected_2 (%)","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Match 3", "field":"Match 3","headerFilter":"input","headerFilterPlaceholder":"Search species"},
+                {"title": "Detected (%)", "field":"Detected_3 (%)","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="}
+                ]
         },
         {   "file": "core_genome.txt", 
             "title": "Core Genome", 
             "link":"core-genome", 
-            "type":"table"
+            "type":"table",
+            "columns" : [
+                {"title":"Isolate","field":"Isolate","headerFilter":"input","headerFilterPlaceholder":"Search isolate"},
+                {"title":"Length", "field":"Length","headerFilter":"input"},
+                {"title": "Aligned", "field":"Aligned","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Unaligned", "field":"Unaligned","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title": "Heterozygous", "field":"Heterozygous","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Low coverage", "field":"Low coverage","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title": "% Aligned", "field":"% Aligned","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="}
+                ]
         },
         {   "file": "distances.tab", 
             "title":"SNP distances", 
@@ -47,27 +76,42 @@
         {   "file":"mlst.txt", 
             "title":"MLST", 
             "type":"table", 
-            "link":"mlst"
+            "link":"mlst",
+            "columns":[]
         },
         {   "file":"resistome.txt", 
             "title":"Resistome", 
             "type":"table", 
-            "link":"resistome"
+            "link":"resistome",
+            "columns":[]
         },
         {   "file":"virulome.txt", 
             "title":"Virulome", 
             "type":"table", 
-            "link":"virulome"
+            "link":"virulome",
+            "columns":[]
         },
         {   "file": "assembly.txt", 
             "title":"Assembly", 
             "type":"table", 
-            "link":"assembly"
+            "link":"assembly",
+            "columns" : [
+                {"title":"Isolate","field":"Isolate","headerFilter":"input","headerFilterPlaceholder":"Search isolate"},
+                {"title":"bp", "field":"bp","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title": "# Contigs", "field":"# Contigs","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"# Gaps", "field":"# Gaps","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title": "Min Contigs size", "field":"Min Contig size","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title": "Avg Contigs size", "field":"Max Contig size","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title": "N50", "field":"N50","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title": "CDS", "field":"CDS","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title": "rRNA", "field":"rRNA","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="}
+                ]
         },
         {   "file": "plasmid.txt", 
             "title":"Plasmid", 
             "type":"table", 
-            "link":"plasmid"
+            "link":"plasmid",
+            "columns":[]
         }
     ],
     "pluspan":[
@@ -81,22 +125,52 @@
             "title":"Pan Genome", 
             "type": "pan", 
             "image": "pan_genome.svg", 
-            "link":"pan-genome"
+            "link":"pan-genome",
+            "columns":[]
         },
         {   "file":"seqdata.txt", 
             "title":"Sequence Data", 
             "link": "sequence-data", 
-            "type" : "table"
+            "type" : "table",
+            "columns" : [
+                {"title":"Isolate","field":"Isolate","headerFilter":"input","headerFilterPlaceholder":"Search isolate"},
+                {"title": "Reads", "field":"Reads","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Yield", "field":"Yield","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"GC content", "field":"GC content","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Min len", "field":"Min len","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Avg len", "field":"Avg len","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Max len", "field":"Max len","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Average quality (% >Q30)", "field":"Average quality (% >Q30)","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Estimated average depth", "field":"Estimated average depth","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="}
+                ]
         },
         {   "file":"species.txt", 
             "title": "Species Identification", 
             "type": "table", 
-            "link":"species-identification"
+            "link":"species-identification",
+            "columns" : [
+                {"title":"Isolate","field":"Isolate","headerFilter":"input","headerFilterPlaceholder":"Search isolate"},
+                {"title":"Match 1", "field":"Match 1","headerFilter":"input","headerFilterPlaceholder":"Search species"},
+                {"title": "Detected (%)", "field":"Detected_1 (%)","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Match 2", "field":"Match 2","headerFilter":"input","headerFilterPlaceholder":"Search species"},
+                {"title": "Detected (%)", "field":"Detected_2 (%)","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Match 3", "field":"Match 3","headerFilter":"input","headerFilterPlaceholder":"Search species"},
+                {"title": "Detected (%)", "field":"Detected_3 (%)","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="}
+                ]
         },
         {   "file": "core_genome.txt", 
             "title": "Core Genome", 
             "link":"core-genome", 
-            "type":"table"
+            "type":"table",
+            "columns" : [
+                {"title":"Isolate","field":"Isolate","headerFilter":"input","headerFilterPlaceholder":"Search isolate"},
+                {"title":"Length", "field":"Length","headerFilter":"input"},
+                {"title": "Aligned", "field":"Aligned","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Unaligned", "field":"Unaligned","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title": "Heterozygous", "field":"Heterozygous","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Low coverage", "field":"Low coverage","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title": "% Aligned", "field":"% Aligned","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="}
+                ]
         },
         {   "file": "distances.tab", 
             "title":"SNP distances", 
@@ -106,27 +180,42 @@
         {   "file":"mlst.txt", 
             "title":"MLST", 
             "type":"table", 
-            "link":"mlst"
+            "link":"mlst",
+            "columns":[]
         },
         {   "file":"resistome.txt", 
             "title":"Resistome", 
             "type":"table", 
-            "link":"resistome"
+            "link":"resistome",
+            "columns":[]
         },
         {   "file":"virulome.txt", 
             "title":"Virulome", 
             "type":"table", 
-            "link":"virulome"
+            "link":"virulome",
+            "columns":[]
         },
         {   "file": "assembly.txt", 
             "title":"Assembly", 
             "type":"table", 
-            "link":"assembly"
+            "link":"assembly",
+            "columns" : [
+                {"title":"Isolate","field":"Isolate","headerFilter":"input","headerFilterPlaceholder":"Search isolate"},
+                {"title":"bp", "field":"bp","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title": "# Contigs", "field":"# Contigs","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"# Gaps", "field":"# Gaps","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title": "Min Contigs size", "field":"Min Contig size","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title": "Max Contigs size", "field":"Max Contig size","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title": "N50", "field":"N50","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title": "CDS", "field":"CDS","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title": "rRNA", "field":"rRNA","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="}
+                ]
         },
         {   "file": "plasmid.txt", 
             "title":"Plasmid", 
             "type":"table", 
-            "link":"plasmid"
+            "link":"plasmid",
+            "columns":[]
         }
     ]
         

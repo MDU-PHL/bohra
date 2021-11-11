@@ -227,6 +227,7 @@ process COLLATE_ASM {
 }
 
 
+
 process COMPILE {
     label 'process_medium'
     publishDir "${params.outdir}",
@@ -248,4 +249,25 @@ process COMPILE {
     --isolates $params.isolates --reference $params.reference --job_id $params.job_id \
     --iqtree $params.run_iqtree
     """
+}
+
+process COLLATE_ABRITMAR {
+    label 'process_medium'
+    publishDir "${params.outdir}",
+        mode: params.publish_dir_mode,
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
+        
+    cache 'lenient'
+    input:
+    tuple val(output_name), val(input)
+
+    output:
+    path "${output_name}.txt", emit: collated
+    
+    script:
+    def resistomes = input.join(' ')
+    """
+    $module_dir/collate_plasmids.py $output_name $resistomes
+    """
+
 }

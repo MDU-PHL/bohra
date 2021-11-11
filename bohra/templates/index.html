@@ -13,8 +13,8 @@
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap-theme.min.css" rel="stylesheet">
     
 
-    <link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/buttons/1.5.6/css/buttons.dataTables.min.css" rel="stylesheet">
+    <!-- <link href="https://cdn.datatables.net/1.10.19/css/jquery.dataTables.min.css" rel="stylesheet">
+    <link href="https://cdn.datatables.net/buttons/1.5.6/css/buttons.dataTables.min.css" rel="stylesheet"> -->
 
     <!-- LOCAL STYLE -->
     <!-- <link href="job.css" rel="stylesheet"> -->
@@ -32,11 +32,13 @@
     <!-- Icon -->
     <script src="https://unpkg.com/feather-icons"></script>
     <!-- Datatables -->
-    <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet">
+    <!-- <link href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css" rel="stylesheet"> -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.css" rel="stylesheet">
-    <link href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css" rel = "stylesheet">
+    <!-- <link href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css" rel = "stylesheet"> -->
     <!-- drag select jquery -->
     <script src="https://thibaultjanbeyer.github.io/DragSelect/ds.min.js"></script>
+    <link href="https://unpkg.com/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet">
+    <script type="text/javascript" src="https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js"></script>
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
@@ -116,7 +118,37 @@
           border-color:#3973ac;
           color: aliceblue;
         }
+        #current-table{
+    background-color:white;
+    border: 1px solid #333;
+    border-radius: 4px;
+}
+.tabulator-col-content {
+  background-color:#3973ac;
+}
 
+/*Theme the header*/
+#current-table .tabulator-header {
+    background-color:#3973ac;
+    color:#fff;
+}
+
+/*Allow column header names to wrap lines*/
+#current-table .tabulator-header .tabulator-col,
+#current-table .tabulator-header .tabulator-col-row-handle {
+    white-space: normal;
+}
+
+/*Color the table rows*/
+#current-table .tabulator-tableHolder .tabulator-table .tabulator-row{
+    color:#fff;
+    background-color: #666;
+}
+
+/*Color even rows*/
+    #current-table .tabulator-tableHolder .tabulator-table .tabulator-row:nth-child(even) {
+    background-color: #444;
+}
         
       </style> 
   </head>
@@ -195,13 +227,14 @@
 <!-- div for summary table and phylogenetic tree -->
 <div class= "container-fluid">
 <!-- buttons -->
-{% for t in td %}
-  <button type="button" class="btn btn-primary btn-xlg btn-outline-primary btn-lg detail-button {{t.link}}-button" {{t.style}}>{{t.title}}</button>
+{% for t,v in tables.items() %}
+  <button type="button" class="btn btn-primary btn-xlg btn-outline-primary btn-lg detail-button {{v.link}}-button">{{v.name}}</button>
 {% endfor %}
 <div id = "snp-distances-graph" class = "hidden-graph">  <!-- placeholder for graphs  --> </div>
 <div id = "snp-density-graph" class = "hidden-graph">  <!-- placeholder for graphs  --> </div>
 
   <div id="current-table">
+    
     <!-- placeholder for selected table = put selected table in this div -->    
   </div>
     <hr>
@@ -218,6 +251,7 @@
             </div>
           </div>
         </div> 
+        <div id = "current-table"></div>
         {% elif t.type == 'table' %}
     <!-- these tables are hidden until needed - then placed in the current table div above -->
     <div class="table-responsive">
@@ -292,307 +326,55 @@
   
         
 <!-- Datatables (to sort tables) -->
-<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<!-- <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script> -->
 <!-- <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap.min.js"></script> -->
-<script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
-<script type="application/javascript" src="https://cdn.rawgit.com/phylocanvas/phylocanvas-quickstart/v2.8.1/phylocanvas-quickstart.js"></script>
-<script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<!-- <script src="https://cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script> -->
+<!-- <script type="application/javascript" src="https://cdn.rawgit.com/phylocanvas/phylocanvas-quickstart/v2.8.1/phylocanvas-quickstart.js"></script> -->
+<!-- <script src="https://cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
 <script src="https://cdn.datatables.net/buttons/1.5.6/js/dataTables.buttons.min.js"></script>
-<script src= "https://cdn.datatables.net/buttons/1.5.6/js/buttons.flash.min.js"></script>
-<script src= "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.html5.min.js"></script>
-<script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.print.min.js"></script>
+<script src= "https://cdn.datatables.net/buttons/1.5.6/js/buttons.flash.min.js"></script> -->
+<!-- <script src= "https://cdnjs.cloudflare.com/ajax/libs/jszip/3.1.3/jszip.min.js"></script> -->
+<!-- <script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.html5.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.print.min.js"></script> -->
 
 
 
 {% block script %}
 <script>
-$(document).ready( function () {
-// 
 
-$("button.summary-table-button").click(function(){
-  console.log('selected table');
-  $("#tablediv").show();
-  $("#treediv").hide();
-});
+$("button.detail-button").click(function(){
+  console.log('button clicked');
+  var section = $(this).text().replace(/\s/g,'-').toLowerCase();
+  console.log(section);
+  var table_dict = {{tables | tojson}};
+  var column_dict = {{ columns | tojson }};
+  // console.log(table_dict[section]);
+  console.log(column_dict[section]);
+  console.log(column_dict[section].length);
 
-$("button.phylogeny-button").click(function(){
-  console.log('selected phylogeny');
-  $("#tablediv").hide();
-  $("#treediv").show();
-});
-
-// using phylocanvas to make tree
-var nwk = $("#tree_string").text();
-var tree = Phylocanvas.createTree('phylocanvas', {
-  showInternalNodeLabels: true,
-  alignLabels: true,
-  lineWidth: 2,
-  disableZoom: true, 
-  fillCanvas:true,   
-  scalebar: { active: true, position: { bottom: 10, centre: 10 } },
-});  
-tree.internalLabelStyle.colour = '#adf0ad';
-tree.on('error', function (event) { throw event.error; });
-tree.on('loaded', function () { console.log('loaded phylocanvas'); });
-tree.load(nwk);
-tree.setTreeType('rectangular');
-tree.setTextSize(20);
-tree.setNodeSize(4);
-tree.draw();
-
-// display modal tables from tree
-
-tree.on('click', function (e) {
-  var node = tree.getNodeAtMousePosition(e);
-  console.log(node.getChildProperties('id'));
-  var selected = node.getChildProperties('id');
-  // snp-distances
-  if (selected.length > 1) {
-      var table_head = "<thead>\n<tr>\n<th></th>";
-      var table_body = "<tbody>";
-      for (var i = 0; i < selected.length; i++) {
-          console.log(selected[i]);
-          table_head = table_head + '<th>' + selected[i] + '</th>\n';
-          var row = '<tr>\n';
-          var first_cell= $('.' + selected[i] + '_snp-dists')[0].innerHTML;
-          row = row + '<td>' + first_cell + '</td>';
-          for (var j = 0; j < selected.length; j++) {
-              console.log(selected[j]);
-              console.log($('.'+selected[i]+'_'+selected[j])[0].innerHTML);
-              var cell = $('.'+selected[i]+'_'+selected[j])[0].innerHTML;
-              row = row +'<td>'+ cell + '</td>\n';
-          }
-          row = row + '</tr>\n';
-          table_body = table_body + row;
-      }
-      table_head = table_head + '</tr>\n</thead>';
-      table_body = table_body + '</tbody>';
-      console.log(table_head);
-      console.log(table_body);
-      var t = table_head +table_body;
-      $('.modal-selected-snps-table').html(t);
-      $("#myModal2").modal();
+  $("#current-table").empty();
+  
+  //create Tabulator on DOM element with id "example-table"
+  if(column_dict[section].length > 1){
+    var table = new Tabulator("#current-table", {
+    pagination:"local",
+    paginationSize:25,
+    paginationSizeSelector:true,
+    movableColumns:true,
+    // height:205, // set height of table (in CSS or here), this enables the Virtual DOM and improves render speed dramatically (can be any valid css height value)
+    data:table_dict[section]['table'], //assign data to table
+    layout:"fitColumns", //fit columns to width of table (optional)
+    columns:column_dict[section],
+    // rowClick:function(e, row){ //trigger an alert message when the row is clicked
+    // 	console.log("Row " + row.getData().id + " Clicked!!!!");
+    // },
+    });
   } else {
-      // tables for each isolate - 
-      var modaltables = {{modaltables | tojson}}; // jinja2 passing a list of tables
-      var isolateid = selected[0];
-      console.log(isolateid);
-    //     need to set .modal-table to row with isolate id $('model-content').html(tablerow)
-      $('.modal-title').html(isolateid + ' details');
-      $('tr.' + isolateid).clone().appendTo('.modal-summary-table');
-      // for each table in analysis generate a specific table
-      $.each(modaltables, function(index, table){
-        $('tr.' + isolateid + '-' + table).clone().appendTo('.modal-body-' + table);
-      });      
-      $("#myModal").modal();
-  }
+    console.log("No results available for " + section);
+    $("#current-table").append("<p> No " + section + " results available.</p>");
+}
+  
 });
-
-$("#change-tree").on("click", function (e) {
-    var button_text = $(this).text();
-    if (button_text == "Circular"){
-        tree.setTreeType("circular");
-        $(this).html("Rectangular");
-    } else if (button_text == "Rectangular") {
-        tree.setTreeType("rectangular");
-        $(this).html("Circular");
-    }
-    
-});
-
-
-
-$("button.help").click(function(){
-  $("#myModal3").modal();
-});
-
-$("button.version").click(function(){
-  $("#myModalversions").modal();
-});
-// remove lines from table
-$(function(){  
-        $('#myModal').on('hidden.bs.modal', function (e) {
-        var modaltables = {{modaltables | tojson}}; // jinja2 passing a list of tables
-        console.log("Modal hidden");
-        $('.modal-body-summary-table').html("");
-        $.each(modaltables, function(index, table){
-          $('.modal-body-' + table).html("");
-        });
-        
-        });
-});
-$('table.summary-table').DataTable( {
-      lengthMenu: [[10, 20, 40, 60, 80, 100 -1], [10, 20, 40, 60, 80, 100, "All"]],
-      //scrollY: '50vh',
-      scrollCollapse: true,
-      paging: false,
-      dom: 'Bfrtip',
-        buttons: [
-             'csv', 'excel'
-        ],
-//       order: [[ -1, "Isolate" ]],
-    } );
-$('table.detail-table').DataTable( {
-        //lengthMenu: [[10, 20, 40, 60, 80, 100 -1], [10, 20, 40, 60, 80, 100, "All"]],
-        //scrollY: '50vh',
-      
-        scrollCollapse: true,
-        paging: false,
-        dom: 'Bfrtip',
-        buttons: [
-             'csv', 'excel'
-        ],
-        // scrollX: true,
-        //       order: [[ -1, "Isolate" ]],
-        } );
-
-// get the pairwise snps from tree tips
-
-
-// put the selected table in the selected detail div
-$('button.detail-button').click(function(){
-        // use the id of the button to find the class of the table to be inserted
-       
-        var section = $(this).text().replace(/\s+/g, '-').toLowerCase();
-        var modaltables = {{tables | tojson}}; // jinja2 passing a list of tables
-        
-        $.each(modaltables, function( index, value ){
-          if (section == value){
-            console.log('showing #' + value);
-            $('#' + value).show(); 
-            $("." + value+"-button").css('background-color','#3973ac');
-			      $("." + value+"-button").css('color','white');
-          } else {
-            console.log('hiding #' + value);
-            $('#' + value).hide();
-            $("." + value+"-button").css('background-color','white');
-			      $("." + value+"-button").css('color','#3973ac');
-        }
-         });
-        
-        var section = $(this).text().replace(/\s+/g, '-').toLowerCase();
-        console.log(section);
-        
-        if (section == 'snp-distances'){
-          // for snp-distances
-            var x = {{snpdistances | tojson}};
-            var max_x = Math.max(x);
-            var bin_size = max_x / 100;
-            var trace = {
-                x: x,
-                type: 'histogram',
-                xbins : {
-                  end:max_x,
-                  size: bin_size,
-                  start:0
-                }
-              };
-            var layout = {
-              xaxis:{
-                title:"Distribution of pairwise SNP distances"
-              },
-              yaxis:{
-                title:"Count"
-              },
-              
-            };
-            var data = [trace];
-            Plotly.newPlot('snp-distances-graph', data, layout);
-            // put selecte into current table
-            //var selected = $('#' + section).html();
-            console.log('showing #' + section);
-            //$('#snp-distances').show();
-            $('#snp-density-graph').html("");     
-        } else if (section == 'core-genome'){
-          // put snp-density in here
-            var x = {{ snpdensity_x | tojson}};
-            var y = {{ snpdensity_y | tojson}};
-            
-            // var y = {{genomebreaks | safe}};
-            
-            var trace = {
-                x: x,
-                y: y,
-                type: 'bar',
-    
-              };
-            var layout = {
-              xaxis:{
-                title:"Genome Position"
-              },
-              yaxis:{
-                title:"Count"
-              },
-              // put lines in here
-              
-            };
-            var data = [trace];
-            Plotly.newPlot('snp-density-graph', data, layout);
-            // put selecte into current table
-            var selected = $('#' + section).html();
-            //$('#' + section).show();  
-            $('#snp-distances-graph').html("");      
-        } else {
-          var selected = $('#' + section).html();
-          //$('#' + section).show();  
-          $('#snp-distances-graph').html("");
-          $('#snp-density-graph').html("");
-        }
-        
-        });
-
-}); 
-
-
-
-
-// for showing snp-distances of selected isolates from tree 
-var ds = new DragSelect({
-selectables: document.getElementsByClassName('tiplab'),
-area: document.getElementById('phylogeny'),
-callback: function(elements) {
-        var selected = [0];
-        console.log(elements.length);
-        if (elements.length > 1){
-                $.each(elements, function( index, value ) {
-                        var cols = $('#snp-distances th:contains(' + value.innerHTML + ')');
-                        var index = cols.index();
-                        selected.push(index);
-                        });
-                console.log(selected);
-                var table_head = "<thead>\n<tr>\n";
-                var table_body = "<tbody>";
-                $.each(selected, function( index, row){
-                        var body_row = "<tr>";
-                        $.each(selected, function(index, cell){
-                                // console.log(" row " + row + " cell " + cell);
-                                console.log($('#snp-distances tr:eq('+row+')')[0].cells[cell].innerHTML);
-                                
-                                if (row == 0) {
-                                        body_row = body_row + "<th>" + $('#snp-distances tr:eq('+row+')')[0].cells[cell].innerHTML + "</th>\n";
-                                } else  {
-                                        body_row = body_row + "<td>" + $('#snp-distances tr:eq('+row+')')[0].cells[cell].innerHTML + "</td>\n";
-                                }
-                        });
-                        body_row = body_row ;
-                        if (row == 0) {
-                                table_head = table_head + body_row + "</tr></thead>\n";
-                        } else {
-                      
-                                table_body = table_body + body_row + "</tr>";
-                        }
-                });
-                table_body = table_body + "</tbody>";
-                // console.log(table_head);
-                // console.log(table_body);
-                var t = table_head + table_body;
-                $('.modal-selected-snps-table').html(t);
-                $("#myModal2").modal();
-        } 
-},
-
-}); 
 
 </script>
 {% endblock %}

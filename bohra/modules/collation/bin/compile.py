@@ -165,7 +165,7 @@ def _plot_distances(wd):
 
 def _get_pan_genome(image, wd):
     path = pathlib.Path(wd, 'report', image)
-    print(path)
+    # print(path)
     if path.exists():
         with open(f"{path}", 'r') as f:
             return f.read().strip()
@@ -243,61 +243,123 @@ def _get_versions(wd):
     else:
         return f"<th class='version-head'>Nothing to display</th>",""
 
+def _get_tables(_data, wd, isos):
+
+    # {
+    # link: [
+    #       {
+                # id: some_int, column_1: data, column_2:data
+    #        },
+    # ]}
+    iso_dict = dict(zip(isos,range(1,len(isos)+1))) # for id in table
+    print(iso_dict)
+    tables = {}
+    columns = {}
+    _empty = []
+    
+    for d in _data:
+        if d['type'] == 'table':
+        # get the table
+            cols = []
+            with open(f"{pathlib.Path(wd, 'report', d['file'])}", 'r') as f:
+                reader = csv.DictReader(f, delimiter = '\t')
+                
+                tables[d['link']] = {'table':[], 'name': d['title'], 'link':d['link']}
+                for row in reader:
+                    if len(row) >1:
+                        _sample_dict = {'id':iso_dict[row['Isolate']]}
+                        
+                        for col in row:
+                            cols.append(col)
+                            _sample_dict[col] = row[col]
+                        tables[d['link']]['table'].append(_sample_dict)
+            cols = list(set(cols))
+            if d['columns'] != []:
+                columns[d['link']] = d['columns']
+            elif 'mlst' in d['link']:
+                _c = [{'title':'Isolate','field':'Isolate',"headerFilter":"input","headerFilterPlaceholder":"Search isolate"},{'title':'Scheme','field':'Scheme',"headerFilter":"input","headerFilterPlaceholder":"Search scheme"},{'title':'ST','field':'ST',"headerFilter":"input","headerFilterPlaceholder":"Search ST"}]
+                _cls = sorted([c for c in cols if c not in ['Isolate','ST','Scheme']])
+                for i in _cls:
+                    _c.append({'title':f"{i}",'field':f"{i}","headerFilter":"input","headerFilterPlaceholder":"Search allele"})
+                columns[d['link']] = _c
+            else:
+                _c = [{'title':'Isolate','field':'Isolate',"headerFilter":"input","headerFilterPlaceholder":"Search isolate"}]
+                _cls = sorted([c for c in cols if c not in ['Isolate']])
+                for i in _cls:
+                    _c.append({'title':f"{i}",'field':f"{i}","headerFilter":"input","headerFilterPlaceholder":f"Search {i}"})
+                columns[d['link']] = _c
+
+                
+                # print(tables[d['link']])
+    # print(tables)
+    return tables,columns
+    # pass
+
 def _compile(args):
     
     # get analysis dict
     _dict = json.load(open(f"{pathlib.Path(args.template_dir, 'report_analysis.json')}", 'r'))
+    # print(_dict[args.pipeline])
+    # for d in _dict[args.pipeline]:
+        # print(d)
     
     isos = _get_isos(wd = args.launchdir, iso_list=args.isolates)
+    # print(isos)
     reporthtml = pathlib.Path('report.html')
-    # path to html template
+    # # path to html template
     indexhtml = pathlib.Path(args.template_dir,'index.html') 
-    # initialise dictionary
-    # data is the dictionary passed to jinja2 to fill html
-    versions_head,versions_body = _get_versions(wd = args.launchdir
-    )
+    tables,columns = _get_tables(_data = _dict[args.pipeline], wd = args.launchdir, isos = isos)
+    
+    _empty = []
+    # for t in tables:
+    #     # print(t)
+    #     if tables[t] == []:
+    #         _empty.append(t)
+    # for e in _empty:
+    #     del tables[e]
+    #     # print(tables[t])
+    
+    # # initialise dictionary
+    # # data is the dictionary passed to jinja2 to fill html
+    # versions_head,versions_body = _get_versions(wd = args.launchdir
+    # )
+    # data = {'tables':tables}
+    # print(data)
+    # print(data)
     data = {
         'newick' :'',
-        'snpdensity':{},
-        'snpdensity_x':{},
-        'snpdensity_y':{},
-        'snpdistances':{},
-        'display':'',
         'job_id':args.job_id[0],
         'pipeline':args.pipeline,
         'date':args.day,
         'user':args.user,
-        'tree_heigth':0,
-        'modaltables':{},
-        'tables':'',
-        'version_head': versions_head,
-        'version_body':versions_body
+        'tables':tables,
+        'columns': columns
         }
-    # print(data)
+    # # print(data)
 
-    td = _dict[args.pipeline]
+    # td = _dict[args.pipeline]
     
-    tables, modaltables, display = _return_tables(pipeline = args.pipeline)
-    data['tree_height'] = len(isos) * 25
-    data['tables'] = tables
-    data['modaltables'] = modaltables
-    data['display'] = display
+    # tables, modaltables, display = _return_tables(pipeline = args.pipeline)
+    # data['tree_height'] = len(isos) * 25
+    # data['tables'] = tables
+    # data['modaltables'] = modaltables
+    # data['display'] = display
     
-    data['newick'] = _get_tree_string(pipeline = args.pipeline, wd = args.launchdir, phylo = args.iqtree)
-        # print(td)
+    # data['newick'] = _get_tree_string(pipeline = args.pipeline, wd = args.launchdir, phylo = args.iqtree)
+    #     # print(td)
     
-    if args.pipeline not in ['preview']:
-        data['snpdensity_x'],data['snpdensity_y']= _plot_snpdensity(reference = args.reference,wd = args.launchdir,  isos = isos)
+    # if args.pipeline not in ['preview']:
+    #     data['snpdensity_x'],data['snpdensity_y']= _plot_snpdensity(reference = args.reference,wd = args.launchdir,  isos = isos)
     
-    if len(isos) > 1 and args.pipeline != 'preview':
-        data['snpdistances']= _plot_distances(wd = args.launchdir)
+    # if len(isos) > 1 and args.pipeline != 'preview':
+    #     data['snpdistances']= _plot_distances(wd = args.launchdir)
 
-    td = _fill_vals(td=td, pipeline = args.pipeline, wd = args.launchdir)
-    if f"{args.iqtree}" == 'false':
-        for t in td:
-            if t['title'] == "Phylogeny":
-                t['style'] = "style='display:none;'"
-    data['td'] = td
+    # td = _fill_vals(td=td, pipeline = args.pipeline, wd = args.launchdir)
+    # if f"{args.iqtree}" == 'false':
+    #     for t in td:
+    #         if t['title'] == "Phylogeny":
+    #             t['style'] = "style='display:none;'"
+    # data['td'] = td
 
     print("rendering html")
     report_template = jinja2.Template(pathlib.Path(indexhtml).read_text())

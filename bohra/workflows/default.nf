@@ -3,7 +3,7 @@
 include { SNIPPY } from './../modules/snippy/main' 
 include { SNIPPY_CORE } from './../modules/snippy_core/main' 
 include { SNP_DISTS } from './../modules/snp_dists/main' 
-include { SNIPPY_QC;ADD_HEADER_MLST;MOBSUITE_WRANGLE;COLLATE_MOBSUITE } from './../modules/collation/main' 
+include { SNIPPY_QC;ADD_HEADER_MLST;MOBSUITE_WRANGLE;COLLATE_MOBSUITE;COLLATE_ABRITMAR } from './../modules/collation/main' 
 include { CSVTK_CONCAT } from './../modules/csvtk/main'
 include { COLLATE_ASM } from './../modules/collation/main'
 include { SHOVILL } from './../modules/shovill/main' 
@@ -124,9 +124,9 @@ workflow CONCAT_RESISTOMES {
     take:
         resistomes
     main:
-        CSVTK_CONCAT ( resistomes )
+        COLLATE_ABRITMAR ( resistomes )
     emit:
-        collated_resistomes = CSVTK_CONCAT.out.collated
+        collated_resistomes = COLLATE_ABRITMAR.out.collated
 
 }
 
@@ -134,9 +134,9 @@ workflow CONCAT_VIRULOMES {
     take:
         virulomes
     main:
-        CSVTK_CONCAT ( virulomes )
+        COLLATE_ABRITMAR ( virulomes )
     emit:
-        collated_virulomes = CSVTK_CONCAT.out.collated
+        collated_virulomes = COLLATE_ABRITMAR.out.collated
 
 }
 

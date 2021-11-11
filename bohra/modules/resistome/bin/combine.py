@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import pathlib, pandas, math, sys,  re
 
+
 def get_genes(_file, _type, _dict):
     
     with open(_file, 'r') as f:
@@ -8,11 +9,15 @@ def get_genes(_file, _type, _dict):
         header = data[0].split('\t')
         line = data[1].split('\t')
         for i in range(1,len(header)):
-            l = line[i] if _type != 'partials' else f"{line[i]}^"
+            print(header[i])
+            l = [gn for gn in line[i].split(',')] if _type != 'partials' else [f"{gn}^" for gn in line[i].split(',')]
+            # l = line[i] if _type != 'partials' else f"{line[i]}^"
+            # print(line[i])
+            print(l)
             if header[i] in _dict:
-                _dict[header[i]].append(l)
+                    _dict[header[i]].extend(l)
             else:
-                _dict[header[i]] = [l]
+                _dict[header[i]] = l
         return _dict
 
 _dict = {'Isolate': sys.argv[1]}
@@ -28,5 +33,5 @@ for d in _dict:
         _dict[d] = ';'.join(_dict[d])
 df = pandas.DataFrame(_dict, index = [0])
 df = df.set_index('Isolate')
-
+print(df)
 df.to_csv('resistome.txt', sep = '\t')

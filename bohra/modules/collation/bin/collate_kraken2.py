@@ -4,7 +4,7 @@ import sys, json, datetime, subprocess, pathlib
 
 # Isolate\tMatch 1\t%\tMatch 2\t%\tMatch 3\t%
 
-SPECIES_TEXT = ["Isolate\tMatch 1\tDetected (%)\tMatch 2\tDetected (%)\tMatch 3\tDetected (%)"]
+SPECIES_TEXT = ["Isolate\tMatch 1\tDetected_1 (%)\tMatch 2\tDetected_2 (%)\tMatch 3\tDetected_3 (%)"]
 RESULT = [f"{sys.argv[1]}"]
 p = subprocess.run(f"grep -P '\tS\t' {sys.argv[2]}  | head -n 3" , shell = True, capture_output = True, encoding = 'utf-8')
 
