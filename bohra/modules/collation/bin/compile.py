@@ -88,17 +88,17 @@ def _plot_snpdensity(reference,wd, isos):
     _df = _df.rename(columns={0:'snps', 'index':'Genome_position'})
     # _df = _df[_df['snps'] != 0]
     # print(_df)
-    bins = list(range(1,max(_all_pos),100))
+    bins = list(range(1,max(_all_pos),1000))
     # print(list(b))
     s = _df.groupby(pandas.cut(_df['Genome_position'], bins=bins)).size()
     df  = s.to_frame().reset_index().reset_index()
-    df['index'] = df['index'].apply(lambda x: (x + 50)*100)
+    df['index'] = df['index'].apply(lambda x: (x + 50)*1000)
     df = df.rename(columns = {0:'snps'})
     df = df[['index','snps']]
     
     chart = alt.Chart(df).mark_bar().encode(
                             x=alt.X('index', axis=alt.Axis(title='Genome position'), scale = alt.Scale(domain=(1, max(bins)))),
-                            y=alt.Y('snps', axis = alt.Axis(title = "SNPs (per 100 bases)"))
+                            y=alt.Y('snps', axis = alt.Axis(title = "SNPs (per 1000 bases)"))
                         ).properties(
                             width = 1200,
                             height = 200
