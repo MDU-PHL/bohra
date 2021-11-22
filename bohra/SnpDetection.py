@@ -124,7 +124,7 @@ class RunSnpDetection(object):
 
     def _check_config(self, config):
 
-        if self._path_exists(config):
+        if self._path_exists(pathlib.Path(config)):
             with open(config, 'r') as c:
                 data = c.read()
                 if self.profile in data:
@@ -311,6 +311,7 @@ class RunSnpDetection(object):
 
         
         software = {
+            'nextflow':'nextflow -v',
             'snippy': 'snippy --version 2>&1',
             'snp-dists': 'snp-dists -v 2>&1',
             'iqtree': 'iqtree --version 2>&1',
@@ -335,11 +336,11 @@ class RunSnpDetection(object):
 
         software_versions = [f"Software"] # a list of versions for output
         LOGGER.info(f"Checking that dependencies are installed and recording version.")
-        version_pat_3 = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)(\.(?P<release>[0-9]+)(?:\.(?P<build>[0-9]+)*))?\b')
+        version_pat_3 = re.compile(r'\bv?(?P<major>[0-9]+)\.(?P<minor>[0-9]+)(?:\.(?P<release>[0-9]+)*)?(?:\.(?P<build>[0-9]+)*)?\b')
         
         for sft in software:
             p = subprocess.run(software[sft], capture_output=True, encoding = "utf-8", shell = True)
-            p = p.stdout.strip()
+            p = p.stdout
             v = version_pat_3.search(p.strip())
             if v:
                 v = v.group(0)

@@ -36,7 +36,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.1.3/css/bootstrap.css" rel="stylesheet">
     <!-- <link href="https://cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css" rel = "stylesheet"> -->
     <!-- drag select jquery -->
-    <script src="https://thibaultjanbeyer.github.io/DragSelect/ds.min.js"></script>
+    
     <link href="https://unpkg.com/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet">
     <script type="text/javascript" src="https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js"></script>
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -93,6 +93,7 @@
 
         #current-table {
           margin-top:20px;
+          border:none;
         }
 
         .btn-outline-secondary {
@@ -120,11 +121,15 @@
         }
         #current-table{
     background-color:white;
-    border: 1px solid #333;
+    /* border: 1px solid #333; */
     border-radius: 4px;
 }
 .tabulator-col-content {
   background-color:#3973ac;
+}
+
+#version-table .tabulator-col {
+  color:white;
 }
 
 /*Theme the header*/
@@ -137,6 +142,7 @@
 #current-table .tabulator-header .tabulator-col,
 #current-table .tabulator-header .tabulator-col-row-handle {
     white-space: normal;
+    background-color: #3973ac;
 }
 
 /*Color the table rows*/
@@ -149,13 +155,13 @@
     #current-table .tabulator-tableHolder .tabulator-table .tabulator-row:nth-child(even) {
     background-color: #444;
 }
-        
+     
       </style> 
   </head>
   <body>
     <header>
-      <h1 class="left">{{job_id}}</h1>
-        <p class ="right"> Data generated {{date}} by {{user}} </p>
+      <h1 class="left" style="margin:5px;">{{job_id}}</h1>
+        <p class ="right" style="margin:5px;"> Data generated {{date}} by {{user}} </p>
         <hr>
     </header>
   <!-- Modals - individual isolates -->
@@ -188,140 +194,60 @@
       </div>
     </div>
 
-    <!-- software versions -->
-
-    <div class="modal fade" id="myModalversions" role="dialog">
-      <div class="modal-dialog modal-dialog-centered modal" >
-        <div class="modal-content">
-          <h2 class="modal-title" style= "color: #3973ac; margin:3px;"> Versions </h2>
-          <hr>
-          
-    <!-- these tables are hidden until needed - then placed in the current table div above -->
-          <div class="table-responsive">
-            <!-- buttons for dowload -->
-            <div id = "version-modal" > 
-              <table class="table table-striped table-bordered table-sortable detail-table">
-                
-                <thead>
-                  <tr><!-- header of table -->
-                    {{version_head}}
-                  </tr>
-                </thead>
-                <tbody>
-                  {{version_body}}
-                </tbody>
-                          <!-- end of table body -->
-              </table>
-            <!-- end of table -->
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
 <div id="help-button" style = "float:right;">
   <button type="button" class="btn btn-sm btn-outline-secondary zoom-button" id = "help" data-toggle="modal" data-target="#myModal3" data-placement="top" title="Select"> Helpful tips </button>    
-  <button type="button" class="btn btn-sm btn-outline-secondary zoom-button" id = "version" data-toggle="modal" data-target="#myModalversions" data-placement="top" title="Select"> Software versions </button>    
+  <button type="button" class="btn btn-sm btn-outline-secondary version-button" id = "version"> Software versions </button>    
   <!-- <button type="button" class="btn btn-sm btn-outline-secondary" id = "nwk" ><span data-feather="arrow-down"> Download newick </button>         -->
 </div>
 <!-- div for summary table and phylogenetic tree -->
 <div class= "container-fluid">
 <!-- buttons -->
+{% if phylo == 'phylo' %}
+<button type="button" class="btn btn-primary btn-xlg btn-outline-primary btn-lg phylogeny-button">Phylogeny</button>
+{% endif %}
 {% for t,v in tables.items() %}
   <button type="button" class="btn btn-primary btn-xlg btn-outline-primary btn-lg detail-button {{v.link}}-button">{{v.name}}</button>
 {% endfor %}
-<div id = "snp-distances-graph" class = "hidden-graph">  <!-- placeholder for graphs  --> </div>
-<div id = "snp-density-graph" class = "hidden-graph">  <!-- placeholder for graphs  --> </div>
 
-  <div id="current-table">
-    
+<div id = "software-versions" class = "versions" style = "display: none;">
+  <table class="table" id = "version-table">     
+    <thead>
+      <tr>
+        {{version_head}}
+      </tr>
+    </thead>
+    <tbody>
+      {{version_body}}
+    </tbody>
+  </table>
+</div>
+<div id = "empty-table"></div>
+<div id="comment"></div>
+<div id = "snp-distances-graph" class = "hidden-graph" style="display:none;">  <!-- placeholder for graphs  --> </div>
+<div id = "snp-density-graph" class = "hidden-graph" style="display: none;">  <!-- placeholder for graphs  --> </div>
+<div id="table-download" style="display: none;">
+  <button type="button" class="btn btn-sm btn-outline-secondary csv-download-button" id = "download-csv"> download csv </button>    
+  <!-- <button type="button" class="btn btn-sm btn-outline-secondary excel-download-button" id = "download-excel"> download xlsx </button>     -->
+</div>  
+<div id="current-table">
     <!-- placeholder for selected table = put selected table in this div -->    
   </div>
-    <hr>
-          {% for t in td %}
-          {% if t.type == 'tree' %}
-          <div id = "phylogeny"  {{t.style}}>
-            <div id="tree_string" style="display: none;">{{newick}}</div>
-            <div id="phylocanvas" style="width: 100%;" >
-              <!-- <p></p> -->
-              <hr>
-              <!-- button div -->
-              <div class = "radial-div">
-              <button id="change-tree" type="button" class="btn btn-sm btn-outline-secondary">Circular</button>
-            </div>
-          </div>
-        </div> 
-        <div id = "current-table"></div>
-        {% elif t.type == 'table' %}
-    <!-- these tables are hidden until needed - then placed in the current table div above -->
-    <div class="table-responsive">
-      <!-- buttons for dowload -->
-      <div id = "{{t.link}}" style = "display: none;">
-        <!-- <h3>{{t.title}}</h3>   -->
-        {% if t.check == 'no_data' %} 
-          <h4>No data to display</h4>
-        {% endif %} 
-        <table class="table table-striped table-bordered table-sortable detail-table">
-          <thead>
-            <tr><!-- header of table -->
-              {{t.head}}
-            </tr>
-          </thead>
-          <tbody>
-            {{t.body}}
-          </tbody>
-                    <!-- end of table body -->
-        </table>
-      <!-- end of table -->
-      </div>
-    </div>
+  <div id = "pan-svg" style = "display:none;margin:10px;">
+    {{ pan_svg }}
+  </div>
+
+  <div id = "phylogeny">
+    <button type="button" class="btn btn-sm btn-outline-secondary back-button" id = "step-back"> back </button>    
+    <button type="button" class="btn btn-sm btn-outline-secondary reset-button" id = "reset-tree"> reset </button> 
+    <button type="button" class="btn btn-sm btn-outline-secondary download-button" id = "download-tree"> download </button> 
+    <button type="button" class="btn btn-sm btn-outline-secondary export-button" id = "export-tree"> export png </button> 
+    <button type="button" class="btn btn-sm btn-outline-secondary search-tree-button" id = "get-iso" style="float: right;"> search </button>   
+    <input type = "text" id = "search-iso" placeholder="Search for sample" style="float: right;">
+       
+    <div id="tree_string" style="display: none;">{{newick}}</div>
+    <div id = "phylocanvas" style = "width: 100%; margin:5px; border: 1px solid lightgray;" ></div>
+  </div>
     
-    {% elif t.type == 'matrix' %}
-    <!-- these tables are hidden until needed - then placed in the current table div above -->
-    <div class="table-responsive" >
-      <!-- buttons for dowload -->
-      <div id = "{{t.link}}" style="display:none;">
-        <!-- <h3>{{t.title}}</h3> -->
-        {% if t.check == 'no_data' %} 
-          <h4>No data to display</h4>
-        {% endif %} 
-        <table class="table table-striped table-bordered table-sortable detail-table">
-          <thead>
-            <tr><!-- header of table -->
-              {{t.head}}
-            </tr>
-          </thead>
-          <tbody>
-            {{t.body}}
-          </tbody>
-                    <!-- end of table body -->
-        </table>
-      <!-- end of table -->
-      </div>
-    </div>
-    {% elif t.type == 'pan' %}
-    <!-- these tables are hidden until needed - then placed in the current table div above -->
-    <div class="table-responsive" >
-      <!-- buttons for dowload -->
-      <div id = "{{t.link}}" style = "display:none;">
-        <!-- <h3>{{t.title}}</h3>   -->
-        <table class="table table-striped table-bordered table-sortable detail-table">
-          <thead>
-            <tr><!-- header of table -->
-              {{t.head}}
-            </tr>
-          </thead>
-          <tbody>
-            {{t.body}}
-          </tbody>
-                    <!-- end of table body -->
-        </table>
-      <!-- end of table -->
-      {{t.image}}  
-      </div>
-    </div>
-    {% endif %}
-    {% endfor %}  
   </div>         
   
         
@@ -338,22 +264,80 @@
 <script src="https://cdn.datatables.net/buttons/1.5.6/js/buttons.print.min.js"></script> -->
 
 
+<script src="https://unpkg.com/@phylocanvas/phylocanvas.gl@latest/dist/bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/vega@5.20.2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.1.1"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.12.2"></script>
 
 {% block script %}
 <script>
 
+var snp_distance_chart = {{ snp_distances | safe }};
+      vegaEmbed('#snp-distances-graph', snp_distance_chart).then(function(result){
+        // var epi_view = result.view;
+      });
+
+var snp_density_chart = {{ snp_density | safe }};
+  vegaEmbed('#snp-density-graph', snp_density_chart).then(function(result){
+  // var epi_view = result.view;
+});
+
+var version_table = new Tabulator("#version-table", {});
+
+$("button.version-button").click(function(){
+  $("#software-versions").show();
+  $("#comment").empty();
+  $("#phylogeny").hide();
+  // $("#download-csv").hide();
+  $("#current-table").empty();
+  $("#snp-distances-graph").hide();
+  $("#snp-density-graph").hide();
+  $('#pan-svg').hide();
+  $("#empty-table").empty();
+});
+
+$("button.phylogeny-button").click(function(){
+  $("#current-table").empty();
+  $("#table-download").hide();
+  $("#phylogeny").show();
+  $("#comment").empty();
+  $("#software-versions").hide();
+  $("#snp-distances-graph").hide();
+  $("#snp-density-graph").hide();
+  $('#pan-svg').hide();
+  $("#empty-table").empty();
+});
+
 $("button.detail-button").click(function(){
   console.log('button clicked');
+  $("#table-download").show();
+  $("#snp-distances-graph").hide();
+  $('#pan-svg').hide();
+  $("#snp-density-graph").hide();
   var section = $(this).text().replace(/\s/g,'-').toLowerCase();
   console.log(section);
   var table_dict = {{tables | tojson}};
   var column_dict = {{ columns | tojson }};
-  // console.log(table_dict[section]);
+  var comment = {{ comment | tojson }}
+  console.log(table_dict[section]);
   console.log(column_dict[section]);
   console.log(column_dict[section].length);
-
+  $("#phylogeny").hide();
+  $("#software-versions").hide();
   $("#current-table").empty();
-  
+  $("#comment").empty();
+  $("#empty-table").empty();
+  $("#comment").append("<p style='margin:5px;'><em>" + comment[section] + "</em></p>");
+  if(section == 'snp-distances') {
+    $("#snp-distances-graph").show();
+  }
+  if(section == 'core-genome'){
+    
+    $("#snp-density-graph").show();
+  }
+  if(section == 'pan-genome'){
+    $('#pan-svg').show();
+  }
   //create Tabulator on DOM element with id "example-table"
   if(column_dict[section].length > 1){
     var table = new Tabulator("#current-table", {
@@ -369,13 +353,120 @@ $("button.detail-button").click(function(){
     // 	console.log("Row " + row.getData().id + " Clicked!!!!");
     // },
     });
+    $("#download-csv").click(function(){
+      console.log('clicking download button')
+        table.download("csv", "data.csv", {delimiter:"."});
+      });
+    // $("#download-excel").click(function(){
+    //   table.download("xlsx", section + ".xlsx", {sheetName:$(this).text()});
+    // });
   } else {
     console.log("No results available for " + section);
-    $("#current-table").append("<p> No " + section + " results available.</p>");
+    $("#comment").empty();
+    $("#empty-table").append("<p><b>No data available for " + section + "</b></p>");
 }
-  
+      
 });
+  
 
+
+  var tree_root = ["1"];
+  var num_nodes = {{num_isos}};
+  $("#phylocanvas").height(num_nodes*40);
+  var tree_string = document.getElementById('tree_string').innerHTML;
+  console.log(tree_string);
+  var tree = new phylocanvas.PhylocanvasGL(
+                  document.querySelector("#phylocanvas"),
+                    { 
+                      // size: document.querySelector("#phylocanvas").getBoundingClientRect(),
+                      source: tree_string,
+                      type: phylocanvas.TreeTypes.Rectangular,
+                      nodeSize:6,
+                      showLabels: true,
+                      showLeafLabels: true,
+                      alignLabels:true,
+                      interactive:true
+                    },
+                  );
+  // tree.alignLabels;
+  // console.log(tree.handleClick(tree.getHighlightedNode()));
+  // console.log(tree.getGraphWithoutLayout());
+
+  $("#phylocanvas").hover(function(){
+    console.log("phylocanvas hover");
+    console.log();
+    var hn = tree.getHighlightedNode();
+    console.log(hn);
+  });
+
+  $("#phylocanvas").click(function(event){
+    console.log('phylocanvas clicked');
+    var hn = tree.getHighlightedNode();
+    // console.log(hn);
+    // console.log(hn.id);
+    tree.setRoot(hn.id);
+    tree_root.push(hn.id);
+    console.log(tree_root);
+  });
+
+
+  $("#step-back").click(function(){
+    console.log(tree_root);
+    
+    var n = tree_root.pop(-1);
+    console.log(n);
+    
+    tree.setRoot(n);
+  });
+
+  $("#reset-tree").click(function(){
+    
+    tree.setRoot("1");
+  });
+
+  
+  function downloadString(text, fileType, fileName) {
+      var blob = new Blob([text], { type: fileType });
+
+      var a = document.createElement('a');
+      a.download = fileName;
+      a.href = URL.createObjectURL(blob);
+      a.dataset.downloadurl = [fileType, a.download, a.href].join(':');
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function() { URL.revokeObjectURL(a.href); }, 1500);
+    }
+
+  $("#download-tree").click(function(){
+    console.log('downloading newick');
+    var nwk_download = tree.exportNewick();
+    var filename = 'bohra.nwk'
+    downloadString(nwk_download,'text',filename);
+  });
+
+  $("#export-tree").click(function(){
+    console.log('export');
+    var png = tree.exportPNG();
+    var filename = 'bohra.png';
+    var download = document.createElement('a');
+    download.href = png;
+    download.download = filename;
+    download.click();
+  });
+
+  $("#get-iso").click(function(){
+    var i = $("#search-iso").val();
+    console.log(i);
+
+    var leaves = tree.getGraphWithoutLayout().leaves
+    $.each(leaves, function(idx, val){
+      if (val.id == i){
+        tree.highlightNode(val);
+      }
+    })
+  });
 </script>
 {% endblock %}
 <script>

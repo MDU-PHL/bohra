@@ -22,7 +22,7 @@ process SNP_DISTS {
     script:
     
     """
-    snp-dists $core > distances.tab
+    snp-dists $core | csvtk rename -t -f 1 -n Isolate > distances.tab
     """
     
 }

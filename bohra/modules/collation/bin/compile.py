@@ -1,60 +1,9 @@
 #!/usr/bin/env python3
 import pathlib, subprocess, argparse, datetime, pandas, re, numpy, jinja2, json, csv
+import altair as alt
 from Bio import SeqIO
 
-def _write_tables(table, wd, link):
-    '''
-    Write a table, given a tab delimited file generate a html string
-    '''
-    # TODO add class isolate id to <tr>
-    # TODO add class distances-isolate to tr if matrix and head-isolate to head td
-    path =  f"{pathlib.Path(wd, 'report', table)}"
-    
-    data = open(path).readlines()
-    # for header
-    header = data[0].split('\t')
-    if len(header) >1:
-        if 'distances.tab' == table:
-            tablehead = [f"<th class='{column}-head'>{column}</th>" for column in header]
-        else:
-            tablehead = [f"<th>{column}</th>" for column in header]
-        # for body seqtablebody
-        body = []
-        for i in range(1,len(data)):
-            raw = data[i].split('\t')
-            raw = [r.strip() for r in raw]
-            if 'distances' in table:
-                row = [f"<tr class='distances-{raw[0]}'>"]
-            else:
-                row = [f"<tr class='{raw[0]}-{link}'>"]
-            if 'distances.tab' == table:
-                # to allow for display on tree
-                    for d in range(len(raw)):
-                        row.append(f"<td align=\"center\" class = \"{raw[0]}_{header[d].strip()}\">{raw[d]}</td>")    
-            elif 'resistome' in table:
-                # to allow for coloring of partials
-                for d in raw:
-                    # 
-                    dr = d.split(';')
-                    drs = []
-                    for i in dr:
-                        if '^' in i:
-                            drs.append(f"<span style=\"color:#3483eb\">{i.strip('^')}</span>")
-                        else:
-                            drs.append(i)
-                    x = ';'.join(drs)
-                    row.append(f"<td align=\"center\">{x}</td>")
-            else: #default
-                for d in raw:
-                    if 'assembly' in table:
-                        print(d)
-                    row.append(f"<td align=\"center\">{d}</td>")
-            row.append(f"</tr>")
-            body = body + row
-            
-        return('\n'.join(tablehead),'\n'.join(body))
-    else:
-        return f"<th>No results to display</th>",f"<tr><td></td></tr>"
+alt.data_transformers.disable_max_rows()
 
 def _get_tree_string(pipeline, wd,phylo):
     '''
@@ -74,7 +23,7 @@ def _get_tree_string(pipeline, wd,phylo):
 
 
 def _get_offset(reference):
-    print(reference)
+    # print(reference)
     d = {}
     offset = 0
     records = list(SeqIO.parse(reference, "genbank"))
@@ -101,7 +50,7 @@ def _plot_snpdensity(reference,wd, isos):
     
     _dict,offset = _get_offset(reference = f"{pathlib.Path(wd,reference)}")
     _all_pos = list(range(1,offset+1))
-    print(_dict)
+    # print(_dict)
     _snp_dict = {}
     # collate all snps in snps.tab
     for i in isos:
@@ -121,7 +70,7 @@ def _plot_snpdensity(reference,wd, isos):
                         _snp_dict[pos] = _snp_dict[pos] + 1
                     else:
                         # print(i)
-                        _snp_dict[pos] = 1
+                        _snp_dict[pos] = 0
     # now generate list for x value in graph
     _density = []
     
@@ -131,10 +80,31 @@ def _plot_snpdensity(reference,wd, isos):
             _density.append(_snp_dict[a])
         else:
             _density.append(0)
-    print(max(_snp_dict.values()))
+    # print(max(_snp_dict.values()))
+    # print(_snp_dict)
     # return dictionary
-    return list(_snp_dict.keys()), list(_snp_dict.values())
-
+    # _snp_dict = {1:5,3:3,10:2}
+    _df = pandas.DataFrame.from_dict(_snp_dict, orient='index').reset_index()
+    _df = _df.rename(columns={0:'snps', 'index':'Genome_position'})
+    # _df = _df[_df['snps'] != 0]
+    # print(_df)
+    bins = list(range(1,max(_all_pos),100))
+    # print(list(b))
+    s = _df.groupby(pandas.cut(_df['Genome_position'], bins=bins)).size()
+    df  = s.to_frame().reset_index().reset_index()
+    df['index'] = df['index'].apply(lambda x: (x + 50)*100)
+    df = df.rename(columns = {0:'snps'})
+    df = df[['index','snps']]
+    
+    chart = alt.Chart(df).mark_bar().encode(
+                            x=alt.X('index', axis=alt.Axis(title='Genome position'), scale = alt.Scale(domain=(1, max(bins)))),
+                            y=alt.Y('snps', axis = alt.Axis(title = "SNPs (per 100 bases)"))
+                        ).properties(
+                            width = 1200,
+                            height = 200
+                        )
+    chart = chart.to_json()
+    return chart
 
 def _plot_distances(wd):
 
@@ -158,12 +128,41 @@ def _plot_distances(wd):
         # collect positions to get allow for histogram and dropna (no snp)
         melted_df = pandas.melt(df, id_vars=[col1], value_vars=names)
         melted_df = melted_df[melted_df[col1]!= melted_df['variable']]
+        # brush = alt.selection_interval(encodings=['x'])
+        # base = alt.Chart(melted_df).mark_bar().encode(
+        #                         y='count():Q'
+        #                     ).properties(
+        #                         width=1200,
+        #                         height=100
+        #                     )
+        # chart = alt.vconcat(
+        #             base.encode(
+        #                 alt.X('value:Q',
+        #                 bin=alt.Bin(maxbins=30, extent=brush),
+        #                 scale=alt.Scale(domain=brush)
+        #                 )
+        #             ),
+        #             base.encode(
+        #                 alt.X('value:Q', bin=alt.Bin(maxbins=30)),
+        #             ).add_selection(brush)
+        #             )
         
-        return(list(melted_df['value']))
+        # chart = chart.to_json()
+        chart = alt.Chart(melted_df).mark_bar().encode(
+                            alt.X('value', axis = alt.Axis(title = 'Pairwise SNP distance')),
+                            y=alt.Y('count()', axis= alt.Axis(title = "Frequency"))
+                        ).properties(
+                                width=1200,
+                                height=200
+                            )
+        chart = chart.to_json()
+        return chart
     except:
-        return []
+        return {}
 
-def _get_pan_genome(image, wd):
+def _get_pan_genome(d, wd):
+
+    image = d[1]['image']
     path = pathlib.Path(wd, 'report', image)
     # print(path)
     if path.exists():
@@ -172,63 +171,13 @@ def _get_pan_genome(image, wd):
     else:
         return ''
 
-def _fill_vals(td, pipeline, wd):
-
-    for t in range(len(td)):
-        print(td[t])
-        # TODO if table add a modal modal + link and link will be title lowercase with hyphen
-        if td[t]['type'] == 'table':
-            td[t]['head'], td[t]['body'] = _write_tables(table=td[t]['file'], wd = wd, link = td[t]['link'])
-            # if td[t]['body'] == 'No data':
-            #     to_remove.append(t)
-        if td[t]['type'] == 'pan':
-            td[t]['head'], td[t]['body'] = _write_tables(table=td[t]['file'], wd = wd,  link = td[t]['link'])
-            td[t]['image'] = _get_pan_genome(image = td[t]['image'], wd = wd)
-        if td[t]['type'] == 'matrix':
-            td[t]['head'], td[t]['body'] = _write_tables(table=td[t]['file'], wd = wd, link = td[t]['link'])
-            # snpdistances = plot_distances()
-    # print(to_remove)
-    # print(td[9])
-    # print(td[11])
-    # for i in to_remove:
-    #     print(td[i])
-    #     # print(td)
-    #     del td[i]
-
-    return td
-
-
-
-def _return_tables(pipeline):
-
-    if pipeline == 'preview':
-        
-        tables =['sequence-data','species-identification']
-        modaltables =['sequence-data','species-identification']
-        display = f""
-    
-    elif pipeline == 'default':
-        
-        tables =['phylogeny', 'core-genome', 'snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data','species-identification', 'plasmid', 'virulome']
-        modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data','species-identification']
-        display = f""
-        # td.extend(s_td)
-    elif pipeline == 'pluspan':
-        # a_ll = td.extend()
-        tables =['phylogeny','core-genome', 'species-identification','snp-distances', 'mlst', 'assembly', 'resistome', 'sequence-data', 'pan-genome', 'plasmid', 'virulome']
-        modaltables = ['core-genome',  'mlst', 'assembly', 'resistome', 'sequence-data']
-        display = f""
-    
-    tables.append('versions')
-
-    return tables, modaltables, display
-
 def _get_isos(wd, iso_list):
     p = pathlib.Path(wd, iso_list)
     with open(p, 'r') as f:
         isos = f.read().strip().split('\n')
     
     return isos
+
 def _get_versions(wd):
 
     p = pathlib.Path(wd, 'report', 'software_versions.txt')
@@ -243,6 +192,65 @@ def _get_versions(wd):
     else:
         return f"<th class='version-head'>Nothing to display</th>",""
 
+def _generate_table(d, columns,comment, tables, wd, iso_dict, id_col):
+
+    if id_col == '':
+        return tables,columns,comment
+    cols = []
+    with open(f"{pathlib.Path(wd, 'report', d['file'])}", 'r') as f:
+        reader = csv.DictReader(f, delimiter = '\t')
+        comment[d['link']] = d['comment']
+        tables[d['link']] = {'table':[], 'name': d['title'], 'link':d['link']}
+        c = 1
+        for row in reader:
+            if len(row) >1:
+                if row[id_col] in iso_dict:
+                    _sample_dict = {'id':iso_dict[row[id_col]]}
+                    # if d['link'] == 'snp-distances':
+                    #     # print(_sample_dict)
+                    for col in row:
+                        cols.append(col)
+                        _sample_dict[col] = row[col]
+                    # if d['link'] == 'snp-distances':
+                    #     # print(_sample_dict)
+                    tables[d['link']]['table'].append(_sample_dict)
+                else:
+                    _data_dict = {'id':c}
+                    c = c + 1
+                    for col in row:
+                        cols.append(col)
+                        _data_dict[col] = row[col]
+                    tables[d['link']]['table'].append(_data_dict)
+                    
+
+    cols = list(set(cols))
+    if d['columns'] != []:
+        columns[d['link']] = d['columns']
+    elif 'mlst' in d['link']:
+        _c = [{'title':'Isolate','field':'Isolate',"headerFilter":"input","headerFilterPlaceholder":"Search isolate"},{'title':'Scheme','field':'Scheme',"headerFilter":"input","headerFilterPlaceholder":"Search scheme"},{'title':'ST','field':'ST',"headerFilter":"input","headerFilterPlaceholder":"Search ST"}]
+        _cls = sorted([c for c in cols if c not in ['Isolate','ST','Scheme']])
+        
+        if _cls != []:
+            for i in _cls:
+                _c.append({'title':f"{i}",'field':f"{i}","headerFilter":"input","headerFilterPlaceholder":"Search allele"})
+        columns[d['link']] = _c
+    
+    elif 'snp-distances' in d['link']:
+        _c = [{'title':'Isolate','field':'Isolate',"headerFilter":"input","headerFilterPlaceholder":"Search isolate"}]
+        _cls = sorted([c for c in cols if c not in ['Isolate']])
+        for i in _cls:
+            _c.append({'title':f"{i}",'field':f"{i}","headerFilter":"input","headerFilterPlaceholder":f"Search {i}"})
+        columns[d['link']] = _c
+    
+    else:
+        _c = [{'title':'Isolate','field':'Isolate',"headerFilter":"input","headerFilterPlaceholder":"Search isolate"}]
+        _cls = sorted([c for c in cols if c not in ['Isolate']])
+        for i in _cls:
+            _c.append({'title':f"{i}",'field':f"{i}","headerFilter":"input","headerFilterPlaceholder":f"Search {i}"})
+        columns[d['link']] = _c
+    
+    return tables,columns,comment
+
 def _get_tables(_data, wd, isos):
 
     # {
@@ -252,47 +260,25 @@ def _get_tables(_data, wd, isos):
     #        },
     # ]}
     iso_dict = dict(zip(isos,range(1,len(isos)+1))) # for id in table
-    print(iso_dict)
+    
     tables = {}
     columns = {}
-    _empty = []
+    comment = {}
     
     for d in _data:
-        if d['type'] == 'table':
-        # get the table
-            cols = []
-            with open(f"{pathlib.Path(wd, 'report', d['file'])}", 'r') as f:
-                reader = csv.DictReader(f, delimiter = '\t')
-                
-                tables[d['link']] = {'table':[], 'name': d['title'], 'link':d['link']}
-                for row in reader:
-                    if len(row) >1:
-                        _sample_dict = {'id':iso_dict[row['Isolate']]}
-                        
-                        for col in row:
-                            cols.append(col)
-                            _sample_dict[col] = row[col]
-                        tables[d['link']]['table'].append(_sample_dict)
-            cols = list(set(cols))
-            if d['columns'] != []:
-                columns[d['link']] = d['columns']
-            elif 'mlst' in d['link']:
-                _c = [{'title':'Isolate','field':'Isolate',"headerFilter":"input","headerFilterPlaceholder":"Search isolate"},{'title':'Scheme','field':'Scheme',"headerFilter":"input","headerFilterPlaceholder":"Search scheme"},{'title':'ST','field':'ST',"headerFilter":"input","headerFilterPlaceholder":"Search ST"}]
-                _cls = sorted([c for c in cols if c not in ['Isolate','ST','Scheme']])
-                for i in _cls:
-                    _c.append({'title':f"{i}",'field':f"{i}","headerFilter":"input","headerFilterPlaceholder":"Search allele"})
-                columns[d['link']] = _c
-            else:
-                _c = [{'title':'Isolate','field':'Isolate',"headerFilter":"input","headerFilterPlaceholder":"Search isolate"}]
-                _cls = sorted([c for c in cols if c not in ['Isolate']])
-                for i in _cls:
-                    _c.append({'title':f"{i}",'field':f"{i}","headerFilter":"input","headerFilterPlaceholder":f"Search {i}"})
-                columns[d['link']] = _c
-
-                
-                # print(tables[d['link']])
-    # print(tables)
-    return tables,columns
+        # print(d)
+        if d['link'] == 'pan-genome':
+            id_col = 'Genes'
+        elif d['type'] == 'table' or d['type'] == 'matrix':
+            id_col = 'Isolate'
+        else:
+            id_col = ''
+        # print(id_col)
+        tables,columns,comment = _generate_table(d = d, wd = wd, iso_dict= iso_dict, columns= columns,tables=tables,comment=comment,id_col=id_col)
+    
+    # print(columns["snp-distances"])
+    
+    return tables,columns,comment
     # pass
 
 def _compile(args):
@@ -308,24 +294,8 @@ def _compile(args):
     reporthtml = pathlib.Path('report.html')
     # # path to html template
     indexhtml = pathlib.Path(args.template_dir,'index.html') 
-    tables,columns = _get_tables(_data = _dict[args.pipeline], wd = args.launchdir, isos = isos)
-    
-    _empty = []
-    # for t in tables:
-    #     # print(t)
-    #     if tables[t] == []:
-    #         _empty.append(t)
-    # for e in _empty:
-    #     del tables[e]
-    #     # print(tables[t])
-    
-    # # initialise dictionary
-    # # data is the dictionary passed to jinja2 to fill html
-    # versions_head,versions_body = _get_versions(wd = args.launchdir
-    # )
-    # data = {'tables':tables}
-    # print(data)
-    # print(data)
+    tables,columns,comment = _get_tables(_data = _dict[args.pipeline], wd = args.launchdir, isos = isos)
+    version_head,version_body = _get_versions(wd = args.launchdir)
     data = {
         'newick' :'',
         'job_id':args.job_id[0],
@@ -333,34 +303,19 @@ def _compile(args):
         'date':args.day,
         'user':args.user,
         'tables':tables,
-        'columns': columns
+        'columns': columns,
+        'comment':comment,
+        'phylo': 'phylo' if args.iqtree == 'true' else 'no_phylo',
+        'num_isos':len(isos),
+        'version_head': version_head,
+        'version_body':version_body,
+        'snp_distances': _plot_distances(wd = args.launchdir),
+        'snp_density': _plot_snpdensity(reference=args.reference, wd = args.launchdir, isos = isos),
+        'pan_svg': _get_pan_genome(d = _dict[args.pipeline], wd = args.launchdir) if args.pipeline == 'pluspan' else ''
         }
-    # # print(data)
-
-    # td = _dict[args.pipeline]
     
-    # tables, modaltables, display = _return_tables(pipeline = args.pipeline)
-    # data['tree_height'] = len(isos) * 25
-    # data['tables'] = tables
-    # data['modaltables'] = modaltables
-    # data['display'] = display
+    data['newick'] = _get_tree_string(pipeline = args.pipeline, wd = args.launchdir, phylo = args.iqtree)
     
-    # data['newick'] = _get_tree_string(pipeline = args.pipeline, wd = args.launchdir, phylo = args.iqtree)
-    #     # print(td)
-    
-    # if args.pipeline not in ['preview']:
-    #     data['snpdensity_x'],data['snpdensity_y']= _plot_snpdensity(reference = args.reference,wd = args.launchdir,  isos = isos)
-    
-    # if len(isos) > 1 and args.pipeline != 'preview':
-    #     data['snpdistances']= _plot_distances(wd = args.launchdir)
-
-    # td = _fill_vals(td=td, pipeline = args.pipeline, wd = args.launchdir)
-    # if f"{args.iqtree}" == 'false':
-    #     for t in td:
-    #         if t['title'] == "Phylogeny":
-    #             t['style'] = "style='display:none;'"
-    # data['td'] = td
-
     print("rendering html")
     report_template = jinja2.Template(pathlib.Path(indexhtml).read_text())
     reporthtml.write_text(report_template.render(data))
