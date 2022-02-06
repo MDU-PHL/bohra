@@ -12,7 +12,7 @@ process SEQKIT_GC {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     
     cache 'lenient'
-    // conda (params.enable_conda ? 'bioconda::shovill=1.1.0' : null)
+    conda (params.enable_conda ? 'bioconda::seqkit=2.1.0' : null)
     // if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
     //     container 'https://depot.galaxyproject.org/singularity/fastp:0.20.1--h8b12597_0'
     // } else {

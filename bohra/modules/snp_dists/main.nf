@@ -11,6 +11,8 @@ process SNP_DISTS {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
     
+    conda (params.enable_conda ? 'bioconda::snp-dists=0.8.2' : null)
+
     cache 'lenient'
     
     input:

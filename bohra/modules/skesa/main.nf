@@ -11,6 +11,8 @@ process SKESA {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"${meta.id}", publish_id:meta.id) }
     
+    conda (params.enable_conda ? 'bioconda::skesa=2.4.0' : null)
+
     cache 'lenient'
     // afterScript "rm -fr /tmp/\$USER/*"
     scratch true

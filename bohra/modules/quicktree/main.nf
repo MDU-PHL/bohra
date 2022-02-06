@@ -11,6 +11,7 @@ process QUICKTREE {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
     
+    conda (params.enable_conda ? 'bioconda::quicktree=2.5' : null)
     
     cache 'lenient'
     

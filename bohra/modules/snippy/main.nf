@@ -13,7 +13,7 @@ process SNIPPY {
     
     // scratch true
     cache 'lenient'
-    // conda (params.enable_conda ? 'bioconda::shovill=1.1.0' : null)
+    conda (params.enable_conda ? 'bioconda::snippy=4.4.5' : null)
     // if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
     //     container 'https://depot.galaxyproject.org/singularity/fastp:0.20.1--h8b12597_0'
     // } else {

@@ -10,6 +10,8 @@ process PANAROO {
         mode: 'copy',
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"report", publish_id:'report') }
     
+    conda (params.enable_conda ? 'bioconda::panaroos=1.2.9' : null)
+
     cache 'lenient'
     scratch true
     // afterScript "rm -fr /tmp/\$USER/*"

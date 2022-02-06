@@ -13,7 +13,7 @@ process SPADES {
     
     cpus options.args2// args2 needs to be cpus for shovill
     cache 'lenient'
-    // conda (params.enable_conda ? 'bioconda::shovill=1.1.0' : null)
+    conda (params.enable_conda ? 'bioconda::spades=3.15.2' : null)
     // if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
     //     container 'https://depot.galaxyproject.org/singularity/fastp:0.20.1--h8b12597_0'
     // } else {
