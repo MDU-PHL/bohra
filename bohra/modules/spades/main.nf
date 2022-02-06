@@ -35,7 +35,7 @@ process SPADES {
     else
         tmp_dir=\$(mktemp -d)
         spades.py -1 ${reads[0]} -2 ${reads[1]} -o current -t $task.cpus --isolate --tmp-dir \$tmp_dir
-        cp current/scaffolds.fasta contigs.fa
+        cp current/contigs.fasta contigs.fa
         rm -rf \$tmp_dir
     fi
     """

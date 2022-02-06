@@ -12,7 +12,7 @@ def combine(prokka, asm, isolate, output):
     df = pandas.read_csv(asm, sep = '\t')
     gff = gff[gff['cond'].isin(['CDS', 'rRNA'])]
     print(gff)
-    rrna = gff[gff['cond'] == 'rRNA'][isolate].values[0].replace("\"","").strip()
+    rrna = gff[gff['cond'] == 'rRNA'][isolate].values[0].replace("\"","").strip() if not gff[gff['cond'] == 'rRNA'].empty else ''
     cds = gff[gff['cond'] == 'CDS'][isolate].values[0].replace("\"","").strip()
     print(rrna)
     print(cds)

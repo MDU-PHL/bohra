@@ -355,7 +355,7 @@ $("button.detail-button").click(function(){
     });
     $("#download-csv").click(function(){
       console.log('clicking download button')
-        table.download("csv", "data.csv", {delimiter:"."});
+        table.download("csv", "data.csv", {delimiter:","});
       });
     // $("#download-excel").click(function(){
     //   table.download("xlsx", section + ".xlsx", {sheetName:$(this).text()});

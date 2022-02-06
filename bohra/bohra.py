@@ -35,7 +35,9 @@ def check_deps():
     """
     C = CheckBohra()
     
-    
+def init_bohra():
+    pass
+
 def main():
     # setup the parser
   
@@ -53,7 +55,7 @@ def main():
     parser_run.add_argument('--job_id','-j',help='Job ID is the name that will be displayed on your report', default='Bohra microbial genomics pipeline')
     parser_run.add_argument('--reference','-r',help='Path to reference (.gbk or .fa)', default = '')
     parser_run.add_argument('--mask','-m',default = '', help='Path to mask file if used (.bed)')
-    parser_run.add_argument("--abritamr_args",default="",help="Set if you would like to use point mutations, please provide a valid species.", choices= ['Acinetobacter_baumannii', "Campylobacter", "Enterococcus_faecalis", "Enterococcus_faecium", "Escherichia", "Klebsiella", "Salmonella", "Staphylococcus_aureus", "Staphylococcus_pseudintermedius", "Streptococcus_agalactiae", "Streptococcus_pneumoniae", "Streptococcus_pyogenes", "Vibrio_cholerae"])
+    parser_run.add_argument("--abritamr_args",default="",help="Set if you would like to use point mutations, please provide a valid species.", choices= ['Neisseria', 'Acinetobacter_baumannii', "Campylobacter", "Enterococcus_faecalis", "Enterococcus_faecium", "Escherichia", "Klebsiella", "Salmonella", "Staphylococcus_aureus", "Staphylococcus_pseudintermedius", "Streptococcus_agalactiae", "Streptococcus_pneumoniae", "Streptococcus_pyogenes", "Vibrio_cholerae"])
     parser_run.add_argument('--kraken_db', '-k', default="KRAKEN2_DEFAULT_DB", help="Path to DB for use with kraken2, if no DB present speciation will not be performed.")
     parser_run.add_argument('--pipeline','-p', default = 'preview', choices=['preview','default','pluspan'], help=f"The pipeline to run. `preview` - generates a rapid tree using mash distances | `default` - runs snippy, phylogenetic tree (if > 3 sequences), assemblies, mlst and amr gene detection | `all` - same as default but includes roary pangenome analysis")
     parser_run.add_argument('--assembler','-a', default = 'spades', choices=['shovill','skesa','spades'], help=f"Assembler to use.")

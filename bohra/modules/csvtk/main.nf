@@ -11,7 +11,8 @@ process CSVTK_CONCAT {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
     
-    
+    conda 'bioconda::csvtk'
+
     cache 'lenient'
     
     input:

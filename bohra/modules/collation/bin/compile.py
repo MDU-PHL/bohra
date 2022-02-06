@@ -239,7 +239,7 @@ def _generate_table(d, columns,comment, tables, wd, iso_dict, id_col):
         _c = [{'title':'Isolate','field':'Isolate',"headerFilter":"input","headerFilterPlaceholder":"Search isolate"}]
         _cls = sorted([c for c in cols if c not in ['Isolate']])
         for i in _cls:
-            _c.append({'title':f"{i}",'field':f"{i}","headerFilter":"input","headerFilterPlaceholder":f"Search {i}"})
+            _c.append({'title':f"{i}",'field':f"{i}", "headerVertical":"true", "vertAlign":"bottom"})
         columns[d['link']] = _c
     
     else:
