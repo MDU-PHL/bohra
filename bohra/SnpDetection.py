@@ -550,7 +550,9 @@ Please select a mode to run, choices are 'analysis' or 'finish'")
         # mask
         if self.mask != '' and not self._path_exists(pathlib.Path(self.mask)):
             LOGGER.critical(f"{self.mask} is not a valid path please try again.")
+            raise SystemExit
         elif self.mask != '' and  self._path_exists(pathlib.Path(self.mask, v = False)):
+            self.mask = self._copy_files(_file = self.mask)
             LOGGER.info(f"Mask file {self.mask} has been provided.")
         else:
             LOGGER.info(f"No mask file has been provided.")
@@ -563,7 +565,7 @@ Please select a mode to run, choices are 'analysis' or 'finish'")
             contigs_file = 'no_contigs'
             
         run_iqtree = 'false' if self.no_phylo else 'true'
-
+        mask_string = 'no_mask' if self.mask == '' else self.mask
         if self.config == '':
             cpus = self._set_cpu_limit_local(self.cpus)
             config = ''
@@ -574,7 +576,7 @@ Please select a mode to run, choices are 'analysis' or 'finish'")
          
         cmd = self._generate_cmd(mode = self.pipeline, run_kraken = self.run_kraken, kraken2_db = self.kraken_db,
                         contigs = contigs_file, cpus = cpus, config = config, assembler = self.assembler, 
-                        mask_string = self.mask, reference = reference, run_iqtree = run_iqtree,profile = self.profile,
+                        mask_string = mask_string, reference = reference, run_iqtree = run_iqtree,profile = self.profile,
                         isolates = isolates_list, day = self.day, user = self.user, 
                         species = self.abritamr_args, gubbins = self.gubbins, blast_db = self.blast_db, data_dir = self.data_dir, job_id = self.job_id)
         self._run_cmd(cmd)
