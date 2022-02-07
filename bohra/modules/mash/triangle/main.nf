@@ -11,7 +11,7 @@ process MASH_TRIANGLE {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
     
-    conda (params.enable_conda ? 'mash=2.4' : null)
+    conda (params.enable_conda ? 'mash' : null)
     cache 'lenient'
     scratch true
     

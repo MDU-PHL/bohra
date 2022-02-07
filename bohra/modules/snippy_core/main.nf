@@ -26,7 +26,7 @@ process SNIPPY_CORE {
 
     script:
     
-    def mask_string = params.mask_string ? "--mask $launchDir/${params.mask_string}" : ""
+    def mask_string = params.mask_string != 'no_mask' ? "--mask $launchDir/${params.mask_string}" : ""
     def core = alns.join(' ')
     """
     snippy-core --ref $reference ${mask_string} $core

@@ -82,10 +82,11 @@ class RunSnpDetection(object):
         self.config = args.config
         self.profile_config = os.getenv('BOHRA_PROFILES','')
         self.profile = self._get_profile() if args.profile == '' else args.profile
-        self.run_kraken = False
+        self.run_kraken = 'false'
         self.no_phylo = args.no_phylo
         self.abritamr_args = args.abritamr_args
         self.proceed = args.proceed
+        self.use_conda = True if args.no_conda == False else False
         
         
     
@@ -151,7 +152,7 @@ class RunSnpDetection(object):
         report_path_preview =  self.workdir / self.job_id / f'report_{self.day}'
         if self.keep == 'Y' and report_path_orig.exists():
             cmd = f"mv {report_path_orig} {report_path_preview}"
-            LOGGER.info(f"Archiving preview directory...")
+            LOGGER.info(f"Archiving previous report directory...")
             subprocess.run(cmd, shell = True, encoding = "utf-8", capture_output= True)
         elif self.keep == 'N' and report_path_orig.exists():
             cmd = f"rm {report_path_orig}"
@@ -226,7 +227,7 @@ class RunSnpDetection(object):
                 for k in range(len(kmerfiles)):
                     s.append(self._check_size_file(pathlib.Path(k2db) / kmerfiles[k]))
                 if 0 not in s:
-                    self.run_kraken = True
+                    self.run_kraken = 'true'
                     return True
         else:
             LOGGER.critical(f'{k2db} is not a directory.')
@@ -309,7 +310,7 @@ class RunSnpDetection(object):
     
     def check_dependencies(self, checking):
 
-        
+                
         software = {
             'nextflow':'nextflow -v',
             'snippy': 'snippy --version 2>&1',
@@ -561,7 +562,7 @@ Please select a mode to run, choices are 'analysis' or 'finish'")
         else:
             contigs_file = 'no_contigs'
             
-        run_iqtree = False if self.no_phylo else True
+        run_iqtree = 'false' if self.no_phylo else 'true'
 
         if self.config == '':
             cpus = self._set_cpu_limit_local(self.cpus)
