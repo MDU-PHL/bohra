@@ -38,7 +38,7 @@ workflow RUN_CORE {
         reference
     main:
         SNIPPY_CORE ( alns, reference )  
-        SNP_DISTS ( SNIPPY_CORE.out.core_full_aln )     
+        SNP_DISTS ( SNIPPY_CORE.out.core_aln )     
         
     emit:
         core_aln = SNIPPY_CORE.out.core_aln
