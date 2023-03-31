@@ -16,7 +16,7 @@ Bohra is microbial genomics pipeline, designed predominantly for use in public h
     * Can be run on a single isolate (phylogenetic tree will not be generated if fewer than three sequences included in dataset)
     * MobSuite integration.
     * Updated [abriTAMR](https://github.com/MDU-PHL/abritamr) with support for point mutations and virulence factors (beta).
-* Roary with visualisation of pan-genome.
+* Panaroo with visualisation of pan-genome.
 * Improved support for different computing environments.
 
 **Comming soon**
@@ -104,7 +104,7 @@ pip3 install bohra
 ```
 * [Snippy (v4.4.5 recommended)](https://github.com/tseemann/snippy)
 * [Shovill (skesa and spades.py)](https://github.com/tseemann/shovill)
-* [Roary](https://sanger-pathogens.github.io/Roary/)
+* [Panaroo](https://github.com/gtonkinhill/panaroo)
 * [Prokka](https://github.com/tseemann/prokka)
 * [kraken2](https://ccb.jhu.edu/software/kraken/)
 * [abritamr](https://github.com/MDU-PHL/abritamr)
