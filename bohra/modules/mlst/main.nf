@@ -35,8 +35,8 @@ process MLST {
     tuple val(meta), path('mlst.json'), emit: json
 
     script:
-    def _blast_db = params.blast_db != 'no_db' ? "--blastdb ${blast_db}" : ""
-    def _publst_db = params.data_dir != 'no_db' ? "--datadir ${blast_db}" : ""
+    def _blast_db = params.blast_db != 'no_db' ? "--blastdb ${params.blast_db}" : ""
+    def _publst_db = params.data_dir != 'no_db' ? "--datadir ${params.data_dir}" : ""
     def exclude = params.mlst_exclude != '' ? "--exclude ${params.mlst_exclude}" : ""
     """
     mlst --json mlst.json --label $meta.id --nopath $contigs $_blast_db $_publst_db  $exclude > mlst.txt
