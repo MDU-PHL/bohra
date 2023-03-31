@@ -534,10 +534,10 @@ class RunSnpDetection(object):
         resume = '' if self.force else "-resume"
         cpu = f'-executor.cpus={int(cpus)}' if cpus != '' else ''
         config = f'-c {config}' if config != '' else ''
-        conda = '--use-conda' if self.use_conda else ''
+        conda = '--enable_conda' if self.use_conda else ''
         snippy_opts = self._generate_snippy_params()
         parameters = f"--job_id {job_id} --mode {mode} --run_iqtree {run_iqtree} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} --mask_string {mask_string} --reference {reference} --contigs_file {contigs} --species {species if species != '' else 'no_species'} --outdir {self.workdir} --isolates {isolates} --user {user} --day {day} --gubbins {gubbins} --blast_db {blast_db} --data_dir {data_dir} {conda} {snippy_opts}"
-        options = f"-with-report bohra_{day}_report.html -with-trace -profile {profile} {resume} {cpu} {config}"
+        options = f"-with-report bohra_{day}_report.html -with-trace -profile {profile} {resume} {cpu} {config} {'-with-conda' if self.use_conda else ''}"
 
         cmd = f"{stub} {parameters} {options}"
         return cmd

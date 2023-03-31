@@ -34,7 +34,7 @@ process PANAROO {
     output:
     path('summary_statistics.txt'), emit: pangenome_summary
     path('gene_presence_absence_roary.csv'), emit: pangenome_csv
-    // path('panaroo/*')
+    path('panaroo/*')
 
     script:
     def gffs_str = gffs.join(' ')
