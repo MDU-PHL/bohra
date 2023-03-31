@@ -10,7 +10,19 @@ process PANAROO {
         mode: 'copy',
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"report", publish_id:'report') }
     
-    conda (params.enable_conda ? 'bioconda::panaroos=1.2.9' : null)
+    
+    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/panaroo" : 'bioconda::panaroos=1.2.9') : null) 
+    
+    if ( params.enable_conda ) {
+        if (file("${params.conda_path}").exists()) {
+            conda "${params.conda_path}/panaroo"
+        } else {
+            conda 'bioconda::panaroo=1.2.9'
+        }
+    } else {
+        conda null
+    }
+    
 
     cache 'lenient'
     scratch true

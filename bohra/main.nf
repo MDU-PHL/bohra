@@ -3,12 +3,16 @@ nextflow.enable.dsl=2
 version = '1.0'
 
 println "Ready"
-println "Welcome to bohra - microbial genomics pipeline!"
+println "Running bohra - microbial genomics pipeline!"
 
 println "Setting up some variables for pipeline."
 println "The pipeline will be run in $launchDir"
 println "Job directory is ${params.outdir}"
+println "The conda path is ${params.conda_path}"
+e = file("${params.conda_path}").exists()
+println "The conda path exists : $e"
 
+println "Conda has been enabled : ${params.enable_conda}"
 // set some parameters
 params.species_options = ['Neisseria', 'Acinetobacter_baumannii', "Campylobacter", "Enterococcus_faecalis", "Enterococcus_faecium", "Escherichia", "Klebsiella", "Salmonella", "Staphylococcus_aureus", "Staphylococcus_pseudintermedius", "Streptococcus_agalactiae", "Streptococcus_pneumoniae", "Streptococcus_pyogenes", "Vibrio_cholerae"]
 params.template_dir = file("${projectDir}/templates")
@@ -31,6 +35,7 @@ contigs_reader.eachLine { line ->
         }
     }
 } 
+
 
 reference = Channel.fromPath( "${params.reference}")
 reads = Channel.fromFilePairs(["${params.outdir}/*/*_R{1,2}*.f*q.gz","${params.outdir}/*/*_{1,2}.f*q.gz"])

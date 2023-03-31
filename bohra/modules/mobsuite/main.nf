@@ -12,12 +12,17 @@ process MOBSUITE {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     
     cache 'lenient'
-    conda (params.enable_conda ? 'bioconda::mob_suite=3.0.3' : null)
-    // if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-    //     container 'https://depot.galaxyproject.org/singularity/fastp:0.20.1--h8b12597_0'
-    // } else {
-    //     container 'quay.io/biocontainers/fastp:0.20.1--h8b12597_0'
-    // }
+    
+    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/mob_suite" : 'bioconda::mob_suite=3.0.2') : null) 
+    if ( params.enable_conda ) {
+        if (file("${params.conda_path}").exists()) {
+            conda "${params.conda_path}/mob_suite"
+        } else {
+            conda 'bioconda::mob_suite=3.0.2'
+        }
+    } else {
+        conda null
+    }
 
     input:
     tuple val(meta), path(asm)

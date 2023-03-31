@@ -16,6 +16,7 @@ include { PROKKA } from './../modules/prokka/main'
 include { IQTREE } from './../modules/iqtree/main' 
 include { MOBSUITE } from './../modules/mobsuite/main' 
 include { GUBBINS } from './../modules/gubbins/main' 
+include { SNIPPY_CLEAN } from './../modules/snippy_clean/main' 
 
 workflow RUN_SNIPPY {   
 
@@ -53,7 +54,8 @@ workflow RUN_GUBBINS {
     take:
         core_full
     main:
-        GUBBINS ( core_full )
+        SNIPPY_CLEAN ( core_full )
+        GUBBINS ( SNIPPY_CLEAN.out.cleaned )
     emit:
         core_aln = GUBBINS.out.gubbins
 }

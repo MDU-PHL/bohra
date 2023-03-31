@@ -16,6 +16,17 @@ process ABRITAMR {
     // publishDir "abritamr",
     //     mode: 'link',
     //     saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
+    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/abritamr" : 'bioconda::abritamr') : null) 
+    
+    if ( params.enable_conda ) {
+        if (file("${params.conda_path}").exists()) {
+            conda "${params.conda_path}/abritamr"
+        } else {
+            conda 'bioconda::bioconda::abritamr'
+        }
+    } else {
+        conda null
+    }
 
     cache 'lenient' 
     scratch true

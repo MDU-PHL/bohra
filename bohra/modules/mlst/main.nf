@@ -12,7 +12,19 @@ process MLST {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     
     cache 'lenient'
-    conda (params.enable_conda ? 'bioconda::mlst=2.19.0' : null)
+    
+    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/mlst" : 'bioconda::mlst=2.19.0') : null) 
+    
+    if ( params.enable_conda ) {
+        if (file("${params.conda_path}").exists()) {
+            conda "${params.conda_path}/mlst"
+        } else {
+            conda 'bioconda::mlst=2.19.0'
+        }
+    } else {
+        conda null
+    }
+
     scratch true
 
     input:

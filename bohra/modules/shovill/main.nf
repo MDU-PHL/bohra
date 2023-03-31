@@ -11,8 +11,19 @@ process SHOVILL {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"${meta.id}", publish_id:meta.id) }
     
-    conda (params.enable_conda ? 'bioconda::shovill=1.1.0' : null)
     
+    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/shovill" : 'shovill=1.1.0') : null) 
+    
+    if ( params.enable_conda ) {
+        if (file("${params.conda_path}").exists()) {
+            conda "${params.conda_path}/shovill"
+        } else {
+            conda 'bioconda::shovill=1.1.0'
+        }
+    } else {
+        conda null
+    }
+
     cache 'lenient'
     // afterScript "rm -fr /tmp/\$USER/*"
     scratch true

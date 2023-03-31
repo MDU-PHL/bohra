@@ -70,6 +70,7 @@ def main():
     parser_run.add_argument('--no_phylo',action="store_true", help = "Set if you do NOT want to generate a phylogentic tree.")
     parser_run.add_argument('--config', default = f"", help='An additional config file, required if running on a non-local machine, ie slurm, cloud. For help see documentation at https://github.com/MDU-PHL/bohra or https://www.nextflow.io/docs/latest/executor.html') # don't need this
     parser_run.add_argument('--profile', default = f"", help='The resource profile to use. Defaults to local, if using an alternative config file, this calue should represent the name of a profile provided') 
+    parser_run.add_argument('--conda_path', default = f"", help='The path to where your pre-installed conda envs are stored, defaults to installing conda envs in your work directory. This can be provided in your profiles settings as well - it assumes you have pre-configured all of your conda environments for each process run by bohra, this is an advanced setting. Please take care.') 
     parser_run.add_argument('--blast_db', default = f"{os.getenv('BLAST_DB', '')}", help='Path to the mlst blast_db, defaults to what is installed in the environment.') 
     parser_run.add_argument('--data_dir', default = f"{os.getenv('PUBMLST_DB','')}", help='Path to the mlst datadir, defaults to what is installed in the environment.') 
     parser_run.add_argument('--mlst_exclude',default = f"", help='Space delimited list of mlst schemes to exclude.', nargs='+')
@@ -80,6 +81,17 @@ def main():
 
     parser_check = subparsers.add_parser('check', help='Check bohra installation', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
+    parser_setup = subparsers.add_parser('generate_input', help='Generate input files for bohra', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser_setup.add_argument(
+        '--read_path',
+        '-r',
+        help = 'Path to look for read files')
+    parser_setup.add_argument(
+        '--contig_path',
+        '-c',
+        help = 'Path to look for contig files')
+
+        
     parser_run.set_defaults(func=run_pipeline)
     parser_check.set_defaults(func=check_deps)
 

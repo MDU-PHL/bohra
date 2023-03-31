@@ -87,6 +87,7 @@ class RunSnpDetection(object):
         self.abritamr_args = args.abritamr_args
         self.proceed = args.proceed
         self.use_conda = True if args.no_conda == False else False
+        self.conda_path = args.conda_path
         
         
     
@@ -206,7 +207,22 @@ class RunSnpDetection(object):
             LOGGER.critical(f"There is something wrong with your reference file. Valid file types are .fasta, .gbk, .fasta.gz, .gbk.gz. Please check your inputs and try again.")
             raise SystemExit
 
-    
+    def _check_gzip(self,read):
+        """
+        ensure that gz file is true gz
+        input:
+            read: path to read file
+        """
+        LOGGER.info(f"Checking if file is valid gzip.")
+        if f"{read}".endswith('gz'):
+            p = subprocess.run(f"gzip --test {read}", shell= True, capture_output= True, encoding='utf-8')
+            if p.returncode != 0:
+                LOGGER.critical(f"Something is wrong with {read}. It is not a valid gzipped file. Please check your inputs and try again.")
+                raise SystemExit
+            return True
+        else:
+            True
+   
     
     def _check_size_file(self, path):
         '''
@@ -374,7 +390,23 @@ class RunSnpDetection(object):
             return True
         else:
             return False
-
+    
+    def _check_gzip(self,read):
+        """
+        ensure that gz file is true gz
+        input:
+            read: path to read file
+        """
+        LOGGER.info(f"Checking if file is valid gzip.")
+        if f"{read}".endswith('gz'):
+            p = subprocess.run(f"gzip --test {read}", shell= True, capture_output= True, encoding='utf-8')
+            if p.returncode != 0:
+                LOGGER.critical(f"Something is wrong with {read}. It is not a valid gzipped file. Please check your inputs and try again.")
+                raise SystemExit
+            return True
+        else:
+            True
+   
     def _check_reads(self,reads):
 
         if self._path_exists(reads):
@@ -502,8 +534,9 @@ class RunSnpDetection(object):
         resume = '' if self.force else "-resume"
         cpu = f'-executor.cpus={int(cpus)}' if cpus != '' else ''
         config = f'-c {config}' if config != '' else ''
+        conda = '--use-conda' if self.use_conda else ''
         snippy_opts = self._generate_snippy_params()
-        parameters = f"--job_id {job_id} --mode {mode} --run_iqtree {run_iqtree} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} --mask_string {mask_string} --reference {reference} --contigs_file {contigs} --species {species if species != '' else 'no_species'} --outdir {self.workdir} --isolates {isolates} --user {user} --day {day} --gubbins {gubbins} --blast_db {blast_db} --data_dir {data_dir} {snippy_opts}"
+        parameters = f"--job_id {job_id} --mode {mode} --run_iqtree {run_iqtree} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} --mask_string {mask_string} --reference {reference} --contigs_file {contigs} --species {species if species != '' else 'no_species'} --outdir {self.workdir} --isolates {isolates} --user {user} --day {day} --gubbins {gubbins} --blast_db {blast_db} --data_dir {data_dir} {conda} {snippy_opts}"
         options = f"-with-report bohra_{day}_report.html -with-trace -profile {profile} {resume} {cpu} {config}"
 
         cmd = f"{stub} {parameters} {options}"
@@ -531,7 +564,12 @@ Please select a mode to run, choices are 'analysis' or 'finish'")
         run pipeline, if workflow runs to completion print out a thank you message.
         '''
         # run checks for inputs
-        self.check_dependencies(checking=False)
+        if self.use_conda == False:
+            LOGGER.warning(f"You are using a pre-configured conda environment - please note the results may be unexpected.")
+            self.check_dependencies(checking=False)
+        else:
+            LOGGER.info(f"You are running with conda - wise decision!! Will noe ensure that kraken DB is configured properly.")
+            self._check_kraken2DB(checking = False)
         # input files
         reads = self._check_reads(reads = self.reads)
         contigs = self._check_contigs(contigs = self.contigs)

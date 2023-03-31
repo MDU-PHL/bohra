@@ -10,8 +10,16 @@ process SNIPPY_CORE {
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode
     
-    conda (params.enable_conda ? 'bioconda::snippy=4.4.5' : null)
-    
+    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/snippy" : 'bioconda::snippy=4.4.5') : null) 
+    if ( params.enable_conda ) {
+        if (file("${params.conda_path}").exists()) {
+            conda "${params.conda_path}/snippy"
+        } else {
+            conda 'bioconda::snippy=4.4.5'
+        }
+    } else {
+        conda null
+    }
     cpus options.args2// args2 needs to be cpus for shovill
     cache 'lenient'
     

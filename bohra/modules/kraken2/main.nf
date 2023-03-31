@@ -11,8 +11,16 @@ process KRAKEN2 {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"${meta.id}", publish_id:meta.id) }
     
-    conda (params.enable_conda ? 'kraken2=2.1.2' : null) 
-    
+    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/kraken2" : 'kraken2=2.1.2') : null) 
+    if ( params.enable_conda ) {
+        if (file("${params.conda_path}").exists()) {
+            conda "${params.conda_path}/kraken2"
+        } else {
+            conda 'kraken2=2.1.2'
+        }
+    } else {
+        conda null
+    }
     cache 'lenient'
     scratch true
     // afterScript "rm -fr /tmp/\$USER/*"

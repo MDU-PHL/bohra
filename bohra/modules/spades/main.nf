@@ -13,13 +13,17 @@ process SPADES {
     
     cpus options.args2// args2 needs to be cpus for shovill
     cache 'lenient'
-    conda (params.enable_conda ? 'bioconda::spades=3.15.2' : null)
-    // if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-    //     container 'https://depot.galaxyproject.org/singularity/fastp:0.20.1--h8b12597_0'
-    // } else {
-    //     container 'quay.io/biocontainers/fastp:0.20.1--h8b12597_0'
-    // }
-
+    
+    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/spades" : 'bioconda::spades=3.15.2') : null) 
+    if ( params.enable_conda ) {
+        if (file("${params.conda_path}").exists()) {
+            conda "${params.conda_path}/spades"
+        } else {
+            conda 'bioconda::spades=3.15.2'
+        }
+    } else {
+        conda null
+    }
     input:
     tuple val(meta), path(reads)
 

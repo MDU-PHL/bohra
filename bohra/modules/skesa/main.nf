@@ -11,7 +11,18 @@ process SKESA {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"${meta.id}", publish_id:meta.id) }
     
-    conda (params.enable_conda ? 'bioconda::skesa=2.4.0' : null)
+    
+    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/skesa" : 'bioconda::skesa=2.4.0') : null) 
+    
+    if ( params.enable_conda ) {
+        if (file("${params.conda_path}").exists()) {
+            conda "${params.conda_path}/skesa"
+        } else {
+            conda 'bioconda::skesa=2.4'
+        }
+    } else {
+        conda null
+    }
 
     cache 'lenient'
     // afterScript "rm -fr /tmp/\$USER/*"
