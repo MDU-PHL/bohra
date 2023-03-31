@@ -299,9 +299,9 @@ class RunSnpDetection(object):
 
         LOGGER.info(f"Checking mlst setup.")
         if self.blast_db == "" or self.data_dir == "":
-            LOGGER.info(f"Getting path to installed blast db for mlst")
-            self.blast_db = self._get_db('--blastdb')
-            self.data_dir = self._get_db('--datadir')
+            LOGGER.warning(f"You do not have mlst databases pre-configured the default DB with your installation of mlst will be used.")
+            # self.blast_db = self._get_db('--blastdb')
+            # self.data_dir = self._get_db('--datadir')
         elif self._path_exists(pathlib.Path(self.blast_db)) and self._path_exists(pathlib.Path(self.data_dir)):
             LOGGER.info(f"Your mlst databases have been found.")
         else:
@@ -568,8 +568,10 @@ Please select a mode to run, choices are 'analysis' or 'finish'")
             LOGGER.warning(f"You are using a pre-configured conda environment - please note the results may be unexpected.")
             self.check_dependencies(checking=False)
         else:
-            LOGGER.info(f"You are running with conda - wise decision!! Will noe ensure that kraken DB is configured properly.")
+            LOGGER.info(f"You are running with conda - wise decision!! Will now ensure that kraken DB is configured properly.")
             self._check_kraken2DB(checking = False)
+            LOGGER.info(f"Now looking for MLST setup")
+            self._check_mlstdb()
         # input files
         reads = self._check_reads(reads = self.reads)
         contigs = self._check_contigs(contigs = self.contigs)
@@ -616,7 +618,7 @@ Please select a mode to run, choices are 'analysis' or 'finish'")
                         contigs = contigs_file, cpus = cpus, config = config, assembler = self.assembler, 
                         mask_string = mask_string, reference = reference, run_iqtree = run_iqtree,profile = self.profile,
                         isolates = isolates_list, day = self.day, user = self.user, 
-                        species = self.abritamr_args, gubbins = self.gubbins, blast_db = self.blast_db, data_dir = self.data_dir, job_id = self.job_id)
+                        species = self.abritamr_args, gubbins = self.gubbins, blast_db = self.blast_db if self.blast_db != '' else 'no_db', data_dir = self.data_dir if self.data_dir != '' else 'no_db', job_id = self.job_id)
         self._run_cmd(cmd)
 
 class CheckBohra(RunSnpDetection):

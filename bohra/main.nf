@@ -13,6 +13,7 @@ e = file("${params.conda_path}").exists()
 println "The conda path exists : $e"
 
 println "Conda has been enabled : ${params.enable_conda}"
+println "The blast_db is : ${params.blast_db}"
 // set some parameters
 params.species_options = ['Neisseria', 'Acinetobacter_baumannii', "Campylobacter", "Enterococcus_faecalis", "Enterococcus_faecium", "Escherichia", "Klebsiella", "Salmonella", "Staphylococcus_aureus", "Staphylococcus_pseudintermedius", "Streptococcus_agalactiae", "Streptococcus_pneumoniae", "Streptococcus_pyogenes", "Vibrio_cholerae"]
 params.template_dir = file("${projectDir}/templates")
@@ -36,14 +37,17 @@ contigs_reader.eachLine { line ->
     }
 } 
 
+// println contigs
 
 reference = Channel.fromPath( "${params.reference}")
 reads = Channel.fromFilePairs(["${params.outdir}/*/*_R{1,2}*.f*q.gz","${params.outdir}/*/*_{1,2}.f*q.gz"])
                 .filter { sample, files -> samples.contains(files[0].getParent().getName())}
                 .map { sample, files -> tuple([id: files[0].getParent().getName(), single_end:false, contigs: contigs[files[0].getParent().getName()]], files)}
 
-blast_db = Channel.fromPath("${params.blast_db}")
-pubmlst_db = Channel.fromPath("${params.data_dir}")
+
+
+
+
 include { READ_ANALYSIS;RUN_KRAKEN } from './workflows/common'
 include { PREVIEW_NEWICK } from './workflows/preview'
 include { COLLATE_KRAKEN;COLLATE_SEQS;WRITE_HTML } from './workflows/collation'
@@ -74,7 +78,7 @@ workflow {
         } else {
             tree = Channel.empty().ifEmpty('EmptyFile')
         }
-        RUN_ASSEMBLE ( reads, blast_db,pubmlst_db )
+        RUN_ASSEMBLE ( reads )
         if (params.mode == 'pluspan') {
             RUN_PANAROO( RUN_ASSEMBLE.out.gff.map { cfg, gff -> gff }.collect() )
             svg = RUN_PANAROO.out.svg

@@ -69,12 +69,11 @@ workflow RUN_IQTREE {
     emit:
         newick = IQTREE.out.newick
 }
+
 workflow RUN_ASSEMBLE {   
 
     take:
-        reads
-        blast_db
-        pubmlst_db
+        reads  
     main:
     if ( params.assembler == 'shovill'){
         SHOVILL ( reads )   
@@ -91,8 +90,7 @@ workflow RUN_ASSEMBLE {
         ABRITAMR ( contigs )
         ab = ABRITAMR.out.abritamr_matches.join( ABRITAMR.out.abritamr_partials )
         COMBINE_AMR( ab )
-        cntg = contigs.combine( blast_db )
-        MLST ( cntg.combine( pubmlst_db ) )
+        MLST ( contigs )
         ADD_HEADER_MLST ( MLST.out.json)
         PROKKA ( contigs )
         // add new processes that generate outputs
