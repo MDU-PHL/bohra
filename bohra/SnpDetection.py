@@ -465,7 +465,15 @@ class RunSnpDetection(object):
             subprocess.run(cmd, shell = True)
 
         return f"{name}"
+    
+    def _link_reads(self, iso_dir,read, target):
 
+        if read.exists() and not pathlib.Path(f"{iso_dir}/{target}").exists():
+                    subprocess.run(f"ln -sf {read} {iso_dir}/{target}", shell = True)
+        elif not read.exists():
+            LOGGER.critical(f"{read} is not a valid path. All read files must be valid path. Please try again.")
+            raise SystemExit
+        
     def _setup_directory(self, reads):
         
         isolates_list = []
@@ -479,14 +487,14 @@ class RunSnpDetection(object):
                 iso_dir = self.workdir/ f"{row[1][0]}" 
                 if not iso_dir.exists():
                     subprocess.run(f"mkdir {iso_dir}", shell = True)
-                for r in [row[1][1],row[1][2]]:
-                    read = pathlib.Path(r)
-                    target = read.name
-                    if read.exists() and not pathlib.Path(f"{iso_dir}/{target}").exists():
-                        subprocess.run(f"ln -sf {r} {iso_dir}/{target}", shell = True)
-                    elif not read.exists():
-                        LOGGER.critical(f"{read} is not a valid path. All read files must be valid path. Please try again.")
-                        raise SystemExit
+                # for r in [row[1][1],row[1][2]]:
+                read1 = pathlib.Path(row[1][1])
+                read2 =pathlib.Path(row[1][2])
+                target1 = 'R1.fastq.gz'
+                target2 = 'R2.fastq.gz'
+                self._link_reads(iso_dir = iso_dir, read = read1, target = target1)
+                self._link_reads(iso_dir = iso_dir, read = read2, target = target2)
+                
         
         self._check_phylo(isolates_list = isolates_list)
         LOGGER.info(f"Updating isolate list.")
