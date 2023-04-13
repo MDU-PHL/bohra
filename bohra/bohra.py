@@ -79,7 +79,7 @@ def main():
     parser_run.add_argument('--keep', default = 'N', choices= ['Y', 'N'], help = 'If you are rerunning bohra over an exisiting directory set --keep to \'Y\' to archive report files - otherwise previous reprot files will be removed.')
     parser_run.add_argument('--no-conda',action="store_true", help="Set if you DO NOT WANT to use separate conda environments for each nextflow process (excluding abritamr).")
 
-    parser_check = subparsers.add_parser('check', help='Check bohra installation', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    # parser_check = subparsers.add_parser('check', help='Check bohra installation', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser_setup = subparsers.add_parser('generate_input', help='Generate input files for bohra', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_setup.add_argument(
@@ -93,7 +93,7 @@ def main():
 
         
     parser_run.set_defaults(func=run_pipeline)
-    parser_check.set_defaults(func=check_deps)
+    # parser_check.set_defaults(func=check_deps)
 
         
     args = parser.parse_args()

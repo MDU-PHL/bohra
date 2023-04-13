@@ -39,7 +39,7 @@ process SNIPPY {
     script:
     """
     snippy --outdir ${meta.id} \\
-    --R1 ${reads[0]} --R2 ${reads[0]} \\
+    --R1 ${reads[0]} --R2 ${reads[1]} \\
     --reference $reference \\
     --mapqual ${params.minmap} --basequal ${params.basequal} \\
     --mincov ${params.mincov} --minfrac ${params.minfrac} \\
