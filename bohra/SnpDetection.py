@@ -673,7 +673,7 @@ class SetupInputFiles():
         
         return isolates
     
-    def _get_isolate_list_path(self, _dir,  ext= f"*.f*q.gz"):
+    def _get_isolate_list(self, _dir,  ext= f"*.f*q.gz"):
 
         all_data = sorted(_dir.rglob(ext))
 
@@ -710,7 +710,7 @@ class SetupInputFiles():
             reads = sorted(_dir.rglob(f"*{iso}*.f*q.gz"))
             if len(reads) == 2:
                 LOGGER.info(f"Now add reads for {iso}")
-                lines.append(f"{iso}\t{reads[0]}\{reads[1]}")
+                lines.append(f"{iso}\t{reads[0]}\t{reads[1]}")
             elif len(reads) <2:
                 LOGGER.warning(f"There do not appear to be 2 reads for {iso}. Skipping")
             else:
@@ -743,13 +743,15 @@ class SetupInputFiles():
     
     def find_reads(self):
 
-        if self._check_path(self.read_path):
+        if self.read_path != '' and self._check_path(self.read_path):
             if self.isolate_list != '': 
                 isolates = self._extract_isolates(isolate_file= self.isolate_list) if self._check_path(self.isolate_list) else []
             else:
                 isolates = []
             self._glob_data(path = self.read_path, isolates= isolates)
-
+        else:
+            LOGGER.critical(f"There seems to be a problem with your read path. Please provide a valid path to the reads you wish to include")
+            raise SystemExit
 
 
     

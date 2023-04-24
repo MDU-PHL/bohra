@@ -84,10 +84,12 @@ def main():
     parser_setup.add_argument(
         '--read_path',
         '-r',
+        default='',
         help = 'Path to look for read files')
     parser_setup.add_argument(
         '--isolate_list',
         '-i',
+        default= '',
         help = 'List of isolates (one isolate name per line) to include in input file. If not provided all sequences in found will be included.'
     )
 
