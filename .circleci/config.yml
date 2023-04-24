@@ -5,7 +5,7 @@ jobs: # A basic unit of work in a run
     working_directory: ~/repo
     docker: # run the steps with Docker
       # CircleCI Python images available at: https://hub  .docker.com/r/circleci/python/
-      - image: circleci/python:3.7.3
+      - image: circleci/python:3.9
         environment: # environment variables for primary container
           PIPENV_VENV_IN_PROJECT: true
     steps: # steps that comprise the `build` job
@@ -24,7 +24,7 @@ jobs: # A basic unit of work in a run
           paths:
             - ".venv"
             - "/usr/local/bin"
-            - "/usr/local/lib/python3.7/site-packages"
+            - "/usr/local/lib/python3.9/site-packages"
       - run:
           command: |
             pipenv run pytest
