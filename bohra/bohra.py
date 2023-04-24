@@ -17,7 +17,7 @@ import pathlib
 import sys
 import os
 import shutil
-from bohra.SnpDetection import RunSnpDetection, SetupInputFile
+from bohra.SnpDetection import RunSnpDetection, SetupInputFiles
 from bohra.version import version
 
 
@@ -31,7 +31,8 @@ def run_pipeline(args):
 
 def find_reads(args):
 
-    S = SetupInputFile(args)
+    S = SetupInputFiles(args)
+    S.find_reads()
 
 def init_bohra():
     pass

@@ -743,9 +743,11 @@ class SetupInputFiles():
     
     def find_reads(self):
 
-        if self._check_path(self.read_path) and self._check_path(self.isolate_list):
-
-            isolates = self._extract_isolates(isolate_file= self.isolate_list)
+        if self._check_path(self.read_path):
+            if self.isolate_list != '': 
+                isolates = self._extract_isolates(isolate_file= self.isolate_list) if self._check_path(self.isolate_list) else []
+            else:
+                isolates = []
             self._glob_data(path = self.read_path, isolates= isolates)
 
 
