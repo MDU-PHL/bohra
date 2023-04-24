@@ -17,7 +17,7 @@ import pathlib
 import sys
 import os
 import shutil
-from bohra.SnpDetection import RunSnpDetection, CheckBohra
+from bohra.SnpDetection import RunSnpDetection, SetupInputFile
 from bohra.version import version
 
 
@@ -29,12 +29,10 @@ def run_pipeline(args):
     R = RunSnpDetection(args)
     return(R.run_pipeline())
 
-def check_deps():
-    """
-    check that dependencies are all installed
-    """
-    C = CheckBohra()
-    
+def find_reads(args):
+
+    S = SetupInputFile(args)
+
 def init_bohra():
     pass
 
@@ -77,7 +75,7 @@ def main():
     parser_run.add_argument('--proceed', action="store_true", help = "If you would like to proceed straigt to the pipeline.")
     parser_run.add_argument('--gubbins',  action = 'store_true', help = 'Set to use gubbins for recombination correction.')
     parser_run.add_argument('--keep', default = 'N', choices= ['Y', 'N'], help = 'If you are rerunning bohra over an exisiting directory set --keep to \'Y\' to archive report files - otherwise previous reprot files will be removed.')
-    parser_run.add_argument('--no-conda',action="store_true", help="Set if you DO NOT WANT to use separate conda environments for each nextflow process (excluding abritamr).")
+    parser_run.add_argument('--no-conda',action="store_true", help="Set if you DO NOT WANT to use separate conda environments for each nextflow process.")
 
     # parser_check = subparsers.add_parser('check', help='Check bohra installation', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
@@ -87,21 +85,22 @@ def main():
         '-r',
         help = 'Path to look for read files')
     parser_setup.add_argument(
-        '--contig_path',
-        '-c',
-        help = 'Path to look for contig files')
+        '--isolate_list',
+        '-i',
+        help = 'List of isolates (one isolate name per line) to include in input file. If not provided all sequences in found will be included.'
+    )
 
         
     parser_run.set_defaults(func=run_pipeline)
-    # parser_check.set_defaults(func=check_deps)
+    parser_setup.set_defaults(func=find_reads)
 
         
     args = parser.parse_args()
     
     if len(sys.argv) <= 2 and sys.argv[1] != 'check':
         parser.print_help(sys.stderr)
-    elif sys.argv[1] == 'check':
-        check_deps()
+    # elif sys.argv[1] == 'check':
+    #     check_deps()
     else:
         # logger = logging.getLogger(__name__)
         # logger.setLevel(logging.INFO)
