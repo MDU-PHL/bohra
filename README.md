@@ -1,15 +1,10 @@
-[![CircleCI](https://circleci.com/gh/MDU-PHL/bohra.svg?style=svg&circle-token=530799cb0764519fc65966ab48bac7e0d02f3688)](https://circleci.com/gh/MDU-PHL/bohra)
-[![Python 3.7](https://img.shields.io/badge/python-3.7-blue.svg)](https://www.python.org/downloads/release/python-370/)
-
+<!-- [![CircleCI](https://circleci.com/gh/MDU-PHL/bohra.svg?style=svg&circle-token=530799cb0764519fc65966ab48bac7e0d02f3688)](https://circleci.com/gh/MDU-PHL/bohra) -->
+[![Python 3.7](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-370/)
 
 
 # Bohra
 
 Bohra is microbial genomics pipeline, designed predominantly for use in public health, but may also be useful in research settings. At a minimum the pipeline takes as input a tab-delimited file with the isolate IDs followed by the path to READ1 and READ2, a reference for alignment and a unique identifier, where reads are illumina reads (other platforms are not supported at this stage).
-
-## Bohra has a new look! Welcome to Bohra-NF
-
-**New features**
 
 * Pipeline written in [Nextflow](https://www.nextflow.io)
 * Default mode
@@ -19,10 +14,17 @@ Bohra is microbial genomics pipeline, designed predominantly for use in public h
 * Panaroo with visualisation of pan-genome.
 * Improved support for different computing environments.
 
+## Recent changes to bohra
+* Each bohra process is now run in its own conda environment. These will by default be included in your working directory.
+* Alternatively you can install your own conda environments and provide the path to where these can be found (see help below).
+* If you wish you can maintain the existing structure - where all the dependencies are installed in a single environment. BEWARE this can cause unexpected behaviour and even cause the pipeline to fail. If you wish to run bohra in this way please contact us for advice.
+
 **Comming soon**
 
 * Improved report structure
-* Option to add your own modules
+* Baby kraken
+* Typing (_Salmonella_ spp., _Listeria monocytogenes_, _Neiserria_)
+* Mtb AMR
 
 
 **Accreditation**
@@ -73,35 +75,45 @@ Bohra can be run in three modes
 * Species identification
 * Pan Genome
 
-### Installation
+### Installation (with conda)
 
-**New installation instructions comming soon**
+Bohra requires >=python3.9 and conda
 
-Bohra requires >=python3.7
+See below for instructions on how to configure the databases for kraken2.
 
-#### Conda (Highly recomended)
-
-Installing bohra with conda will ensure that all dependencies are present. See below for instructions on how to configure the databases for kraken2.
-
-Set up conda - documentation for conda installation can be found [here](https://conda.io/en/latest/miniconda.html)
+1. Set up conda - documentation for conda installation can be found [here](https://conda.io/en/latest/miniconda.html)
 ```
 conda config --add channels defaults
 conda config --add channels bioconda
 conda config --add channels conda-forge
 ```
-It is recomended that you set up a `bohra` environment
+
+2. Create the conda environment
 ```
-conda create -n <bohra_env_name> bohra
-```
-To use bohra
-```
+conda create -n <bohra_env_name> bohra python=3.9
 conda activate <bohra_env_name>
 ```
-#### PyPi
-If installing with `pip` you will need to ensure other dependencies are also installed.
+You can also install `bohra` with 
 ```
 pip3 install bohra
 ```
+
+3. Ensure that you have a kraken2 database. Minikraken can obtained as follows
+```
+wget ftp://ftp.ccb.jhu.edu/pub/data/kraken2_dbs/minikraken2_v2_8GB_201904_UPDATE.tgz
+tar -C $HOME -zxvf minikraken2_v2_8GB_201904_UPDATE.tgz
+```
+This will download and unzip the kraken2 DB. Other kraken2 DB are also available, you can find more information [here](https://ccb.jhu.edu/software/kraken2/index.shtml?t=downloads)
+
+Once you have the DB downloaded you will have to create an environment variable called `KRAKEN2_DEFAULT_DB`. This can be done by adding the following to your `$HOME/.bashrc`
+```
+export KRAKEN_DEFAULT_DB=$HOME/minikraken2_v2_8GB_201904_UPDATE
+```
+
+#### Recommended conda environments (for the brave)
+
+If you would like to use pre-installed conda envs - the following are suggested. You may also attempt to install all these dependencies into a single conda environment - however it is not recomended as there may be significant dependency clashes.
+
 * [Snippy (v4.4.5 recommended)](https://github.com/tseemann/snippy)
 * [Shovill (skesa and spades.py)](https://github.com/tseemann/shovill)
 * [Panaroo](https://github.com/gtonkinhill/panaroo)
@@ -117,27 +129,6 @@ pip3 install bohra
 * [csvtk](https://github.com/shenwei356/csvtk)
 
 
-#### Check installation
-
-Check that all dependencies are installed.
-
-```
-bohra check
-```
-
-*IMPORTANT*
-
-In addition to installing kraken ensure that you have a kraken2 database. Minikraken can obtained as follows
-```
-wget ftp://ftp.ccb.jhu.edu/pub/data/kraken2_dbs/minikraken2_v2_8GB_201904_UPDATE.tgz
-tar -C $HOME -zxvf minikraken2_v2_8GB_201904_UPDATE.tgz
-```
-This will download and unzip the kraken2 DB. Other kraken2 DB are also available, you can find more information [here](https://ccb.jhu.edu/software/kraken2/index.shtml?t=downloads)
-
-Once you have the DB downloaded you will have to create an environment variable called `KRAKEN2_DEFAULT_DB`. This can be done by adding the following to your `$HOME/.bashrc`
-```
-export KRAKEN_DEFAULT_DB=$HOME/minikraken2_v2_8GB_201904_UPDATE
-```
 
 ### Running bohra
 
@@ -150,81 +141,15 @@ export KRAKEN_DEFAULT_DB=$HOME/minikraken2_v2_8GB_201904_UPDATE
 
 #### Using CLI
 
-```
-$ bohra run -h
+**`bohra generate_input`**
 
-Bohra - a bacterial genomics pipeline - version 2.0.0
-
- -h, --help            show this help message and exit
-  -v, --version         show program's version number and exit
-  --check               Check that dependencies are installed correctly.
-                        (default: False)
-  --input_file INPUT_FILE, -i INPUT_FILE
-                        Path to reads file, which is a tab-delimited with 3
-                        columns <isolatename> <path_to_read1> <path_to_read2>.
-                        REQUIRED (default: )
-  --contigs CONTIGS, -c CONTIGS
-                        Path to contigs file, which is a tab-delimited with 3
-                        columns <isolatename> <path_to_contigs>. OPTIONAL if
-                        you already have assemblies. (default: )
-  --job_id JOB_ID, -j JOB_ID
-                        Job ID, will be the name of the output directory
-                        (default: )
-  --reference REFERENCE, -r REFERENCE
-                        Path to reference (.gbk or .fa) (default: )
-  --mask MASK, -m MASK  Path to mask file if used (.bed) (default: )
-  --abritamr_args {Acinetobacter_baumannii,Campylobacter,Enterococcus_faecalis,Enterococcus_faecium,Escherichia,Klebsiella,Salmonella,Staphylococcus_aureus,Staphylococcus_pseudintermedius,Streptococcus_agalactiae,Streptococcus_pneumoniae,Streptococcus_pyogenes,Vibrio_cholerae}
-                        Set if you would like to use point mutations, please
-                        provide a valid species. (default: )
-  --kraken_db KRAKEN_DB, -k KRAKEN_DB
-                        Path to DB for use with kraken2, if no DB present
-                        speciation will not be performed. (default:
-                        KRAKEN2_DEFAULT_DB)
-  --pipeline {preview,default,all}, -p {preview,default,all}
-                        The pipeline to run. `preview` - generates a rapid
-                        tree using mash distances | `default` - runs snippy,
-                        phylogenetic tree (if > 3 sequences), assemblies, mlst
-                        and amr gene detection | `all` - same as default but
-                        includes roary pangenome analysis (default: preview)
-  --assembler {shovill,skesa,spades}, -a {shovill,skesa,spades}
-                        Assembler to use. (default: spades)
-  --cpus CPUS           Number of max CPU cores to run, will define how many
-                        rules are run at a time (default: 72)
-  --minaln MINALN, -ma MINALN
-                        Minimum percent alignment. Isolates which do not align
-                        to reference at this threshold will not be included in
-                        core phylogeny. (default: 0)
-  --minqual MINQUAL, -mq MINQUAL
-                        Minimum Avg quality of reads (default: 0)
-  --mincov MINCOV, -mc MINCOV
-                        Minimum percent alignment. Isolates which do not have
-                        average read coverage above this threshold will not be
-                        included further analysis. (default: 0)
-  --workdir WORKDIR, -w WORKDIR
-                        The directory where Bohra will be run, default is
-                        current directory (default:
-                        /home/khhor/sandbox/bohra/weird_bugs)
-  --force, -f           Add if you would like to force a complete restart of
-                        the pipeline. All previous logs will be lost.
-                        (default: False)
-  --no_phylo            Set if you do NOT want to generate a phylogentic tree.
-                        (default: False)
-  --config CONFIG       An additional config file, required if running on a
-                        non-local machine, ie slurm, cloud. For help see
-                        documentation at https://github.com/MDU-PHL/bohra or
-                        https://www.nextflow.io/docs/latest/executor.html
-                        (default: )
-  --profile PROFILE     The resource profile to use. Defaults to local, if
-                        using an alternative config file, this calue should
-                        represent the name of a profile provided (default:
-                        lcl)
-  --gubbins             Set to use gubbins for recombination correction.
-                        (default: False)
-  --keep {Y,N}          If you are rerunning bohra over an exisiting directory
-                        set --keep to 'Y' to archive report files - otherwise
-                        previous reprot files will be removed. (default: N)
+`bohra` will generate an input file for you with the path to reads in the correct format, you will need to supply a path to where the reads can be found. You may also want to supply a file with a list of sample IDs (especially if there are more reads in the path provided than you wish to use). Please note `generate_input` assumes that the files are named as `<sample_ID_someother_stuff_{R1,R2}.f*q.gz>` and will output a file called `isolates.tab`
 
 ```
+bohra generate_input -r path_to_reads
+```
+
+**`bohra run`**
 
 
 **Input file**
@@ -252,7 +177,7 @@ Phage masking is important for to prevent the inflation of SNPs that can be intr
 
 
 
-### Preview mode
+### Preview mode (default)
 
 `bohra` preview mode uses `mash` to calculate mash distances between isolates and generate a mash tree to rapidly identify outliers in your dataset or identify clades of interest for a more focused analysis.
 
@@ -267,7 +192,22 @@ Default mode will perform SNP detection, assemblies (if contigs file not provide
 ```
 bohra run -i input.tab -c contigs.tab -r ref.fa -p default -j job_id
 ```
-
+In addition, if you would like `bohra` to output point mutations for AMR (based on `abritAMR` and AMRFinderplus), you can also add the `--abritamr_args` flag with one of the following species:
+```
+Neisseria
+Acinetobacter_baumannii
+Campylobacter
+Enterococcus_faecalis
+Enterococcus_faecium
+Escherichia
+Klebsiella
+Salmonella
+Staphylococcus_aureus
+Staphylococcus_pseudintermedius
+Streptococcus_agalactiae
+Streptococcus_pneumoniae
+Streptococcus_pyogenes,Vibrio_cholerae
+```
 
 ### Plus pangenome
 
