@@ -17,7 +17,7 @@ process PANAROO {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/panaroo"
         } else {
-            conda 'bioconda::panaroo=1.2.9'
+            conda 'bioconda::panaroo=1.2.9 csvtk'
         }
     } else {
         conda null
