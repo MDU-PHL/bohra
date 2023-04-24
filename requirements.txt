@@ -1,10 +1,9 @@
+pytest
+altair
 jinja2
 biopython>=1.70
-pandas>=0.23.0
-pathlib
-numpy
-svgwrite
+pandas=1.0.5
+numpy=1.23.1
 psutil
-pytest
 sh
 packaging
