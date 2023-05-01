@@ -31,7 +31,7 @@ process GUBBINS {
 
     script:
     """
-    run_gubbins.py -c $task.cpus  --prefix clean cleaned
+    run_gubbins.py -c $task.cpus  --prefix clean $cleaned
     snp-sites -c clean.filtered_polymorphic_sites.fasta > gubbins.aln
     """
     
