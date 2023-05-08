@@ -16,7 +16,7 @@ process MASH_TRIANGLE {
     
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/mash"
+            conda "${params.conda_path}/bohra-mash"
         } else {
             conda 'mash'
         }

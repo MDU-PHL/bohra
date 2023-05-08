@@ -20,7 +20,7 @@ process ABRITAMR {
     
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/abritamr"
+            conda "${params.conda_path}/bohra-abritamr"
         } else {
             conda 'bioconda::bioconda::abritamr'
         }

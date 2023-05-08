@@ -15,7 +15,7 @@ process PANAROO {
     
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/panaroo"
+            conda "${params.conda_path}/bohra-panaroo"
         } else {
             conda 'bioconda::panaroo=1.2.9 csvtk'
         }

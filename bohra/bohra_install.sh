@@ -45,6 +45,16 @@ if [[ $su -eq 1 ]]
     else
         echo $ENV_PREFIX-snippy is already setup. Nothing left to do
 fi
+echo "Checking set up for $ENV_PREFIX-snpdists"
+su=$(check_installation $ENV_PREFIX-snpdists)
+# echo $su
+if [[ $su -eq 1 ]]
+    then
+        echo $ENV_PREFIX-snpdists can not be found. Now setting up $ENV_PREFIX-snpdists
+        mamba create -y -n $ENV_PREFIX-snpdists snp-dists
+    else
+        echo $ENV_PREFIX-snpdists is already setup. Nothing left to do
+fi
 # shovill
 echo "Checking set up for $ENV_PREFIX-shovill"
 su=$(check_installation $ENV_PREFIX-shovill)

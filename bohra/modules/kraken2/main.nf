@@ -14,7 +14,7 @@ process KRAKEN2 {
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/kraken2" : 'kraken2=2.1.2') : null) 
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/kraken2"
+            conda "${params.conda_path}/bohra-kraken2"
         } else {
             conda 'kraken2=2.1.2'
         }

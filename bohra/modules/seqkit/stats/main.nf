@@ -16,7 +16,7 @@ process SEQKIT_STATS {
     
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/seqkit"
+            conda "${params.conda_path}/bohra-seqkit"
         } else {
             conda 'csvtk seqkit=2.1.0'
         }

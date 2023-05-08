@@ -16,7 +16,7 @@ process MOBSUITE {
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/mob_suite" : 'bioconda::mob_suite=3.0.2') : null) 
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/mob_suite"
+            conda "${params.conda_path}/bohra-mob_suite"
         } else {
             conda 'bioconda::mob_suite=3.0.2'
         }

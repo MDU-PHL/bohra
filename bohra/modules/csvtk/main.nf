@@ -15,7 +15,7 @@ process CSVTK_CONCAT {
     
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/csvtk"
+            conda "${params.conda_path}/bohra-csvtk"
         } else {
             conda 'bioconda::csvtk'
         }
