@@ -66,7 +66,6 @@ if [[ $su -eq 1 ]]
     else
         echo $ENV_PREFIX-shovill is already setup. Nothing left to do
 fi
-
 # # mlst
 echo "Checking set up for $ENV_PREFIX-mlst"
 su=$(check_installation $ENV_PREFIX-mlst)
@@ -161,7 +160,7 @@ su=$(check_installation $ENV_PREFIX-quicktree)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-quicktree can not be found. Now setting up $ENV_PREFIX-quicktree
-        mamba create -y -n $ENV_PREFIX-quicktree quicktree=2.5
+        mamba create -y -n $ENV_PREFIX-quicktree quicktree=2.5 newick_utils
     else
         echo $ENV_PREFIX-quicktree is already setup. Nothing left to do
 fi
