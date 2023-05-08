@@ -96,6 +96,7 @@ def main():
     )
 
     parser_init = subparsers.add_parser('init', help='Setup bohra dependencies', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser_check = subparsers.add_parser('check', help='Check for bohra dependencies', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
 
     parser_run.set_defaults(func=run_pipeline)
@@ -104,10 +105,10 @@ def main():
 
         
     args = parser.parse_args()
-    
-    if len(sys.argv) <= 2 and sys.argv[1] != 'init':
+    print(len(sys.argv))
+    if len(sys.argv) < 2:
         parser.print_help(sys.stderr)
-    elif sys.argv[1] == 'init':
+    elif sys.argv[1] in ['init', 'check']:
         init_bohra()
     else:
         # logger = logging.getLogger(__name__)

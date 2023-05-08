@@ -37,14 +37,10 @@ class InitBohra(object):
 
         LOGGER.info(f"Will now try to install dependencies. Please be patient this may take some time!!... Maybe get coffee.")
         process = subprocess.Popen(['bash', f"{self.script_path}/bohra_install.sh"], stdout=subprocess.PIPE, encoding='utf-8')
-        # stdout = process.communicate()[0]
-        # print('{}'.format(stdout))
         while process.poll() is None:
             l = process.stdout.readline().strip() # This blocks until it receives a newline.
             print(f"{l}")
-# When the subprocess terminates there might be unconsumed output 
-# that still needs to be processed.
-        print(process.stdout.read().strip())
+        
 
 class RunSnpDetection(object):
     '''
