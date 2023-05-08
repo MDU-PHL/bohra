@@ -15,7 +15,7 @@ process IQTREE {
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/iqtree2" : 'iqtree=2.1.4 snp-sites=2.5.1') : null)
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/bohra-iqtree2"
+            conda "${params.conda_path}/bohra-iqtree"
         } else {
             conda 'iqtree=2.1.4 snp-sites=2.5.1'
         }
