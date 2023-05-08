@@ -45,7 +45,6 @@ def main():
     parser = argparse.ArgumentParser(description=f'Bohra - a bacterial genomics pipeline - version {version}',formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + version)
     # options for running
-
     subparsers = parser.add_subparsers(help="Task to perform")
     # run bohra pipeline
     parser_run = subparsers.add_parser('run', help='Run bohra', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -80,8 +79,6 @@ def main():
     parser_run.add_argument('--keep', default = 'N', choices= ['Y', 'N'], help = 'If you are rerunning bohra over an exisiting directory set --keep to \'Y\' to archive report files - otherwise previous reprot files will be removed.')
     parser_run.add_argument('--no-conda',action="store_true", help="Set if you DO NOT WANT to use separate conda environments for each nextflow process.")
 
-    # parser_check = subparsers.add_parser('check', help='Check bohra installation', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-
     parser_setup = subparsers.add_parser('generate_input', help='Generate input files for bohra', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_setup.add_argument(
         '--read_path',
@@ -111,22 +108,6 @@ def main():
     elif sys.argv[1] in ['init', 'check']:
         init_bohra()
     else:
-        # logger = logging.getLogger(__name__)
-        # logger.setLevel(logging.INFO)
-        # # create file handler which logs even debug messages
-        # fh = logging.FileHandler('bohra.log')
-        # fh.setLevel(logging.INFO)
-        # # create console handler with a higher log level
-        # ch = logging.StreamHandler()
-        # ch.setLevel(logging.INFO)
-        # # create formatter and add it to the handlers
-        # formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p')
-        # fh.setFormatter(formatter)
-        # ch.setFormatter(formatter)
-        # # add the handlers to the logger
-        # logger.addHandler(ch)
-        # logger.addHandler(fh)
-        # logger.info(f"Starting bohra pipeline using {' '.join(sys.argv)}")
         args.func(args)
 	
 if __name__ == '__main__':
