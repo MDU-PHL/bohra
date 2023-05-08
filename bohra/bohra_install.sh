@@ -51,7 +51,7 @@ su=$(check_installation $ENV_PREFIX-snpdists)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-snpdists can not be found. Now setting up $ENV_PREFIX-snpdists
-        mamba create -y -n $ENV_PREFIX-snpdists snp-dists
+        mamba create -y -n $ENV_PREFIX-snpdists snp-dists csvtk
     else
         echo $ENV_PREFIX-snpdists is already setup. Nothing left to do
 fi
