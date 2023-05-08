@@ -11,13 +11,13 @@ Bohra is modular allowing the user to choose between calling SNPs and generating
 """
 
 
-import logging
+# import logging
 import argparse
 import pathlib
 import sys
 import os
 import shutil
-from bohra.SnpDetection import RunSnpDetection, SetupInputFiles
+from bohra.SnpDetection import RunSnpDetection, SetupInputFiles, InitBohra
 from bohra.version import version
 
 
@@ -35,7 +35,9 @@ def find_reads(args):
     S.find_reads()
 
 def init_bohra():
-    pass
+    
+    I = InitBohra()
+    I.init()
 
 def main():
     # setup the parser
@@ -93,17 +95,20 @@ def main():
         help = 'List of isolates (one isolate name per line) to include in input file. If not provided all sequences in found will be included.'
     )
 
-        
+    parser_init = subparsers.add_parser('init', help='Setup bohra dependencies', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+
+
     parser_run.set_defaults(func=run_pipeline)
     parser_setup.set_defaults(func=find_reads)
+    
 
         
     args = parser.parse_args()
     
-    if len(sys.argv) <= 2 and sys.argv[1] != 'check':
+    if len(sys.argv) <= 2 and sys.argv[1] != 'init':
         parser.print_help(sys.stderr)
-    # elif sys.argv[1] == 'check':
-    #     check_deps()
+    elif sys.argv[1] == 'init':
+        init_bohra()
     else:
         # logger = logging.getLogger(__name__)
         # logger.setLevel(logging.INFO)

@@ -27,6 +27,25 @@ fh.setFormatter(formatter)
 LOGGER.addHandler(ch) 
 LOGGER.addHandler(fh)
 
+class InitBohra(object):
+
+    def __init__(self):
+
+        self.script_path = f"{pathlib.Path(__file__).parent}"
+    
+    def init(self):
+
+        LOGGER.info(f"Will now try to install dependencies. Please be patient this may take some time!!... Maybe get coffee.")
+        process = subprocess.Popen(['bash', f"{self.script_path}/bohra_install.sh"], stdout=subprocess.PIPE, encoding='utf-8')
+        # stdout = process.communicate()[0]
+        # print('{}'.format(stdout))
+        while process.poll() is None:
+            l = process.stdout.readline().strip() # This blocks until it receives a newline.
+            print(f"{l}")
+# When the subprocess terminates there might be unconsumed output 
+# that still needs to be processed.
+        print(process.stdout.read().strip())
+
 class RunSnpDetection(object):
     '''
     A class for Bohra pipeline object
@@ -370,7 +389,7 @@ class RunSnpDetection(object):
         self._check_kraken2DB(checking = checking)
         software_versions.append(f"kraken2 DB: {self.kraken_db}")
         if not checking:
-            print(checking)
+            # print(checking)
             self._check_mlstdb()
             software_versions.append(f"mlst blast db: {self.blast_db}")
             software_versions.append(f"mlst data dir: {self.data_dir}")
