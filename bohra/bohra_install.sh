@@ -4,7 +4,7 @@
 
 ENV_PREFIX="bohra"
 # abort if any step fails
-# set -e
+set -e
 # resets to base env
 eval "$(conda shell.bash hook)"
 # check that mamba is installed
@@ -20,30 +20,22 @@ else
 fi
 
 function check_installation(){
-    # echo Checking $1
-    # echo $1
     rt=$(conda activate $1 2>&1)
     # echo "$rt"
     if [[ "$rt" =~ .*"EnvironmentNameNotFound".* ]]
     then 
-        # echo $1 is already setup. Nothing left to do
         x=1
     else
-        # echo $1 is not yet setup.
         x=0
     fi
     echo $x
-    # return $x
 }
 
 ENVS=($ENV_PREFIX-csvtk $ENV_PREFIX-mash $ENV_PREFIX-spades $ENV_PREFIX-skesa $ENV_PREFIX-seqtk $ENV_PREFIX-seqkit $ENV_PREFIX-iqtree $ENV_PREFIX-quicktree $ENV_PREFIX-prokka $ENV_PREFIX-snippy $ENV_PREFIX-shovill $ENV_PREFIX-mlst $ENV_PREFIX-kraken2 $ENV_PREFIX-mob_suite $ENV_PREFIX-panaroo $ENV_PREFIX-abritamr $ENV_PREFIX-gubbins)
 # set up conda envs
-# echo "Checking set up conda environments for bohra"
-
-
+echo "Checking conda environments for bohra, if they are not found they will be installed."
 # snippy
 echo "Checking set up for $ENV_PREFIX-snippy"
-
 su=$(check_installation $ENV_PREFIX-snippy)
 # echo $su
 if [[ $su -eq 1 ]]
@@ -97,7 +89,7 @@ if [[ $su -eq 1 ]]
         mamba create -y -n $ENV_PREFIX-mob_suite mob_suite=3.0.2 numpy=1.21.1
     else
         echo $ENV_PREFIX-mob_suite is already setup. Nothing left to do
-        # conda activate $ENV_PREFIX-mob_suite
+        conda activate $ENV_PREFIX-mob_suite
         if [ -d $CONDA_PREFIX/lib/python3.8/site-packages/mob_suite/databases ]
             then
                 echo mob_suite database is present
@@ -245,8 +237,5 @@ if [[ $su -eq 1 ]]
     else
         echo $ENV_PREFIX-csvtk is already setup. Nothing left to do
 fi
-
-
-# # echo The dependencies for bohra have been installed in your default conda path - go forth and analyse!!
-
-# # echo Please contact us at https://github.com/MDU-PHL/bohra for any issues or concerns
+echo The dependencies for bohra are installed in your default conda path - go forth and analyse!!
+echo Please contact us at https://github.com/MDU-PHL/bohra for any issues or concerns
