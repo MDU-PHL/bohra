@@ -15,7 +15,7 @@ process SEQTK {
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/seqtk" : 'seqtk') : null) 
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/seqtk"
+            conda "${params.conda_path}/bohra-seqtk"
         } else {
             conda 'bioconda::seqtk'
         }

@@ -16,7 +16,7 @@ process SKESA {
     
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/skesa"
+            conda "${params.conda_path}/bohra-skesa"
         } else {
             conda 'bioconda::skesa=2.4'
         }

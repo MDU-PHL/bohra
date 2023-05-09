@@ -16,7 +16,7 @@ process PROKKA {
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/prokka" : 'bioconda::prokka=1.14.6') : null) 
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/prokka"
+            conda "${params.conda_path}/bohra-prokka"
         } else {
             conda 'bioconda::prokka'
         }

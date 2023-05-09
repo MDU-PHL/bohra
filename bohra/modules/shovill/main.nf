@@ -16,7 +16,7 @@ process SHOVILL {
     
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/shovill"
+            conda "${params.conda_path}/bohra-shovill"
         } else {
             conda 'bioconda::shovill=1.1.0'
         }

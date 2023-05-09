@@ -27,6 +27,21 @@ fh.setFormatter(formatter)
 LOGGER.addHandler(ch) 
 LOGGER.addHandler(fh)
 
+class InitBohra(object):
+
+    def __init__(self):
+
+        self.script_path = f"{pathlib.Path(__file__).parent}"
+    
+    def init(self):
+
+        LOGGER.info(f"Will now try to install dependencies. Please be patient this may take some time!!... Maybe get coffee.")
+        process = subprocess.Popen(['bash', f"{self.script_path}/bohra_install.sh"], stdout=subprocess.PIPE, encoding='utf-8')
+        while process.poll() is None:
+            l = process.stdout.readline().strip() # This blocks until it receives a newline.
+            print(f"{l}")
+        
+
 class RunSnpDetection(object):
     '''
     A class for Bohra pipeline object
@@ -370,7 +385,7 @@ class RunSnpDetection(object):
         self._check_kraken2DB(checking = checking)
         software_versions.append(f"kraken2 DB: {self.kraken_db}")
         if not checking:
-            print(checking)
+            # print(checking)
             self._check_mlstdb()
             software_versions.append(f"mlst blast db: {self.blast_db}")
             software_versions.append(f"mlst data dir: {self.data_dir}")
@@ -543,8 +558,9 @@ class RunSnpDetection(object):
         cpu = f'-executor.cpus={int(cpus)}' if cpus != '' else ''
         config = f'-c {config}' if config != '' else ''
         conda = '--enable_conda' if self.use_conda else ''
+        conda_path = f"--conda_path {self.conda_path}" if self.conda_path != '' else ''
         snippy_opts = self._generate_snippy_params()
-        parameters = f"--job_id {job_id} --mode {mode} --run_iqtree {run_iqtree} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} --mask_string {mask_string} --reference {reference} --contigs_file {contigs} --species {species if species != '' else 'no_species'} --outdir {self.workdir} --isolates {isolates} --user {user} --day {day} --gubbins {gubbins} --blast_db {blast_db} --data_dir {data_dir} {conda} {snippy_opts}"
+        parameters = f"--job_id {job_id} --mode {mode} --run_iqtree {run_iqtree} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} --mask_string {mask_string} --reference {reference} --contigs_file {contigs} --species {species if species != '' else 'no_species'} --outdir {self.workdir} --isolates {isolates} --user {user} --day {day} --gubbins {gubbins} --blast_db {blast_db} --data_dir {data_dir} {conda} {conda_path} {snippy_opts}"
         options = f"-with-report bohra_{day}_report.html -with-trace -profile {profile} {resume} {cpu} {config} {'-with-conda' if self.use_conda else ''}"
 
         cmd = f"{stub} {parameters} {options}"
