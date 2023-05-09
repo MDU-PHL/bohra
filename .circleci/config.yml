@@ -5,13 +5,13 @@ jobs: # A basic unit of work in a run
     working_directory: ~/repo
     docker: # run the steps with Docker
       # CircleCI Python images available at: https://hub  .docker.com/r/circleci/python/
-      - image: circleci/python:3.9
+      - image: circleci/python:3.8
         environment: # environment variables for primary container
           PIPENV_VENV_IN_PROJECT: true
     steps: # steps that comprise the `build` job
       - checkout # check out source code to working directory
       - run: sudo chown -R circleci:circleci /usr/local/bin
-      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.7/site-packages
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.8/site-packages
       - restore_cache:
       # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
           key: deps9-{{ .Branch }}-{{ checksum "requirements.txt" }}
@@ -24,7 +24,7 @@ jobs: # A basic unit of work in a run
           paths:
             - ".venv"
             - "/usr/local/bin"
-            - "/usr/local/lib/python3.9/site-packages"
+            - "/usr/local/lib/python3.8/site-packages"
       - run:
           command: |
             pipenv run pytest
