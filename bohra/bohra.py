@@ -102,16 +102,16 @@ def main():
     parser_check = subparsers.add_parser('check', help='Check for bohra dependencies', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser_test = subparsers.add_parser('test', help='Test bohra', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser_test.add_argument(
-        '--read_path',
-        help='Path to reads', 
-        default=f"{pathlib.Path(__file__).parent / 'tests'/ 'data'}"
-    )
-    parser_test.add_argument(
-        '--reference',
-        '-r',help='Reference to be used in test.', 
-        default=f"{pathlib.Path(__file__).parent / 'tests'/ 'data'/'NZ_CP012021.gbk'}"
-    )
+    # parser_test.add_argument(
+    #     '--read_path',
+    #     help='Path to reads', 
+    #     default=f"{pathlib.Path(__file__).parent / 'test'/ 'data'}"
+    # )
+    # parser_test.add_argument(
+    #     '--reference',
+    #     '-r',help='Reference to be used in test.', 
+    #     default=f"{pathlib.Path(__file__).parent / 'tests'/ 'data'/'NZ_CP012021.gbk'}"
+    # )
     
     parser_run.set_defaults(func=run_pipeline)
     parser_setup.set_defaults(func=find_reads)

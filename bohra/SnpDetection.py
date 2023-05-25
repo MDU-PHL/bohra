@@ -664,7 +664,7 @@ Please select a mode to run, choices are 'analysis' or 'finish'")
 #         self.check_dependencies(checking = self.check)
 
 
-class SetupInputFiles():
+class SetupInputFiles(RunSnpDetection):
 
     def __init__(self, args):
 
@@ -687,6 +687,7 @@ class SetupInputFiles():
         else:
             LOGGER.critical(f"Path provided : {path} does not exist - please try again.")
             return False
+        
     def _extract_isolates(self, isolate_file):
         
         with open(isolate_file, 'r') as f:
@@ -778,14 +779,29 @@ class TestBohra(SetupInputFiles):
 
     def __init__(self,args):
 
-        self.read_path = args.read_path
+        self.read_path = f"{pathlib.Path.cwd() / 'test_data'}"
+        self.isolate_list = ['ERR1102348','ERR1102353','ERR1102355','ERR1102356']
+        self.download_stub = "https://github.com/MDU-PHL/bohra/tree/make_tests_suite/bohra/tests/data/"
 
-    def _find_reads(self):
-        if self.read_path != '' and self._check_path(self.read_path):
+    def _download_reads_from_github(self):
 
-            self._glob_data(path = self.read_path)
-    
+        for isolate in self.isolate_list:
+            for r in [1,2]:
+                cmd = f"wget -P test_data/{isolate} {self.download_stub}/{isolate}/{isolate}_{r}.fastq.gz"
+                self._run_subprocess(cmd = cmd)
+
+    def _download_reference_from_github(self):
+
+        cmd = f"wget {self.download_stub}/NZ_CP012021.gbk"
+        self._run_subprocess(cmd = cmd)
+
     def run_tests(self):
 
-        self._find_reads()
+        LOGGER.info(f"Will now download some reads for testing - this may take a little while - it might be coffee time.")
+        self._download_reads_from_github()
+        LOGGER.info(f"Getting reference for testing.")
+        self._download_reference_from_github()
+        LOGGER.info(f"Now generating input file for bohra.")
+        self._glob_data(path = self.read_path)
+
 
