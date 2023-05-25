@@ -17,7 +17,7 @@ import pathlib
 import sys
 import os
 import shutil
-from bohra.SnpDetection import RunSnpDetection, SetupInputFiles, InitBohra, GetTestData
+from bohra.SnpDetection import RunSnpDetection, SetupInputFiles, InitBohra, TestBohra
 from bohra.version import version
 
 
@@ -40,10 +40,9 @@ def init_bohra():
     I.init()
 
 def test_bohra(args):
-    I = InitBohra()
-    I.init()
-    T = GetTestData(args)
-    T.get_input()
+    
+    S = TestBohra(args)
+    S.run_tests()
 
 
 def main():
@@ -103,8 +102,17 @@ def main():
     parser_check = subparsers.add_parser('check', help='Check for bohra dependencies', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
     parser_test = subparsers.add_parser('test', help='Test bohra', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-    parser_test.add_argument('--input_file','-i',help='Path to reads file, which is a tab-delimited with 3 columns <isolatename>  <path_to_read1> <path_to_read2>. If not supplied a dataset will be downloaded from SRA to run tests.', default='')
-    parser_test.add_argument('--reference','-r',help='Reference to be used in test, if none provided a reference will be downloaded.', default='')
+    parser_test.add_argument(
+        '--read_path',
+        help='Path to reads', 
+        default=f"{pathlib.Path(__file__).parent / 'tests'/ 'data'}"
+    )
+    parser_test.add_argument(
+        '--reference',
+        '-r',help='Reference to be used in test.', 
+        default=f"{pathlib.Path(__file__).parent / 'tests'/ 'data'/'NZ_CP012021.gbk'}"
+    )
+    
     parser_run.set_defaults(func=run_pipeline)
     parser_setup.set_defaults(func=find_reads)
     parser_test.set_defaults(func=test_bohra)
