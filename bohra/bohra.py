@@ -43,7 +43,7 @@ def test_bohra(args):
     
     S = TestBohra(args)
     S.run_tests()
-
+    # run_pipeline(inputs)
 
 def main():
     # setup the parser

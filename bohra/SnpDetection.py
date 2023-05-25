@@ -782,6 +782,8 @@ class TestBohra(SetupInputFiles):
         self.read_path = f"{pathlib.Path.cwd() / 'test_data'}"
         self.isolate_list = ['ERR1102348','ERR1102353','ERR1102355','ERR1102356']
         self.download_stub = "https://github.com/MDU-PHL/bohra/tree/make_tests_suite/bohra/tests/data/"
+        self.reference = f"Lm_Cluster1_J1-108.fa"
+
 
     def _download_reads_from_github(self):
 
@@ -804,4 +806,7 @@ class TestBohra(SetupInputFiles):
         LOGGER.info(f"Now generating input file for bohra.")
         self._glob_data(path = self.read_path)
 
+        cmd = f"bohra run -i isolates.tab -r {self.reference} -p pluspan --proceed"
+        self._run_subprocess(cmd=cmd)
 
+        # return bohra
