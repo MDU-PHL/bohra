@@ -1,7 +1,7 @@
 import pathlib
 import os, getpass, shutil, re, psutil
 import pandas
-# from bohra.bohra import check_deps
+from collections import namedtuple
 # import sh
 import logging
 # import filecmp
@@ -41,6 +41,7 @@ class InitBohra(object):
             l = process.stdout.readline().strip() # This blocks until it receives a newline.
             print(f"{l}")
         
+
 
 class RunSnpDetection(object):
     '''
@@ -566,13 +567,17 @@ class RunSnpDetection(object):
         cmd = f"{stub} {parameters} {options}"
         return cmd
         
-        
+    def _run_subprocess(self, cmd):
+
+        LOGGER.info(f"Running:\n\033[1m{cmd}\033[0m")
+        p = subprocess.run(cmd, shell = True)
+        return p
+    
     def _run_cmd(self, cmd):
         
         if self.proceed:
-            LOGGER.info(f"Running:\n\033[1m{cmd}\033[0m")
-            p = subprocess.run(cmd, shell = True)
-            return p
+            return self._run_subprocess(cmd= cmd)
+        
         else:
 
             try:
@@ -644,6 +649,53 @@ Please select a mode to run, choices are 'analysis' or 'finish'")
                         isolates = isolates_list, day = self.day, user = self.user, 
                         species = self.abritamr_args, gubbins = self.gubbins, blast_db = self.blast_db if self.blast_db != '' else 'no_db', data_dir = self.data_dir if self.data_dir != '' else 'no_db', job_id = self.job_id)
         self._run_cmd(cmd)
+
+
+class GetTestData(RunSnpDetection):
+
+    def __init__(self, args):
+        # super().__init__(args)
+        self.input_file = False if args.input_file == '' else pathlib.Path(args.input_file)
+        self.reference = False if  args.reference == '' else pathlib.Path(args.reference)
+        self.ref_name_downloaded = "GCA_000703365.1.gbk"
+
+    def _download_reads(self):
+    
+        pass
+
+    def _get_downloaded_input(self):
+
+        pass
+
+    def _download_reference(self):
+        
+        
+        cmd = f"esearch -db assembly -query 'GCA_000703365.1 NOT refseq[filter]' | elink -target nuccore -name assembly_nuccore_insdc | efetch -format gb -style withparts > {self.ref_name_downloaded}"
+        LOGGER.info(f"Downloading reference GCA_000703365.1")
+        proc = self._run_subprocess(cmd = cmd)
+        if proc.returncode != 0:
+            return self.ref_name_downloaded
+        else:
+            LOGGER.critical(f"Something has gone wrong with reference download. The following error was reported : {proc.stderr}")
+            raise SystemExit
+
+
+
+
+    def get_input(self):
+
+        Bohra_input = namedtuple("Bohra_input", "input_file reference")
+        if self.input_file != False and self.reference != False:
+            LOGGER.info(f"Input files have been provided. Will now run the bohra pipeline.")
+            return Bohra_input(self.input_file, self.reference)
+        elif not self.input_file and not self.reference:
+            LOGGER.info(f"A test data set will be downloaded for you. Please be patient this may take some time... great excuse for a coffee break.")
+            
+        else:
+            LOGGER.critical("You have not supplied both and input file of isolates and a reference. If you would like to download a test data set please re run with : \n bohra test")
+            raise SystemExit
+            
+
 
 # class CheckBohra(RunSnpDetection):
 
