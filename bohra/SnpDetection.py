@@ -794,7 +794,7 @@ class TestBohra(SetupInputFiles):
 
     def _download_reference_from_github(self):
 
-        cmd = f"wget {self.download_stub}/NZ_CP012021.gbk"
+        cmd = f"wget {self.download_stub}/{self.reference}"
         self._run_subprocess(cmd = cmd)
 
     def run_tests(self):
