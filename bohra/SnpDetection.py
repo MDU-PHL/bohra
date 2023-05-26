@@ -801,7 +801,7 @@ class TestBohra(SetupInputFiles):
         
 
     def run_tests(self):
-
+        
         LOGGER.info(f"Will now download some reads for testing - this may take a little while - it might be coffee time.")
         self._download_reads_from_github()
         LOGGER.info(f"Getting reference for testing.")

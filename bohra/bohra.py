@@ -110,7 +110,7 @@ def main():
     # parser_test.add_argument(
     #     '--reference',
     #     '-r',help='Reference to be used in test.', 
-    #     default=f"{pathlib.Path(__file__).parent / 'tests'/ 'data'/'NZ_CP012021.gbk'}"
+    #     default=f"{pathlib.Path(__file__).parent / 'tests'/ 'data'/'Lm_Cluster1_J1-108.fa'}"
     # )
     
     parser_run.set_defaults(func=run_pipeline)

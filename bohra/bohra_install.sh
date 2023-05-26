@@ -246,5 +246,18 @@ if [[ $su -eq 1 ]]
     else
         echo $ENV_PREFIX-csvtk is already setup. Nothing left to do
 fi
+# stype
+echo "Checking set up for $ENV_PREFIX-stype"
+su=$(check_installation $ENV_PREFIX-stype)
+# echo $su
+if [[ $su -eq 1 ]]
+    then
+        echo $ENV_PREFIX-stype can not be found. Now setting up $ENV_PREFIX-stype
+        mamba create -y -n $ENV_PREFIX-stype sistr_cmd=1.1.1
+        conda activate $ENV_PREFIX-stype
+        pip3 install git+https://github.com/MDU-PHL/salmonella_typing
+    else
+        echo $ENV_PREFIX-csvtk is already setup. Nothing left to do
+fi
 echo The dependencies for bohra are installed in your default conda path - go forth and analyse!!
 echo Please contact us at https://github.com/MDU-PHL/bohra for any issues or concerns
