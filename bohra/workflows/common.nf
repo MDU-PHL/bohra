@@ -20,12 +20,9 @@ workflow READ_ANALYSIS {
         SEQKIT_GC ( preview )
         COMBD = SEQKIT_STATS.out.stats.join( SEQKIT_GC.out.stats )
         COLLATE_STATS_ISOLATE ( COMBD.combine(reference) )
-        MASH_SKETCH ( preview )       
-        
-
     emit:
         stats = COLLATE_STATS_ISOLATE.out.read_assessment
-        skch = MASH_SKETCH.out.sketch
+        
 
 }
 
@@ -46,12 +43,14 @@ workflow RUN_KRAKEN {
 workflow PREVIEW_NEWICK {
 
     take:
-        sketches
+        preview
         // seqkit
         // seqtk_stats
     main:
-         MASH_TRIANGLE ( sketches )
-         QUICKTREE ( MASH_TRIANGLE.out.mash_distances )
+        MASH_SKETCH ( preview ) 
+        //   sketches = join mash_sketches
+        MASH_TRIANGLE ( sketches )
+        QUICKTREE ( MASH_TRIANGLE.out.mash_distances )
     emit:
         nwk = QUICKTREE.out.preveiw_tree
 

@@ -558,7 +558,7 @@ class RunSnpDetection(object):
         resume = '' if self.force else "-resume"
         cpu = f'-executor.cpus={int(cpus)}' if cpus != '' else ''
         config = f'-c {config}' if config != '' else ''
-        conda = '--enable_conda' if self.use_conda else ''
+        conda = '--enable_conda true' if self.use_conda else ''
         conda_path = f"--conda_path {self.conda_path}" if self.conda_path != '' else ''
         snippy_opts = self._generate_snippy_params()
         parameters = f"--job_id {job_id} --mode {mode} --run_iqtree {run_iqtree} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} --mask_string {mask_string} --reference {reference} --contigs_file {contigs} --species {species if species != '' else 'no_species'} --outdir {self.workdir} --isolates {isolates} --user {user} --day {day} --gubbins {gubbins} --blast_db {blast_db} --data_dir {data_dir} {conda} {conda_path} {snippy_opts}"
@@ -781,21 +781,24 @@ class TestBohra(SetupInputFiles):
 
         self.read_path = f"{pathlib.Path.cwd() / 'test_data'}"
         self.isolate_list = ['ERR1102348','ERR1102353','ERR1102355','ERR1102356']
-        self.download_stub = "https://github.com/MDU-PHL/bohra/tree/make_tests_suite/bohra/tests/data/"
+        self.download_stub = "https://raw.githubusercontent.com/MDU-PHL/bohra/make_tests_suite/bohra/tests/data"
         self.reference = f"Lm_Cluster1_J1-108.fa"
 
 
     def _download_reads_from_github(self):
 
         for isolate in self.isolate_list:
+            
             for r in [1,2]:
-                cmd = f"wget -P test_data/{isolate} {self.download_stub}/{isolate}/{isolate}_{r}.fastq.gz"
+                cmd = f"mkdir -p test_data/{isolate} && wget -O test_data/{isolate}/{isolate}_{r}.fastq.gz {self.download_stub}/{isolate}/{isolate}_{r}.fastq.gz"
                 self._run_subprocess(cmd = cmd)
+            
 
     def _download_reference_from_github(self):
 
-        cmd = f"wget {self.download_stub}/{self.reference}"
+        cmd = f"wget -O {self.reference} {self.download_stub}/{self.reference}"
         self._run_subprocess(cmd = cmd)
+        
 
     def run_tests(self):
 
@@ -807,6 +810,11 @@ class TestBohra(SetupInputFiles):
         self._glob_data(path = self.read_path)
 
         cmd = f"bohra run -i isolates.tab -r {self.reference} -p pluspan --proceed"
-        self._run_subprocess(cmd=cmd)
+        proc = self._run_subprocess(cmd=cmd)
+
+        if proc.returncode == 0:
+            LOGGER.info(f"bohra test has completed successfully!!")
+        else:
+            LOGGER.critical(f"bohra run was not successful... please raise an issue on github.")
 
         # return bohra

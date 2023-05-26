@@ -1,10 +1,6 @@
 #!/usr/bin/env python3
 import sys, json, datetime, subprocess, pathlib,pandas
 
-# Isolate\tMatch 1\t%\tMatch 2\t%\tMatch 3\t%
-
-STATS_TEXT = ["Isolate\tReads\tYield\tGC content\tMin len\tAvg len\tMax len\tAvg qual\tEstimated average depth\tQuality (>Q30)"]
-
 
 def get_vals_seqtk(f):
 
@@ -50,21 +46,16 @@ def get_qual(min_qscore, min_dpth, qscore, dpth):
     else:
         return 'FAIL'
 
-# STATS_TEXT = ["Isolate\tReads\tYield\tGC content\tMin len\tAvg len\tMax len\tAvg qual\tEstimated average depth\tQuality (>Q30)"]
 gcs = pandas.read_csv(sys.argv[3], sep = '\t')
 tab = pandas.read_csv(sys.argv[2], sep = '\t')
 tab['Isolate'] = sys.argv[1]
-print(tab)
-print(gcs)
-# file   format   type   num_seqs   sum_len     min_len   avg_len   max_len   Q1      Q2      Q3      sum_gap   N50   Q20(%)   Q30(%)
 tab = tab.rename(columns = {'num_seqs': 'Reads', 'sum_len': 'Yield','min_len':'Min len','max_len':'Max len', 'avg_len':'Avg len', 'Q30(%)': 'Average quality (% >Q30)'})
 tab['Estimated average depth'] = get_dpth(ref = sys.argv[4], bases = tab['Yield'].values[0])
 tab['GC content'] = gcs[gcs.columns[0]].values[0]
 tab['Avgerage quality'] = gcs[gcs.columns[1]].values[0]
 tab = tab[['Isolate','Reads','Yield','GC content','Min len','Avg len','Max len','Average quality (% >Q30)','Estimated average depth']]
 tab.to_csv('read_assessment.txt', sep = '\t', index = False)
-# 
-# print(ROW)
+
 
 
 
