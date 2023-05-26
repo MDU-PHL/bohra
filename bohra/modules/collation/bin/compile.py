@@ -19,7 +19,7 @@ def _get_tree_string(pipeline, wd,phylo):
             tree = t.read().strip()
     else:
         tree = 'No tree available'
-    print(tree)
+    # print(tree)
     return tree
 
 
