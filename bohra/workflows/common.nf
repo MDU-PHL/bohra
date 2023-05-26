@@ -13,13 +13,15 @@ workflow READ_ANALYSIS {
 
     take:
         preview
-        reference
+        
     main:
         
         SEQKIT_STATS ( preview )
         SEQKIT_GC ( preview )
+        KMC ( preview )
         COMBD = SEQKIT_STATS.out.stats.join( SEQKIT_GC.out.stats )
-        COLLATE_STATS_ISOLATE ( COMBD.combine(reference) )
+        COMBD = COMBD.join( KMC.out.genome_size )
+        COLLATE_STATS_ISOLATE ( COMBD )
     emit:
         stats = COLLATE_STATS_ISOLATE.out.read_assessment
         
@@ -44,11 +46,9 @@ workflow PREVIEW_NEWICK {
 
     take:
         preview
-        // seqkit
-        // seqtk_stats
     main:
         MASH_SKETCH ( preview ) 
-        //   sketches = join mash_sketches
+        sketches = MASH_SKETCH.out.skch.map { cfg, sketch -> sketch }.collect()
         MASH_TRIANGLE ( sketches )
         QUICKTREE ( MASH_TRIANGLE.out.mash_distances )
     emit:

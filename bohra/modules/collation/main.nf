@@ -46,7 +46,7 @@ process COLLATE_STATS_ISOLATE {
         conda null
     }
     input:
-    tuple val(meta), path(seqkit_stats), path(seqkit_qual), path(reference)
+    tuple val(meta), path(seqkit_stats), path(seqkit_qual), path(genome_size)
 
     output:
     tuple val(meta), path ("read_assessment.txt"), emit: read_assessment
@@ -54,7 +54,7 @@ process COLLATE_STATS_ISOLATE {
     script:
     """
     ${module_dir}/collate_stats.py $meta.id $seqkit_stats  \
-    $seqkit_qual $launchDir/$params.reference read_assessment.txt
+    $seqkit_qual $genome_size read_assessment.txt
     """
     
 }
