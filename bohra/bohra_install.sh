@@ -259,5 +259,16 @@ if [[ $su -eq 1 ]]
     else
         echo $ENV_PREFIX-csvtk is already setup. Nothing left to do
 fi
+# lissero
+echo "Checking set up for $ENV_PREFIX-lissero"
+su=$(check_installation $ENV_PREFIX-lissero
+# echo $su
+if [[ $su -eq 1 ]]
+    then
+        echo $ENV_PREFIX-lissero can not be found. Now setting up $ENV_PREFIX-lissero
+        mamba create -y -n $ENV_PREFIX-lissero lissero csvtk
+    else
+        echo $ENV_PREFIX-lissero is already setup. Nothing left to do
+fi
 echo The dependencies for bohra are installed in your default conda path - go forth and analyse!!
 echo Please contact us at https://github.com/MDU-PHL/bohra for any issues or concerns
