@@ -1,14 +1,13 @@
 #!/usr/bin/env nextflow
 
-// include { CSVTK_CONCAT } from './../modules/csvtk/main'
+include { CSVTK_CONCAT } from './../modules/csvtk/main'
 // include { COLLATE_ASM } from './../modules/collation/main'
-// include { SHOVILL } from './../modules/shovill/main' 
-// include { SPADES } from './../modules/spades/main' 
-// include { SKESA } from './../modules/skesa/main' 
-// include { SEQKIT_STATS } from './../modules/seqkit/stats/main' addParams( options: [args2: 'contigs'] )
-// include { ABRITAMR;COMBINE_AMR } from './../modules/resistome/main' addParams( options: [args2: 4] )
-// include { MLST } from './../modules/mlst/main' addParams( options: [args2: 4] )
-// include { PROKKA } from './../modules/prokka/main' 
+include { SHOVILL } from './../modules/shovill/main' 
+include { SPADES } from './../modules/spades/main' 
+include { SKESA } from './../modules/skesa/main' 
+include { SEQKIT_STATS } from './../modules/seqkit/stats/main' addParams( options: [args2: 'contigs'] )
+include { PROKKA } from './../modules/prokka/main'
+include { COLLATE_ASM } from './../modules/collation/main'
 
 workflow RUN_ASSEMBLE {   
 
@@ -26,25 +25,58 @@ workflow RUN_ASSEMBLE {
         SKESA ( reads )
         contigs = SKESA.out.contigs
         }
-        println contigs.view()
-        // SEQKIT_STATS ( contigs )
+        SEQKIT_STATS ( contigs )
         // ABRITAMR ( contigs )
         // ab = ABRITAMR.out.abritamr_matches.join(ABRITAMR.out.abritamr_partials)
         // COMBINE_AMR( ab )
         // MLST ( contigs )
-        // PROKKA ( contigs )
+        PROKKA ( contigs )
         
-    // emit:
-    //     contigs
-    //     assembly_stats = SEQKIT_STATS.out.stats
+    emit:
+        contigs
+        assembly_stats = SEQKIT_STATS.out.stats
     //     resistome = COMBINE_ABRITAMR.out.resistome
     //     virulome = ABRITAMR.out.abritamr_virulence
     //     mlst = MLST.out.mlst
-    //     gff = PROKKA.out.gff
-    //     prokka_txt = PROKKA.out.prokka_txt
+        gff = PROKKA.out.gff
+        prokka_txt = PROKKA.out.prokka_txt
 }
 
-// workflow CONCAT_MLST {
+
+
+workflow COLLATE_ASM_PROKKA {
+    take:
+        asm
+    main:
+        COLLATE_ASM ( asm )
+    emit:
+        collated_asm = COLLATE_ASM.out.assembly
+
+}
+
+
+workflow CONCAT_ASM {
+    take:
+        asm
+    main:
+        CSVTK_CONCAT ( asm )
+    emit:
+        collated_assembly = CSVTK_CONCAT.out.collated
+
+}
+
+
+// workflow TYPING {
+    
+//     take:
+//         contigs
+//     main:
+//         ABRITAMR ( contigs )
+//         ab = ABRITAMR.out.abritamr_matches.join(ABRITAMR.out.abritamr_partials)
+//         COMBINE_AMR( ab )
+//         MLST ( contigs )
+// }
+// // workflow CONCAT_MLST {
 //     take:
 //         mlsts
 //     main:
