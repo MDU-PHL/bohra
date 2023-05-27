@@ -4,7 +4,7 @@ include { initOptions; saveFiles; getSoftwareName } from './functions'
 params.options = [:]
 def options    = initOptions(params.options)
 
-process STYPE {
+process LISSERO {
     tag "$meta.id"
     label 'process_high'
     publishDir "${params.outdir}",
@@ -13,27 +13,30 @@ process STYPE {
     
     cpus options.args2// args2 needs to be cpus for shovill
     cache 'lenient'
-    errorStrategy 'ignore'
+    // errorStrategy 'ignore'
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/spades" : 'bioconda::spades=3.15.2') : null) 
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/bohra-stype"
-        } 
+            conda "${params.conda_path}/bohra-lissero"
+        } else {
+            conda 'lissero csvtk'
+        }
         // will need to release stype to conda added in ignore strategy in case people don't use init - at least whole pipeline won't fall down
     } else {
         conda null
     }
     input:
-    tuple val(meta), path(contigs)
+    tuple val(meta), path(contigs), val(species_obs)
 
     output:
-    tuple val(meta), path('sistr_filtered.csv'), emit: typer
+    tuple val(meta), path('typer.txt'), emit: typer
     
 
     script:
     """
-    stype -c $contigs -px $meta.id
-    cp $meta.id/sistr_filtered.csv .
+    echo -e Isolate'\n'${meta.id} >> tmp.tab
+    lissero $contigs | sed 's/contigs\\.fa/$meta.id/g'  > lissero.tab
+    paste tmp.tab lissero.tab | csvtk -t rename -f SEROTYPE -n Serotype | csvtk -t cut -f -ID,-COMMENT > typer.txt
     """
     
 }

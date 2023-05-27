@@ -4,7 +4,7 @@ include { initOptions; saveFiles; getSoftwareName } from './functions'
 params.options = [:]
 def options    = initOptions(params.options)
 
-process LISSERO {
+process STYPE {
     tag "$meta.id"
     label 'process_high'
     publishDir "${params.outdir}",
@@ -17,10 +17,8 @@ process LISSERO {
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/spades" : 'bioconda::spades=3.15.2') : null) 
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/bohra-lissero"
-        } else {
-            conda 'lissero csvtk'
-        }
+            conda "${params.conda_path}/bohra-stype"
+        } 
         // will need to release stype to conda added in ignore strategy in case people don't use init - at least whole pipeline won't fall down
     } else {
         conda null
@@ -29,12 +27,15 @@ process LISSERO {
     tuple val(meta), path(contigs)
 
     output:
-    tuple val(meta), path('lissero.csv'), emit: typer
+    tuple val(meta), path('typer.txt'), emit: typer
     
 
     script:
     """
-    lissero $contigs | sed 's/contigs\.fa/$meta.id/g' | csvtk tab2csv > lissero.csv"
+    stype -c $contigs -px $meta.id
+    csvtk cut -f 'Isolate,h1,h2,o_antigen,serogroup,serovar' $meta.id/sistr_filtered.csv \
+    | csvtk rename -f 'genome,serogroup,serovar' -n 'Isolate,Serogroup,Serovar'  \
+    | csvtk csv2tab > typer.txt
     """
     
 }

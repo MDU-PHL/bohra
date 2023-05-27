@@ -55,13 +55,26 @@ include { COLLATE_KRAKEN;COLLATE_SEQS;WRITE_HTML } from './workflows/collation'
 include { RUN_SNIPPY;RUN_CORE;RUN_GUBBINS } from './workflows/snps'
 include { RUN_PANAROO } from './workflows/pangenome'
 include { RUN_ASSEMBLE;COLLATE_ASM_PROKKA;CONCAT_ASM } from './workflows/assemble'
-    
+include { BASIC;SEROTYPES;CONCAT_TYPER } from './workflows/typing'
+
+
 workflow {
     
     
 
     READ_ANALYSIS ( reads )
     results = COLLATE_SEQS ( READ_ANALYSIS.out.stats.map { cfg, stats -> stats }.collect() )
+    if ( params.run_kraken ) {
+            kraken = Channel.fromPath( "${params.kraken2_db}")
+            RUN_KRAKEN ( reads.combine(kraken) )
+            COLLATE_KRAKEN ( RUN_KRAKEN.out.species.map { cfg, species -> species }.collect() )
+            results = results.concat( COLLATE_KRAKEN.out.collated_species )
+            species = RUN_KRAKEN.out.species_obs
+            
+        } else {
+            species = Channel.empty().ifEmpty('EmptyFile')
+        }
+    
     if (params.mode == 'preview') {
         PREVIEW_NEWICK ( reads )
         results = results.concat( PREVIEW_NEWICK.out.nwk.concat )
@@ -80,12 +93,29 @@ workflow {
             tree = Channel.empty().ifEmpty('EmptyFile')
         }
         results = results.concat( CONCAT_CORE_STATS ( RUN_SNIPPY.out.qual.map { cfg, core_stats -> core_stats }.collect().map { files -> tuple("core_genome", files)} ) )
-    } else if ( params.mode == 'assemble' || params.mode == 'typing' || params.mode == 'default' || params.mode == 'full'){
+    } else if ( params.mode == 'assemble' || params.mode == 'amr_typing' || params.mode == 'default' || params.mode == 'full'){
             RUN_ASSEMBLE ( reads )
             APS = RUN_ASSEMBLE.out.prokka_txt.join( RUN_ASSEMBLE.out.assembly_stats )
             COLLATE_ASM_PROKKA ( APS )
             CONCAT_ASM ( COLLATE_ASM_PROKKA.out.collated_asm.map { cfg, asm -> asm }.collect().map { files -> tuple("assembly", files)} )
             results = results.concat( CONCAT_ASM.out.collated_assembly )
+            if ( params.mode == 'amr_typing' || params.mode == 'default'  || params.mode == 'full'){
+                    
+                    BASIC ( RUN_ASSEMBLE.out.contigs )
+                    if ( params.run_kraken ){
+                        typing_input = RUN_ASSEMBLE.out.contigs.join( species )
+                        SEROTYPES ( typing_input )
+                        CONCAT_TYPER ( SEROTYPES.out.typers)
+                        results = results.concat(CONCAT_TYPER.out.collated_typers)
+                    }
+                    //     CONCAT_MLST ( RUN_ASSEMBLE.out.mlst.map { cfg, mlst -> mlst }.collect().map { files -> tuple("mlst", files)} )
+                    // if ( params.run_kraken ){
+                        
+                    //     // SEROTYPES ( contigs.join( spc ))
+                    // } else {
+                    //     typer = Channel.empty().ifEmpty('EmptyFile')
+                    // }
+                }
     }
     // else if (params.mode != 'preview'){
     //     RUN_SNIPPY ( reads.combine( reference ) )
@@ -122,11 +152,6 @@ workflow {
 
     // }
 
-    if ( params.run_kraken ) {
-            kraken = Channel.fromPath( "${params.kraken2_db}")
-            RUN_KRAKEN ( reads.combine(kraken) )
-            COLLATE_KRAKEN ( RUN_KRAKEN.out.species.map { cfg, species -> species }.collect() )
-            results = results.concat( COLLATE_KRAKEN.out.collated_species )
-        }
+    
     WRITE_HTML ( results.collect() ) 
 }

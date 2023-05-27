@@ -152,6 +152,85 @@
                 ]
         }
     ],
+    "amr_typing":[
+        {   "file":"seqdata.txt", 
+            "title":"Sequence Data", 
+            "link": "sequence-data", 
+            "type" : "table",
+            "comment": "",
+            "columns" : [
+                {"title":"Isolate","field":"Isolate","headerFilter":"input","headerFilterPlaceholder":"Search isolate"},
+                {"title": "Reads", "field":"Reads","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Yield", "field":"Yield","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"GC content", "field":"GC content","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Min len", "field":"Min len","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Avg len", "field":"Avg len","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Max len", "field":"Max len","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Average quality (% >Q30)", "field":"Average quality (% >Q30)","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Estimated average depth", "field":"Estimated average depth","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="}
+                ]
+        },
+        {   "file":"species.txt", 
+            "title": "Species Identification", 
+            "type": "table", 
+            "link":"species-identification",
+            "comment": "",
+            "columns" : [
+                {"title":"Isolate","field":"Isolate","headerFilter":"input","headerFilterPlaceholder":"Search isolate"},
+                {"title":"Match 1", "field":"Match 1","headerFilter":"input","headerFilterPlaceholder":"Search species"},
+                {"title": "Detected (%)", "field":"Detected_1 (%)","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Match 2", "field":"Match 2","headerFilter":"input","headerFilterPlaceholder":"Search species"},
+                {"title": "Detected (%)", "field":"Detected_2 (%)","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"Match 3", "field":"Match 3","headerFilter":"input","headerFilterPlaceholder":"Search species"},
+                {"title": "Detected (%)", "field":"Detected_3 (%)","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="}
+                ]
+        },
+        {   "file": "assembly.txt", 
+            "title":"Assembly", 
+            "type":"table", 
+            "link":"assembly",
+            "comment":"",
+            "columns" : [
+                {"title":"Isolate","field":"Isolate","headerFilter":"input","headerFilterPlaceholder":"Search isolate"},
+                {"title":"bp", "field":"bp","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title": "# Contigs", "field":"# Contigs","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title":"# Gaps", "field":"# Gaps","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title": "Min Contigs size", "field":"Min Contig size","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title": "Avg Contigs size", "field":"Max Contig size","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title": "N50", "field":"N50","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title": "CDS", "field":"CDS","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
+                {"title": "rRNA", "field":"rRNA","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="}
+                ]
+        },
+        {   "file":"mlst.txt", 
+            "title":"MLST", 
+            "type":"table", 
+            "link":"mlst",
+            "comment": "",
+            "columns":[]
+        },
+        {   "file":"typer.txt", 
+            "title":"Typing", 
+            "type":"table", 
+            "link":"typing",
+            "comment": "",
+            "columns":[]
+        },
+        {   "file":"resistome.txt", 
+            "title":"Resistome", 
+            "type":"table", 
+            "link":"resistome",
+            "comment": "Note: * indicates a <90% match (identity and coverage) <100%, ^ indicates > 50% < 90% coverage >90% identity. ",
+            "columns":[]
+        },
+        {   "file":"virulome.txt", 
+            "title":"Virulome", 
+            "type":"table", 
+            "link":"virulome",
+            "comment": "Note: * indicates a <90% match (identity and coverage) <100%, ^ indicates > 50% < 90% coverage >90% identity. ",
+            "columns":[]
+        }
+    ],
     "default":[
         {   "title": "Phylogeny", 
             "link":"phylogeny", 
