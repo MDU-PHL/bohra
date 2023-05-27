@@ -7,7 +7,11 @@ include { ADD_HEADER_MLST } from './../modules/collation/main'
 include { LISSERO } from './../modules/lissero/main'
 include { MENINGOTYPE } from './../modules/meningotype/main'
 include { STYPE } from './../modules/stype/main'
+include { NGMASTER } from './../modules/ngmaster/main'
+include { KLEBORATE } from './../modules/kleborate/main'
 include {CSVTK_CONCAT } from './../modules/csvtk/main'
+
+
 workflow BASIC {
     
     take:
@@ -41,6 +45,7 @@ workflow SEROTYPES {
         nmen = typing_input.filter { cfg, contigs, species_obs -> species_obs == 'Neisseria meningitidis'}
         ngono = typing_input.filter { cfg, contigs, species_obs -> species_obs == 'Neisseria gonorrhoeae'}
         salmonella = typing_input.filter { cfg, contigs, species_obs -> species_obs =~ 'Salmonella'}
+        klebs = typing_input.filter { cfg, contigs, species_obs -> species_obs =~ 'Klebsiella'}
         // listeria = listeria.map { cfg, contigs, species_obs -> cfg,contigs }
         // println listeria.view()
         LISSERO ( listeria )
@@ -48,8 +53,13 @@ workflow SEROTYPES {
         STYPE ( salmonella )
         salmo_typers = STYPE.out.typer.map {cfg, typer -> typer }.collect()
         MENINGOTYPE ( nmen )
+        nmen_typers = MENINGOTYPE.out.typer.map {cfg, typer -> typer }.collect()
+        NGMASTER ( ngono )
+        ngono_typers = NGMASTER.out.typer.map {cfg, typer -> typer }.collect()
+        KLEBORATE ( klebs )
+        klebs_typers = KLEBORATE.out.typer.map {cfg, typer -> typer }.collect()
 
-        typers = lissero_typers.concat ( salmo_typers, nmen ).map { files -> tuple("typer", files)}
+        typers = lissero_typers.concat ( salmo_typers, nmen_typers, ngono_typers, klebs_typers ).map { files -> tuple("typer", files)}
         println typers.view()
 
     emit:

@@ -303,6 +303,17 @@ if [[ $su -eq 1 ]]
     else
         echo $ENV_PREFIX-ngmaster is already setup. Nothing left to do
 fi
+# kleborate
+echo "Checking set up for $ENV_PREFIX-kleborate"
+su=$(check_installation $ENV_PREFIX-kleborate)
+# echo $su
+if [[ $su -eq 1 ]]
+    then
+        echo $ENV_PREFIX-kleborate can not be found. Now setting up $ENV_PREFIX-kleborate
+        mamba create -y -n $ENV_PREFIX-kleborate kleborate csvtk
+    else
+        echo $ENV_PREFIX-kleborate is already setup. Nothing left to do
+fi
 
 echo The dependencies for bohra are installed in your default conda path - go forth and analyse!!
 echo Please contact us at https://github.com/MDU-PHL/bohra for any issues or concerns
