@@ -5,6 +5,7 @@ include { MLST } from './../modules/mlst/main' addParams( options: [args2: 4] )
 // include { PROKKA } from './../modules/prokka/main' 
 include { ADD_HEADER_MLST } from './../modules/collation/main' 
 include { LISSERO } from './../modules/lissero/main'
+include { MENINGOTYPE } from './../modules/meningotype/main'
 include { STYPE } from './../modules/stype/main'
 include {CSVTK_CONCAT } from './../modules/csvtk/main'
 workflow BASIC {
@@ -37,6 +38,8 @@ workflow SEROTYPES {
     main:
         
         listeria = typing_input.filter { cfg, contigs, species_obs -> species_obs == 'Listeria monocytogenes'}
+        nmen = typing_input.filter { cfg, contigs, species_obs -> species_obs == 'Neisseria meningitidis'}
+        ngono = typing_input.filter { cfg, contigs, species_obs -> species_obs == 'Neisseria gonorrhoeae'}
         salmonella = typing_input.filter { cfg, contigs, species_obs -> species_obs =~ 'Salmonella'}
         // listeria = listeria.map { cfg, contigs, species_obs -> cfg,contigs }
         // println listeria.view()
@@ -44,8 +47,9 @@ workflow SEROTYPES {
         lissero_typers = LISSERO.out.typer.map {cfg, typer -> typer }.collect()
         STYPE ( salmonella )
         salmo_typers = STYPE.out.typer.map {cfg, typer -> typer }.collect()
+        MENINGOTYPE ( nmen )
 
-        typers = lissero_typers.concat ( salmo_typers ).map { files -> tuple("typer", files)}
+        typers = lissero_typers.concat ( salmo_typers, nmen ).map { files -> tuple("typer", files)}
         println typers.view()
 
     emit:

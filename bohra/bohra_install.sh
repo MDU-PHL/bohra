@@ -281,6 +281,28 @@ if [[ $su -eq 1 ]]
     else
         echo $ENV_PREFIX-lissero is already setup. Nothing left to do
 fi
+# meningtype
+echo "Checking set up for $ENV_PREFIX-meningotype"
+su=$(check_installation $ENV_PREFIX-meningotype)
+# echo $su
+if [[ $su -eq 1 ]]
+    then
+        echo $ENV_PREFIX-meningotype can not be found. Now setting up $ENV_PREFIX-meningotype
+        mamba create -y -n $ENV_PREFIX-meningotype meningotype csvtk
+    else
+        echo $ENV_PREFIX-meningotype is already setup. Nothing left to do
+fi
+# ngmaster
+echo "Checking set up for $ENV_PREFIX-ngmaster"
+su=$(check_installation $ENV_PREFIX-ngmaster)
+# echo $su
+if [[ $su -eq 1 ]]
+    then
+        echo $ENV_PREFIX-ngmaster can not be found. Now setting up $ENV_PREFIX-ngmaster
+        mamba create -y -n $ENV_PREFIX-ngmaster ngmaster csvtk
+    else
+        echo $ENV_PREFIX-ngmaster is already setup. Nothing left to do
+fi
 
 echo The dependencies for bohra are installed in your default conda path - go forth and analyse!!
 echo Please contact us at https://github.com/MDU-PHL/bohra for any issues or concerns
