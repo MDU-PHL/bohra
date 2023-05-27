@@ -314,6 +314,17 @@ if [[ $su -eq 1 ]]
     else
         echo $ENV_PREFIX-kleborate is already setup. Nothing left to do
 fi
+# ectyper
+echo "Checking set up for $ENV_PREFIX-ectyper"
+su=$(check_installation $ENV_PREFIX-ectyper)
+# echo $su
+if [[ $su -eq 1 ]]
+    then
+        echo $ENV_PREFIX-ectyper can not be found. Now setting up $ENV_PREFIX-ectyper
+        mamba create -y -n $ENV_PREFIX-ectyper ectyper csvtk
+    else
+        echo $ENV_PREFIX-ectyper is already setup. Nothing left to do
+fi
 
 echo The dependencies for bohra are installed in your default conda path - go forth and analyse!!
 echo Please contact us at https://github.com/MDU-PHL/bohra for any issues or concerns
