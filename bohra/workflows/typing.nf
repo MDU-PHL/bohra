@@ -10,7 +10,9 @@ include { STYPE } from './../modules/stype/main'
 include { NGMASTER } from './../modules/ngmaster/main'
 include { KLEBORATE } from './../modules/kleborate/main'
 include { ECTYPER } from './../modules/ectyper/main'
+include { EMMTYPER } from './../modules/emmtyper/main'
 include {CSVTK_CONCAT } from './../modules/csvtk/main'
+
 
 
 workflow BASIC {
@@ -39,7 +41,7 @@ workflow SEROTYPES {
     
     take:
         typing_input
-        // species
+        
     main:
         
         listeria = typing_input.filter { cfg, contigs, species_obs -> species_obs == 'Listeria monocytogenes'}
@@ -48,8 +50,8 @@ workflow SEROTYPES {
         salmonella = typing_input.filter { cfg, contigs, species_obs -> species_obs =~ 'Salmonella'}
         klebs = typing_input.filter { cfg, contigs, species_obs -> species_obs =~ 'Klebsiella'}
         ecoli = typing_input.filter { cfg, contigs, species_obs -> species_obs == 'Escherichia coli'}
-        // listeria = listeria.map { cfg, contigs, species_obs -> cfg,contigs }
-        // println listeria.view()
+        igas = typing_input.filter { cfg, contigs, species_obs -> species_obs == 'Streptococcus pyogenes'}
+        
         LISSERO ( listeria )
         lissero_typers = LISSERO.out.typer.map {cfg, typer -> typer }.collect()
         STYPE ( salmonella )
@@ -62,8 +64,9 @@ workflow SEROTYPES {
         klebs_typers = KLEBORATE.out.typer.map {cfg, typer -> typer }.collect()
         ECTYPER ( ecoli )
         ecoli_typers = ECTYPER.out.typer.map {cfg, typer -> typer }.collect()
-        typers = lissero_typers.concat ( salmo_typers, nmen_typers, ngono_typers, klebs_typers, ecoli_typers ).map { files -> tuple("typer", files)}
-        println typers.view()
+        EMMTYPER ( igas )
+        emm_typers = EMMTYPER.out.typer.map {cfg, typer -> typer }.collect()
+        typers = lissero_typers.concat ( salmo_typers, nmen_typers, ngono_typers, klebs_typers, ecoli_typers,emm_typers ).map { files -> tuple("typer", files)}
 
     emit:
         typers = typers
@@ -80,3 +83,4 @@ workflow CONCAT_TYPER {
         collated_typers = CSVTK_CONCAT.out.collated
 
 }
+

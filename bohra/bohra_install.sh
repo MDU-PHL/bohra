@@ -325,6 +325,17 @@ if [[ $su -eq 1 ]]
     else
         echo $ENV_PREFIX-ectyper is already setup. Nothing left to do
 fi
+# emmtyper
+echo "Checking set up for $ENV_PREFIX-emmtyper"
+su=$(check_installation $ENV_PREFIX-emmtyper)
+# echo $su
+if [[ $su -eq 1 ]]
+    then
+        echo $ENV_PREFIX-emmtyper can not be found. Now setting up $ENV_PREFIX-emmtyper
+        mamba create -y -n $ENV_PREFIX-emmtyper emmtyper csvtk
+    else
+        echo $ENV_PREFIX-emmtyper is already setup. Nothing left to do
+fi
 
 echo The dependencies for bohra are installed in your default conda path - go forth and analyse!!
 echo Please contact us at https://github.com/MDU-PHL/bohra for any issues or concerns

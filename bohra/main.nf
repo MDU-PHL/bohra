@@ -100,7 +100,6 @@ workflow {
             CONCAT_ASM ( COLLATE_ASM_PROKKA.out.collated_asm.map { cfg, asm -> asm }.collect().map { files -> tuple("assembly", files)} )
             results = results.concat( CONCAT_ASM.out.collated_assembly )
             if ( params.mode == 'amr_typing' || params.mode == 'default'  || params.mode == 'full'){
-                    
                     BASIC ( RUN_ASSEMBLE.out.contigs )
                     if ( params.run_kraken ){
                         typing_input = RUN_ASSEMBLE.out.contigs.join( species )
@@ -108,15 +107,16 @@ workflow {
                         CONCAT_TYPER ( SEROTYPES.out.typers)
                         results = results.concat(CONCAT_TYPER.out.collated_typers)
                     }
-                    //     CONCAT_MLST ( RUN_ASSEMBLE.out.mlst.map { cfg, mlst -> mlst }.collect().map { files -> tuple("mlst", files)} )
-                    // if ( params.run_kraken ){
-                        
-                    //     // SEROTYPES ( contigs.join( spc ))
-                    // } else {
-                    //     typer = Channel.empty().ifEmpty('EmptyFile')
-                    // }
+                
                 }
-    }
+            if (params.mode == 'full') {
+                    RUN_PANAROO( RUN_ASSEMBLE.out.gff.map { cfg, gff -> gff }.collect() )
+                    svg = RUN_PANAROO.out.svg
+                } else {
+                    svg = Channel.empty().ifEmpty('EmptyFile')
+                }
+            results = results.concat( svg )
+    } 
     // else if (params.mode != 'preview'){
     //     RUN_SNIPPY ( reads.combine( reference ) )
     //     RUN_CORE ( RUN_SNIPPY.out.aln.map { cfg, aln -> aln.getParent() }.collect(), reference )
