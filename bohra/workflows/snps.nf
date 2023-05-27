@@ -6,6 +6,8 @@ include { SNP_DISTS } from './../modules/snp_dists/main'
 include { SNIPPY_QC } from './../modules/collation/main' 
 include { GUBBINS } from './../modules/gubbins/main' 
 include { SNIPPY_CLEAN } from './../modules/snippy_clean/main' 
+include { IQTREE } from './../modules/iqtree/main' 
+include { CSVTK_CONCAT } from './../modules/csvtk/main'
 
 
 workflow RUN_SNIPPY {   
@@ -38,6 +40,16 @@ workflow RUN_CORE {
         core_stats = SNIPPY_CORE.out.core_stats
         dists = SNP_DISTS.out.distances
         
+}
+
+workflow RUN_IQTREE {
+    take:
+        core_aln
+        core_full_aln
+    main:
+        IQTREE ( core_aln,core_full_aln )
+    emit:
+        newick = IQTREE.out.newick
 }
 
 workflow RUN_GUBBINS {

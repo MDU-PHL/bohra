@@ -52,7 +52,7 @@ include { READ_ANALYSIS } from './workflows/read_assessment'
 include { RUN_KRAKEN } from './workflows/species'
 include { PREVIEW_NEWICK } from './workflows/preview'
 include { COLLATE_KRAKEN;COLLATE_SEQS;WRITE_HTML } from './workflows/collation'
-include { RUN_SNIPPY;RUN_CORE;RUN_GUBBINS } from './workflows/snps'
+include { RUN_SNIPPY;RUN_CORE;RUN_GUBBINS;RUN_IQTREE;CONCAT_CORE_STATS } from './workflows/snps'
 include { RUN_PANAROO } from './workflows/pangenome'
 include { RUN_ASSEMBLE;COLLATE_ASM_PROKKA;CONCAT_ASM } from './workflows/assemble'
 include { BASIC;SEROTYPES;CONCAT_TYPER } from './workflows/typing'
@@ -78,7 +78,8 @@ workflow {
     if (params.mode == 'preview') {
         PREVIEW_NEWICK ( reads )
         results = results.concat( PREVIEW_NEWICK.out.nwk.concat )
-    } else if ( params.mode == 'snps' || params.mode == 'phylogeny' || params.mode == 'default' ) {
+    } 
+    if ( params.mode == 'snps' || params.mode == 'phylogeny' || params.mode == 'default' ) {
         RUN_SNIPPY ( reads.combine( reference ) )
         RUN_CORE ( RUN_SNIPPY.out.aln.map { cfg, aln -> aln.getParent() }.collect(), reference )
         core_aln =  RUN_CORE.out.core_aln
@@ -93,7 +94,8 @@ workflow {
             tree = Channel.empty().ifEmpty('EmptyFile')
         }
         results = results.concat( CONCAT_CORE_STATS ( RUN_SNIPPY.out.qual.map { cfg, core_stats -> core_stats }.collect().map { files -> tuple("core_genome", files)} ) )
-    } else if ( params.mode == 'assemble' || params.mode == 'amr_typing' || params.mode == 'default' || params.mode == 'full'){
+    } 
+    if ( params.mode == 'assemble' || params.mode == 'amr_typing' || params.mode == 'default' || params.mode == 'full'){
             RUN_ASSEMBLE ( reads )
             APS = RUN_ASSEMBLE.out.prokka_txt.join( RUN_ASSEMBLE.out.assembly_stats )
             COLLATE_ASM_PROKKA ( APS )

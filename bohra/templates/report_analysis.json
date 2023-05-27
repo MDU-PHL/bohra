@@ -299,6 +299,13 @@
             "comment": "",
             "columns":[]
         },
+        {   "file":"typer.txt", 
+            "title":"Typing", 
+            "type":"table", 
+            "link":"typing",
+            "comment": "",
+            "columns":[]
+        },
         {   "file":"resistome.txt", 
             "title":"Resistome", 
             "type":"table", 
@@ -338,7 +345,7 @@
             "columns":[]
         }
     ],
-    "pluspan":[
+    "full":[
         {   "title": "Phylogeny", 
             "link":"phylogeny", 
             "file": "core.newick", 
@@ -414,6 +421,13 @@
             "title":"MLST", 
             "type":"table", 
             "link":"mlst",
+            "comment": "",
+            "columns":[]
+        },
+        {   "file":"typer.txt", 
+            "title":"Typing", 
+            "type":"table", 
+            "link":"typing",
             "comment": "",
             "columns":[]
         },
