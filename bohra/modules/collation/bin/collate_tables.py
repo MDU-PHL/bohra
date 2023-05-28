@@ -10,5 +10,6 @@ for _file in files:
         df = tmp
     else:
         df = df.append(tmp)
+df = df.fillna('')
 df.to_csv(f'{sys.argv[1]}.txt', sep = '\t', index = False)
     

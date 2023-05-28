@@ -848,11 +848,11 @@ class TestBohra(SetupInputFiles):
             self._make_test_input(path = self.download_path)
             
         cmd = f"bohra run -i isolates.tab -r {self.reference} -p full --proceed"
-        # proc = self._run_subprocess(cmd=cmd)
+        proc = self._run_subprocess(cmd=cmd)
 
-        # if proc.returncode == 0:
-        #     LOGGER.info(f"bohra test has completed successfully!!")
-        # else:
-        #     LOGGER.critical(f"bohra run was not successful... please raise an issue on github.")
+        if proc.returncode == 0:
+            LOGGER.info(f"bohra test has completed successfully!!")
+        else:
+            LOGGER.critical(f"bohra run was not successful... please raise an issue on github.")
 
         # return bohra

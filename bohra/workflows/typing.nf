@@ -2,8 +2,8 @@
 
 include { ABRITAMR;COMBINE_AMR } from './../modules/resistome/main' addParams( options: [args2: 4] )
 include { MLST } from './../modules/mlst/main' addParams( options: [args2: 4] )
-// include { PROKKA } from './../modules/prokka/main' 
-include { ADD_HEADER_MLST } from './../modules/collation/main' 
+include { MOBSUITE } from './../modules/mobsuite/main' 
+include { ADD_HEADER_MLST;COLLATE_ABRITMAR;COLLATE_MOBSUITE;MOBSUITE_WRANGLE } from './../modules/collation/main' 
 include { LISSERO } from './../modules/lissero/main'
 include { MENINGOTYPE } from './../modules/meningotype/main'
 include { STYPE } from './../modules/stype/main'
@@ -15,7 +15,7 @@ include {CSVTK_CONCAT } from './../modules/csvtk/main'
 
 
 
-workflow BASIC {
+workflow BASIC_TYPING {
     
     take:
         contigs
@@ -25,12 +25,15 @@ workflow BASIC {
         COMBINE_AMR( ab )
         MLST ( contigs )
         ADD_HEADER_MLST ( MLST.out.json)
+        MOBSUITE ( contigs )
+        MOBSUITE_WRANGLE ( MOBSUITE.out.mobs )
         
         
     emit:
         resistome = COMBINE_AMR.out.resistome
         virulome = ABRITAMR.out.abritamr_virulence
         mlst = ADD_HEADER_MLST.out.mlst
+        plasmid = MOBSUITE_WRANGLE.out.plasmid
         
 
 }
@@ -84,3 +87,44 @@ workflow CONCAT_TYPER {
 
 }
 
+workflow CONCAT_MLST {
+    take:
+        mlsts
+    main:
+        CSVTK_CONCAT ( mlsts )
+    emit:
+        collated_mlst = CSVTK_CONCAT.out.collated
+
+}
+
+
+workflow CONCAT_RESISTOMES {
+    take:
+        resistomes
+    main:
+        COLLATE_ABRITMAR ( resistomes )
+    emit:
+        collated_resistomes = COLLATE_ABRITMAR.out.collated
+
+}
+
+workflow CONCAT_VIRULOMES {
+    take:
+        virulomes
+    main:
+        COLLATE_ABRITMAR ( virulomes )
+    emit:
+        collated_virulomes = COLLATE_ABRITMAR.out.collated
+
+}
+
+
+workflow CONCAT_PLASMID {
+    take:
+        plasmids
+    main:
+        COLLATE_MOBSUITE ( plasmids )
+    emit:
+        collated_plasmids = COLLATE_MOBSUITE.out.collated_plasmid
+
+}

@@ -187,7 +187,7 @@ process COLLATE_MOBSUITE {
     script:
     def plasmids = input.join(' ')
     """
-    $module_dir/collate_plasmids.py $output_name $plasmids
+    $module_dir/collate_tables.py $output_name $plasmids
     """
 
 }
@@ -275,7 +275,7 @@ process COLLATE_ABRITMAR {
     script:
     def resistomes = input.join(' ')
     """
-    $module_dir/collate_plasmids.py $output_name $resistomes
+    $module_dir/collate_tables.py $output_name $resistomes
     """
 
 }

@@ -229,6 +229,13 @@
             "link":"virulome",
             "comment": "Note: * indicates a <90% match (identity and coverage) <100%, ^ indicates > 50% < 90% coverage >90% identity. ",
             "columns":[]
+        },
+        {   "file": "plasmid.txt", 
+            "title":"Plasmid", 
+            "type":"table", 
+            "link":"plasmid",
+            "comment":"",
+            "columns":[]
         }
     ],
     "default":[
