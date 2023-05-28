@@ -479,14 +479,18 @@ class RunSnpDetection(object):
         LOGGER.info(f"Your analysis contains {len(isolates_list)}")
         if self.pipeline == 'preivew' and len(isolates_list) > 2:
             LOGGER.info(f"You are running in preview mode, a mash tree will be output")
-        if len(isolates_list) < 3 and self.pipeline in ['default', 'all']:
+        if self.pipeline in ['amr_typing', 'assemble']:
+            LOGGER.info(f"Your are running the {self.pipeline} bohra pipeline. No tree will be generated.")
+            self.no_phylo = True
+        elif len(isolates_list) < 3 and self.pipeline in ['phylogeny', 'default', 'all']:
             LOGGER.warning(f"You have less than 3 isolates in your dataset, no phylogenetic tree will be generated.")
             self.no_phylo = True
         elif not self.no_phylo:
             LOGGER.info(f"A phylogenetic tree will be generated.")
-        if self.pipeline == 'all' and len(isolates_list) < 4:
+        elif self.pipeline == 'all' and len(isolates_list) < 4:
             LOGGER.warning(f"You can not run roary with less the 4 isolates.")
             self.pipeline = 'default'
+        
         # if self.no_phylo:
         #     LOGGER.info(f"You have selected no_phylo option so no phylogenetic tree will be generated.")
         
@@ -529,7 +533,7 @@ class RunSnpDetection(object):
                     target2 = 'R2.fastq.gz'
                     self._link_reads(iso_dir = iso_dir, read = read1, target = target1)
                     self._link_reads(iso_dir = iso_dir, read = read2, target = target2)       
-            self._check_phylo(isolates_list = isolates_list)
+            # self._check_phylo(isolates_list = isolates_list)
         
         elif self.contigs != '' and pathlib.Path(self.contigs).exists():
             tab = pandas.read_csv(self.contigs, sep = '\t', header = None, names = ['Isolate','Path'])
@@ -540,7 +544,7 @@ class RunSnpDetection(object):
         else:
             LOGGER.critical(f"There seems to be a problem with your input files... not isolates can be extracted. Please check you inputs and try again.")
             raise SystemExit
-        
+        self._check_phylo(isolates_list = isolates_list)
         LOGGER.info(f"Updating isolate list.")
         pathlib.Path(f"isolates.list").write_text('\n'.join(isolates_list))
         return f"isolates.list"

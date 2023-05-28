@@ -310,9 +310,9 @@ def _compile(args):
         'num_isos':len(isos),
         'version_head': version_head,
         'version_body':version_body,
-        'snp_distances': _plot_distances(wd = args.launchdir),
-        'snp_density': _plot_snpdensity(reference=args.reference, wd = args.launchdir, isos = isos),
-        'pan_svg': _get_pan_genome(d = _dict[args.pipeline], wd = args.launchdir) if args.pipeline == 'pluspan' else ''
+'snp_distances': _plot_distances(wd = args.launchdir) if args.pipeline not in ['assemble','amr_typing'] else {0:0},
+        'snp_density': _plot_snpdensity(reference=args.reference, wd = args.launchdir, isos = isos) if args.pipeline not in ['assemble','amr_typing'] else {0:0},
+        'pan_svg': _get_pan_genome(d = _dict[args.pipeline], wd = args.launchdir) if args.pipeline == 'full' else ''
         }
     
     data['newick'] = _get_tree_string(pipeline = args.pipeline, wd = args.launchdir, phylo = args.iqtree)

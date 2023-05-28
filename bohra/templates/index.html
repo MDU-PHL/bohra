@@ -235,7 +235,7 @@
   <div id = "pan-svg" style = "display:none;margin:10px;">
     {{ pan_svg }}
   </div>
-
+{% if phylo == 'phylo' %}
   <div id = "phylogeny">
     <button type="button" class="btn btn-sm btn-outline-secondary back-button" id = "step-back"> back </button>    
     <button type="button" class="btn btn-sm btn-outline-secondary reset-button" id = "reset-tree"> reset </button> 
@@ -247,7 +247,7 @@
     <div id="tree_string" style="display: none;">{{newick}}</div>
     <div id = "phylocanvas" style = "width: 100%; margin:5px; border: 1px solid lightgray;" ></div>
   </div>
-    
+  {% endif %}
   </div>         
   
         

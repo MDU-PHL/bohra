@@ -54,7 +54,7 @@ include { PREVIEW_NEWICK } from './workflows/preview'
 include { COLLATE_KRAKEN;COLLATE_SEQS;WRITE_HTML } from './workflows/collation'
 include { RUN_SNPS } from './workflows/snps'
 include { RUN_PANAROO } from './workflows/pangenome'
-include { RUN_ASSEMBLE;COLLATE_ASM_PROKKA;CONCAT_ASM } from './workflows/assemble'
+include { RUN_ASSEMBLE } from './workflows/assemble'
 include { BASIC_TYPING;SEROTYPES;CONCAT_TYPER;CONCAT_RESISTOMES;CONCAT_MLST;CONCAT_VIRULOMES;CONCAT_PLASMID } from './workflows/typing'
 
 
@@ -78,53 +78,39 @@ workflow {
     if (params.mode == 'preview') {
         PREVIEW_NEWICK ( reads )
         results = results.concat( PREVIEW_NEWICK.out.nwk.concat )
+        WRITE_HTML ( results.collect() )
     }
     if ( params.mode == 'snps' || params.mode == 'phylogeny') {
         RUN_SNPS ( reads,reference )
-        // RUN_CORE ( RUN_SNIPPY.out.aln.map { cfg, aln -> aln.getParent() }.collect(), reference )
-        // core_aln =  RUN_CORE.out.core_aln
-        // if ( params.gubbins ){
-        //     RUN_GUBBINS( RUN_CORE.out.core_full_aln )
-        //     core_aln = RUN_GUBBINS.out.core_aln
-        // }
-        // if (params.run_iqtree ){
-        //     RUN_IQTREE ( core_aln, RUN_CORE.out.core_full_aln)
-        //     tree = RUN_IQTREE.out.newick
-        // } else {
-        //     tree = Channel.empty().ifEmpty('EmptyFile')
-        // }
         results = results.concat( RUN_SNPS.out.core_stats, RUN_SNPS.out.tree )
+        WRITE_HTML ( results.collect() )
     } 
-    if ( params.mode == 'assemble' || params.mode == 'amr_typing' || params.mode == 'default' || params.mode == 'full'){
+    if ( params.mode == 'assemble' || params.mode == 'amr_typing' ){
             RUN_ASSEMBLE ( reads )
-            APS = RUN_ASSEMBLE.out.prokka_txt.join( RUN_ASSEMBLE.out.assembly_stats )
-            COLLATE_ASM_PROKKA ( APS )
-            CONCAT_ASM ( COLLATE_ASM_PROKKA.out.collated_asm.map { cfg, asm -> asm }.collect().map { files -> tuple("assembly", files)} )
-            results = results.concat( CONCAT_ASM.out.collated_assembly )
-            if ( params.mode == 'amr_typing' || params.mode == 'default'  || params.mode == 'full'){
+            results = results.concat( RUN_ASSEMBLE.out.assembly_stats )
+            if ( params.mode == 'amr_typing'){
                     BASIC_TYPING ( RUN_ASSEMBLE.out.contigs )
-                    mlst = CONCAT_MLST ( BASIC_TYPING.out.mlst.map { cfg, mlst -> mlst }.collect().map { files -> tuple("mlst", files)})
-                    resistome = CONCAT_RESISTOMES ( BASIC_TYPING.out.resistome.map { cfg, resistome -> resistome }.collect().map { files -> tuple("resistome", files)})
-                    virulome = CONCAT_VIRULOMES ( BASIC_TYPING.out.virulome.map { cfg, virulome -> virulome }.collect().map { files -> tuple("virulome", files)})
-                    plasmid = CONCAT_PLASMID ( BASIC_TYPING.out.virulome.map { cfg, plasmid -> plasmid }.collect().map { files -> tuple("plasmid", files)})
-                    results = results.concat( mlst, resistome, virulome, plasmid )
+                    results = results.concat( BASIC_TYPING.out.mlst, BASIC_TYPING.out.resistome, BASIC_TYPING.out.virulome, BASIC_TYPING.out.plasmid )
                     if ( params.run_kraken ){
                         typing_input = RUN_ASSEMBLE.out.contigs.join( species )
                         SEROTYPES ( typing_input )
                         CONCAT_TYPER ( SEROTYPES.out.typers)
                         results = results.concat(CONCAT_TYPER.out.collated_typers)
                     }
-                
-                }
-            if (params.mode == 'full') {
-                    RUN_PANAROO( RUN_ASSEMBLE.out.gff.map { cfg, gff -> gff }.collect() )
-                    svg = RUN_PANAROO.out.svg
+                    WRITE_HTML ( results.collect() )
                 } else {
-                    svg = Channel.empty().ifEmpty('EmptyFile')
+                    WRITE_HTML ( results.collect() )
                 }
-            results = results.concat( svg )
+            
+            // if (params.mode == 'full') {
+            //         RUN_PANAROO( RUN_ASSEMBLE.out.gff.map { cfg, gff -> gff }.collect() )
+            //         svg = RUN_PANAROO.out.svg
+            //     } else {
+            //         svg = Channel.empty().ifEmpty('EmptyFile')
+            //     }
+            // results = results.concat( svg )
     } 
 
     
-    WRITE_HTML ( results.collect() ) 
+     
 }
