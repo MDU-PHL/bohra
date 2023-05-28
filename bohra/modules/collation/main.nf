@@ -247,7 +247,7 @@ process COMPILE {
     val(results) 
 
     output:
-    path "report.html", emit: html
+    path "report_*.html", emit: html
     
     script:
     def res = results.join(' ')

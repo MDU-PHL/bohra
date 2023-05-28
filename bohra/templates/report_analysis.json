@@ -41,7 +41,7 @@
         }
         ],
     "snps":[
-        {   "title": "Phylogeny", 
+        {   "title": "Tree", 
             "link":"phylogeny", 
             "file": "core.newick", 
             "type": "tree",
@@ -239,7 +239,7 @@
         }
     ],
     "default":[
-        {   "title": "Phylogeny", 
+        {   "title": "Tree", 
             "link":"phylogeny", 
             "file": "core.newick", 
             "type": "tree",
@@ -353,7 +353,7 @@
         }
     ],
     "full":[
-        {   "title": "Phylogeny", 
+        {   "title": "Tree", 
             "link":"phylogeny", 
             "file": "core.newick", 
             "type": "tree",

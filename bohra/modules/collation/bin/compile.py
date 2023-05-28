@@ -292,7 +292,7 @@ def _compile(args):
     
     isos = _get_isos(wd = args.launchdir, iso_list=args.isolates)
     # print(isos)
-    reporthtml = pathlib.Path('report.html')
+    reporthtml = pathlib.Path(f'report_{args.pipeline}.html')
     # # path to html template
     indexhtml = pathlib.Path(args.template_dir,'index.html') 
     tables,columns,comment = _get_tables(_data = _dict[args.pipeline], wd = args.launchdir, isos = isos)
@@ -310,8 +310,8 @@ def _compile(args):
         'num_isos':len(isos),
         'version_head': version_head,
         'version_body':version_body,
-'snp_distances': _plot_distances(wd = args.launchdir) if args.pipeline not in ['assemble','amr_typing'] else {0:0},
-        'snp_density': _plot_snpdensity(reference=args.reference, wd = args.launchdir, isos = isos) if args.pipeline not in ['assemble','amr_typing'] else {0:0},
+        'snp_distances': _plot_distances(wd = args.launchdir) if args.pipeline not in ['preview', 'assemble','amr_typing'] else {0:0},
+        'snp_density': _plot_snpdensity(reference=args.reference, wd = args.launchdir, isos = isos) if args.pipeline not in ['preview', 'assemble','amr_typing'] else {0:0},
         'pan_svg': _get_pan_genome(d = _dict[args.pipeline], wd = args.launchdir) if args.pipeline == 'full' else ''
         }
     

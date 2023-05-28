@@ -77,7 +77,7 @@ workflow {
     results = results.concat(species)
     if (params.mode == 'preview') {
         PREVIEW_NEWICK ( reads )
-        results = results.concat( PREVIEW_NEWICK.out.nwk.concat )
+        results = results.concat( PREVIEW_NEWICK.out.nwk )
         WRITE_HTML ( results.collect() )
     }
     if ( params.mode == 'snps' || params.mode == 'phylogeny') {
@@ -101,15 +101,29 @@ workflow {
                 } else {
                     WRITE_HTML ( results.collect() )
                 }
-            
-            // if (params.mode == 'full') {
-            //         RUN_PANAROO( RUN_ASSEMBLE.out.gff.map { cfg, gff -> gff }.collect() )
-            //         svg = RUN_PANAROO.out.svg
-            //     } else {
-            //         svg = Channel.empty().ifEmpty('EmptyFile')
-            //     }
-            // results = results.concat( svg )
     } 
+    if ( params.mode == 'default' || params.mode == 'full') {
+        RUN_SNPS ( reads,reference )
+        results = results.concat( RUN_SNPS.out.core_stats, RUN_SNPS.out.tree )
+        RUN_ASSEMBLE ( reads )
+        results = results.concat( RUN_ASSEMBLE.out.assembly_stats )
+        BASIC_TYPING ( RUN_ASSEMBLE.out.contigs )
+        results = results.concat( BASIC_TYPING.out.mlst, BASIC_TYPING.out.resistome, BASIC_TYPING.out.virulome, BASIC_TYPING.out.plasmid )
+        if ( params.run_kraken ){
+            typing_input = RUN_ASSEMBLE.out.contigs.join( species )
+            SEROTYPES ( typing_input )
+            CONCAT_TYPER ( SEROTYPES.out.typers)
+            results = results.concat(CONCAT_TYPER.out.collated_typers)
+        }
+        if (params.mode == 'full') {
+                    RUN_PANAROO( RUN_ASSEMBLE.out.gff.map { cfg, gff -> gff }.collect() )
+                    svg = RUN_PANAROO.out.svg
+                } else {
+                    svg = Channel.empty().ifEmpty('EmptyFile')
+                }
+        results = results.concat( svg )
+        WRITE_HTML ( results.collect() )
+    }
 
     
      
