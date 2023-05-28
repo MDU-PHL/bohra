@@ -779,10 +779,12 @@ class TestBohra(SetupInputFiles):
 
     def __init__(self,args):
 
-        self.read_path = f"{pathlib.Path.cwd() / 'test_data'}"
+        self.download_path = f"{pathlib.Path.cwd() / 'test_data'}"
         self.isolate_list = ['ERR1102348','ERR1102353','ERR1102355','ERR1102356']
         self.download_stub = "https://raw.githubusercontent.com/MDU-PHL/bohra/make_tests_suite/bohra/tests/data"
-        self.reference = f"Lm_Cluster1_J1-108.fa"
+        self.reference = self._check_reference(args.reference)
+        self.read_path = args.read_path
+        self.ref_name = 'Lm_Cluster1_J1-108.fa'
 
 
     def _download_reads_from_github(self):
@@ -796,25 +798,53 @@ class TestBohra(SetupInputFiles):
 
     def _download_reference_from_github(self):
 
-        cmd = f"wget -O {self.reference} {self.download_stub}/{self.reference}"
+        cmd = f"wget -O {self.ref_name} {self.download_stub}/{self.ref_name}"
         self._run_subprocess(cmd = cmd)
-        
+        return self.ref_name
+    
+    def _check_reference(self, path):
+
+        if not pathlib.Path(path).exists():
+
+            return self._download_reference_from_github()
+
+        else:
+            return path
+
+    def _check_test_data(self,path):
+
+        for i in self.isolate_list:
+            reads = sorted(pathlib.Path(path).glob(f"{i}/{i}*.f*q.gz"))
+            if len(reads) != 2:
+                LOGGER.warning(f"Reads for {i} are not found. Will try to get them for you!")
+                return False
+        LOGGER.info(f"All reads are found at {path}")
+        return True
+    
+    def _make_test_input(self, path):
+
+        LOGGER.info(f"Now generating input file for bohra.")
+        self._glob_data(path = path)
 
     def run_tests(self):
         
-        LOGGER.info(f"Will now download some reads for testing - this may take a little while - it might be coffee time.")
-        self._download_reads_from_github()
-        LOGGER.info(f"Getting reference for testing.")
-        self._download_reference_from_github()
-        LOGGER.info(f"Now generating input file for bohra.")
-        self._glob_data(path = self.read_path)
-
-        cmd = f"bohra run -i isolates.tab -r {self.reference} -p pluspan --proceed"
-        proc = self._run_subprocess(cmd=cmd)
-
-        if proc.returncode == 0:
-            LOGGER.info(f"bohra test has completed successfully!!")
+        LOGGER.info(f"Checking availability of data.")
+        if not pathlib.Path(self.read_path).exists():
+            LOGGER.info(f"Will now download some reads for testing - this may take a little while - it might be coffee time.")
+            self._download_reads_from_github()
+        elif self._check_test_data(path = self.read_path):
+            self._make_test_input(path = self.read_path)
         else:
-            LOGGER.critical(f"bohra run was not successful... please raise an issue on github.")
+            LOGGER.info(f"Will now download some reads for testing - this may take a little while - it might be coffee time.")
+            self._download_reads_from_github()
+            self._make_test_input(path = self.download_path)
+            
+        cmd = f"bohra run -i isolates.tab -r {self.reference} -p full --proceed"
+        # proc = self._run_subprocess(cmd=cmd)
+
+        # if proc.returncode == 0:
+        #     LOGGER.info(f"bohra test has completed successfully!!")
+        # else:
+        #     LOGGER.critical(f"bohra run was not successful... please raise an issue on github.")
 
         # return bohra

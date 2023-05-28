@@ -79,7 +79,7 @@ workflow {
         PREVIEW_NEWICK ( reads )
         results = results.concat( PREVIEW_NEWICK.out.nwk.concat )
     } 
-    if ( params.mode == 'snps' || params.mode == 'phylogeny' || params.mode == 'default' ) {
+    if ( params.mode == 'snps' || params.mode == 'phylogeny' || params.mode == 'default' || params.mode == 'full') {
         RUN_SNIPPY ( reads.combine( reference ) )
         RUN_CORE ( RUN_SNIPPY.out.aln.map { cfg, aln -> aln.getParent() }.collect(), reference )
         core_aln =  RUN_CORE.out.core_aln
