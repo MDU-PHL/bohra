@@ -18,8 +18,9 @@ process ECTYPER {
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-ectyper"
-        } 
-        // will need to release stype to conda added in ignore strategy in case people don't use init - at least whole pipeline won't fall down
+        } else {
+            conda 'ectyper csvtk'
+        }
     } else {
         conda null
     }
@@ -28,6 +29,7 @@ process ECTYPER {
 
     output:
     tuple val(meta), path('typer.txt'), emit: typer
+
     
 
     script:

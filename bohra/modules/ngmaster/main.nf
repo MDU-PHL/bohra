@@ -14,12 +14,14 @@ process NGMASTER {
     cpus options.args2// args2 needs to be cpus for shovill
     cache 'lenient'
     errorStrategy 'ignore'
-    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/spades" : 'bioconda::spades=3.15.2') : null) 
+    
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-ngmaster"
-        } 
-        // will need to release stype to conda added in ignore strategy in case people don't use init - at least whole pipeline won't fall down
+        } else {
+            conda 'ngmaster csvtk'
+        }
+       
     } else {
         conda null
     }
@@ -34,7 +36,7 @@ process NGMASTER {
     """
     echo -e Isolate'\n'${meta.id} >> tmp.tab
     ngmaster  $contigs  > ngmaster.tab
-    paste tmp.tab ngmaster.tab | csvtk -t cut -f -FILE,-SCHEME > typer.txt
+    paste tmp.tab ngmaster.tab | csvtk -t cut -f -ID> typer.txt
     """
     
 }

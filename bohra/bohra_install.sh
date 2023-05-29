@@ -41,7 +41,7 @@ su=$(check_installation $ENV_PREFIX-snippy)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-snippy can not be found. Now setting up $ENV_PREFIX-snippy
-        mamba create --force -y -n $ENV_PREFIX-snippy snpeff=5.0 snippy=4.4.5 snp-sites
+        mamba create --force -y -n $ENV_PREFIX-snippy csvtk snpeff=5.0 snippy=4.4.5 snp-sites
     else
         echo $ENV_PREFIX-snippy is already setup. Nothing left to do
 fi
@@ -264,7 +264,7 @@ su=$(check_installation $ENV_PREFIX-stype)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-stype can not be found. Now setting up $ENV_PREFIX-stype
-        mamba create -y -n $ENV_PREFIX-stype sistr_cmd=1.1.1
+        mamba create -y -n $ENV_PREFIX-stype sistr_cmd=1.1.1 csvtk
         conda activate $ENV_PREFIX-stype
         pip3 install git+https://github.com/MDU-PHL/salmonella_typing
     else

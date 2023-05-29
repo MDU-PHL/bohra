@@ -19,7 +19,7 @@ process SPADES {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-spades"
         } else {
-            conda 'bioconda::spades=3.15.2'
+            conda 'bioconda::spades=3.15.2 csvtk'
         }
     } else {
         conda null

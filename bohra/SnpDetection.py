@@ -103,16 +103,14 @@ class RunSnpDetection(object):
         
     def _check_input_files(self, _input, contigs, pipeline):
         
-        if _input == '' and contigs == '':
-            LOGGER.critical(f"You must supply input files. Please see help and try again.")
+        if _input == '':
+            LOGGER.critical(f"You must supply and input file. Please see help and try again.")
             raise SystemExit
 
-        if _input == '':
-            if pipeline in ['preview', 'snps','phylogeny','default','full']:
-                LOGGER.critical(f"You are trying to run the {pipeline} bohra pipeline - you must supply an input file with paths to reads.")
-                raise SystemExit
-            elif pipeline in ['assemble', 'amr_typing'] and contigs != '':
-                return _input, contigs
+        # if _input == '':
+        #     if pipeline in ['preview', 'snps','phylogeny','default','full']:
+        #         LOGGER.critical(f"You are trying to run the {pipeline} bohra pipeline - you must supply an input file with paths to reads.")
+        #         raise SystemExit
         
         return pathlib.Path(_input), contigs
 
@@ -444,7 +442,7 @@ class RunSnpDetection(object):
    
     def _check_reads(self,reads):
 
-        if reads != '' and self._path_exists(reads) and self.pipeline not in ['assemble','amr_typing']:
+        if reads != '' and self._path_exists(reads):
             
             tab = pandas.read_csv(reads, sep = '\t', header = None)
             if self._check_shape(tab.shape[1]):
@@ -453,8 +451,8 @@ class RunSnpDetection(object):
                 LOGGER.critical(f"{reads} is not in the correct format. Please check your inputs and try again.")
                 raise SystemExit
             return tab
-        elif self.pipeline in ['assemble','amr_typing']:
-            return pandas.DataFrame()
+        # elif self.pipeline in ['assemble','amr_typing']:
+        #     return pandas.DataFrame()
         else:
             LOGGER.critical(f"Something is wrong with {reads}. Please try again.")
             raise SystemExit
@@ -540,6 +538,13 @@ class RunSnpDetection(object):
             for row in tab.iterrows():
                 if not row[1][0].startswith('#'):
                     isolates_list.append(row[1][0])
+                    iso_dir = self.workdir/ f"{row[1][0]}" 
+                    if not iso_dir.exists():
+                        subprocess.run(f"mkdir {iso_dir}", shell = True)
+                    # for r in [row[1][1],row[1][2]]:
+                    contig = pathlib.Path(row[1][1])
+                    target = 'contigs.fa'
+                    self._link_reads(iso_dir = iso_dir, read = contig, target = target)
         
         else:
             LOGGER.critical(f"There seems to be a problem with your input files... not isolates can be extracted. Please check you inputs and try again.")
@@ -791,11 +796,11 @@ class TestBohra(SetupInputFiles):
 
     def __init__(self,args):
 
-        self.download_path = f"{pathlib.Path.cwd() / 'test_data'}"
+        # self.download_path = f"{pathlib.Path.cwd() / 'test_data'}"
         self.isolate_list = ['ERR1102348','ERR1102353','ERR1102355','ERR1102356']
-        self.download_stub = "https://raw.githubusercontent.com/MDU-PHL/bohra/make_tests_suite/bohra/tests/data"
+        self.download_stub = "https://raw.githubusercontent.com/MDU-PHL/bohra/master/data"
         self.reference = self._check_reference_test(args.reference)
-        self.read_path = args.read_path
+        self.read_path = f"{pathlib.Path.cwd() / 'test_data'}"
         self.ref_name = 'Lm_Cluster1_J1-108.fa'
 
 
@@ -849,7 +854,7 @@ class TestBohra(SetupInputFiles):
         else:
             LOGGER.info(f"Will now download some reads for testing - this may take a little while - it might be coffee time.")
             self._download_reads_from_github()
-            self._make_test_input(path = self.download_path)
+            self._make_test_input(path = self.read_path)
             
         cmd = f"bohra run -i isolates.tab -r {self.reference} -p full --proceed"
         proc = self._run_subprocess(cmd=cmd)

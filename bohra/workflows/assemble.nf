@@ -12,6 +12,7 @@ workflow RUN_ASSEMBLE {
 
     take:
         reads
+        
     main:
     if ( params.assembler == 'shovill'){
         SHOVILL ( reads )   

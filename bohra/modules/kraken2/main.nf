@@ -31,6 +31,7 @@ process KRAKEN2 {
     output:
     tuple val(meta), path('kraken2.tab'), emit: kraken2
 
+
     script:
     def read_files = meta.single_end ?"$reads" : "--paired ${reads[0]} ${reads[1]}"
     """

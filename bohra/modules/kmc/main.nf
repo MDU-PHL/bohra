@@ -13,7 +13,7 @@ process KMC {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-kmc"
         } else {
-            conda 'kmc'
+            conda 'kmc csvtk'
         }
     } else {
         conda null
@@ -25,6 +25,7 @@ process KMC {
 
     output:
     tuple val(meta), path('est_genome_size_kmer.txt'), emit: genome_size
+
 
     script:
     

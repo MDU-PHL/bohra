@@ -21,7 +21,7 @@ process LISSERO {
         } else {
             conda 'lissero csvtk'
         }
-        // will need to release stype to conda added in ignore strategy in case people don't use init - at least whole pipeline won't fall down
+        
     } else {
         conda null
     }
@@ -30,7 +30,6 @@ process LISSERO {
 
     output:
     tuple val(meta), path('typer.txt'), emit: typer
-    
 
     script:
     """

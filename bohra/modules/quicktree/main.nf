@@ -18,7 +18,7 @@ process QUICKTREE {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-quicktree"
         } else {
-            conda 'bioconda::bioconda::quicktree=2.5'
+            conda 'bioconda::bioconda::quicktree=2.5 newick_utils'
         }
     } else {
         conda null

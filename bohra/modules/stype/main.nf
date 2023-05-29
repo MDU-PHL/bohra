@@ -24,7 +24,7 @@ process STYPE {
         conda null
     }
     input:
-    tuple val(meta), path(contigs)
+    tuple val(meta), path(contigs), val(species)
 
     output:
     tuple val(meta), path('typer.txt'), emit: typer
@@ -32,8 +32,8 @@ process STYPE {
 
     script:
     """
-    stype -c $contigs -px $meta.id
-    csvtk cut -f 'Isolate,h1,h2,o_antigen,serogroup,serovar' $meta.id/sistr_filtered.csv \
+    stype run -c $contigs -px $meta.id
+    csvtk cut -f 'genome,h1,h2,o_antigen,serogroup,serovar' $meta.id/sistr_filtered.csv \
     | csvtk rename -f 'genome,serogroup,serovar' -n 'Isolate,Serogroup,Serovar'  \
     | csvtk csv2tab > typer.txt
     """

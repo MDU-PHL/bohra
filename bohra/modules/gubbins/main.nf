@@ -16,7 +16,7 @@ process GUBBINS {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-gubbins"
         } else {
-            conda 'gubbins=2.4.1 snp-sites=2.5.1'
+            conda 'gubbins=2.4.1 snp-sites=2.5.1 csvtk'
         }
     } else {
         conda null

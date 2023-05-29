@@ -18,8 +18,9 @@ process MENINGOTYPE {
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-meningotype"
-        } 
-        // will need to release stype to conda added in ignore strategy in case people don't use init - at least whole pipeline won't fall down
+        } else {
+            conda 'meningotype csvtk'
+        }
     } else {
         conda null
     }
@@ -34,7 +35,7 @@ process MENINGOTYPE {
     """
     echo -e Isolate'\n'${meta.id} >> tmp.tab
     meningotype --all $contigs  > meningotype.tab
-    paste tmp.tab meningotype.tab | csvtk -t rename -f SEROTYPE -n Serotype | csvtk -t cut -f -SAMPLE_ID,-MLST > typer.txt
+    paste tmp.tab meningotype.tab | csvtk -t rename -f SEROGROUP -n Serogroup | csvtk -t cut -f -SAMPLE_ID,-MLST > typer.txt
     """
     
 }

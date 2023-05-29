@@ -18,8 +18,10 @@ process KLEBORATE {
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-kleborate"
-        } 
-        // will need to release stype to conda added in ignore strategy in case people don't use init - at least whole pipeline won't fall down
+        } else {
+            conda 'kleborate csvtk'
+        }
+        
     } else {
         conda null
     }
@@ -28,6 +30,7 @@ process KLEBORATE {
 
     output:
     tuple val(meta), path('typer.txt'), emit: typer
+    
     
 
     script:

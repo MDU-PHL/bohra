@@ -24,6 +24,7 @@ input_file = file(params.isolates) // need to make this an input file
     reader.eachLine { line ->
     samples << line
     }
+// println samples
 def contigs = [:]
 // open the distribution table
 if (params.contigs_file != 'no_contigs'){
@@ -45,9 +46,6 @@ reads = Channel.fromFilePairs(["${params.outdir}/*/R{1,2}*.f*q.gz","${params.out
                 .map { sample, files -> tuple([id: files[0].getParent().getName(), single_end:false, contigs: contigs[files[0].getParent().getName()]], files)}
 
 
-
-
-
 include { READ_ANALYSIS } from './workflows/read_assessment'
 include { RUN_KRAKEN } from './workflows/species'
 include { PREVIEW_NEWICK } from './workflows/preview'
@@ -56,7 +54,7 @@ include { RUN_SNPS } from './workflows/snps'
 include { RUN_PANAROO } from './workflows/pangenome'
 include { RUN_ASSEMBLE } from './workflows/assemble'
 include { BASIC_TYPING;SEROTYPES;CONCAT_TYPER;CONCAT_RESISTOMES;CONCAT_MLST;CONCAT_VIRULOMES;CONCAT_PLASMID } from './workflows/typing'
-
+include { FULL_VERSIONS;DEFAULT_VERSIONS;AMR_TYPING_VERSIONS;SNPS_VERSIONS;ASSEMBLE_VERSIONS } from './workflows/versions'
 
 workflow {
     
@@ -83,11 +81,17 @@ workflow {
     if ( params.mode == 'snps' || params.mode == 'phylogeny') {
         RUN_SNPS ( reads,reference )
         results = results.concat( RUN_SNPS.out.core_stats, RUN_SNPS.out.tree )
+        SNPS_VERSIONS( )
+        results = results.concat( SNPS_VERSIONS.out.versions)
         WRITE_HTML ( results.collect() )
     } 
     if ( params.mode == 'assemble' || params.mode == 'amr_typing' ){
             RUN_ASSEMBLE ( reads )
             results = results.concat( RUN_ASSEMBLE.out.assembly_stats )
+            if ( params.mode == 'assemble' ){
+                ASSEMBLE_VERSIONS( )
+                results = results.concat( ASSEMBLE_VERSIONS.out.versions )
+            }
             if ( params.mode == 'amr_typing'){
                     BASIC_TYPING ( RUN_ASSEMBLE.out.contigs )
                     results = results.concat( BASIC_TYPING.out.mlst, BASIC_TYPING.out.resistome, BASIC_TYPING.out.virulome, BASIC_TYPING.out.plasmid )
@@ -96,6 +100,8 @@ workflow {
                         SEROTYPES ( typing_input )
                         CONCAT_TYPER ( SEROTYPES.out.typers)
                         results = results.concat(CONCAT_TYPER.out.collated_typers)
+                        AMR_TYPING_VERSIONS()
+                        results = results.concat( AMR_TYPING_VERSIONS.out.versions )
                     }
                     WRITE_HTML ( results.collect() )
                 } else {
@@ -109,6 +115,13 @@ workflow {
         results = results.concat( RUN_ASSEMBLE.out.assembly_stats )
         BASIC_TYPING ( RUN_ASSEMBLE.out.contigs )
         results = results.concat( BASIC_TYPING.out.mlst, BASIC_TYPING.out.resistome, BASIC_TYPING.out.virulome, BASIC_TYPING.out.plasmid )
+        if ( params.mode == 'default' ) {
+            DEFAULT_VERSIONS()
+            results = results.concat( DEFAULT_VERSIONS.out.versions )
+        } else if (params.mode == 'full') {
+            FULL_VERSIONS()
+            results = results.concat( FULL_VERSIONS.out.versions )
+        }
         if ( params.run_kraken ){
             typing_input = RUN_ASSEMBLE.out.contigs.join( species )
             SEROTYPES ( typing_input )
@@ -118,6 +131,7 @@ workflow {
         if (params.mode == 'full') {
                     RUN_PANAROO( RUN_ASSEMBLE.out.gff.map { cfg, gff -> gff }.collect() )
                     svg = RUN_PANAROO.out.svg
+                    
                 } else {
                     svg = Channel.empty().ifEmpty('EmptyFile')
                 }

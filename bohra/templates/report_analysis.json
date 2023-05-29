@@ -38,6 +38,17 @@
                 {"title":"Match 3", "field":"Match 3","headerFilter":"input","headerFilterPlaceholder":"Search species"},
                 {"title": "Detected (%)", "field":"Detected_3 (%)","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="}
                 ]
+        },
+        {"file":"versions.txt", 
+        "title": "Software Versions", 
+        "type": "table", 
+        "link":"software-versions",
+        "comment": "",
+        "columns" : [
+            {"title":"Tool","field":"tool","headerFilter":"input","headerFilterPlaceholder":"Search tool"},
+            {"title":"Conda environment", "field":"conda_env","headerFilter":"input","headerFilterPlaceholder":"Search conda env"},
+            {"title": "Version", "field":"version","headerFilter":"input"}
+            ]
         }
         ],
     "snps":[
@@ -100,7 +111,20 @@
             "link":"snp-distances",
             "comment": "",
             "columns":[]
-        }],
+        },
+        {"file":"versions.txt", 
+        "title": "Software Versions", 
+        "type": "table", 
+        "link":"software-versions",
+        "comment": "",
+        "columns" : [
+            {"title":"Tool","field":"tool","headerFilter":"input","headerFilterPlaceholder":"Search tool"},
+            {"title":"Conda environment", "field":"conda_env","headerFilter":"input","headerFilterPlaceholder":"Search conda env"},
+            {"title": "Version", "field":"version","headerFilter":"input"}
+            ]
+        }
+    ],
+        
     "assemble":[
         {   "file":"seqdata.txt", 
             "title":"Sequence Data", 
@@ -150,6 +174,17 @@
                 {"title": "CDS", "field":"CDS","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="},
                 {"title": "rRNA", "field":"rRNA","headerFilter":"number", "headerFilterPlaceholder":"at least...", "headerFilterFunc":">="}
                 ]
+        },
+        {"file":"versions.txt", 
+        "title": "Software Versions", 
+        "type": "table", 
+        "link":"software-versions",
+        "comment": "",
+        "columns" : [
+            {"title":"Tool","field":"tool","headerFilter":"input","headerFilterPlaceholder":"Search tool"},
+            {"title":"Conda environment", "field":"conda_env","headerFilter":"input","headerFilterPlaceholder":"Search conda env"},
+            {"title": "Version", "field":"version","headerFilter":"input"}
+            ]
         }
     ],
     "amr_typing":[
@@ -236,6 +271,17 @@
             "link":"plasmid",
             "comment":"",
             "columns":[]
+        },
+        {"file":"versions.txt", 
+        "title": "Software Versions", 
+        "type": "table", 
+        "link":"software-versions",
+        "comment": "",
+        "columns" : [
+            {"title":"Tool","field":"tool","headerFilter":"input","headerFilterPlaceholder":"Search tool"},
+            {"title":"Conda environment", "field":"conda_env","headerFilter":"input","headerFilterPlaceholder":"Search conda env"},
+            {"title": "Version", "field":"version","headerFilter":"input"}
+            ]
         }
     ],
     "default":[
@@ -350,6 +396,17 @@
             "link":"plasmid",
             "comment":"",
             "columns":[]
+        },
+        {"file":"versions.txt", 
+        "title": "Software Versions", 
+        "type": "table", 
+        "link":"software-versions",
+        "comment": "",
+        "columns" : [
+            {"title":"Tool","field":"tool","headerFilter":"input","headerFilterPlaceholder":"Search tool"},
+            {"title":"Conda environment", "field":"conda_env","headerFilter":"input","headerFilterPlaceholder":"Search conda env"},
+            {"title": "Version", "field":"version","headerFilter":"input"}
+            ]
         }
     ],
     "full":[
@@ -475,6 +532,17 @@
             "link":"plasmid",
             "comment":"",
             "columns":[]
+        },
+        {"file":"versions.txt", 
+        "title": "Software Versions", 
+        "type": "table", 
+        "link":"software-versions",
+        "comment": "",
+        "columns" : [
+            {"title":"Tool","field":"tool","headerFilter":"input","headerFilterPlaceholder":"Search tool"},
+            {"title":"Conda environment", "field":"conda_env","headerFilter":"input","headerFilterPlaceholder":"Search conda env"},
+            {"title": "Version", "field":"version","headerFilter":"input"}
+            ]
         }
     ]
         

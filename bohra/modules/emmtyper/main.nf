@@ -18,8 +18,9 @@ process EMMTYPER {
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-emmtyper"
-        } 
-        // will need to release stype to conda added in ignore strategy in case people don't use init - at least whole pipeline won't fall down
+        } else {
+            conda 'emmtyper csvtk'
+        }
     } else {
         conda null
     }
@@ -28,7 +29,6 @@ process EMMTYPER {
 
     output:
     tuple val(meta), path('typer.txt'), emit: typer
-    
 
     script:
     """
