@@ -798,7 +798,7 @@ class TestBohra(SetupInputFiles):
 
         # self.download_path = f"{pathlib.Path.cwd() / 'test_data'}"
         self.isolate_list = ['ERR1102348','ERR1102353','ERR1102355','ERR1102356']
-        self.download_stub = "https://raw.githubusercontent.com/MDU-PHL/bohra/master/data"
+        self.download_stub = "https://raw.githubusercontent.com/MDU-PHL/bohra/add_typers/data"
         self.reference = self._check_reference_test(args.reference)
         self.read_path = f"{pathlib.Path.cwd() / 'test_data'}"
         self.ref_name = 'Lm_Cluster1_J1-108.fa'
