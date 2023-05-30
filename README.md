@@ -1,29 +1,25 @@
 <!-- [![CircleCI](https://circleci.com/gh/MDU-PHL/bohra.svg?style=svg&circle-token=530799cb0764519fc65966ab48bac7e0d02f3688)](https://circleci.com/gh/MDU-PHL/bohra) -->
-[![Python 3.7](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-370/)
+[![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-390/)
 
 
 # Bohra
 
-Bohra is microbial genomics pipeline, designed predominantly for use in public health, but may also be useful in research settings. At a minimum the pipeline takes as input a tab-delimited file with the isolate IDs followed by the path to READ1 and READ2, a reference for alignment and a unique identifier, where reads are illumina reads (other platforms are not supported at this stage).
-
-* Pipeline written in [Nextflow](https://www.nextflow.io)
-* Default mode
-    * Can be run on a single isolate (phylogenetic tree will not be generated if fewer than three sequences included in dataset)
-    * MobSuite integration.
-    * Updated [abriTAMR](https://github.com/MDU-PHL/abritamr) with support for point mutations and virulence factors (beta).
-* Panaroo with visualisation of pan-genome.
-* Improved support for different computing environments.
+Bohra is microbial genomics pipeline, designed predominantly for use in public health, but may also be useful in research settings. At a minimum the pipeline takes as input a tab-delimited file with the isolate IDs followed by the path to READ1 and READ2, where reads are illumina reads (other platforms are not supported at this stage).
 
 ## Recent changes to bohra
-* Each bohra process is now run in its own conda environment. These will by default be included in your working directory.
-* Alternatively you can install your own conda environments and provide the path to where these can be found (see help below).
-* If you wish you can maintain the existing structure - where all the dependencies are installed in a single environment. BEWARE this can cause unexpected behaviour and even cause the pipeline to fail. If you wish to run bohra in this way please contact us for advice.
+* Install script to setup dependencies for you.
+* Addition of typers
+    * [Kleborate](https://github.com/klebgenomics/Kleborate/wiki)
+    * [stype](https://github.com/MDU-PHLsalmonella_typing) (NATA accredited ISO1589)
+    * [meningotype](https://github.com/MDU-PHL/meningotype) (NATA accredited ISO1589)
+    * [lissero](https://github.com/MDU-PHL/lissero) (NATA accredited ISO1589)
+    * [ngmaster](https://github.com/MDU-PHL/ngmaster)
+    * [ectyper](https://github.com/phac-nml/ecoli_serotyping)
 
 **Comming soon**
 
 * Improved report structure
 * Baby kraken
-* Typing (_Salmonella_ spp., _Listeria monocytogenes_, _Neiserria_)
 * Mtb AMR
 
 

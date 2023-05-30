@@ -154,7 +154,7 @@ if [[ $su -eq 1 ]]
         echo $ENV_PREFIX-prokka is already setup. Nothing left to do
 fi
 # quicktree
-echo "Checking set up for $ENV_PREFIX-  "
+echo "Checking set up for $ENV_PREFIX-quicktree  "
 su=$(check_installation $ENV_PREFIX-quicktree)
 # echo $su
 if [[ $su -eq 1 ]]
@@ -219,7 +219,7 @@ su=$(check_installation $ENV_PREFIX-spades)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-spades can not be found. Now setting up $ENV_PREFIX-spades
-        mamba create -y -n $ENV_PREFIX-spades spades=3.15.2
+        mamba create -y -n $ENV_PREFIX-spades spades=3.13
     else
         echo $ENV_PREFIX-spades is already setup. Nothing left to do
 fi
@@ -338,4 +338,23 @@ if [[ $su -eq 1 ]]
 fi
 
 echo The dependencies for bohra are installed in your default conda path - go forth and analyse!!
+
+if [[ -z $KRAKEN2_DEFAULT_DB ]]; then
+  
+  echo KRAKEN2_DEFAUT_DB is undefined. Would you like to download babykraken database?
+  read -p "Download babykraken (10MB) (Y/N)? " download
+    if [ "$download" != "${download#[Yy]}" ] ;then 
+    
+        echo Downloading babykraken now.
+        curl -L https://github.com/MDU-PHL/babykraken/blob/master/dist/babykraken.tar.gz?raw=true | tar xz
+        echo babykraken has been downloaded. Please use --kraken_db $(pwd)/babykraken to run kraken2
+        
+    else
+        
+        echo Okey dokey .. hopefully you remember to provide a kraken path when you run bohra
+    fi
+
+   
+fi
+
 echo Please contact us at https://github.com/MDU-PHL/bohra for any issues or concerns
