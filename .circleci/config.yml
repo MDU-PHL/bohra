@@ -12,8 +12,8 @@ jobs: # A basic unit of work in a run
       - checkout # check out source code to working directory
 #       - run: sudo chown -R circleci:circleci /usr/local/bin
 #       - run: sudo chown -R circleci:circleci /opt/conda
-      - run: source /opt/conda/etc/profile.d/conda.sh
-      - run: conda env create -f environment.yml && conda activate bohra
+#       - run: source /opt/conda/etc/profile.d/conda.sh
+      - run: conda env create -f environment.yml && source activate bohra
 #       - run: 
       # - restore_cache:
       # # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
