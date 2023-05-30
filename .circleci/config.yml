@@ -15,9 +15,9 @@ jobs: # A basic unit of work in a run
 #       - run: source /opt/conda/etc/profile.d/conda.sh
       - run: conda env create -f environment.yml && source activate bohra
 #       - run: 
-      # - restore_cache:
-      # # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
-      #     key: deps9-{{ .Branch }}-{{ checksum "requirements.txt" }}
+      - restore_cache:
+      # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
+          key: deps9-{{ .Branch }}-{{ checksum "environment.yml" }}
       # - run:
       #     command: |
       #       sudo pip install pipenv
@@ -30,8 +30,8 @@ jobs: # A basic unit of work in a run
       #       - "/usr/local/lib/python3.9/site-packages"
       - run:
           command: |
-            pipenv run pytest
-            bohra test
+            pytest
+           # bohra test
       - store_test_results: # Upload test results for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
           path: test-results
       - store_artifacts: # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
