@@ -810,9 +810,9 @@ class TestBohra(SetupInputFiles):
         self.download_stub = "https://raw.githubusercontent.com/MDU-PHL/bohra/add_typers/data"
         self.reference = self._check_reference_test(args.reference)
         self.read_path = f"{pathlib.Path.cwd() / 'test_data'}"
-        self.ref_name = 'Lm_Cluster1_J1-108.fa'
+        # self.ref_name = self._get_ref_name()
 
-
+    
     def _download_reads_from_github(self):
 
         for isolate in self.isolate_list:
@@ -824,9 +824,9 @@ class TestBohra(SetupInputFiles):
 
     def _download_reference_from_github(self):
 
-        cmd = f"wget -O {self.ref_name} {self.download_stub}/{self.ref_name}"
+        cmd = f"wget -O Lm_Cluster1_J1-108.fa {self.download_stub}/Lm_Cluster1_J1-108.fa"
         self._run_subprocess(cmd = cmd)
-        return self.ref_name
+        return 'Lm_Cluster1_J1-108.fa'
     
     def _check_reference_test(self, path):
 
