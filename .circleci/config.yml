@@ -22,6 +22,7 @@ jobs: # A basic unit of work in a run
             bohra -h
             pytest
             bohra init
+            bohra test
           
  #     - run: bohra 
 #       - run: 
