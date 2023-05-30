@@ -2,7 +2,7 @@
 
 include { CSVTK_CONCAT } from './../modules/csvtk/main'
 include { SHOVILL } from './../modules/shovill/main' 
-include { SPADES } from './../modules/spades/main' 
+include { SPADES } from './../modules/spades/main' addParams( options: [args2: "${params.spades_opt}"] )
 include { SKESA } from './../modules/skesa/main' 
 include { SEQKIT_STATS } from './../modules/seqkit/stats/main' addParams( options: [args2: 'contigs'] )
 include { PROKKA } from './../modules/prokka/main'

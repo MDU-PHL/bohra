@@ -62,7 +62,7 @@ su=$(check_installation $ENV_PREFIX-shovill)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-shovill can not be found. Now setting up $ENV_PREFIX-shovill
-        mamba create -y -n $ENV_PREFIX-shovill shovill
+        mamba create -y -n $ENV_PREFIX-shovill csvtk shovill
     else
         echo $ENV_PREFIX-shovill is already setup. Nothing left to do
 fi
@@ -73,7 +73,7 @@ su=$(check_installation $ENV_PREFIX-mlst)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-mlst can not be found. Now setting up $ENV_PREFIX-mlst
-        mamba create -y -n $ENV_PREFIX-mlst mlst
+        mamba create -y -n $ENV_PREFIX-mlst csvtk mlst
     else
         echo $ENV_PREFIX-mlst is already setup. Nothing left to do
 fi
@@ -84,7 +84,7 @@ su=$(check_installation $ENV_PREFIX-kraken2)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-kraken2 can not be found. Now setting up $ENV_PREFIX-kraken2
-        mamba create -y -n $ENV_PREFIX-kraken2 kraken2=2.1.2
+        mamba create -y -n $ENV_PREFIX-kraken2 csvtk kraken2=2.1.2
     else
         echo $ENV_PREFIX-kraken2 is already setup. Nothing left to do
 fi
@@ -95,7 +95,7 @@ su=$(check_installation $ENV_PREFIX-mob_suite)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-mob_suite can not be found. Now setting up $ENV_PREFIX-mob_suite
-        mamba create -y -n $ENV_PREFIX-mob_suite mob_suite=3.0.2 numpy=1.21.1
+        mamba create -y -n $ENV_PREFIX-mob_suite csvtk mob_suite=3.0.2 numpy=1.21.1
     else
         echo $ENV_PREFIX-mob_suite is already setup. Nothing left to do
         conda activate $ENV_PREFIX-mob_suite
@@ -125,7 +125,7 @@ su=$(check_installation $ENV_PREFIX-abritamr)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-abritamr can not be found. Now setting up $ENV_PREFIX-abritamr
-        mamba create -y -n $ENV_PREFIX-abritamr abritamr=1.0.14
+        mamba create -y -n $ENV_PREFIX-abritamr csvtk abritamr=1.0.14
     else
         echo $ENV_PREFIX-abritamr is already setup. Nothing left to do
 fi
@@ -137,7 +137,7 @@ su=$(check_installation $ENV_PREFIX-gubbins)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-gubbins can not be found. Now setting up $ENV_PREFIX-gubbins
-        mamba create -y -n $ENV_PREFIX-gubbins gubbins=2.4.1 snp-sites=2.5.1
+        mamba create -y -n $ENV_PREFIX-gubbins csvtk gubbins=2.4.1 snp-sites=2.5.1
     else
         echo $ENV_PREFIX-gubbins is already setup. Nothing left to do
 fi
@@ -149,7 +149,7 @@ su=$(check_installation $ENV_PREFIX-prokka)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-prokka can not be found. Now setting up $ENV_PREFIX-prokka
-        mamba create -y -n $ENV_PREFIX-prokka prokka
+        mamba create -y -n $ENV_PREFIX-prokka csvtk prokka
     else
         echo $ENV_PREFIX-prokka is already setup. Nothing left to do
 fi
@@ -160,7 +160,7 @@ su=$(check_installation $ENV_PREFIX-quicktree)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-quicktree can not be found. Now setting up $ENV_PREFIX-quicktree
-        mamba create -y -n $ENV_PREFIX-quicktree quicktree=2.5 newick_utils
+        mamba create -y -n $ENV_PREFIX-quicktree csvtk quicktree=2.5 newick_utils
     else
         echo $ENV_PREFIX-quicktree is already setup. Nothing left to do
 fi
@@ -171,7 +171,7 @@ su=$(check_installation $ENV_PREFIX-iqtree)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-iqtree can not be found. Now setting up $ENV_PREFIX-iqtree
-        mamba create -y -n $ENV_PREFIX-iqtree iqtree=2.1.4 snp-sites=2.5.1
+        mamba create -y -n $ENV_PREFIX-iqtree csvtk iqtree=2.1.4 snp-sites=2.5.1
     else
         echo $ENV_PREFIX-iqtree is already setup. Nothing left to do
 fi
@@ -195,7 +195,7 @@ su=$(check_installation $ENV_PREFIX-seqtk)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-seqtk can not be found. Now setting up $ENV_PREFIX-seqtk
-        mamba create -y -n $ENV_PREFIX-seqtk seqtk
+        mamba create -y -n $ENV_PREFIX-seqtk csvtk seqtk
     else
         echo $ENV_PREFIX-seqtk is already setup. Nothing left to do
 fi
@@ -207,7 +207,7 @@ su=$(check_installation $ENV_PREFIX-skesa)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-skesa can not be found. Now setting up $ENV_PREFIX-skesa
-        mamba create -y -n $ENV_PREFIX-skesa skesa
+        mamba create -y -n $ENV_PREFIX-skesa csvtk skesa
     else
         echo $ENV_PREFIX-skesa is already setup. Nothing left to do
 fi
@@ -219,7 +219,7 @@ su=$(check_installation $ENV_PREFIX-spades)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-spades can not be found. Now setting up $ENV_PREFIX-spades
-        mamba create -y -n $ENV_PREFIX-spades spades=3.13
+        mamba create -y -n $ENV_PREFIX-spades python=3.7 csvtk spades=3.13
     else
         echo $ENV_PREFIX-spades is already setup. Nothing left to do
 fi
@@ -231,7 +231,7 @@ su=$(check_installation $ENV_PREFIX-mash)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-mash can not be found. Now setting up $ENV_PREFIX-mash
-        mamba create -y -n $ENV_PREFIX-mash mash
+        mamba create -y -n $ENV_PREFIX-mash csvtk mash
     else
         echo $ENV_PREFIX-mash is already setup. Nothing left to do
 fi
@@ -253,7 +253,7 @@ su=$(check_installation $ENV_PREFIX-kmc)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-kmc can not be found. Now setting up $ENV_PREFIX-kmc
-        mamba create -y -n $ENV_PREFIX-kmc kmc
+        mamba create -y -n $ENV_PREFIX-kmc csvtk kmc
     else
         echo $ENV_PREFIX-kmc is already setup. Nothing left to do
 fi

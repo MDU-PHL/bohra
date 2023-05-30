@@ -96,6 +96,7 @@ class RunSnpDetection(object):
         self.run_kraken = 'false'
         self.no_phylo = args.no_phylo
         self.abritamr_args = args.abritamr_args
+        self.spades_args = args.spades_args
         self.proceed = args.proceed
         self.use_conda = True if args.no_conda == False else False
         self.conda_path = args.conda_path
@@ -587,7 +588,14 @@ class RunSnpDetection(object):
                 snippy_opts.append(f"--{d} {_dict[d]}")
         
         return ' '.join(snippy_opts)
-        
+    
+    def _generate_spades_args(self):
+
+        if self.assembler == 'spades':
+            return f"--spades_opt '{self.spades_args}'"
+        else:
+            return ''
+
     def _generate_cmd(self, mode, run_kraken, kraken2_db,assembler, mask_string, reference, 
                         isolates, user, day, contigs, run_iqtree, species, cpus, config, profile, gubbins,blast_db,data_dir, job_id):
         
@@ -598,7 +606,8 @@ class RunSnpDetection(object):
         conda = '--enable_conda true' if self.use_conda else ''
         conda_path = f"--conda_path {self.conda_path}" if self.conda_path != '' else ''
         snippy_opts = self._generate_snippy_params()
-        parameters = f"--job_id {job_id} --mode {mode} --run_iqtree {run_iqtree} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} --mask_string {mask_string} --reference {reference} --contigs_file {contigs} --species {species if species != '' else 'no_species'} --outdir {self.workdir} --isolates {isolates} --user {user} --day {day} --gubbins {gubbins} --blast_db {blast_db} --data_dir {data_dir} {conda} {conda_path} {snippy_opts}"
+        spades_opts = self._generate_spades_args()
+        parameters = f"--job_id {job_id} --mode {mode} --run_iqtree {run_iqtree} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} --mask_string {mask_string} --reference {reference} --contigs_file {contigs} --species {species if species != '' else 'no_species'} --outdir {self.workdir} --isolates {isolates} --user {user} --day {day} --gubbins {gubbins} --blast_db {blast_db} --data_dir {data_dir} {conda} {conda_path} {snippy_opts} {spades_opts}"
         options = f"-with-report bohra_{day}_report.html -with-trace -profile {profile} {resume} {cpu} {config} {'-with-conda' if self.use_conda else ''}"
 
         cmd = f"{stub} {parameters} {options}"

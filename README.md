@@ -8,6 +8,7 @@ Bohra is microbial genomics pipeline, designed predominantly for use in public h
 
 ## Recent changes to bohra
 * Install script to setup dependencies for you.
+* babykraken download as part of the dependency installation.
 * Addition of typers
     * [Kleborate](https://github.com/klebgenomics/Kleborate/wiki)
     * [stype](https://github.com/MDU-PHLsalmonella_typing) (NATA accredited ISO1589)
@@ -19,14 +20,18 @@ Bohra is microbial genomics pipeline, designed predominantly for use in public h
 **Comming soon**
 
 * Improved report structure
-* Baby kraken
 * Mtb AMR
 
 
 **Accreditation**
 
-* _snippy and snippy-core version 4.4.5 are NATA accredited for accurate detection of SNPs for reporting of genomic relationships at [MDU](https://biomedicalsciences.unimelb.edu.au/departments/microbiology-Immunology/research/services/microbiological-diagnostic-unit-public-health-laboratory#about-mdu-phl) Victoria Australia_ 
-* _abritamr is accredited for detection of AMR genes at [MDU](https://biomedicalsciences.unimelb.edu.au/departments/microbiology-Immunology/research/services/microbiological-diagnostic-unit-public-health-laboratory#about-mdu-phl) Victoria Australia_ 
+Many of the underlying tools of the bohra pipeline are NATA accredited by [MDU](https://biomedicalsciences.unimelb.edu.au/departments/microbiology-Immunology/research/services/) Victoria Australia (ISO1589).
+
+* `snippy` and `snippy-core` version 4.4.5  
+* `abritamr` 
+* `stype`
+* `meningotype`
+* `lissero`
 
 ### Motivation
 
@@ -36,6 +41,7 @@ Bohra was inspired by Nullarbor (https://github.com/tseemann/nullarbor) to be us
 
 Bohra the name of an exinct species of tree kangaroo that lived on the Nullarbor plain in Australia. The name was chosen to reflect the fact that it will be predominantly used to build *trees*, relies on [*snippy*](https://github.com/tseemann/snippy) (named for a very famous kangaroo) and was inspired by [*nullarbor*](https://github.com/tseemann/nullarbor). 
 
+For detailed usage information please see our [wiki](https://github.com/MDU-PHL/bohra/wiki)
 
 ## Pipeline
 
@@ -43,33 +49,63 @@ Bohra takes raw sequencing reads and produces a standalone html file for simple 
 
 ![Image](https://github.com/MDU-PHL/bohra/blob/master/workflow.png)
 
-Bohra can be run in three modes
-1. Preview
+Bohra can be run in 7 modes
+1. **Preview**
 * Calculate mash-distances
 * Build a mash-tree
 * Report sequencing statistics
 * Species identification (providing you have kraken2 database setup properly ;) )
 
-2. Default SNPs, species ID, assemly, MLST, Resistome and annotation)
+2. **Default** 
 * Call variants
+* Generate core genome
+* Calculate SNP distances
 * Generate a phylogenetic tree
 * Assemble 
 * MLST
+* Serotyping
 * Resistome
 * Annotate
 * Plasmid prediction
 * Species identification
 
-3. SNPs, Phylogeny, PanGenome and  Typing and Species Identification
+3. **Full** 
 * Call variants
+* Generate core genome
+* Calculate SNP distances
 * Generate a phylogenetic tree
 * Assemble 
 * MLST
+* Serotyping
 * Resistome
 * Annotate
 * Plasmid prediction
 * Species identification
 * Pan Genome
+
+4. **SNPS (no phylogenetic tree)**
+* Call variants
+* Generate core genome
+* Calculate SNP distances
+
+
+5. **Phylogeny (SNPS + phylogenetic tree)**
+* Call variants
+* Generate core genome
+* Calculate SNP distances
+* Generate a phylogenetic tree
+
+6. **Assemble**
+* Assemble genomes
+* Annotate assemblies
+
+7. **AMR and Typing**
+* Assemble genomes
+* Annotate assemblies
+* MLST
+* Serotyping
+* Resistome
+* Plasmid prediction
 
 ### Installation (with conda)
 
@@ -89,7 +125,7 @@ conda config --add channels conda-forge
 conda create -n <bohra_env_name> bohra python=3.9
 conda activate <bohra_env_name>
 ```
-You can also install `bohra` with 
+You can also install `bohra` with (NOT for the faint of heart - you will need to make sure you have ALL of the bohra dependencies installed).
 ```
 pip3 install bohra
 ```
