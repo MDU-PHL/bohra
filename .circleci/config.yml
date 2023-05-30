@@ -12,7 +12,7 @@ jobs: # A basic unit of work in a run
       - checkout # check out source code to working directory
 #       - run: sudo chown -R circleci:circleci /usr/local/bin
 #       - run: sudo chown -R circleci:circleci /opt/conda
-      - run: conda init
+      - run: source /opt/conda/bin/activate
       - run: conda env create -f environment.yml
       - run: conda activate bohra
       # - restore_cache:
