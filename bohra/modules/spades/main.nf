@@ -38,7 +38,7 @@ process SPADES {
         cp $meta.contigs contigs.fa
     else
         tmp_dir=\$(mktemp -d)
-        spades.py -1 ${reads[0]} -2 ${reads[1]} -o current -t $task.cpus --cov-cutoff auto --tmp-dir \$tmp_dir
+        spades.py -1 ${reads[0]} -2 ${reads[1]} -o current -t $task.cpus $options.args --tmp-dir \$tmp_dir
         cp current/contigs.fasta contigs.fa
         rm -rf \$tmp_dir
     fi

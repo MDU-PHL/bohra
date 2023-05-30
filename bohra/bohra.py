@@ -64,7 +64,8 @@ def main():
     parser_run.add_argument("--abritamr_args",default="",help="Set if you would like to use point mutations, please provide a valid species.", choices= ['Neisseria', 'Acinetobacter_baumannii', "Campylobacter", "Enterococcus_faecalis", "Enterococcus_faecium", "Escherichia", "Klebsiella", "Salmonella", "Staphylococcus_aureus", "Staphylococcus_pseudintermedius", "Streptococcus_agalactiae", "Streptococcus_pneumoniae", "Streptococcus_pyogenes", "Vibrio_cholerae"])
     parser_run.add_argument('--kraken_db', '-k', default="KRAKEN2_DEFAULT_DB", help="Path to DB for use with kraken2, if no DB present speciation will not be performed.")
     parser_run.add_argument('--pipeline','-p', default = 'preview', choices=['preview','default','full','snps','phylogeny','assemble','amr_typing'], help=f"The pipeline to run. `preview` - generates a rapid tree using mash distances | `default` - runs snippy, phylogenetic tree (if > 3 sequences), assemblies, mlst and amr gene detection | `all` - same as default but includes roary pangenome analysis")
-    parser_run.add_argument('--assembler','-a', default = 'shovill', choices=['shovill','skesa','spades'], help=f"Assembler to use.")
+    parser_run.add_argument('--assembler','-a', default = 'shovill', choices=['shovill','skesa','spades'], help=f"Assembler to use (shovill uses spades > 3.14 with --isolate mode).")
+    parser_run.add_argument('--spades_args', default = "", help="Use to add arguments to spades for example: '--cov-cutoff auto' ")
     parser_run.add_argument('--cpus',help='Number of max CPU cores to run, will define how many rules are run at a time, if 0 then the avail cpus will be determined at time of launch', default=0) # need to change
     parser_run.add_argument('--minmap','-mp',help='Snippy - minimum read mapping quality to consider.', default='60')
     parser_run.add_argument('--basequal','-bq',help='Snippy - Minimum base quality to consider.', default='13')
