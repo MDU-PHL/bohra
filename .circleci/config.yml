@@ -15,12 +15,12 @@ jobs: # A basic unit of work in a run
 #       - run: source /opt/conda/etc/profile.d/conda.sh
       - run: 
           command: |
-          conda env create -f environment.yml 
-          source activate bohra 
-          python3 setup.py sdist bdist_wheel
-          pip3 install dist/bohra-2.2.1-py3-none-any.whl 
-          bohra -h
-          pytest
+            conda env create -f environment.yml 
+            source activate bohra 
+            python3 setup.py sdist bdist_wheel
+            pip3 install dist/bohra-2.2.1-py3-none-any.whl 
+            bohra -h
+            pytest
           
  #     - run: bohra 
 #       - run: 
