@@ -17,7 +17,7 @@ jobs: # A basic unit of work in a run
 #       - run: 
       - restore_cache:
       # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
-          key: deps9-{{ .Branch }}-{{ checksum "environment.yml" }}
+          key: deps9-{{ .Branch }}-{{ checksum "requirements.txt" }}
       # - run:
       #     command: |
       #       sudo pip install pipenv
