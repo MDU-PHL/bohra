@@ -19,6 +19,7 @@ jobs: # A basic unit of work in a run
             source activate bohra 
             python3 setup.py sdist bdist_wheel
             pip3 install dist/bohra-2.2.1-py3-none-any.whl 
+            sudo chown -R circleci:circleci .
             bohra -h
             pytest
             bohra init
