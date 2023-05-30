@@ -54,7 +54,7 @@ include { RUN_SNPS } from './workflows/snps'
 include { RUN_PANAROO } from './workflows/pangenome'
 include { RUN_ASSEMBLE } from './workflows/assemble'
 include { BASIC_TYPING;SEROTYPES;CONCAT_TYPER;CONCAT_RESISTOMES;CONCAT_MLST;CONCAT_VIRULOMES;CONCAT_PLASMID } from './workflows/typing'
-include { FULL_VERSIONS;DEFAULT_VERSIONS;AMR_TYPING_VERSIONS;SNPS_VERSIONS;ASSEMBLE_VERSIONS } from './workflows/versions'
+include { PREVIEW_VERSIONS;FULL_VERSIONS;DEFAULT_VERSIONS;AMR_TYPING_VERSIONS;SNPS_VERSIONS;ASSEMBLE_VERSIONS } from './workflows/versions'
 
 workflow {
     
@@ -76,6 +76,8 @@ workflow {
     if (params.mode == 'preview') {
         PREVIEW_NEWICK ( reads )
         results = results.concat( PREVIEW_NEWICK.out.nwk )
+        PREVIEW_VERSIONS()
+        results = results.concat( PREVIEW_VERSIONS.out.versions )
         WRITE_HTML ( results.collect() )
     }
     if ( params.mode == 'snps' || params.mode == 'phylogeny') {
