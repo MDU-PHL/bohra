@@ -13,11 +13,12 @@ jobs: # A basic unit of work in a run
 #       - run: sudo chown -R circleci:circleci /usr/local/bin
 #       - run: sudo chown -R circleci:circleci /opt/conda
 #       - run: source /opt/conda/etc/profile.d/conda.sh
-      - run: conda env create -f environment.yml && source activate bohra
+      - run: conda env create -f environment.yml && source activate bohra && pytest
+      - run: source activate bohra && bohra init && bohra test
 #       - run: 
-      - restore_cache:
-      # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
-          key: deps9-{{ .Branch }}-{{ checksum "environment.yml" }}
+#       - restore_cache:
+#       # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
+#           key: deps9-{{ .Branch }}-{{ checksum "requirements.txt" }}
       # - run:
       #     command: |
       #       sudo pip install pipenv
@@ -28,9 +29,9 @@ jobs: # A basic unit of work in a run
       #       - ".venv"
       #       - "/usr/local/bin"
       #       - "/usr/local/lib/python3.9/site-packages"
-      - run:
-          command: |
-            pytest
+#       - run:
+#           command: |
+#             pytest
            # bohra test
       - store_test_results: # Upload test results for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
           path: test-results
