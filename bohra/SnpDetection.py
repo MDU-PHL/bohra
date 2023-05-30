@@ -805,14 +805,11 @@ class TestBohra(SetupInputFiles):
 
     def __init__(self,args):
 
-        # self.download_path = f"{pathlib.Path.cwd() / 'test_data'}"
         self.isolate_list = ['ERR1102348','ERR1102353','ERR1102355','ERR1102356']
-        self.download_stub = "https://raw.githubusercontent.com/MDU-PHL/bohra/add_typers/data"
+        self.download_stub = "https://raw.githubusercontent.com/MDU-PHL/bohra/master/data"
         self.reference = self._check_reference_test(args.reference)
         self.read_path = f"{pathlib.Path.cwd() / 'test_data'}"
-        # self.ref_name = self._get_ref_name()
 
-    
     def _download_reads_from_github(self):
 
         for isolate in self.isolate_list:
@@ -873,4 +870,3 @@ class TestBohra(SetupInputFiles):
         else:
             LOGGER.critical(f"bohra run was not successful... please raise an issue on github.")
 
-        # return bohra
