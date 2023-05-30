@@ -21,6 +21,7 @@ jobs: # A basic unit of work in a run
             pip3 install dist/bohra-2.2.1-py3-none-any.whl 
             bohra -h
             pytest
+            bohra init
           
  #     - run: bohra 
 #       - run: 
