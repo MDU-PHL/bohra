@@ -36,6 +36,7 @@ process LISSERO {
     echo -e Isolate'\n'${meta.id} >> tmp.tab
     lissero $contigs | sed 's/contigs\\.fa/$meta.id/g'  > lissero.tab
     paste tmp.tab lissero.tab | csvtk -t rename -f SEROTYPE -n Serotype | csvtk -t cut -f -ID,-COMMENT > typer.txt
+    rm -f tmp.tab
     """
     
 }

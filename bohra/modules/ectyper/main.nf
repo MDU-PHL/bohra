@@ -37,6 +37,7 @@ process ECTYPER {
     echo -e Isolate'\n'${meta.id} >> tmp.tab
     ectyper -i $contigs -o ectyper 
     paste tmp.tab ectyper/output.tsv | csvtk -t cut -f -Name,-Species,-QC > typer.txt
+    rm -f tmp.tab
     """
     
 }

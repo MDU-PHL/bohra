@@ -36,6 +36,7 @@ process MENINGOTYPE {
     echo -e Isolate'\n'${meta.id} >> tmp.tab
     meningotype --all $contigs  > meningotype.tab
     paste tmp.tab meningotype.tab | csvtk -t rename -f SEROGROUP -n Serogroup | csvtk -t cut -f -SAMPLE_ID,-MLST > typer.txt
+    rm -f tmp.tab
     """
     
 }

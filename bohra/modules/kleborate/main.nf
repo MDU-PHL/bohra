@@ -38,6 +38,7 @@ process KLEBORATE {
     echo -e Isolate'\n'${meta.id} >> tmp.tab
     kleborate -o kleborate.tab -a $contigs
     paste tmp.tab kleborate.tab | csvtk -t rename -f species -n Species | csvtk -t cut -f -strain,-ST > typer.txt
+    rm -f tmp.tab
     """
     
 }
