@@ -487,7 +487,7 @@ class RunSnpDetection(object):
         elif not self.no_phylo:
             LOGGER.info(f"A phylogenetic tree will be generated.")
         elif self.pipeline == 'all' and len(isolates_list) < 4:
-            LOGGER.warning(f"You can not run roary with less the 4 isolates.")
+            LOGGER.warning(f"You can not run panaroo with less than 4 isolates.")
             self.pipeline = 'default'
         
         # if self.no_phylo:
