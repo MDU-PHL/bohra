@@ -68,8 +68,6 @@ workflow AMR_TYPING_VERSIONS {
         seqkit = VERSION_SEQKIT.out.version
         kmc = VERSION_KMC.out.version
         versions = seqkit.concat( kmc )
-        seqkit = VERSION_SEQKIT.out.version
-        kmc = VERSION_KMC.out.version
         if ( params.assembler == 'shovill'){
         VERSION_SHOVILL()
         asm = VERSION_SHOVILL.out.version    
@@ -81,22 +79,12 @@ workflow AMR_TYPING_VERSIONS {
         VERSION_SKESA()
         asm = VERSION_SKESA.out.version    
         }
-        versions = snippy.concat ( snp_dists, seqkit, kmc, asm )
+        versions = versions.concat ( asm )
 
         if ( params.run_kraken ){
             VERSION_KRAKEN2()
             kraken2 = VERSION_KRAKEN2.out.version
             versions = versions.concat(kraken2)
-        }
-        if ( params.gubbins ) {
-            VERSION_GUBBINS()
-            gubbins = VERSION_GUBBINS.out.version
-            versions = versions.concat ( gubbins )
-        } 
-        if (params.run_iqtree ){
-            VERSION_IQTREE()
-            iqtree = VERSION_IQTREE.out.version
-            versions = versions.concat(iqtree)
         }
         VERSION_ABRITAMR()
         abritamr = VERSION_ABRITAMR.out.version
