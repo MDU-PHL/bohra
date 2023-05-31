@@ -506,7 +506,7 @@ class RunSnpDetection(object):
 
         return f"{name}"
     
-    def _link_reads(self, iso_dir,read, target):
+    def _link_input_files(self, iso_dir,read, target):
 
         if read.exists() and not pathlib.Path(f"{iso_dir}/{target}").exists():
                     subprocess.run(f"ln -sf {read} {iso_dir}/{target}", shell = True)
@@ -530,8 +530,8 @@ class RunSnpDetection(object):
                     read2 =pathlib.Path(row[1][2])
                     target1 = 'R1.fastq.gz'
                     target2 = 'R2.fastq.gz'
-                    self._link_reads(iso_dir = iso_dir, read = read1, target = target1)
-                    self._link_reads(iso_dir = iso_dir, read = read2, target = target2)       
+                    self._link_input_files(iso_dir = iso_dir, read = read1, target = target1)
+                    self._link_input_files(iso_dir = iso_dir, read = read2, target = target2)       
             # self._check_phylo(isolates_list = isolates_list)
         
         elif self.contigs != '' and pathlib.Path(self.contigs).exists():
@@ -545,7 +545,7 @@ class RunSnpDetection(object):
                     # for r in [row[1][1],row[1][2]]:
                     contig = pathlib.Path(row[1][1])
                     target = 'contigs.fa'
-                    self._link_reads(iso_dir = iso_dir, read = contig, target = target)
+                    self._link_input_files(iso_dir = iso_dir, read = contig, target = target)
         
         else:
             LOGGER.critical(f"There seems to be a problem with your input files... not isolates can be extracted. Please check you inputs and try again.")
