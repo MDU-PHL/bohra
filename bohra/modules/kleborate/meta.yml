@@ -48,18 +48,11 @@ output:
       description: |
         Groovy Map containing sample information
         e.g. [ id:'test', single_end:false ]
-  - contigs:
+  - typer:
       type: file
-      description: The report file from kraken2
-      pattern: "*.contigs.fa"
-  - log:
-      type: file
-      description: fastq log file
-      pattern: "*.shovill.log"
-  - version:
-      type: file
-      description: File containing software version
-      pattern: "*.{version.txt}"
+      description: typer output
+      pattern: "typer.txt"
+
 authors:
   - "@kristyhoran"
   
