@@ -1,12 +1,12 @@
-name: mlst
-description: in silico MLST against pubmlst database
+name: kmc
+description: determine genome size
 keywords:
-  - mlst
+  - kmc
 tools:
-  - shovill:
+  - kmc:
       description: |
-        Scan contig files against PubMLST typing schemes
-      documentation: https://github.com/tseemann/mlst
+        none
+      documentation: 
       doi: 
 params:
   - outdir:
@@ -48,14 +48,11 @@ output:
       description: |
         Groovy Map containing sample information
         e.g. [ id:'test', single_end:false ]
-  - mlst:
+  - genome_size:
       type: file
-      description: The report file from kraken2
-      pattern: "*.mlst.tab"
-  - version:
-      type: file
-      description: File containing software version
-      pattern: "*.{version.txt}"
+      description: genome size
+      pattern: "est_genome_size_kmer.txt"
+  
 authors:
   - "@kristyhoran"
   
