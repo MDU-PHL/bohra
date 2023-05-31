@@ -3,10 +3,10 @@ description: Assemble bacterial isolate genomes from Illumina paired-end reads
 keywords:
   - assembly
 tools:
-  - shovill:
+  - lissero:
       description: |
-        Assemble bacterial isolate genomes from Illumina paired-end reads
-      documentation: https://github.com/tseemann/shovill
+        none
+      documentation: https://github.com/MDU-PHL/lissero
       doi: 
 params:
   - outdir:
@@ -36,11 +36,10 @@ input:
       description: |
         Groovy Map containing sample information
         e.g. [ id:'test', single_end:false ]
-  - reads:
+  - contigs:
       type: file
       description: |
-        List of input FastQ files of size 1 and 2 for single-end and paired-end data,
-        respectively.
+        List of input Fasta files.
 
 output:
   - meta:
