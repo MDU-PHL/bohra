@@ -26,12 +26,7 @@ workflow RUN_ASSEMBLE {
         contigs = SKESA.out.contigs
         }
         SEQKIT_STATS ( contigs )
-        // ABRITAMR ( contigs )
-        // ab = ABRITAMR.out.abritamr_matches.join(ABRITAMR.out.abritamr_partials)
-        // COMBINE_AMR( ab )
-        // MLST ( contigs )
         RUN_PROKKA ( contigs )
-        // COLLATE_ASM ( asm )
         APS = RUN_PROKKA.out.prokka_txt.join( SEQKIT_STATS.out.stats )
         COLLATE_ASM ( APS )
         asm_stats = CSVTK_CONCAT ( COLLATE_ASM.out.assembly.map { cfg, asm -> asm }.collect().map { files -> tuple("assembly", files)} )
@@ -41,9 +36,6 @@ workflow RUN_ASSEMBLE {
         assembly_stats = asm_stats
         gff = RUN_PROKKA.out.gff
         prokka_txt = RUN_PROKKA.out.prokka_txt
-    //     resistome = COMBINE_ABRITAMR.out.resistome
-    //     virulome = ABRITAMR.out.abritamr_virulence
-    //     mlst = MLST.out.mlst
         
 }
 
@@ -59,87 +51,3 @@ workflow RUN_PROKKA {
 
 }
 
-// workflow COLLATE_ASM_PROKKA {
-//     take:
-//         asm
-//     main:
-//         COLLATE_ASM ( asm )
-//     emit:
-//         collated_asm = COLLATE_ASM.out.assembly
-
-// }
-
-
-// workflow CONCAT_ASM {
-//     take:
-//         asm
-//     main:
-//         CSVTK_CONCAT ( asm )
-//     emit:
-//         collated_assembly = CSVTK_CONCAT.out.collated
-
-// }
-
-
-// workflow TYPING {
-    
-//     take:
-//         contigs
-//     main:
-//         ABRITAMR ( contigs )
-//         ab = ABRITAMR.out.abritamr_matches.join(ABRITAMR.out.abritamr_partials)
-//         COMBINE_AMR( ab )
-//         MLST ( contigs )
-// }
-// // workflow CONCAT_MLST {
-//     take:
-//         mlsts
-//     main:
-//         CSVTK_CONCAT ( mlsts )
-//     emit:
-//         collated_mlst = CSVTK_CONCAT.out.collated
-
-// }
-
-
-// workflow CONCAT_RESISTOMES {
-//     take:
-//         resistomes
-//     main:
-//         CSVTK_CONCAT ( resistomes )
-//     emit:
-//         collated_resistomes = CSVTK_CONCAT.out.collated
-
-// }
-
-
-// workflow CONCAT_ASM {
-//     take:
-//         asm
-//     main:
-//         CSVTK_CONCAT ( asm )
-//     emit:
-//         collated_assembly = CSVTK_CONCAT.out.collated
-
-// }
-
-// workflow CONCAT_VIRULOME {
-//     take:
-//         virulome
-//     main:
-//         CSVTK_CONCAT ( virulome )
-//     emit:
-//         collated_virulome = CSVTK_CONCAT.out.collated
-
-// }
-
-
-// workflow COLLATE_ASM_PROKKA {
-//     take:
-//         asm
-//     main:
-//         COLLATE_ASM ( asm )
-//     emit:
-//         collated_asm = COLLATE_ASM.out.assembly
-
-// }

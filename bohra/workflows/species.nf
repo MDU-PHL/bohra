@@ -12,8 +12,6 @@ workflow RUN_KRAKEN {
         COLLATE_KRAKEN2_ISOLATE ( KRAKEN2.out.kraken2 )
         EXTRACT_SPECIES ( KRAKEN2.out.kraken2 )
         
-        // println species.view()
-        
     emit:
         kraken2 = KRAKEN2.out.kraken2
         species = COLLATE_KRAKEN2_ISOLATE.out.species

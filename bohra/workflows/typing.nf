@@ -12,7 +12,6 @@ include { KLEBORATE } from './../modules/kleborate/main'
 include { ECTYPER } from './../modules/ectyper/main'
 include { EMMTYPER } from './../modules/emmtyper/main'
 include {CSVTK_CONCAT } from './../modules/csvtk/main'
-// include { RUN_ASSEMBLE } from '/assemble'
 
 
 workflow CONCAT_TYPER {

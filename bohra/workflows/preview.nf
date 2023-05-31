@@ -16,7 +16,7 @@ workflow PREVIEW_NEWICK {
         QUICKTREE ( MASH_TRIANGLE.out.mash_distances )
     emit:
         nwk = QUICKTREE.out.preveiw_tree
-        // MASH_SKETCH.out.skch
+       
 
 }
 
