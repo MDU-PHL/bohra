@@ -6,4 +6,5 @@ include bohra/modules/*/*
 include bohra/modules/*/*/*
 include bohra/workflows/*
 include bohra/templates/*
+include bohra/bohra_install.sh
 
