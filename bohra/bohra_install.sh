@@ -1,3 +1,4 @@
+#!/bin/bash
 # Creates conda environments required for bohra
 # Each environment will be prefaced with 'bohra-' to distinguish them from other
 # possible installations that the user has.
@@ -299,7 +300,7 @@ su=$(check_installation $ENV_PREFIX-ngmaster)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-ngmaster can not be found. Now setting up $ENV_PREFIX-ngmaster
-        mamba create -y -n $ENV_PREFIX-ngmaster ngmaster=1.0.0 csvtk
+        mamba create -y -n $ENV_PREFIX-ngmaster ngmaster csvtk
     else
         echo $ENV_PREFIX-ngmaster is already setup. Nothing left to do
 fi
