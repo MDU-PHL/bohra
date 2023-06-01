@@ -36,7 +36,7 @@ process NGMASTER {
     """
     echo -e Isolate'\n'${meta.id} >> tmp.tab
     ngmaster  $contigs  > ngmaster.tab
-    paste tmp.tab ngmaster.tab | csvtk -t cut -f -ID> typer.txt
+    paste tmp.tab ngmaster.tab | csvtk -t cut -f -2> typer.txt
     rm -f tmp.tab
     """
     

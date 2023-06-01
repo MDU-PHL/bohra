@@ -299,7 +299,7 @@ su=$(check_installation $ENV_PREFIX-ngmaster)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-ngmaster can not be found. Now setting up $ENV_PREFIX-ngmaster
-        mamba create -y -n $ENV_PREFIX-ngmaster ngmaster csvtk
+        mamba create -y -n $ENV_PREFIX-ngmaster ngmaster=1.0.0 csvtk
     else
         echo $ENV_PREFIX-ngmaster is already setup. Nothing left to do
 fi

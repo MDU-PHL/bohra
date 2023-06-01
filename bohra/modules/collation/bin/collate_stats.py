@@ -30,7 +30,11 @@ def get_length(genome_size):
 
     with open(genome_size, 'r') as f:
         x = f.read().strip().split('\n')[0].strip()
-        return int(x)
+        try:
+            return int(x)
+        except:
+            print(f"Something has gone horribly wrong {x} can not be parsed to an int!!")
+            raise SystemExit
     
 def get_dpth(genome_size,bases):
     length = get_length(genome_size)
