@@ -3,7 +3,7 @@ description: in silico MLST against pubmlst database
 keywords:
   - mlst
 tools:
-  - shovill:
+  - mlst:
       description: |
         Scan contig files against PubMLST typing schemes
       documentation: https://github.com/tseemann/mlst
@@ -36,11 +36,10 @@ input:
       description: |
         Groovy Map containing sample information
         e.g. [ id:'test', single_end:false ]
-  - reads:
+  - contigs:
       type: file
       description: |
-        List of input FastQ files of size 1 and 2 for single-end and paired-end data,
-        respectively.
+        List of input Fasta files.
 
 output:
   - meta:
@@ -51,11 +50,8 @@ output:
   - mlst:
       type: file
       description: The report file from kraken2
-      pattern: "*.mlst.tab"
-  - version:
-      type: file
-      description: File containing software version
-      pattern: "*.{version.txt}"
+      pattern: "*.mlst.txt"
+  
 authors:
   - "@kristyhoran"
   

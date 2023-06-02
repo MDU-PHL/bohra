@@ -10,7 +10,7 @@ dependencies:
   - any2fasta=0.4.2=hdfd78af_3
   - bzip2=1.0.8=h7f98852_4
   - c-ares=1.18.1=h7f98852_0
-  - ca-certificates=2022.12.7=ha878542_0
+  - ca-certificates=2023.5.7=hbcca054_0
   - cairo=1.16.0=h35add3b_1015
   - coreutils=9.2=h0b41bf4_0
   - csvtk=0.25.0=h9ee0642_0
@@ -59,8 +59,9 @@ dependencies:
   - libzlib=1.2.13=h166bdaf_4
   - ncurses=6.3=h27087fc_1
   - nextflow=22.10.6=h4a94de4_0
+  - nf-test=0.7.3=h2a3209d_2
   - openjdk=17.0.3=h4335b31_6
-  - openssl=3.1.0=h0b41bf4_0
+  - openssl=3.1.0=hd590300_3
   - pcre2=10.40=hc3806b6_0
   - perl=5.32.1=2_h7f98852_perl5
   - perl-exporter-tiny=1.002002=pl5321hdfd78af_0
@@ -121,4 +122,4 @@ dependencies:
     - six==1.16.0
     - tomli==2.0.1
     - toolz==0.12.0
-prefix: /opt/conda/envs/bohra_nf
+

@@ -19,7 +19,7 @@ def _get_tree_string(pipeline, wd,phylo):
             tree = t.read().strip()
     else:
         tree = 'No tree available'
-    print(tree)
+    # print(tree)
     return tree
 
 
@@ -129,26 +129,6 @@ def _plot_distances(wd):
         # collect positions to get allow for histogram and dropna (no snp)
         melted_df = pandas.melt(df, id_vars=[col1], value_vars=names)
         melted_df = melted_df[melted_df[col1]!= melted_df['variable']]
-        # brush = alt.selection_interval(encodings=['x'])
-        # base = alt.Chart(melted_df).mark_bar().encode(
-        #                         y='count():Q'
-        #                     ).properties(
-        #                         width=1200,
-        #                         height=100
-        #                     )
-        # chart = alt.vconcat(
-        #             base.encode(
-        #                 alt.X('value:Q',
-        #                 bin=alt.Bin(maxbins=30, extent=brush),
-        #                 scale=alt.Scale(domain=brush)
-        #                 )
-        #             ),
-        #             base.encode(
-        #                 alt.X('value:Q', bin=alt.Bin(maxbins=30)),
-        #             ).add_selection(brush)
-        #             )
-        
-        # chart = chart.to_json()
         chart = alt.Chart(melted_df).mark_bar().encode(
                             alt.X('value', axis = alt.Axis(title = 'Pairwise SNP distance')),
                             y=alt.Y('count()', axis= alt.Axis(title = "Frequency"))
@@ -242,7 +222,7 @@ def _generate_table(d, columns,comment, tables, wd, iso_dict, id_col):
         for i in _cls:
             _c.append({'title':f"{i}",'field':f"{i}", "headerVertical":"true", "vertAlign":"bottom"})
         columns[d['link']] = _c
-    
+
     else:
         _c = [{'title':'Isolate','field':'Isolate',"headerFilter":"input","headerFilterPlaceholder":"Search isolate"}]
         _cls = sorted([c for c in cols if c not in ['Isolate']])
@@ -270,6 +250,8 @@ def _get_tables(_data, wd, isos):
         # print(d)
         if d['link'] == 'pan-genome':
             id_col = 'Genes'
+        elif d['link'] == 'software-versions':
+            id_col = 'tool'
         elif d['type'] == 'table' or d['type'] == 'matrix':
             id_col = 'Isolate'
         else:
@@ -292,7 +274,7 @@ def _compile(args):
     
     isos = _get_isos(wd = args.launchdir, iso_list=args.isolates)
     # print(isos)
-    reporthtml = pathlib.Path('report.html')
+    reporthtml = pathlib.Path(f'report_{args.pipeline}.html')
     # # path to html template
     indexhtml = pathlib.Path(args.template_dir,'index.html') 
     tables,columns,comment = _get_tables(_data = _dict[args.pipeline], wd = args.launchdir, isos = isos)
@@ -308,11 +290,11 @@ def _compile(args):
         'comment':comment,
         'phylo': 'phylo' if args.iqtree == 'true' else 'no_phylo',
         'num_isos':len(isos),
-        'version_head': version_head,
-        'version_body':version_body,
-        'snp_distances': _plot_distances(wd = args.launchdir),
-        'snp_density': _plot_snpdensity(reference=args.reference, wd = args.launchdir, isos = isos),
-        'pan_svg': _get_pan_genome(d = _dict[args.pipeline], wd = args.launchdir) if args.pipeline == 'pluspan' else ''
+        # 'version_head': version_head,
+        # 'version_body':version_body,
+        'snp_distances': _plot_distances(wd = args.launchdir) if args.pipeline not in ['preview', 'assemble','amr_typing'] else {0:0},
+        'snp_density': _plot_snpdensity(reference=args.reference, wd = args.launchdir, isos = isos) if args.pipeline not in ['preview', 'assemble','amr_typing'] else {0:0},
+        'pan_svg': _get_pan_genome(d = _dict[args.pipeline], wd = args.launchdir) if args.pipeline == 'full' else ''
         }
     
     data['newick'] = _get_tree_string(pipeline = args.pipeline, wd = args.launchdir, phylo = args.iqtree)

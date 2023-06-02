@@ -1,0 +1,58 @@
+name: kmc
+description: determine genome size
+keywords:
+  - kmc
+tools:
+  - kmc:
+      description: |
+        none
+      documentation: 
+      doi: 
+params:
+  - outdir:
+      type: string
+      description: |
+        The pipeline's output directory. By default, the module will
+        output files into `$params.outdir/<SOFTWARE>`
+  - publish_dir_mode:
+      type: string
+      description: |
+        Value for the Nextflow `publishDir` mode parameter.
+        Available: symlink, rellink, link, copy, copyNoFollow, move.
+  - enable_conda:
+      type: boolean
+      description: |
+        Run the module with Conda using the software specified
+        via the `conda` directive
+  - singularity_pull_docker_container:
+      type: boolean
+      description: |
+        Instead of directly downloading Singularity images for use with Singularity,
+        force the workflow to pull and convert Docker containers instead.
+
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - reads:
+      type: file
+      description: |
+        List of input FastQ files of size 1 and 2 for single-end and paired-end data,
+        respectively.
+
+output:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - genome_size:
+      type: file
+      description: genome size
+      pattern: "est_genome_size_kmer.txt"
+  
+authors:
+  - "@kristyhoran"
+  

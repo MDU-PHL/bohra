@@ -32,7 +32,7 @@ process IQTREE {
 
     output:
         path('core.newick'), emit: newick
-
+    
     script:    
     """
     iqtree -fconst \$(snp-sites -C $full_aln) \\

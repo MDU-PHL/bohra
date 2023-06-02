@@ -105,7 +105,6 @@ workflow RUN_ASSEMBLE {
         mlst = ADD_HEADER_MLST.out.mlst
         gff = PROKKA.out.gff
         prokka_txt = PROKKA.out.prokka_txt
-        // add the result file emmitted by new rule
         plasmid = MOBSUITE_WRANGLE.out.plasmid
 }
 

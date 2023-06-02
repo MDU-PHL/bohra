@@ -24,6 +24,7 @@ input_file = file(params.isolates) // need to make this an input file
     reader.eachLine { line ->
     samples << line
     }
+// println samples
 def contigs = [:]
 // open the distribution table
 if (params.contigs_file != 'no_contigs'){
@@ -45,65 +46,101 @@ reads = Channel.fromFilePairs(["${params.outdir}/*/R{1,2}*.f*q.gz","${params.out
                 .map { sample, files -> tuple([id: files[0].getParent().getName(), single_end:false, contigs: contigs[files[0].getParent().getName()]], files)}
 
 
-
-
-
-include { READ_ANALYSIS;RUN_KRAKEN } from './workflows/common'
+include { READ_ANALYSIS } from './workflows/read_assessment'
+include { RUN_KRAKEN } from './workflows/species'
 include { PREVIEW_NEWICK } from './workflows/preview'
 include { COLLATE_KRAKEN;COLLATE_SEQS;WRITE_HTML } from './workflows/collation'
-// include { RUN_SNIPPY } from './workflows/snps'
+include { RUN_SNPS } from './workflows/snps'
 include { RUN_PANAROO } from './workflows/pangenome'
-include { RUN_ASSEMBLE;CONCAT_STATS;CONCAT_MLST;CONCAT_RESISTOMES;COLLATE_ASM_PROKKA;CONCAT_ASM;RUN_SNIPPY;RUN_CORE;RUN_IQTREE;CONCAT_VIRULOMES;CONCAT_CORE_STATS;CONCAT_PLASMID;RUN_GUBBINS } from './workflows/default'
-    
+include { RUN_ASSEMBLE } from './workflows/assemble'
+include { BASIC_TYPING;SEROTYPES;CONCAT_TYPER;CONCAT_RESISTOMES;CONCAT_MLST;CONCAT_VIRULOMES;CONCAT_PLASMID } from './workflows/typing'
+include { PREVIEW_VERSIONS;FULL_VERSIONS;DEFAULT_VERSIONS;AMR_TYPING_VERSIONS;SNPS_VERSIONS;ASSEMBLE_VERSIONS } from './workflows/versions'
+
 workflow {
     
     
 
-    READ_ANALYSIS ( reads,reference )
-    if (params.mode == 'preview') {
-        PREVIEW_NEWICK ( READ_ANALYSIS.out.skch.map { cfg, sketch -> sketch }.collect() )
-        COLLATE_SEQS ( READ_ANALYSIS.out.stats.map { cfg, stats -> stats }.collect() )
-        results = PREVIEW_NEWICK.out.nwk.concat( COLLATE_SEQS.out.collated_seqdata )
-    } else if (params.mode != 'preview'){
-        RUN_SNIPPY ( reads.combine( reference ) )
-        RUN_CORE ( RUN_SNIPPY.out.aln.map { cfg, aln -> aln.getParent() }.collect(), reference )
-        core_aln =  RUN_CORE.out.core_aln
-        if ( params.gubbins ){
-            RUN_GUBBINS( RUN_CORE.out.core_full_aln )
-            core_aln = RUN_GUBBINS.out.core_aln
-        }
-        if (params.run_iqtree ){
-            RUN_IQTREE ( core_aln, RUN_CORE.out.core_full_aln)
-            tree = RUN_IQTREE.out.newick
-        } else {
-            tree = Channel.empty().ifEmpty('EmptyFile')
-        }
-        RUN_ASSEMBLE ( reads )
-        if (params.mode == 'pluspan') {
-            RUN_PANAROO( RUN_ASSEMBLE.out.gff.map { cfg, gff -> gff }.collect() )
-            svg = RUN_PANAROO.out.svg
-        } else {
-            svg = Channel.empty().ifEmpty('EmptyFile')
-        }
-        CONCAT_MLST ( RUN_ASSEMBLE.out.mlst.map { cfg, mlst -> mlst }.collect().map { files -> tuple("mlst", files)} )
-        CONCAT_STATS ( READ_ANALYSIS.out.stats.map { cfg, stats -> stats }.collect().map { files -> tuple("seqdata", files)} )
-        CONCAT_RESISTOMES ( RUN_ASSEMBLE.out.resistome.map { cfg, resistome -> resistome }.collect().map { files -> tuple("resistome", files)} )
-        CONCAT_VIRULOMES ( RUN_ASSEMBLE.out.virulome.map { cfg, resistome -> resistome }.collect().map { files -> tuple("virulome", files)} )
-        // combined asm and prokka stats
-        APS = RUN_ASSEMBLE.out.prokka_txt.join( RUN_ASSEMBLE.out.assembly_stats )
-        COLLATE_ASM_PROKKA ( APS )
-        CONCAT_CORE_STATS ( RUN_SNIPPY.out.qual.map { cfg, core_stats -> core_stats }.collect().map { files -> tuple("core_genome", files)} )
-        CONCAT_ASM ( COLLATE_ASM_PROKKA.out.collated_asm.map { cfg, asm -> asm }.collect().map { files -> tuple("assembly", files)} )
-        CONCAT_PLASMID ( RUN_ASSEMBLE.out.plasmid.map { cfg, plasmid -> plasmid }.collect().map { files -> tuple("plasmid", files)} )
-        results = CONCAT_ASM.out.collated_assembly.concat(svg, tree, CONCAT_PLASMID.out.collated_plasmids, CONCAT_CORE_STATS.out.collated_core, CONCAT_VIRULOMES.out.collated_virulomes, CONCAT_RESISTOMES.out.collated_resistomes, CONCAT_MLST.out.collated_mlst )
-
-    }
-
+    READ_ANALYSIS ( reads )
+    results = COLLATE_SEQS ( READ_ANALYSIS.out.stats.map { cfg, stats -> stats }.collect() )
     if ( params.run_kraken ) {
             kraken = Channel.fromPath( "${params.kraken2_db}")
             RUN_KRAKEN ( reads.combine(kraken) )
             COLLATE_KRAKEN ( RUN_KRAKEN.out.species.map { cfg, species -> species }.collect() )
             results = results.concat( COLLATE_KRAKEN.out.collated_species )
+            species = RUN_KRAKEN.out.species_obs
+            
+        } else {
+            species = Channel.empty().ifEmpty('EmptyFile')
         }
-    WRITE_HTML ( results.collect() ) 
+    results = results.concat(species)
+    if (params.mode == 'preview') {
+        PREVIEW_NEWICK ( reads )
+        results = results.concat( PREVIEW_NEWICK.out.nwk )
+        PREVIEW_VERSIONS()
+        results = results.concat( PREVIEW_VERSIONS.out.versions )
+        WRITE_HTML ( results.collect() )
+    }
+    if ( params.mode == 'snps' || params.mode == 'phylogeny') {
+        RUN_SNPS ( reads,reference )
+        results = results.concat( RUN_SNPS.out.core_stats, RUN_SNPS.out.tree )
+        SNPS_VERSIONS( )
+        results = results.concat( SNPS_VERSIONS.out.versions)
+        WRITE_HTML ( results.collect() )
+    } 
+    if ( params.mode == 'assemble' || params.mode == 'amr_typing' ){
+            RUN_ASSEMBLE ( reads )
+            results = results.concat( RUN_ASSEMBLE.out.assembly_stats )
+            if ( params.mode == 'assemble' ){
+                ASSEMBLE_VERSIONS( )
+                results = results.concat( ASSEMBLE_VERSIONS.out.versions )
+            }
+            if ( params.mode == 'amr_typing'){
+                    BASIC_TYPING ( RUN_ASSEMBLE.out.contigs )
+                    results = results.concat( BASIC_TYPING.out.mlst, BASIC_TYPING.out.resistome, BASIC_TYPING.out.virulome, BASIC_TYPING.out.plasmid )
+                    if ( params.run_kraken ){
+                        typing_input = RUN_ASSEMBLE.out.contigs.join( species )
+                        SEROTYPES ( typing_input )
+                        CONCAT_TYPER ( SEROTYPES.out.typers)
+                        results = results.concat(CONCAT_TYPER.out.collated_typers)
+                        AMR_TYPING_VERSIONS()
+                        results = results.concat( AMR_TYPING_VERSIONS.out.versions )
+                    }
+                    WRITE_HTML ( results.collect() )
+                } else {
+                    WRITE_HTML ( results.collect() )
+                }
+    } 
+    if ( params.mode == 'default' || params.mode == 'full') {
+        RUN_SNPS ( reads,reference )
+        results = results.concat( RUN_SNPS.out.core_stats, RUN_SNPS.out.tree )
+        RUN_ASSEMBLE ( reads )
+        results = results.concat( RUN_ASSEMBLE.out.assembly_stats )
+        BASIC_TYPING ( RUN_ASSEMBLE.out.contigs )
+        results = results.concat( BASIC_TYPING.out.mlst, BASIC_TYPING.out.resistome, BASIC_TYPING.out.virulome, BASIC_TYPING.out.plasmid )
+        if ( params.mode == 'default' ) {
+            DEFAULT_VERSIONS()
+            results = results.concat( DEFAULT_VERSIONS.out.versions )
+        } else if (params.mode == 'full') {
+            FULL_VERSIONS()
+            results = results.concat( FULL_VERSIONS.out.versions )
+        }
+        if ( params.run_kraken ){
+            typing_input = RUN_ASSEMBLE.out.contigs.join( species )
+            SEROTYPES ( typing_input )
+            CONCAT_TYPER ( SEROTYPES.out.typers)
+            results = results.concat(CONCAT_TYPER.out.collated_typers)
+        }
+        if (params.mode == 'full') {
+                    RUN_PANAROO( RUN_ASSEMBLE.out.gff.map { cfg, gff -> gff }.collect() )
+                    svg = RUN_PANAROO.out.svg
+                    
+                } else {
+                    svg = Channel.empty().ifEmpty('EmptyFile')
+                }
+        results = results.concat( svg )
+        WRITE_HTML ( results.collect() )
+    }
+
+    
+     
 }

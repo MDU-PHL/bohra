@@ -1,7 +1,7 @@
 import pathlib
-import os, getpass, shutil, re, psutil
+import os, getpass, shutil, re, psutil, string, random
 import pandas
-# from bohra.bohra import check_deps
+from collections import namedtuple
 # import sh
 import logging
 # import filecmp
@@ -42,6 +42,7 @@ class InitBohra(object):
             print(f"{l}")
         
 
+
 class RunSnpDetection(object):
     '''
     A class for Bohra pipeline object
@@ -71,17 +72,12 @@ class RunSnpDetection(object):
         self.job_id =args.job_id
         LOGGER.info(f"Job ID is set {self.job_id}")
         # path to reference and mask
-        self.ref = pathlib.Path(args.reference)
+        self.ref = args.reference
         # LOGGER.info(f"The reference is {self.ref}")
         # self.link_file(self.ref)
         self.mask = args.mask
         # path to input file
-        if args.input_file == '':
-            LOGGER.critical('`read` file can not be empty, please set -r path_to_input to try again')
-            raise SystemExit()
-        else:
-            self.reads = pathlib.Path(args.input_file)
-        self.contigs = args.contigs
+        self.reads,self.contigs = self._check_input_files(_input = args.input_file, contigs = args.contigs, pipeline = self.pipeline)
 
         self.keep = True if args.keep == 'Y' else False
         # snippy args
@@ -100,12 +96,26 @@ class RunSnpDetection(object):
         self.run_kraken = 'false'
         self.no_phylo = args.no_phylo
         self.abritamr_args = args.abritamr_args
+        self.spades_args = args.spades_args
         self.proceed = args.proceed
         self.use_conda = True if args.no_conda == False else False
         self.conda_path = args.conda_path
         
         
-    
+    def _check_input_files(self, _input, contigs, pipeline):
+        
+        if _input == '':
+            LOGGER.critical(f"You must supply and input file. Please see help and try again.")
+            raise SystemExit
+
+        # if _input == '':
+        #     if pipeline in ['preview', 'snps','phylogeny','default','full']:
+        #         LOGGER.critical(f"You are trying to run the {pipeline} bohra pipeline - you must supply an input file with paths to reads.")
+        #         raise SystemExit
+        
+        return pathlib.Path(_input), contigs
+
+
     def _get_profile(self):
 
         # get hostname
@@ -153,27 +163,22 @@ class RunSnpDetection(object):
             LOGGER.critical(f"You have provided the path to an alternative config file, which does not exist. Please try again.")
             raise SystemExit
 
-    def _remove_core(self):
-        '''
-        Need to remove core_isolates.txt to get snakemake to redo snippy core step
-        '''
-        LOGGER.info(f"Removing previous snippy-core output.")
-        corefiles = sorted(pathlib.Path(self.workdir, self.job_id).glob('core*'))
-        if corefiles:
-            for core in corefiles:
-                core.unlink()
+    def _generate_random_string(self):
+
+        letters = string.ascii_lowercase
+        result_str = ''.join(random.choice(letters) for i in range(10))
+
+        return result_str
     
     def setup_for_rerun(self):
-        report_path_orig = self.workdir / self.job_id / 'report'
-        report_path_preview =  self.workdir / self.job_id / f'report_{self.day}'
-        if self.keep == 'Y' and report_path_orig.exists():
+        
+        report_path_orig = self.workdir / 'report'
+        report_path_preview =  self.workdir / f'report_archived_{self.day}_{self._generate_random_string()}'
+        if self.keep and report_path_orig.exists():
             cmd = f"mv {report_path_orig} {report_path_preview}"
             LOGGER.info(f"Archiving previous report directory...")
-            subprocess.run(cmd, shell = True, encoding = "utf-8", capture_output= True)
-        elif self.keep == 'N' and report_path_orig.exists():
-            cmd = f"rm {report_path_orig}"
-            LOGGER.info(f"Removing previous report files")
-            subprocess.run(cmd, shell = True, encoding = "utf-8", capture_output= True)
+            self._run_subprocess(cmd  = cmd)
+        
 
 
     def _path_exists(self,path, v = True):
@@ -212,16 +217,30 @@ class RunSnpDetection(object):
             raise SystemExit()
    
 
-    def _check_ref(self, ref):
-
-        LOGGER.info(f"Checking if reference is a valid reference file.")
-        p = subprocess.run(f"any2fasta {ref}", shell = True, capture_output = True, encoding = "utf-8")
-        if p.returncode == 0:
-            LOGGER.info(f"Reference is in a valid format.")
+    def _check_ref(self, ref, pipeline):
+        
+        if pipeline in ['snps','default','full','phylogeny']:
+            if self.ref == '':
+                LOGGER.critical(f"Reference file must be provided. Please try again.")
+                raise SystemExit
+            elif not self._path_exists(pathlib.Path(self.ref), v = True):
+                LOGGER.critical(f"A valid reference file must be provided. Please try again.")
+                raise SystemExit
+            
+            LOGGER.info(f"Reference {self.ref} has been found. Will now copy to running directory.")
+            reference = self._copy_files(_file = self.ref)
+            LOGGER.info(f"Checking if reference is a valid reference file.")
+            p = subprocess.run(f"any2fasta {ref}", shell = True, capture_output = True, encoding = "utf-8")
+            if p.returncode == 0:
+                LOGGER.info(f"Reference is in a valid format.")
+            
+            else:
+                LOGGER.critical(f"There is something wrong with your reference file. Valid file types are .fasta, .gbk, .fasta.gz, .gbk.gz. Please check your inputs and try again.")
+                raise SystemExit
+            return reference
         else:
-            LOGGER.critical(f"There is something wrong with your reference file. Valid file types are .fasta, .gbk, .fasta.gz, .gbk.gz. Please check your inputs and try again.")
-            raise SystemExit
-
+            return 'no_ref_req'
+        
     def _check_gzip(self,read):
         """
         ensure that gz file is true gz
@@ -424,7 +443,7 @@ class RunSnpDetection(object):
    
     def _check_reads(self,reads):
 
-        if self._path_exists(reads):
+        if reads != '' and self._path_exists(reads):
             
             tab = pandas.read_csv(reads, sep = '\t', header = None)
             if self._check_shape(tab.shape[1]):
@@ -433,6 +452,8 @@ class RunSnpDetection(object):
                 LOGGER.critical(f"{reads} is not in the correct format. Please check your inputs and try again.")
                 raise SystemExit
             return tab
+        # elif self.pipeline in ['assemble','amr_typing']:
+        #     return pandas.DataFrame()
         else:
             LOGGER.critical(f"Something is wrong with {reads}. Please try again.")
             raise SystemExit
@@ -457,14 +478,18 @@ class RunSnpDetection(object):
         LOGGER.info(f"Your analysis contains {len(isolates_list)}")
         if self.pipeline == 'preivew' and len(isolates_list) > 2:
             LOGGER.info(f"You are running in preview mode, a mash tree will be output")
-        if len(isolates_list) < 3 and self.pipeline in ['default', 'all']:
+        if self.pipeline in ['amr_typing', 'assemble']:
+            LOGGER.info(f"Your are running the {self.pipeline} bohra pipeline. No tree will be generated.")
+            self.no_phylo = True
+        elif len(isolates_list) < 3 and self.pipeline in ['phylogeny', 'default', 'all']:
             LOGGER.warning(f"You have less than 3 isolates in your dataset, no phylogenetic tree will be generated.")
             self.no_phylo = True
         elif not self.no_phylo:
             LOGGER.info(f"A phylogenetic tree will be generated.")
-        if self.pipeline == 'all' and len(isolates_list) < 4:
-            LOGGER.warning(f"You can not run roary with less the 4 isolates.")
+        elif self.pipeline == 'all' and len(isolates_list) < 4:
+            LOGGER.warning(f"You can not run panaroo with less than 4 isolates.")
             self.pipeline = 'default'
+        
         # if self.no_phylo:
         #     LOGGER.info(f"You have selected no_phylo option so no phylogenetic tree will be generated.")
         
@@ -481,7 +506,7 @@ class RunSnpDetection(object):
 
         return f"{name}"
     
-    def _link_reads(self, iso_dir,read, target):
+    def _link_input_files(self, iso_dir,read, target):
 
         if read.exists() and not pathlib.Path(f"{iso_dir}/{target}").exists():
                     subprocess.run(f"ln -sf {read} {iso_dir}/{target}", shell = True)
@@ -492,25 +517,39 @@ class RunSnpDetection(object):
     def _setup_directory(self, reads):
         
         isolates_list = []
-        # if not pathlib.Path(self.job_id).exists():
-        #     LOGGER.info(f"Creating job directory")
-        #     subprocess.run(f"mkdir {self.workdir}", shell = True)
-        LOGGER.info(f"Setting up isolate directories.")
-        for row in reads.iterrows():
-            if not row[1][0].startswith('#'):
-                isolates_list.append(row[1][0])
-                iso_dir = self.workdir/ f"{row[1][0]}" 
-                if not iso_dir.exists():
-                    subprocess.run(f"mkdir {iso_dir}", shell = True)
-                # for r in [row[1][1],row[1][2]]:
-                read1 = pathlib.Path(row[1][1])
-                read2 =pathlib.Path(row[1][2])
-                target1 = 'R1.fastq.gz'
-                target2 = 'R2.fastq.gz'
-                self._link_reads(iso_dir = iso_dir, read = read1, target = target1)
-                self._link_reads(iso_dir = iso_dir, read = read2, target = target2)
-                
+        if not reads.empty:
+            LOGGER.info(f"Setting up isolate directories.")
+            for row in reads.iterrows():
+                if not row[1][0].startswith('#'):
+                    isolates_list.append(row[1][0])
+                    iso_dir = self.workdir/ f"{row[1][0]}" 
+                    if not iso_dir.exists():
+                        subprocess.run(f"mkdir {iso_dir}", shell = True)
+                    # for r in [row[1][1],row[1][2]]:
+                    read1 = pathlib.Path(row[1][1])
+                    read2 =pathlib.Path(row[1][2])
+                    target1 = 'R1.fastq.gz'
+                    target2 = 'R2.fastq.gz'
+                    self._link_input_files(iso_dir = iso_dir, read = read1, target = target1)
+                    self._link_input_files(iso_dir = iso_dir, read = read2, target = target2)       
+            # self._check_phylo(isolates_list = isolates_list)
         
+        elif self.contigs != '' and pathlib.Path(self.contigs).exists():
+            tab = pandas.read_csv(self.contigs, sep = '\t', header = None, names = ['Isolate','Path'])
+            for row in tab.iterrows():
+                if not row[1][0].startswith('#'):
+                    isolates_list.append(row[1][0])
+                    iso_dir = self.workdir/ f"{row[1][0]}" 
+                    if not iso_dir.exists():
+                        subprocess.run(f"mkdir {iso_dir}", shell = True)
+                    # for r in [row[1][1],row[1][2]]:
+                    contig = pathlib.Path(row[1][1])
+                    target = 'contigs.fa'
+                    self._link_input_files(iso_dir = iso_dir, read = contig, target = target)
+        
+        else:
+            LOGGER.critical(f"There seems to be a problem with your input files... not isolates can be extracted. Please check you inputs and try again.")
+            raise SystemExit
         self._check_phylo(isolates_list = isolates_list)
         LOGGER.info(f"Updating isolate list.")
         pathlib.Path(f"isolates.list").write_text('\n'.join(isolates_list))
@@ -549,7 +588,14 @@ class RunSnpDetection(object):
                 snippy_opts.append(f"--{d} {_dict[d]}")
         
         return ' '.join(snippy_opts)
-        
+    
+    def _generate_spades_args(self):
+
+        if self.assembler == 'spades':
+            return f"--spades_opt '{self.spades_args}'"
+        else:
+            return ''
+
     def _generate_cmd(self, mode, run_kraken, kraken2_db,assembler, mask_string, reference, 
                         isolates, user, day, contigs, run_iqtree, species, cpus, config, profile, gubbins,blast_db,data_dir, job_id):
         
@@ -557,22 +603,27 @@ class RunSnpDetection(object):
         resume = '' if self.force else "-resume"
         cpu = f'-executor.cpus={int(cpus)}' if cpus != '' else ''
         config = f'-c {config}' if config != '' else ''
-        conda = '--enable_conda' if self.use_conda else ''
+        conda = '--enable_conda true' if self.use_conda else ''
         conda_path = f"--conda_path {self.conda_path}" if self.conda_path != '' else ''
         snippy_opts = self._generate_snippy_params()
-        parameters = f"--job_id {job_id} --mode {mode} --run_iqtree {run_iqtree} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} --mask_string {mask_string} --reference {reference} --contigs_file {contigs} --species {species if species != '' else 'no_species'} --outdir {self.workdir} --isolates {isolates} --user {user} --day {day} --gubbins {gubbins} --blast_db {blast_db} --data_dir {data_dir} {conda} {conda_path} {snippy_opts}"
+        spades_opts = self._generate_spades_args()
+        parameters = f"--job_id {job_id} --mode {mode} --run_iqtree {run_iqtree} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} --mask_string {mask_string} --reference {reference} --contigs_file {contigs} --species {species if species != '' else 'no_species'} --outdir {self.workdir} --isolates {isolates} --user {user} --day {day} --gubbins {gubbins} --blast_db {blast_db} --data_dir {data_dir} {conda} {conda_path} {snippy_opts} {spades_opts}"
         options = f"-with-report bohra_{day}_report.html -with-trace -profile {profile} {resume} {cpu} {config} {'-with-conda' if self.use_conda else ''}"
 
         cmd = f"{stub} {parameters} {options}"
         return cmd
         
-        
+    def _run_subprocess(self, cmd):
+
+        LOGGER.info(f"Running:\n\033[1m{cmd}\033[0m")
+        p = subprocess.run(cmd, shell = True)
+        return p
+    
     def _run_cmd(self, cmd):
         
         if self.proceed:
-            LOGGER.info(f"Running:\n\033[1m{cmd}\033[0m")
-            p = subprocess.run(cmd, shell = True)
-            return p
+            return self._run_subprocess(cmd= cmd)
+        
         else:
 
             try:
@@ -587,6 +638,7 @@ Please select a mode to run, choices are 'analysis' or 'finish'")
         '''
         run pipeline, if workflow runs to completion print out a thank you message.
         '''
+        self.setup_for_rerun()
         # run checks for inputs
         if self.use_conda == False:
             LOGGER.warning(f"You are using a pre-configured conda environment - please note the results may be unexpected.")
@@ -601,16 +653,8 @@ Please select a mode to run, choices are 'analysis' or 'finish'")
         contigs = self._check_contigs(contigs = self.contigs)
         
         # reference
-        if self.ref == '':
-            LOGGER.critical(f"Reference file must be provided. Please try again.")
-            raise SystemExit
-        elif not self._path_exists(self.ref, v = True):
-            LOGGER.critical(f"A valid reference file must be provided. Please try again.")
-            raise SystemExit
-        else:
-            LOGGER.info(f"Reference {self.ref} has been found. Will now copy to running directory.")
-            reference = self._copy_files(_file = self.ref)
-            self._check_ref(ref = reference)
+        
+        reference = self._check_ref(ref = self.ref,pipeline=self.pipeline)
         # mask
         if self.mask != '' and not self._path_exists(pathlib.Path(self.mask)):
             LOGGER.critical(f"{self.mask} is not a valid path please try again.")
@@ -621,7 +665,7 @@ Please select a mode to run, choices are 'analysis' or 'finish'")
         else:
             LOGGER.info(f"No mask file has been provided.")
 
-        isolates_list = self._setup_directory(reads = reads)
+        isolates_list = self._setup_directory(reads = reads) 
 
         if contigs:
             contigs_file = self.contigs
@@ -645,21 +689,8 @@ Please select a mode to run, choices are 'analysis' or 'finish'")
                         species = self.abritamr_args, gubbins = self.gubbins, blast_db = self.blast_db if self.blast_db != '' else 'no_db', data_dir = self.data_dir if self.data_dir != '' else 'no_db', job_id = self.job_id)
         self._run_cmd(cmd)
 
-# class CheckBohra(RunSnpDetection):
 
-#     def __init__(self):
-        
-#         # user
-#         self.user = getpass.getuser()
-#         # get date and time
-#         self.now = datetime.datetime.today().strftime("%d_%m_%y_%H")
-#         self.day = datetime.datetime.today().strftime('%Y-%m-%d')
-#         self.script_path = f"{pathlib.Path(__file__).parent}"
-#         self.check = True
-#         self.check_dependencies(checking = self.check)
-
-
-class SetupInputFiles():
+class SetupInputFiles(RunSnpDetection):
 
     def __init__(self, args):
 
@@ -682,6 +713,7 @@ class SetupInputFiles():
         else:
             LOGGER.critical(f"Path provided : {path} does not exist - please try again.")
             return False
+        
     def _extract_isolates(self, isolate_file):
         
         with open(isolate_file, 'r') as f:
@@ -769,7 +801,72 @@ class SetupInputFiles():
             LOGGER.critical(f"There seems to be a problem with your read path. Please provide a valid path to the reads you wish to include")
             raise SystemExit
 
+class TestBohra(SetupInputFiles):
 
+    def __init__(self,args):
+
+        self.isolate_list = ['ERR1102348','ERR1102353','ERR1102355','ERR1102356']
+        self.download_stub = "https://raw.githubusercontent.com/MDU-PHL/bohra/master/data"
+        self.reference = self._check_reference_test(args.reference)
+        self.read_path = f"{pathlib.Path.cwd() / 'test_data'}"
+
+    def _download_reads_from_github(self):
+
+        for isolate in self.isolate_list:
+            
+            for r in [1,2]:
+                cmd = f"mkdir -p test_data/{isolate} && wget -O test_data/{isolate}/{isolate}_{r}.fastq.gz {self.download_stub}/{isolate}/{isolate}_{r}.fastq.gz"
+                self._run_subprocess(cmd = cmd)
+            
+
+    def _download_reference_from_github(self):
+
+        cmd = f"wget -O Lm_Cluster1_J1-108.fa {self.download_stub}/Lm_Cluster1_J1-108.fa"
+        self._run_subprocess(cmd = cmd)
+        return 'Lm_Cluster1_J1-108.fa'
     
+    def _check_reference_test(self, path):
 
+        if not pathlib.Path(path).exists():
+
+            return self._download_reference_from_github()
+
+        else:
+            return path
+
+    def _check_test_data(self,path):
+
+        for i in self.isolate_list:
+            reads = sorted(pathlib.Path(path).glob(f"{i}/{i}*.f*q.gz"))
+            if len(reads) != 2:
+                LOGGER.warning(f"Reads for {i} are not found. Will try to get them for you!")
+                return False
+        LOGGER.info(f"All reads are found at {path}")
+        return True
+    
+    def _make_test_input(self, path):
+
+        LOGGER.info(f"Now generating input file for bohra.")
+        self._glob_data(path = path)
+
+    def run_tests(self):
+        
+        LOGGER.info(f"Checking availability of data.")
+        if not pathlib.Path(self.read_path).exists():
+            LOGGER.info(f"Will now download some reads for testing - this may take a little while - it might be coffee time.")
+            self._download_reads_from_github()
+        elif self._check_test_data(path = self.read_path):
+            self._make_test_input(path = self.read_path)
+        else:
+            LOGGER.info(f"Will now download some reads for testing - this may take a little while - it might be coffee time.")
+            self._download_reads_from_github()
+            self._make_test_input(path = self.read_path)
+            
+        cmd = f"bohra run -i isolates.tab -r {self.reference} -p full --proceed"
+        proc = self._run_subprocess(cmd=cmd)
+
+        if proc.returncode == 0:
+            LOGGER.info(f"bohra test has completed successfully!!")
+        else:
+            LOGGER.critical(f"bohra run was not successful... please raise an issue on github.")
 

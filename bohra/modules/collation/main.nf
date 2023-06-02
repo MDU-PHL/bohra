@@ -46,7 +46,7 @@ process COLLATE_STATS_ISOLATE {
         conda null
     }
     input:
-    tuple val(meta), path(seqkit_stats), path(seqkit_qual), path(reference)
+    tuple val(meta), path(seqkit_stats), path(seqkit_qual), path(genome_size)
 
     output:
     tuple val(meta), path ("read_assessment.txt"), emit: read_assessment
@@ -54,7 +54,7 @@ process COLLATE_STATS_ISOLATE {
     script:
     """
     ${module_dir}/collate_stats.py $meta.id $seqkit_stats  \
-    $seqkit_qual $launchDir/$params.reference read_assessment.txt
+    $seqkit_qual $genome_size read_assessment.txt
     """
     
 }
@@ -187,7 +187,7 @@ process COLLATE_MOBSUITE {
     script:
     def plasmids = input.join(' ')
     """
-    $module_dir/collate_plasmids.py $output_name $plasmids
+    $module_dir/collate_tables.py $output_name $plasmids
     """
 
 }
@@ -247,7 +247,7 @@ process COMPILE {
     val(results) 
 
     output:
-    path "report.html", emit: html
+    path "report_*.html", emit: html
     
     script:
     def res = results.join(' ')
@@ -275,7 +275,7 @@ process COLLATE_ABRITMAR {
     script:
     def resistomes = input.join(' ')
     """
-    $module_dir/collate_plasmids.py $output_name $resistomes
+    $module_dir/collate_tables.py $output_name $resistomes
     """
 
 }

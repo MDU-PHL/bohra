@@ -195,21 +195,21 @@
     </div>
 
 <div id="help-button" style = "float:right;">
-  <button type="button" class="btn btn-sm btn-outline-secondary zoom-button" id = "help" data-toggle="modal" data-target="#myModal3" data-placement="top" title="Select"> Helpful tips </button>    
-  <button type="button" class="btn btn-sm btn-outline-secondary version-button" id = "version"> Software versions </button>    
+  <!-- <button type="button" class="btn btn-sm btn-outline-secondary zoom-button" id = "help" data-toggle="modal" data-target="#myModal3" data-placement="top" title="Select"> Helpful tips </button>     -->
+  <!-- <button type="button" class="btn btn-sm btn-outline-secondary version-button" id = "version"> Software versions </button>     -->
   <!-- <button type="button" class="btn btn-sm btn-outline-secondary" id = "nwk" ><span data-feather="arrow-down"> Download newick </button>         -->
 </div>
 <!-- div for summary table and phylogenetic tree -->
 <div class= "container-fluid">
 <!-- buttons -->
 {% if phylo == 'phylo' %}
-<button type="button" class="btn btn-primary btn-xlg btn-outline-primary btn-lg phylogeny-button">Phylogeny</button>
+<button type="button" class="btn btn-primary btn-xlg btn-outline-primary btn-lg phylogeny-button">Tree</button>
 {% endif %}
 {% for t,v in tables.items() %}
   <button type="button" class="btn btn-primary btn-xlg btn-outline-primary btn-lg detail-button {{v.link}}-button">{{v.name}}</button>
 {% endfor %}
 
-<div id = "software-versions" class = "versions" style = "display: none;">
+<!-- <div id = "software-versions" class = "versions" style = "display: none;">
   <table class="table" id = "version-table">     
     <thead>
       <tr>
@@ -220,7 +220,7 @@
       {{version_body}}
     </tbody>
   </table>
-</div>
+</div> -->
 <div id = "empty-table"></div>
 <div id="comment"></div>
 <div id = "snp-distances-graph" class = "hidden-graph" style="display:none;">  <!-- placeholder for graphs  --> </div>
@@ -235,7 +235,7 @@
   <div id = "pan-svg" style = "display:none;margin:10px;">
     {{ pan_svg }}
   </div>
-
+{% if phylo == 'phylo' %}
   <div id = "phylogeny">
     <button type="button" class="btn btn-sm btn-outline-secondary back-button" id = "step-back"> back </button>    
     <button type="button" class="btn btn-sm btn-outline-secondary reset-button" id = "reset-tree"> reset </button> 
@@ -247,7 +247,7 @@
     <div id="tree_string" style="display: none;">{{newick}}</div>
     <div id = "phylocanvas" style = "width: 100%; margin:5px; border: 1px solid lightgray;" ></div>
   </div>
-    
+  {% endif %}
   </div>         
   
         

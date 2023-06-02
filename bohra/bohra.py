@@ -17,7 +17,7 @@ import pathlib
 import sys
 import os
 import shutil
-from bohra.SnpDetection import RunSnpDetection, SetupInputFiles, InitBohra
+from bohra.SnpDetection import RunSnpDetection, SetupInputFiles, InitBohra, TestBohra
 from bohra.version import version
 
 
@@ -39,6 +39,12 @@ def init_bohra():
     I = InitBohra()
     I.init()
 
+def test_bohra(args):
+    
+    S = TestBohra(args)
+    S.run_tests()
+    # run_pipeline(inputs)
+
 def main():
     # setup the parser
   
@@ -57,8 +63,9 @@ def main():
     parser_run.add_argument('--mask','-m',default = '', help='Path to mask file if used (.bed)')
     parser_run.add_argument("--abritamr_args",default="",help="Set if you would like to use point mutations, please provide a valid species.", choices= ['Neisseria', 'Acinetobacter_baumannii', "Campylobacter", "Enterococcus_faecalis", "Enterococcus_faecium", "Escherichia", "Klebsiella", "Salmonella", "Staphylococcus_aureus", "Staphylococcus_pseudintermedius", "Streptococcus_agalactiae", "Streptococcus_pneumoniae", "Streptococcus_pyogenes", "Vibrio_cholerae"])
     parser_run.add_argument('--kraken_db', '-k', default="KRAKEN2_DEFAULT_DB", help="Path to DB for use with kraken2, if no DB present speciation will not be performed.")
-    parser_run.add_argument('--pipeline','-p', default = 'preview', choices=['preview','default','pluspan'], help=f"The pipeline to run. `preview` - generates a rapid tree using mash distances | `default` - runs snippy, phylogenetic tree (if > 3 sequences), assemblies, mlst and amr gene detection | `all` - same as default but includes roary pangenome analysis")
-    parser_run.add_argument('--assembler','-a', default = 'shovill', choices=['shovill','skesa','spades'], help=f"Assembler to use.")
+    parser_run.add_argument('--pipeline','-p', default = 'preview', choices=['preview','default','full','snps','phylogeny','assemble','amr_typing'], help=f"The pipeline to run. `preview` - generates a rapid tree using mash distances | `default` - runs snippy, phylogenetic tree (if > 3 sequences), assemblies, mlst and amr gene detection | `all` - same as default but includes roary pangenome analysis")
+    parser_run.add_argument('--assembler','-a', default = 'shovill', choices=['shovill','skesa','spades'], help=f"Assembler to use (shovill uses spades > 3.14 with --isolate mode).")
+    parser_run.add_argument('--spades_args', default = "", help="Use to add arguments to spades (when running with --assembler spades) for example: '--cov-cutoff auto' ")
     parser_run.add_argument('--cpus',help='Number of max CPU cores to run, will define how many rules are run at a time, if 0 then the avail cpus will be determined at time of launch', default=0) # need to change
     parser_run.add_argument('--minmap','-mp',help='Snippy - minimum read mapping quality to consider.', default='60')
     parser_run.add_argument('--basequal','-bq',help='Snippy - Minimum base quality to consider.', default='13')
@@ -70,7 +77,7 @@ def main():
     parser_run.add_argument('--no_phylo',action="store_true", help = "Set if you do NOT want to generate a phylogentic tree.")
     parser_run.add_argument('--config', default = f"", help='An additional config file, required if running on a non-local machine, ie slurm, cloud. For help see documentation at https://github.com/MDU-PHL/bohra or https://www.nextflow.io/docs/latest/executor.html') # don't need this
     parser_run.add_argument('--profile', default = f"", help='The resource profile to use. Defaults to local, if using an alternative config file, this calue should represent the name of a profile provided') 
-    parser_run.add_argument('--conda_path', default = f"", help='The path to where your pre-installed conda envs are stored, defaults to installing conda envs in your work directory. This can be provided in your profiles settings as well - it assumes you have pre-configured all of your conda environments for each process run by bohra, this is an advanced setting. Please take care.') 
+    parser_run.add_argument('--conda_path', default = f"{pathlib.Path(os.getenv('CONDA_PREFIX')).parent}", help='The path to where your pre-installed conda envs are stored, defaults to installing conda envs in your work directory. This can be provided in your profiles settings as well - it assumes you have pre-configured all of your conda environments for each process run by bohra, this is an advanced setting. Please take care.') 
     parser_run.add_argument('--blast_db', default = f"{os.getenv('BLAST_DB', '')}", help='Path to the mlst blast_db, defaults to what is installed in the environment.') 
     parser_run.add_argument('--data_dir', default = f"{os.getenv('PUBMLST_DB','')}", help='Path to the mlst datadir, defaults to what is installed in the environment.') 
     parser_run.add_argument('--mlst_exclude',default = f"", help='Space delimited list of mlst schemes to exclude.', nargs='+')
@@ -95,9 +102,16 @@ def main():
     parser_init = subparsers.add_parser('init', help='Setup bohra dependencies', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser_check = subparsers.add_parser('check', help='Check for bohra dependencies', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
 
-
+    parser_test = subparsers.add_parser('test', help='Test bohra', formatter_class=argparse.ArgumentDefaultsHelpFormatter)
+    parser_test.add_argument(
+        '--reference',
+        '-r',help='Reference to be used in test.', 
+        default='Lm_Cluster1_J1-108.fa'
+    )
+    
     parser_run.set_defaults(func=run_pipeline)
     parser_setup.set_defaults(func=find_reads)
+    parser_test.set_defaults(func=test_bohra)
     
 
         
