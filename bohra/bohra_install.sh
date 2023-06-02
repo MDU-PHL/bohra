@@ -24,7 +24,7 @@ fi
 function check_installation(){
     rt=$(conda activate $1 2>&1)
     # echo "$rt"
-    if [[ "$rt" =~ .*"EnvironmentNameNotFound".* ]]
+    if [[ "$rt" =~ .*"EnvironmentNameNotFound".* || "$rt" =~ .*"Could not find".* ]]
     then 
         x=1
     else
