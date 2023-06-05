@@ -36,15 +36,7 @@ process COLLATE_STATS_ISOLATE {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     cache 'lenient' 
-    if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/seqkit"
-        } else {
-            conda 'csvtk seqkit=2.1.0 pandas numpy=1.23.1 any2fasta'
-        }
-    } else {
-        conda null
-    }
+    
     input:
     tuple val(meta), path(seqkit_stats), path(seqkit_qual), path(genome_size)
 
