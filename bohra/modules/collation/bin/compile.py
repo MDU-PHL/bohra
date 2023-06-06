@@ -178,31 +178,35 @@ def _generate_table(d, columns,comment, tables, wd, iso_dict, id_col):
     if id_col == '':
         return tables,columns,comment
     cols = []
-    with open(f"{pathlib.Path(wd, 'report', d['file'])}", 'r') as f:
-        reader = csv.DictReader(f, delimiter = '\t')
-        comment[d['link']] = d['comment']
-        tables[d['link']] = {'table':[], 'name': d['title'], 'link':d['link']}
-        c = 1
-        for row in reader:
-            if len(row) >1:
-                if row[id_col] in iso_dict:
-                    _sample_dict = {'id':iso_dict[row[id_col]]}
-                    # if d['link'] == 'snp-distances':
-                    #     # print(_sample_dict)
-                    for col in row:
-                        cols.append(col)
-                        _sample_dict[col] = row[col]
-                    # if d['link'] == 'snp-distances':
-                    #     # print(_sample_dict)
-                    tables[d['link']]['table'].append(_sample_dict)
-                else:
-                    _data_dict = {'id':c}
-                    c = c + 1
-                    for col in row:
-                        cols.append(col)
-                        _data_dict[col] = row[col]
-                    tables[d['link']]['table'].append(_data_dict)
-                    
+    try:
+        with open(f"{pathlib.Path(wd, 'report', d['file'])}", 'r') as f:
+            reader = csv.DictReader(f, delimiter = '\t')
+            comment[d['link']] = d['comment']
+            tables[d['link']] = {'table':[], 'name': d['title'], 'link':d['link']}
+            c = 1
+            for row in reader:
+                if len(row) >1:
+                    if row[id_col] in iso_dict:
+                        _sample_dict = {'id':iso_dict[row[id_col]]}
+                        # if d['link'] == 'snp-distances':
+                        #     # print(_sample_dict)
+                        for col in row:
+                            cols.append(col)
+                            _sample_dict[col] = row[col]
+                        # if d['link'] == 'snp-distances':
+                        #     # print(_sample_dict)
+                        tables[d['link']]['table'].append(_sample_dict)
+                    else:
+                        _data_dict = {'id':c}
+                        c = c + 1
+                        for col in row:
+                            cols.append(col)
+                            _data_dict[col] = row[col]
+                        tables[d['link']]['table'].append(_data_dict)
+    except FileNotFoundError:
+        print(f"No file found for {d['title']}")
+
+                        
 
     cols = list(set(cols))
     if d['columns'] != []:

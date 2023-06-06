@@ -782,7 +782,7 @@ class SetupInputFiles(RunSnpDetection):
         :output - list of data
         """
 
-        _dir = pathlib.Path(path)
+        _dir = pathlib.Path(path).resolve()
 
         if data_type == 'reads':
 
