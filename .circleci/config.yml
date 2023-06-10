@@ -15,7 +15,7 @@ jobs: # A basic unit of work in a run
             conda env create -f environment.yml 
             source activate bohra 
             python3 setup.py sdist bdist_wheel
-            pip3 install dist/bohra-2.2.1-py3-none-any.whl 
+            pip3 install dist/bohra-*-py3-none-any.whl 
             bohra -h
             pytest
             bohra init
