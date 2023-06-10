@@ -108,11 +108,6 @@ class RunSnpDetection(object):
             LOGGER.critical(f"You must supply and input file. Please see help and try again.")
             raise SystemExit
 
-        # if _input == '':
-        #     if pipeline in ['preview', 'snps','phylogeny','default','full']:
-        #         LOGGER.critical(f"You are trying to run the {pipeline} bohra pipeline - you must supply an input file with paths to reads.")
-        #         raise SystemExit
-        
         return pathlib.Path(_input), contigs
 
 
@@ -178,8 +173,6 @@ class RunSnpDetection(object):
             cmd = f"mv {report_path_orig} {report_path_preview}"
             LOGGER.info(f"Archiving previous report directory...")
             self._run_subprocess(cmd  = cmd)
-        
-
 
     def _path_exists(self,path, v = True):
         '''
@@ -476,7 +469,7 @@ class RunSnpDetection(object):
     def _check_phylo(self, isolates_list):
         LOGGER.info(f"Checking if phylo needs to be run.")
         LOGGER.info(f"Your analysis contains {len(isolates_list)}")
-        if self.pipeline == 'preivew' and len(isolates_list) > 2:
+        if self.pipeline == 'preview' and len(isolates_list) > 2:
             LOGGER.info(f"You are running in preview mode, a mash tree will be output")
         if self.pipeline in ['amr_typing', 'assemble']:
             LOGGER.info(f"Your are running the {self.pipeline} bohra pipeline. No tree will be generated.")
