@@ -5,10 +5,10 @@ include { EXTRACT_SPECIES } from './../modules/utils/main'
 
 workflow RUN_KRAKEN {
     take:
-        preview
+        reads
     main:
         
-        KRAKEN2 ( preview )
+        KRAKEN2 ( reads )
         COLLATE_KRAKEN2_ISOLATE ( KRAKEN2.out.kraken2 )
         EXTRACT_SPECIES ( KRAKEN2.out.kraken2 )
         
