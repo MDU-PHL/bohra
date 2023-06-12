@@ -513,7 +513,13 @@ class RunSnpDetection(object):
         elif not read.exists():
             LOGGER.critical(f"{read} is not a valid path. All read files must be valid path. Please try again.")
             raise SystemExit
-        
+    
+    def _check_reads_not_equal(self, r1,r2):
+
+        if f"{r1}" == f"{r2}":
+            LOGGER.critical(f"It seems that {r1} and {r2} are the same name. You must supply paths to R1 and R2. Please check your inputs and try again.")
+            raise SystemExit
+
     def _setup_directory(self, reads):
         
         isolates_list = []
@@ -528,6 +534,7 @@ class RunSnpDetection(object):
                     # for r in [row[1][1],row[1][2]]:
                     read1 = pathlib.Path(row[1][1])
                     read2 =pathlib.Path(row[1][2])
+                    self._check_reads_not_equal(r1 = read1, r2 = read2)
                     target1 = 'R1.fastq.gz'
                     target2 = 'R2.fastq.gz'
                     self._link_input_files(iso_dir = iso_dir, read = read1, target = target1)
