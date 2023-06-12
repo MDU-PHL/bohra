@@ -855,6 +855,7 @@ class TestBohra(SetupInputFiles):
         if not pathlib.Path(self.read_path).exists():
             LOGGER.info(f"Will now download some reads for testing - this may take a little while - it might be coffee time.")
             self._download_reads_from_github()
+            self._make_test_input(path = self.read_path)
         elif self._check_test_data(path = self.read_path):
             self._make_test_input(path = self.read_path)
         else:
