@@ -29,7 +29,6 @@ workflow {
     
 
     MLST ( contigs )
-    println params.truth
 
     TEST_MLST ( MLST.out.mlst )
 
