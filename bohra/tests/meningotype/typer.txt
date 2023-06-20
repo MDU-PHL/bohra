@@ -1,0 +1,2 @@
+Isolate	Serogroup	ctrA	PorA	FetA	PorB	fHbp	NHBA	NadA	BAST
+for_testing	W	ctrA	5,2	F1-1	NEIS2020_244	623	29	6	141

@@ -2,17 +2,43 @@
     "mlst": {
         "truth" : "mlst/mlst_truth.txt",
         "main": "mlst/main.nf",
-        "input": "Lm_Cluster1_J1-108.fa"
+        "input": "asm/Lm_Cluster1_J1-108.fa"
     },
     "ectyper": {
         "truth" : "ectyper/typer.txt",
         "main": "ectyper/main.nf",
-        "input": "ecoli.fa"
+        "input": "asm/ecoli.fa"
     },
     "emmtyper": {
         "truth" : "emmtyper/typer.txt",
         "main": "emmtyper/main.nf",
-        "input": "igas.fa"
+        "input": "asm/igas.fa"
+    },
+    "kleborate": {
+        "truth" : "kleborate/typer.txt",
+        "main": "kleborate/main.nf",
+        "input": "asm/klebs.fa"
+    },
+    "lissero": {
+        "truth" : "lissero/typer.txt",
+        "main": "lissero/main.nf",
+        "input": "asm/Lm_Cluster1_J1-108.fa"
+    },
+    "meningotype": {
+        "truth" : "meningotype/typer.txt",
+        "main": "meningotype/main.nf",
+        "input": "asm/nmen.fa"
+    },
+    "ngmaster": {
+        "truth" : "ngmaster/typer.txt",
+        "main": "ngmaster/main.nf",
+        "input": "asm/gono.fa"
+    },
+    "snippy": {
+        "truth" : "snippy/snps.tab",
+        "main": "snippy/main.nf",
+        "input": "reads",
+        "ref": "asm/Lm_Cluster1_J1-108.fa"
     }
     
     

@@ -28,6 +28,8 @@ def get_paths(tool):
         cp= script_path / get_input(tool)
         tr = script_path / get_truth(tool)
         return nf,cp,tr
+def get_reference():
+        return script_path / f"{cfg['snippy']['ref']}"
 
 def clean():
 
@@ -35,7 +37,58 @@ def clean():
         
 
 
-@pytest.mark.nf
+@pytest.mark.nf_snps
+def test_nf_snippy():
+        nf,cp,tr = get_paths("snippy")
+        ref = get_reference()
+        cmd = f"nextflow run {nf} --read_path {cp} --conda_path {conda_path} --outdir {outdir} --reference {ref} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr} --minmap 60 --basequal 13 --minqual 100 --minfrac 0 --mincov 10"
+        proc = subprocess.run(cmd, shell=True, capture_output=True)
+        
+        assert proc.returncode == 0
+        clean()
+
+
+@pytest.mark.nf_typing
+def test_nf_ngmaster():
+        nf,cp,tr = get_paths("ngmaster")
+        
+        cmd = f"nextflow run {nf} --contig_path {cp} --conda_path {conda_path} --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
+        proc = subprocess.run(cmd, shell=True, capture_output=True)
+        
+        assert proc.returncode == 0
+        clean()
+
+@pytest.mark.nf_typing
+def test_nf_meningotype():
+        nf,cp,tr = get_paths("meningotype")
+        
+        cmd = f"nextflow run {nf} --contig_path {cp} --conda_path {conda_path} --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
+        proc = subprocess.run(cmd, shell=True, capture_output=True)
+        
+        assert proc.returncode == 0
+        clean()
+
+@pytest.mark.nf_typing
+def test_nf_lissero():
+        nf,cp,tr = get_paths("lissero")
+        
+        cmd = f"nextflow run {nf} --contig_path {cp} --conda_path {conda_path} --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
+        proc = subprocess.run(cmd, shell=True, capture_output=True)
+        
+        assert proc.returncode == 0
+        clean()
+
+@pytest.mark.nf_typing
+def test_nf_kleborate():
+        nf,cp,tr = get_paths("kleborate")
+        
+        cmd = f"nextflow run {nf} --contig_path {cp} --conda_path {conda_path} --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
+        proc = subprocess.run(cmd, shell=True, capture_output=True)
+        
+        assert proc.returncode == 0
+        clean()
+
+@pytest.mark.nf_typing
 def test_nf_emmtyper():
         nf,cp,tr = get_paths("emmtyper")
         
@@ -45,7 +98,7 @@ def test_nf_emmtyper():
         assert proc.returncode == 0
         clean()
 
-@pytest.mark.nf
+@pytest.mark.nf_typing
 def test_nf_ectyper():
         nf,cp,tr = get_paths("ectyper")
         
@@ -55,7 +108,7 @@ def test_nf_ectyper():
         assert proc.returncode == 0
         clean()
 
-@pytest.mark.nf
+@pytest.mark.nf_typing
 def test_nf_mlst():
         nf,cp,tr = get_paths("mlst")
         
