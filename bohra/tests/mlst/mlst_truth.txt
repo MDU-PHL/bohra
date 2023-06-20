@@ -1,0 +1,1 @@
+for_testing	listeria_2	1	abcZ(3)	bglA(1)	cat(1)	dapE(1)	dat(3)	ldh(1)	lhkA(3)

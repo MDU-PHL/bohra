@@ -1,0 +1,11 @@
+{
+    "mlst": {
+        "truth" : "mlst/mlst_truth.txt",
+        "main": "mlst/main.nf",
+        "input": "Lm_Cluster1_J1-108.fa"
+    }
+    
+    
+
+
+}
