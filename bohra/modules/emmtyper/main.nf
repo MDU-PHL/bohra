@@ -33,8 +33,8 @@ process EMMTYPER {
     script:
     """
     echo -e ${meta.id} >> tmp.tab
-    emmtpyer $contigs > emmtyper.tab
-    paste tmp.tab emmtyper.tab | csvtk add-header -n 'Isolate,Num_clusters,emm_type,emm_like,emm_cluster' > typer.txt
+    emmtyper $contigs > emmtyper.tab
+    paste tmp.tab emmtyper.tab | csvtk -t cut -f -2 |csvtk -t add-header -n 'Isolate,Num_clusters,emm_type,emm_like,emm_cluster' > typer.txt
     rm -f tmp.tab
     """
     

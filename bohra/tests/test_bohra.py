@@ -34,6 +34,17 @@ def clean():
         subprocess.run(f"rm -rf .nextflow* bohra.log work for_testing", shell = True)
         
 
+
+@pytest.mark.nf
+def test_nf_emmtyper():
+        nf,cp,tr = get_paths("emmtyper")
+        
+        cmd = f"nextflow run {nf} --contig_path {cp} --conda_path {conda_path} --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
+        proc = subprocess.run(cmd, shell=True, capture_output=True)
+        
+        assert proc.returncode == 0
+        # clean()
+
 @pytest.mark.nf
 def test_nf_ectyper():
         nf,cp,tr = get_paths("ectyper")

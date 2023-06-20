@@ -8,6 +8,11 @@
         "truth" : "ectyper/typer.txt",
         "main": "ectyper/main.nf",
         "input": "ecoli.fa"
+    },
+    "emmtyper": {
+        "truth" : "emmtyper/typer.txt",
+        "main": "emmtyper/main.nf",
+        "input": "igas.fa"
     }
     
     
