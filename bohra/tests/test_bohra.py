@@ -43,7 +43,7 @@ def test_nf_emmtyper():
         proc = subprocess.run(cmd, shell=True, capture_output=True)
         
         assert proc.returncode == 0
-        # clean()
+        clean()
 
 @pytest.mark.nf
 def test_nf_ectyper():

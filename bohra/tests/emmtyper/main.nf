@@ -30,6 +30,6 @@ workflow {
 
     EMMTYPER ( contigs )
 
-    // TEST_EMMTYPER ( EMMTYPER.out.typer )
+    TEST_EMMTYPER ( EMMTYPER.out.typer )
 
 }
