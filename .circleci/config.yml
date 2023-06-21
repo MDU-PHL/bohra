@@ -15,7 +15,6 @@ jobs: # A basic unit of work in a run
             conda config --add channels defaults
             conda config --add channels bioconda
             conda config --add channels conda-forge
-            conda install -n base mamba
             conda env create -f environment.yml 
             source activate bohra 
             python3 setup.py sdist bdist_wheel
