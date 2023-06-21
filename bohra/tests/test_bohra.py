@@ -34,8 +34,36 @@ def get_reference():
 def clean():
 
         subprocess.run(f"rm -rf .nextflow* bohra.log work for_testing", shell = True)
-        
+   
 
+
+@pytest.mark.nf_snps
+def test_nf_snippy_clean():
+        nf,cp,tr = get_paths("snippy_clean")
+        cmd = f"nextflow run {nf} --aln_path {cp} --conda_path {conda_path} --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
+        proc = subprocess.run(cmd, shell=True, capture_output=True)
+        
+        assert proc.returncode == 0
+        clean()
+
+@pytest.mark.nf_snps
+def test_nf_snp_dists():
+        nf,cp,tr = get_paths("snp_dists")
+        cmd = f"nextflow run {nf} --aln_path {cp} --conda_path {conda_path} --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
+        proc = subprocess.run(cmd, shell=True, capture_output=True)
+        
+        assert proc.returncode == 0
+        clean()
+
+@pytest.mark.nf_snps
+def test_nf_snippy_core():
+        nf,cp,tr = get_paths("snippy_core")
+        ref = get_reference()
+        cmd = f"nextflow run {nf} --aln_path {cp} --conda_path {conda_path} --outdir {outdir} --reference {ref} --mask_string no_mask --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
+        proc = subprocess.run(cmd, shell=True, capture_output=True)
+        
+        assert proc.returncode == 0
+        clean()
 
 @pytest.mark.nf_snps
 def test_nf_snippy():

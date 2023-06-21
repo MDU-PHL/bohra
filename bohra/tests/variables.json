@@ -39,6 +39,22 @@
         "main": "snippy/main.nf",
         "input": "reads",
         "ref": "asm/Lm_Cluster1_J1-108.fa"
+    },
+    "snippy_core": {
+        "truth" : "snippy_core/core.aln",
+        "main": "snippy_core/main.nf",
+        "input": "alns",
+        "ref": "asm/Lm_Cluster1_J1-108.fa"
+    },
+    "snp_dists": {
+        "truth" : "snp_dists/distances.tab",
+        "main": "snp_dists/main.nf",
+        "input": "alns"
+    },
+    "snippy_clean": {
+        "truth" : "snippy_clean/cleaned.full.aln",
+        "main": "snippy_clean/main.nf",
+        "input": "alns"
     }
     
     
