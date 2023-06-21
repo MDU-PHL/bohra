@@ -40,7 +40,7 @@ def clean():
 @pytest.mark.nf_snps
 def test_nf_snippy_clean():
         nf,cp,tr = get_paths("snippy_clean")
-        cmd = f"nextflow run {nf} --aln_path {cp} --conda_path {conda_path} --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
+        cmd = f"nextflow run {nf} --aln_path {cp}  --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
         proc = subprocess.run(cmd, shell=True, capture_output=True)
         
         assert proc.returncode == 0
@@ -49,7 +49,7 @@ def test_nf_snippy_clean():
 @pytest.mark.nf_snps
 def test_nf_snp_dists():
         nf,cp,tr = get_paths("snp_dists")
-        cmd = f"nextflow run {nf} --aln_path {cp} --conda_path {conda_path} --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
+        cmd = f"nextflow run {nf} --aln_path {cp} --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
         proc = subprocess.run(cmd, shell=True, capture_output=True)
         
         assert proc.returncode == 0
@@ -59,7 +59,7 @@ def test_nf_snp_dists():
 def test_nf_snippy_core():
         nf,cp,tr = get_paths("snippy_core")
         ref = get_reference()
-        cmd = f"nextflow run {nf} --aln_path {cp} --conda_path {conda_path} --outdir {outdir} --reference {ref} --mask_string no_mask --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
+        cmd = f"nextflow run {nf} --aln_path {cp} --outdir {outdir} --reference {ref} --mask_string no_mask --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
         proc = subprocess.run(cmd, shell=True, capture_output=True)
         
         assert proc.returncode == 0
@@ -69,7 +69,7 @@ def test_nf_snippy_core():
 def test_nf_snippy():
         nf,cp,tr = get_paths("snippy")
         ref = get_reference()
-        cmd = f"nextflow run {nf} --read_path {cp} --conda_path {conda_path} --outdir {outdir} --reference {ref} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr} --minmap 60 --basequal 13 --minqual 100 --minfrac 0 --mincov 10"
+        cmd = f"nextflow run {nf} --read_path {cp}  --outdir {outdir} --reference {ref} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr} --minmap 60 --basequal 13 --minqual 100 --minfrac 0 --mincov 10"
         proc = subprocess.run(cmd, shell=True, capture_output=True)
         
         assert proc.returncode == 0
@@ -80,7 +80,7 @@ def test_nf_snippy():
 def test_nf_ngmaster():
         nf,cp,tr = get_paths("ngmaster")
         
-        cmd = f"nextflow run {nf} --contig_path {cp} --conda_path {conda_path} --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
+        cmd = f"nextflow run {nf} --contig_path {cp} --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
         proc = subprocess.run(cmd, shell=True, capture_output=True)
         
         assert proc.returncode == 0
@@ -90,7 +90,7 @@ def test_nf_ngmaster():
 def test_nf_meningotype():
         nf,cp,tr = get_paths("meningotype")
         
-        cmd = f"nextflow run {nf} --contig_path {cp} --conda_path {conda_path} --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
+        cmd = f"nextflow run {nf} --contig_path {cp}  --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
         proc = subprocess.run(cmd, shell=True, capture_output=True)
         
         assert proc.returncode == 0
@@ -100,7 +100,7 @@ def test_nf_meningotype():
 def test_nf_lissero():
         nf,cp,tr = get_paths("lissero")
         
-        cmd = f"nextflow run {nf} --contig_path {cp} --conda_path {conda_path} --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
+        cmd = f"nextflow run {nf} --contig_path {cp}  --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
         proc = subprocess.run(cmd, shell=True, capture_output=True)
         
         assert proc.returncode == 0
@@ -110,7 +110,7 @@ def test_nf_lissero():
 def test_nf_kleborate():
         nf,cp,tr = get_paths("kleborate")
         
-        cmd = f"nextflow run {nf} --contig_path {cp} --conda_path {conda_path} --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
+        cmd = f"nextflow run {nf} --contig_path {cp}  --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
         proc = subprocess.run(cmd, shell=True, capture_output=True)
         
         assert proc.returncode == 0
@@ -120,7 +120,7 @@ def test_nf_kleborate():
 def test_nf_emmtyper():
         nf,cp,tr = get_paths("emmtyper")
         
-        cmd = f"nextflow run {nf} --contig_path {cp} --conda_path {conda_path} --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
+        cmd = f"nextflow run {nf} --contig_path {cp} --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
         proc = subprocess.run(cmd, shell=True, capture_output=True)
         
         assert proc.returncode == 0
@@ -130,7 +130,7 @@ def test_nf_emmtyper():
 def test_nf_ectyper():
         nf,cp,tr = get_paths("ectyper")
         
-        cmd = f"nextflow run {nf} --contig_path {cp} --conda_path {conda_path} --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
+        cmd = f"nextflow run {nf} --contig_path {cp} --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
         proc = subprocess.run(cmd, shell=True, capture_output=True)
         
         assert proc.returncode == 0
@@ -140,7 +140,7 @@ def test_nf_ectyper():
 def test_nf_mlst():
         nf,cp,tr = get_paths("mlst")
         
-        cmd = f"nextflow run {nf} --contig_path {cp} --conda_path {conda_path} --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --blast_db no_db --data_dir no_db --mlst_exclude 'ecoli,abaumannii' --truth {tr}"
+        cmd = f"nextflow run {nf} --contig_path {cp}  --outdir {outdir} --publish_dir_mode copy --enable_conda true -with-conda --blast_db no_db --data_dir no_db --mlst_exclude 'ecoli,abaumannii' --truth {tr}"
         proc = subprocess.run(cmd, shell=True, capture_output=True)
         
         assert proc.returncode == 0
