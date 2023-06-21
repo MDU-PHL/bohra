@@ -17,8 +17,8 @@ jobs: # A basic unit of work in a run
             python3 setup.py sdist bdist_wheel
             pip3 install dist/bohra-*-py3-none-any.whl 
             bohra -h
-            pytest
             bohra init
+            pytest
      
       - store_test_results: # Upload test results for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
           path: test-results
