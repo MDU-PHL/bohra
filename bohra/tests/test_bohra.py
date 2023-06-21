@@ -33,7 +33,7 @@ def get_reference():
 
 def clean():
 
-        subprocess.run(f"rm -rf .nextflow* bohra.log work for_testing", shell = True)
+        subprocess.run(f"rm -rf .nextflow* bohra.log work for_testing core.* clean.*", shell = True)
    
 
 
