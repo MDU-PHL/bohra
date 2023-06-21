@@ -21,7 +21,8 @@ jobs: # A basic unit of work in a run
             pip3 install dist/bohra-*-py3-none-any.whl 
             bohra -h
             bohra init
-            pytest
+            pytest -m nf_snps -v --disable-pytest-warnings
+            pytest -m nf_typing -v --disable-pytest-warnings 
      
       - store_test_results: # Upload test results for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
           path: test-results
