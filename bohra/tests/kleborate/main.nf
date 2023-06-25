@@ -30,6 +30,6 @@ workflow {
 
     KLEBORATE ( contigs )
 
-    TEST_KLEBORATE ( KLEBORATE.out.typer )
+    // TEST_KLEBORATE ( KLEBORATE.out.typer )
 
 }

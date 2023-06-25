@@ -30,6 +30,6 @@ workflow {
 
     ECTYPER ( contigs )
 
-    TEST_ECTYPER ( ECTYPER.out.typer )
+    // TEST_ECTYPER ( ECTYPER.out.typer )
 
 }

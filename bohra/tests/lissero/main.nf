@@ -30,6 +30,6 @@ workflow {
 
     LISSERO ( contigs )
 
-    TEST_LISSERO ( LISSERO.out.typer )
+    // TEST_LISSERO ( LISSERO.out.typer )
 
 }

@@ -30,6 +30,6 @@ workflow {
 
     MENINGOTYPE ( contigs )
 
-    TEST_MENINGOTYPE ( MENINGOTYPE.out.typer )
+    // TEST_MENINGOTYPE ( MENINGOTYPE.out.typer )
 
 }

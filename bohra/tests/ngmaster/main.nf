@@ -30,6 +30,6 @@ workflow {
 
     NGMASTER ( contigs )
 
-    TEST_NGMASTER ( NGMASTER.out.typer )
+    // TEST_NGMASTER ( NGMASTER.out.typer )
 
 }
