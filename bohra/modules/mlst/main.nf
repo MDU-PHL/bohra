@@ -19,7 +19,7 @@ process MLST {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-mlst"
         } else {
-            conda 'bioconda::mlst=2.19.0'
+            conda 'mlst=2.19.0'
         }
     } else {
         conda null
