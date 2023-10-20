@@ -25,7 +25,7 @@ workflow RUN_SNPS {
         core_aln =  SNIPPY_CORE.out.core_aln
 
         if ( params.gubbins ){
-            SNIPPY_CLEAN ( SNIPPY_CORE.out.core_full )
+            SNIPPY_CLEAN ( SNIPPY_CORE.out.core_full_aln )
             GUBBINS ( SNIPPY_CLEAN.out.cleaned )
             core_aln = GUBBINS.out.gubbins
         }
