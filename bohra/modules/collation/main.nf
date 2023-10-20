@@ -247,7 +247,7 @@ process COMPILE {
     $module_dir/compile.py --pipeline $params.mode --launchdir $launchDir \
     --template_dir $params.template_dir  --day ${params.day} --user ${params.user} \
     --isolates $params.isolates --reference $params.reference --job_id $params.job_id \
-    --iqtree $params.run_iqtree
+    --iqtree $params.run_iqtree --mask $params.mask_string
     """
 }
 

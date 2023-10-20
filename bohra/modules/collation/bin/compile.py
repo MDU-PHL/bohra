@@ -36,7 +36,8 @@ def _get_offset(reference):
             offset += len(record.seq)
     # print(d)
     return d, offset
-def get_bin_size(chromosomes):
+
+def get_bin_size(_dict):
 
     sum_len = 0
     for d in _dict:
@@ -47,10 +48,10 @@ def get_bin_size(chromosomes):
         print(f"Something has gone wrong - the maxbins value should be > 0.")
     return _maxbins
 
-def check_masked(mask_file):
+def check_masked(mask_file, df):
 
     masked = []
-    if mask_file != '' and pathlib.Path(mask_file).exists()
+    if mask_file != '' and pathlib.Path(mask_file).exists():
         mask = pandas.read_csv(f"{mask_file}", sep = '\t', header = None, names = ['CHR','Pos1','Pos2'])
         mask['CHR'] = mask['CHR'].astype(str)
         
@@ -67,7 +68,7 @@ def get_contig_breaks(_dict):
     for_contigs = []
     for chromosome in _dict:
         if _dict[chromosome]['length'] > 5000:
-            for_contigs.append(d[chromosome]['length'] + d[chromosome]['offset'])
+            for_contigs.append(_dict[chromosome]['length'] + _dict[chromosome]['offset'])
 
     return for_contigs
 
@@ -87,7 +88,7 @@ def _plot_snpdensity(reference,wd, isos, mask_file = ''):
     _dict,offset = _get_offset(reference = f"{pathlib.Path(wd,reference)}")
     chromosomes = list(_dict.keys())
     
-    _maxbins = get_bin_size(chromosomes = chromosomes)
+    _maxbins = get_bin_size(_dict = _dict)
     # collate all snps in snps.tab
     vars = {}
     for i in isos:
@@ -114,11 +115,11 @@ def _plot_snpdensity(reference,wd, isos, mask_file = ''):
     data = {}
     for var in vars:
         for pos in vars[var]:
-            offset = d[var]['offset']
+            offset = _dict[var]['offset']
             data[pos + offset] = vars[var][pos]
     df = pandas.DataFrame.from_dict(data, orient='index',columns=['vars']).reset_index()
     # check if mask file used - if yes grey it out in the graph.
-    df = check_masked(mask_file = mask_file)
+    df = check_masked(mask_file = mask_file, df = df)
     # get positions of the contig breaks
     for_contigs = get_contig_breaks(_dict = _dict)
     # set colours
@@ -139,10 +140,11 @@ def _plot_snpdensity(reference,wd, isos, mask_file = ''):
     chart = alt.layer(*graphs).configure_axis(
                     grid=False
                     ).properties(
-                        width = 'container'
+                        width = 1200
                     ).interactive()
-                    
+
     chart = chart.to_json()
+    
     return chart
 
 def _plot_distances(wd):
@@ -335,7 +337,7 @@ def _compile(args):
         # 'version_head': version_head,
         # 'version_body':version_body,
         'snp_distances': _plot_distances(wd = args.launchdir) if args.pipeline not in ['preview', 'assemble','amr_typing'] else {0:0},
-        'snp_density': _plot_snpdensity(reference=args.reference, wd = args.launchdir, isos = isos) if args.pipeline not in ['preview', 'assemble','amr_typing'] else {0:0},
+        'snp_density': _plot_snpdensity(reference=args.reference, wd = args.launchdir, isos = isos, mask_file = args.mask) if args.pipeline not in ['preview', 'assemble','amr_typing'] else {0:0},
         'pan_svg': _get_pan_genome(d = _dict[args.pipeline], wd = args.launchdir) if args.pipeline == 'full' else ''
         }
     
@@ -353,6 +355,9 @@ def set_parsers():
         help='',
         default = 'default')
     parser.add_argument('--launchdir',
+        help='',
+        default = '')
+    parser.add_argument('--mask',
         help='',
         default = '')
     parser.add_argument('--template_dir',
