@@ -36,8 +36,43 @@ def _get_offset(reference):
             offset += len(record.seq)
     # print(d)
     return d, offset
+def get_bin_size(chromosomes):
 
-def _plot_snpdensity(reference,wd, isos):
+    sum_len = 0
+    for d in _dict:
+        sum_len = sum_len + _dict[d]['length']
+    
+    _maxbins = int(sum_len/3000)
+    if _maxbins == 0:
+        print(f"Something has gone wrong - the maxbins value should be > 0.")
+    return _maxbins
+
+def check_masked(mask_file):
+
+    masked = []
+    if mask_file != '' and pathlib.Path(mask_file).exists()
+        mask = pandas.read_csv(f"{mask_file}", sep = '\t', header = None, names = ['CHR','Pos1','Pos2'])
+        mask['CHR'] = mask['CHR'].astype(str)
+        
+        for row in mask.iterrows():
+            off = d[row[1]['CHR']]['offset']
+            l = list(range(row[1]['Pos1'] + off, row[1]['Pos2']+off +1))
+            masked.extend(l)
+
+    df['masked'] = numpy.where(df['index'].isin(masked), 'masked', 'unmasked')
+    
+    return df
+
+def get_contig_breaks(_dict):
+    for_contigs = []
+    for chromosome in _dict:
+        if _dict[chromosome]['length'] > 5000:
+            for_contigs.append(d[chromosome]['length'] + d[chromosome]['offset'])
+
+    return for_contigs
+
+
+def _plot_snpdensity(reference,wd, isos, mask_file = ''):
 
     '''
     generate a snp-density accross the genome plot - using the core.tab file
@@ -50,60 +85,63 @@ def _plot_snpdensity(reference,wd, isos):
     # helper functions for getting the data into the right format.
     
     _dict,offset = _get_offset(reference = f"{pathlib.Path(wd,reference)}")
-    _all_pos = list(range(1,offset+1))
-    # print(_dict)
-    _snp_dict = {}
+    chromosomes = list(_dict.keys())
+    
+    _maxbins = get_bin_size(chromosomes = chromosomes)
     # collate all snps in snps.tab
+    vars = {}
     for i in isos:
         # open snps.tab
         snps = pathlib.Path(wd, i, 'snps.tab')
         if snps.exists():
-            with open(snps, 'r') as s:
-                reader = csv.DictReader(s, delimiter = '\t')
-                for row in reader:
-                    # print(row)
-                    chrom = row['CHROM'].split('.')[0]
-                    ofs = _dict[chrom]['offset'] # offset value of this chromosome
-                    pos = int(row['POS']) + ofs #get the position in the genome (with offset)
-                    if pos in _snp_dict: 
-                        # print(i)
-                        # if the pos is in the dict already, it has been found in another sample so increment
-                        _snp_dict[pos] = _snp_dict[pos] + 1
-                    else:
-                        # print(i)
-                        _snp_dict[pos] = 0
-    # now generate list for x value in graph
-    _density = []
-    
-    for a in _all_pos:
+            tab_file = pandas.read_csv(f"{snps}", dtype = str,sep = '\t')
+            for chromosome  in chromosomes:
+            # print(var)
+            # vars = []
+                if chromosome not in vars:
+                    vars[chromosome] = {}
+                chr = tab_file[tab_file['CHROM'] == chromosome]
+                # print(chr)
+                if not chr.empty:
+                    for row in chr.iterrows():
+                        # print(row[1]['POS'])
+                        pos = int(row[1]['POS'])
+                        if pos not in vars[chromosome]:
+                            vars[chromosome][pos] = 1
+                        else:
+                            vars[chromosome][pos] = vars[chromosome][pos] + 1
+    # now generate list for x and y value in graph
+    data = {}
+    for var in vars:
+        for pos in vars[var]:
+            offset = d[var]['offset']
+            data[pos + offset] = vars[var][pos]
+    df = pandas.DataFrame.from_dict(data, orient='index',columns=['vars']).reset_index()
+    # check if mask file used - if yes grey it out in the graph.
+    df = check_masked(mask_file = mask_file)
+    # get positions of the contig breaks
+    for_contigs = get_contig_breaks(_dict = _dict)
+    # set colours
+    domain = ['masked', 'unmasked']
+    range_ = ['#d9dcde', '#216cb8']
+    # do bar graphs
+    bar = alt.Chart(df).mark_bar().encode(
+        x=alt.X('index:Q', bin=alt.Bin(maxbins=_maxbins), title = "Core genome position.", axis=alt.Axis(ticks=False)),
+        y=alt.Y('sum(vars):Q',title = "Variants observed (per 500 bp)"),
+        color=alt.Color('masked').scale(domain=domain, range=range_).legend(None)
+    )
+    # generate list of graphs for addition of vertical lines
+    graphs = [bar]
+    if for_contigs != []:
+        for line in for_contigs:
+            graphs.append(alt.Chart().mark_rule(strokeDash=[3, 3], size=1, color = 'grey').encode(x = alt.datum(line)))
         
-        if a in _snp_dict:
-            _density.append(_snp_dict[a])
-        else:
-            _density.append(0)
-    # print(max(_snp_dict.values()))
-    # print(_snp_dict)
-    # return dictionary
-    # _snp_dict = {1:5,3:3,10:2}
-    _df = pandas.DataFrame.from_dict(_snp_dict, orient='index').reset_index()
-    _df = _df.rename(columns={0:'snps', 'index':'Genome_position'})
-    # _df = _df[_df['snps'] != 0]
-    # print(_df)
-    bins = list(range(1,max(_all_pos),1000))
-    # print(list(b))
-    s = _df.groupby(pandas.cut(_df['Genome_position'], bins=bins)).size()
-    df  = s.to_frame().reset_index().reset_index()
-    df['index'] = df['index'].apply(lambda x: (x + 50)*1000)
-    df = df.rename(columns = {0:'snps'})
-    df = df[['index','snps']]
-    
-    chart = alt.Chart(df).mark_bar().encode(
-                            x=alt.X('index', axis=alt.Axis(title='Genome position'), scale = alt.Scale(domain=(1, max(bins)))),
-                            y=alt.Y('snps', axis = alt.Axis(title = "SNPs (per 1000 bases)"))
-                        ).properties(
-                            width = 1200,
-                            height = 200
-                        )
+    chart = alt.layer(*graphs).configure_axis(
+                    grid=False
+                    ).properties(
+                        width = 'container'
+                    ).interactive()
+                    
     chart = chart.to_json()
     return chart
 
