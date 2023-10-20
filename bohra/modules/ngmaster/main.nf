@@ -31,6 +31,7 @@ process NGMASTER {
     output:
     tuple val(meta), path('typer.txt'), emit: typer
     
+    
 
     script:
     """

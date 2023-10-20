@@ -399,7 +399,7 @@ process VERSION_SPADES {
     }
 
     output:
-    path "version_spades.txt", emit: version
+    path "version_assembler.txt", emit: version
 
     script:
     """
@@ -425,11 +425,11 @@ process VERSION_SKESA {
     }
 
     output:
-    path "version_skesa.txt", emit: version
+    path "version_assembler.txt", emit: version
 
     script:
     """
-    echo -e skesa'\t'\$CONDA_PREFIX'\t'\$(skesa -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_skesa.txt
+    echo -e skesa'\t'\$CONDA_PREFIX'\t'\$(skesa -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
     """
 }
 
@@ -450,14 +450,28 @@ process VERSION_SHOVILL {
         conda null
     }
     output:
-    path "version_shovill.txt", emit: version
+    path "version_assembler.txt", emit: version
 
     script:
     """
-    echo -e shovill'\t'\$CONDA_PREFIX'\t'\$(shovill -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_shovill.txt
+    echo -e shovill'\t'\$CONDA_PREFIX'\t'\$(shovill -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
     """
 }
 
+process VERSION_NOASM {
+    label 'process_medium'
+    publishDir "${params.outdir}",
+        mode: params.publish_dir_mode,
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
+    
+    output:
+    path "version_assembler.txt", emit: version
+
+    script:
+    """
+    echo -e User supplied'\t'No assembly performed'\t'user supplied assemblies | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
+    """
+}
 
 process VERSION_PANAROO {
     label 'process_medium'

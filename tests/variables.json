@@ -55,6 +55,11 @@
         "truth" : "snippy_clean/cleaned.full.aln",
         "main": "snippy_clean/main.nf",
         "input": "alns"
+    },
+    "gubbins": {
+        "truth" : "gubbins/gubbins.aln",
+        "main": "gubbins/main.nf",
+        "input": "alns"
     }
     
     
