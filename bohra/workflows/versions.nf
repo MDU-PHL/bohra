@@ -72,7 +72,7 @@ workflow AMR_TYPING_VERSIONS {
             VERSION_NOASM()
             asm = VERSION_NOASM.out.version
         }
-        elif ( params.assembler == 'shovill'){
+        else if ( params.assembler == 'shovill'){
         VERSION_SHOVILL()
         asm = VERSION_SHOVILL.out.version    
         } 
@@ -126,7 +126,7 @@ workflow ASSEMBLE_VERSIONS {
             VERSION_NOASM()
             asm = VERSION_NOASM.out.version
         }
-        elif ( params.assembler == 'shovill'){
+        else if ( params.assembler == 'shovill'){
         VERSION_SHOVILL()
         asm = VERSION_SHOVILL.out.version    
         } 
@@ -169,7 +169,7 @@ workflow DEFAULT_VERSIONS {
             VERSION_NOASM()
             asm = VERSION_NOASM.out.version
         }
-        elif ( params.assembler == 'shovill'){
+        else if ( params.assembler == 'shovill'){
         VERSION_SHOVILL()
         asm = VERSION_SHOVILL.out.version    
         } 
@@ -240,7 +240,7 @@ workflow FULL_VERSIONS {
             VERSION_NOASM()
             asm = VERSION_NOASM.out.version
         }
-        elif ( params.assembler == 'shovill'){
+        else if ( params.assembler == 'shovill'){
         VERSION_SHOVILL()
         asm = VERSION_SHOVILL.out.version    
         } 
