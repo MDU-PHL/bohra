@@ -2,7 +2,7 @@
 nextflow.enable.dsl=2
 version = '1.0'
 
-include { NGMASTER } from './../../modules/ngmaster'
+include { NGMASTER } from '/../../bohra/modules/ngmaster'
 
 process TEST_NGMASTER {
     debug true

@@ -2,7 +2,7 @@
 nextflow.enable.dsl=2
 version = '1.0'
 
-include { KLEBORATE } from './../../modules/kleborate'
+include { KLEBORATE } from '/../../bohra/modules/kleborate'
 
 process TEST_KLEBORATE {
     debug true

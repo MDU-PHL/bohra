@@ -2,7 +2,7 @@
 nextflow.enable.dsl=2
 version = '1.0'
 
-include { MENINGOTYPE } from './../../modules/meningotype'
+include { MENINGOTYPE } from '/../../bohra/modules/meningotype'
 
 process TEST_MENINGOTYPE {
     debug true

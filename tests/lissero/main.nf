@@ -2,7 +2,7 @@
 nextflow.enable.dsl=2
 version = '1.0'
 
-include { LISSERO } from './../../modules/lissero'
+include { LISSERO } from '/../../bohra/modules/lissero'
 
 process TEST_LISSERO {
     debug true

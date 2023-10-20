@@ -2,7 +2,7 @@
 nextflow.enable.dsl=2
 version = '1.0'
 
-include { SNIPPY_CLEAN } from './../../modules/snippy_clean'
+include { SNIPPY_CLEAN } from './../../bohra/modules/snippy_clean'
 
 process TEST_SNIPPY_CLEAN {
     debug true

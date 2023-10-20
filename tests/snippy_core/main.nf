@@ -2,7 +2,7 @@
 nextflow.enable.dsl=2
 version = '1.0'
 
-include { SNIPPY_CORE } from './../../modules/snippy_core'
+include { SNIPPY_CORE } from './../../bohra/modules/snippy_core'
 
 process TEST_SNIPPY_CORE {
     debug true

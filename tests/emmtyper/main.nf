@@ -2,7 +2,7 @@
 nextflow.enable.dsl=2
 version = '1.0'
 
-include { EMMTYPER } from './../../modules/emmtyper'
+include { EMMTYPER } from '/../../bohra/modules/emmtyper'
 
 process TEST_EMMTYPER {
     debug true

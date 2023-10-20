@@ -2,7 +2,7 @@
 nextflow.enable.dsl=2
 version = '1.0'
 
-include { MLST } from './../../modules/mlst'
+include { MLST } from './../../bohra/modules/mlst'
 
 process TEST_MLST {
     debug true

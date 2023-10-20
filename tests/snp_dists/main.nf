@@ -2,7 +2,7 @@
 nextflow.enable.dsl=2
 version = '1.0'
 
-include { SNP_DISTS } from './../../modules/snp_dists'
+include { SNP_DISTS } from './../../bohra/modules/snp_dists'
 
 process TEST_SNP_DISTS {
     debug true

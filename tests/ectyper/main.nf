@@ -2,7 +2,7 @@
 nextflow.enable.dsl=2
 version = '1.0'
 
-include { ECTYPER } from './../../modules/ectyper'
+include { ECTYPER } from '/../../bohra/modules/ectyper'
 
 process TEST_ECTYPER {
     debug true
