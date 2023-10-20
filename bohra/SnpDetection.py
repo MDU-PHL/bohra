@@ -445,7 +445,7 @@ class RunSnpDetection(object):
 
         if reads != '' and self._path_exists(reads):
             
-            tab = pandas.read_csv(reads, sep = '\t', header = None)
+            tab = pandas.read_csv(reads, sep = '\t', header = None, dtype = str)
             if self._check_shape(tab.shape[1]):
                 LOGGER.info(f"File {reads} is in correct format.")
             else:
@@ -462,7 +462,7 @@ class RunSnpDetection(object):
     def _check_contigs(self, contigs):
 
         if contigs != '' and self._path_exists(pathlib.Path(contigs)):
-            tab = pandas.read_csv(contigs, sep = '\t', header = None)
+            tab = pandas.read_csv(contigs, sep = '\t', header = None, dtype = str)
             if self._check_shape(tab.shape[1], reads = False):
                 LOGGER.info(f"File {contigs} is in correct format.")
                 return True
