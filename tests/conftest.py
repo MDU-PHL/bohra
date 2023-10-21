@@ -8,5 +8,5 @@ def pytest_configure(config):
         "markers", "nf_snps: marks tests as nextflow snps modules m(deselect with '-m \"not nextflow\"')"
     )
     config.addinivalue_line(
-        "markers", "setup: marks tests as setup tests m(deselect with '-m \"not nextflow\"')"
+        "markers", "setup_bohra: marks tests as setup tests m(deselect with '-m \"not nextflow\"')"
     )

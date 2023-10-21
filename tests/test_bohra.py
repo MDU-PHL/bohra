@@ -146,7 +146,7 @@ def test_nf_mlst():
         assert proc.returncode == 0
         clean()
 
-@pytest.mark.setup
+@pytest.mark.setup_bohra
 def test_name_string():
         '''
         assert true when the input is a string > len 0
@@ -156,7 +156,7 @@ def test_name_string():
                 detect_obj.logger = logging.getLogger(__name__)
                 assert detect_obj._name_exists('somestring')
 
-@pytest.mark.setup
+@pytest.mark.setup_bohra
 def test_name_non_string():
         '''
         if a non string input is used return false
@@ -167,7 +167,7 @@ def test_name_non_string():
                 with pytest.raises(SystemExit):
                         detect_obj._name_exists(9)
 
-@pytest.mark.setup
+@pytest.mark.setup_bohra
 def test_name_empty_string():
         '''
         confirm that False is returned if a 0 length strin is input
@@ -178,7 +178,7 @@ def test_name_empty_string():
                 with pytest.raises(SystemExit):
                         detect_obj._name_exists('')
 
-@pytest.mark.setup            
+@pytest.mark.setup_bohra            
 def test_path_exists():
 
         '''
@@ -190,7 +190,7 @@ def test_path_exists():
                 some_path = pathlib.Path(__file__).parent
                 assert detect_obj._path_exists(some_path)
 
-@pytest.mark.setup           
+@pytest.mark.setup_bohra           
 def test_not_path_exists():
 
         '''
