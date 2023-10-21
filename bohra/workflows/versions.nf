@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 include {CSVTK_CONCAT } from './../modules/csvtk/main'
-include { VERSION_NOASM;VERSION_MASH;VERSION_QUICKTREE;VERSION_PROKKA;VERSION_PANAROO;VERSION_NGMASTER;VERSION_MOBSUITE;VERSION_MENINGOTYPE;VERSION_LISSERO;VERSION_KLEBORATE;VERSION_EMMTYPER;VERSION_ECTYPER;VERSION_ANY2FASTA;VERSION_MLST;VERSION_ABRITAMR;VERSION_SHOVILL;VERSION_SPADES;VERSION_SKESA;VERSION_SNIPPY;VERSION_SNPDISTS;VERSION_SEQKIT;VERSION_KMC;VERSION_KRAKEN2;VERSION_GUBBINS; VERSION_IQTREE} from './../modules/utils/main'
+include { VERSION_MASH;VERSION_QUICKTREE;VERSION_PROKKA;VERSION_PANAROO;VERSION_NGMASTER;VERSION_MOBSUITE;VERSION_MENINGOTYPE;VERSION_LISSERO;VERSION_KLEBORATE;VERSION_EMMTYPER;VERSION_ECTYPER;VERSION_ANY2FASTA;VERSION_MLST;VERSION_ABRITAMR;VERSION_SHOVILL;VERSION_SPADES;VERSION_SKESA;VERSION_SNIPPY;VERSION_SNPDISTS;VERSION_SEQKIT;VERSION_KMC;VERSION_KRAKEN2;VERSION_GUBBINS; VERSION_IQTREE} from './../modules/utils/main'
 
 
 workflow PREVIEW_VERSIONS {
@@ -68,11 +68,7 @@ workflow AMR_TYPING_VERSIONS {
         seqkit = VERSION_SEQKIT.out.version
         kmc = VERSION_KMC.out.version
         versions = seqkit.concat( kmc )
-        if ( params.contigs != 'no_contigs'){
-            VERSION_NOASM()
-            asm = VERSION_NOASM.out.version
-        }
-        else if ( params.assembler == 'shovill'){
+        if ( params.assembler == 'shovill'){
         VERSION_SHOVILL()
         asm = VERSION_SHOVILL.out.version    
         } 
@@ -122,11 +118,7 @@ workflow ASSEMBLE_VERSIONS {
         seqkit = VERSION_SEQKIT.out.version
         kmc = VERSION_KMC.out.version
         versions = seqkit.concat( kmc )
-        if ( params.contigs != 'no_contigs'){
-            VERSION_NOASM()
-            asm = VERSION_NOASM.out.version
-        }
-        else if ( params.assembler == 'shovill'){
+        if ( params.assembler == 'shovill'){
         VERSION_SHOVILL()
         asm = VERSION_SHOVILL.out.version    
         } 
@@ -165,11 +157,7 @@ workflow DEFAULT_VERSIONS {
         snp_dists = VERSION_SNPDISTS.out.version
         seqkit = VERSION_SEQKIT.out.version
         kmc = VERSION_KMC.out.version
-        if ( params.contigs != 'no_contigs'){
-            VERSION_NOASM()
-            asm = VERSION_NOASM.out.version
-        }
-        else if ( params.assembler == 'shovill'){
+        if ( params.assembler == 'shovill'){
         VERSION_SHOVILL()
         asm = VERSION_SHOVILL.out.version    
         } 
@@ -236,11 +224,7 @@ workflow FULL_VERSIONS {
         snp_dists = VERSION_SNPDISTS.out.version
         seqkit = VERSION_SEQKIT.out.version
         kmc = VERSION_KMC.out.version
-        if ( params.contigs != 'no_contigs'){
-            VERSION_NOASM()
-            asm = VERSION_NOASM.out.version
-        }
-        else if ( params.assembler == 'shovill'){
+        if ( params.assembler == 'shovill'){
         VERSION_SHOVILL()
         asm = VERSION_SHOVILL.out.version    
         } 

@@ -200,8 +200,7 @@ def _get_isos(wd, iso_list):
     return isos
 
 def _generate_table(d, columns,comment, tables, wd, iso_dict, id_col):
-    print(id_col)
-    # print(d)
+    
     if id_col == '':
         return tables,columns,comment
     cols = []

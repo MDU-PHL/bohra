@@ -402,8 +402,13 @@ process VERSION_SPADES {
     path "version_assembler.txt", emit: version
 
     script:
+    if( params.contigs_file == 'no_contigs')
     """
     echo -e spades'\t'\$CONDA_PREFIX'\t'\$(spades.py -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_spades.txt
+    """
+    else
+    """
+    echo -e Assembly file suppliaed'\t'Not Applicable'\t'${params.contigs_file} | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
     """
 }
 
@@ -428,8 +433,13 @@ process VERSION_SKESA {
     path "version_assembler.txt", emit: version
 
     script:
+    if( params.contigs_file == 'no_contigs')
     """
     echo -e skesa'\t'\$CONDA_PREFIX'\t'\$(skesa -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
+    """
+    else
+    """
+    echo -e Assembly file suppliaed'\t'Not Applicable'\t'${params.contigs_file} | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
     """
 }
 
@@ -452,27 +462,16 @@ process VERSION_SHOVILL {
     output:
     path "version_assembler.txt", emit: version
 
-    script:
-    """
-    echo -e shovill'\t'\$CONDA_PREFIX'\t'\$(shovill -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
-    """
+    script: 
+    if( params.contigs_file == 'no_contigs' )
+        """
+        echo -e shovill'\t'\$CONDA_PREFIX'\t'\$(shovill -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
+        """
+    else
+        """
+        echo -e Assembly file suppliaed'\t'Not Applicable'\t'${params.contigs_file} | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
+        """
 }
-
-process VERSION_NOASM {
-    label 'process_medium'
-    publishDir "${params.outdir}",
-        mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
-    
-    output:
-    path "version_assembler.txt", emit: version
-
-    script:
-    """
-    echo -e User supplied'\t'No assembly performed'\t'user supplied assemblies | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
-    """
-}
-
 
 
 process VERSION_PANAROO {
