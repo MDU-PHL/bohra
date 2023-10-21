@@ -28,13 +28,13 @@ process EMMTYPER {
     tuple val(meta), path(contigs), val(species)
 
     output:
-    tuple val(meta), path('typer.txt'), emit: typer
+    tuple val(meta), path("typer_${getSoftwareName(task.process)}.txt"), emit: typer
 
     script:
     """
     echo -e ${meta.id} >> tmp.tab
     emmtyper $contigs > emmtyper.tab
-    paste tmp.tab emmtyper.tab | csvtk -t cut -f -2 |csvtk -t add-header -n 'Isolate,Num_clusters,emm_type,emm_like,emm_cluster' > typer.txt
+    paste tmp.tab emmtyper.tab | csvtk -t cut -f -2 |csvtk -t add-header -n 'Isolate,Num_clusters,emm_type,emm_like,emm_cluster' > typer_${getSoftwareName(task.process)}.txt
     rm -f tmp.tab
     """
     

@@ -181,6 +181,9 @@ def _plot_distances(wd):
     except:
         return {}
 
+def _extract_typer( wd ):
+    pass
+
 def _get_pan_genome(d, wd):
 
     image = d[1]['image']
