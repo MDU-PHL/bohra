@@ -199,22 +199,9 @@ def _get_isos(wd, iso_list):
     
     return isos
 
-def _get_versions(wd):
-
-    p = pathlib.Path(wd, 'report', 'software_versions.txt')
-    if p.exists():
-        with open(f"{p}", 'r') as f:
-            data = f.read().strip().split('\n')
-            _head = f"<th class='version-head'>{data[0]}</th>"
-            body = []
-            for d in data[1:]:
-                body.append(f"<tr><td>{d}</td></tr>")
-        return _head,'\n'.join(body)
-    else:
-        return f"<th class='version-head'>Nothing to display</th>",""
-
 def _generate_table(d, columns,comment, tables, wd, iso_dict, id_col):
-
+    print(id_col)
+    # print(d)
     if id_col == '':
         return tables,columns,comment
     cols = []
@@ -296,6 +283,8 @@ def _get_tables(_data, wd, isos):
             id_col = 'Genes'
         elif d['link'] == 'software-versions':
             id_col = 'tool'
+        elif d['link'] == 'pipeline-details':
+            id_col = 'detail'
         elif d['type'] == 'table' or d['type'] == 'matrix':
             id_col = 'Isolate'
         else:
@@ -307,6 +296,12 @@ def _get_tables(_data, wd, isos):
     
     return tables,columns,comment
     # pass
+
+def _get_reference_string(reference, mask, pipeline):
+    
+    m = mask if mask != 'no_mask' else 'No mask'
+
+    return f'Reference: {reference} Mask: {m}'
 
 def _compile(args):
     
@@ -322,13 +317,14 @@ def _compile(args):
     # # path to html template
     indexhtml = pathlib.Path(args.template_dir,'index.html') 
     tables,columns,comment = _get_tables(_data = _dict[args.pipeline], wd = args.launchdir, isos = isos)
-    version_head,version_body = _get_versions(wd = args.launchdir)
+    
     data = {
         'newick' :'',
         'job_id':args.job_id[0],
         'pipeline':args.pipeline,
         'date':args.day,
         'user':args.user,
+        # 'reference_string':_get_reference_string(reference = args.reference, mask = args.mask, pipeline = args.pipeline),
         'tables':tables,
         'columns': columns,
         'comment':comment,
@@ -355,6 +351,9 @@ def set_parsers():
         help='',
         default = 'default')
     parser.add_argument('--launchdir',
+        help='',
+        default = '')
+    parser.add_argument('--contigs',
         help='',
         default = '')
     parser.add_argument('--mask',

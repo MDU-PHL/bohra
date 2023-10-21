@@ -640,6 +640,14 @@ class RunSnpDetection(object):
 Please select a mode to run, choices are 'analysis' or 'finish'")
                 raise SystemExit
 
+    def _write_details(self,cmd, reference, mask):
+
+        col1 = ['Reference file', 'Mask file', 'Working directory', 'User', 'Date', 'Pipeline', 'Nextflow command']
+        col2 = [reference, mask,self.workdir,self.user,self.day,self.pipeline, cmd]
+        df = pandas.DataFrame({'detail':col1,'description':col2})
+        LOGGER.info(f"Saving pipeline details")
+        subprocess.run(f"mkdir -p {self.workdir}/report", shell = True)
+        df.to_csv(f"{self.workdir}/report/details.txt", index =False, sep = '\t')
 
     def run_pipeline(self):
         '''
@@ -693,7 +701,10 @@ Please select a mode to run, choices are 'analysis' or 'finish'")
                         contigs = contigs_file, cpus = cpus, config = config, assembler = self.assembler, 
                         mask_string = mask_string, reference = reference, run_iqtree = run_iqtree,profile = self.profile,
                         isolates = isolates_list, day = self.day, user = self.user, 
-                        species = self.abritamr_args, gubbins = self.gubbins, blast_db = self.blast_db if self.blast_db != '' else 'no_db', data_dir = self.data_dir if self.data_dir != '' else 'no_db', job_id = self.job_id)
+                        species = self.abritamr_args, gubbins = self.gubbins, 
+                        blast_db = self.blast_db if self.blast_db != '' else 'no_db', 
+                        data_dir = self.data_dir if self.data_dir != '' else 'no_db', job_id = self.job_id)
+        self._write_details(cmd = cmd, reference = reference, mask = mask_string)
         self._run_cmd(cmd)
 
 
