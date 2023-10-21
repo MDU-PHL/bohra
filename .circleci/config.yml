@@ -17,6 +17,7 @@ jobs: # A basic unit of work in a run
             sudo apt install -y python3-pip
             python3 -m venv bohra
             source bohra/bin/activate
+            pip3 install .
             bohra -h
       
       - store_test_results: # Upload test results for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
