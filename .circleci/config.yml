@@ -15,9 +15,7 @@ jobs: # A basic unit of work in a run
             python3 setup.py sdist bdist_wheel
             sudo apt-get update
             sudo apt install -y python3-pip
-            sudo pip3 install pipenv
-            pipenv install dist/bohra-*-py3-none-any.whl
-            pipenv install pytest
+            pip3 install .
             bohra -h
       
       - store_test_results: # Upload test results for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
