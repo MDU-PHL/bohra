@@ -13,7 +13,6 @@ jobs: # A basic unit of work in a run
       - run:
           command: | # create whl and use pipenv to install dependencies
             python3 setup.py sdist bdist_wheel
-            sudo apt install -y python3-pip
             sudo pip install pipenv
             pipenv install dist/bohra-*-py3-none-any.whl
             pipenv install pytest
