@@ -181,8 +181,31 @@ def _plot_distances(wd):
     except:
         return {}
 
-def _extract_typer( wd ):
-    pass
+def _subset_versions( _typers, wd, _types ):
+
+    if _types != set():
+        vs = pandas.read_csv(f"{pathlib.Path(wd, 'report', 'versions.txt')}", sep = '\t')
+        print(vs)
+        to_remove = [i for i in vs['tool'].unique() if (i in _typers['typers'] and (i not in _types))]
+        vs = vs[~vs['tool'].isin(to_remove)]
+        print(vs)
+        vs.to_csv(f"{pathlib.Path(wd, 'report', 'versions.txt')}", sep = '\t', index = False)
+
+def _extract_typer( _typers, wd ):
+    
+    typers = sorted(pathlib.Path(wd).glob(f"*/typer*.txt"))
+    print(typers)
+    _types = set()
+    if typers != []:
+        for typer in typers:
+            t = typer.name.split('_')[-1].split('.')[0]
+            _types.add(t)
+    
+    print(_types)
+    _subset_versions(_typers = _typers, wd = wd, _types = _types)
+
+    return _types
+
 
 def _get_pan_genome(d, wd):
 
@@ -299,16 +322,15 @@ def _get_tables(_data, wd, isos):
     return tables,columns,comment
     # pass
 
-def _get_reference_string(reference, mask, pipeline):
-    
-    m = mask if mask != 'no_mask' else 'No mask'
 
-    return f'Reference: {reference} Mask: {m}'
 
 def _compile(args):
     
     # get analysis dict
     _dict = json.load(open(f"{pathlib.Path(args.template_dir, 'report_analysis.json')}", 'r'))
+    _typers = json.load(open(f"{pathlib.Path(args.template_dir, 'typers.json')}", "r"))
+    print(_typers)
+    _extract_typer(_typers = _typers, wd = args.launchdir)
     # print(_dict[args.pipeline])
     # for d in _dict[args.pipeline]:
         # print(d)
