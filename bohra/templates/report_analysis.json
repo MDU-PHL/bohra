@@ -57,7 +57,7 @@
         "comment": "",
         "columns" : [
             {"title":"Detail","field":"detail","headerFilter":"input","headerFilterPlaceholder":"Search detail"},
-            {"title":"Description", "field":"description","headerFilter":"input","headerFilterPlaceholder":"Search description"}
+            {"title":"Description", "field":"description","formatter": "textarea", "headerFilter":"input","headerFilterPlaceholder":"Search description"}
             ]
         }
         ],
@@ -140,7 +140,7 @@
         "comment": "",
         "columns" : [
             {"title":"Detail","field":"detail","headerFilter":"input","headerFilterPlaceholder":"Search detail"},
-            {"title":"Description", "field":"description","headerFilter":"input","headerFilterPlaceholder":"Search description"}
+            {"title":"Description", "field":"description","formatter": "textarea", "headerFilter":"input","headerFilterPlaceholder":"Search description"}
             ]
         }
     ],
@@ -213,7 +213,7 @@
         "comment": "",
         "columns" : [
             {"title":"Detail","field":"detail","headerFilter":"input","headerFilterPlaceholder":"Search detail"},
-            {"title":"Description", "field":"description","headerFilter":"input","headerFilterPlaceholder":"Search description"}
+            {"title":"Description", "field":"description","formatter": "textarea", "headerFilter":"input","headerFilterPlaceholder":"Search description"}
             ]
         }
     ],
@@ -320,7 +320,7 @@
         "comment": "",
         "columns" : [
             {"title":"Detail","field":"detail","headerFilter":"input","headerFilterPlaceholder":"Search detail"},
-            {"title":"Description", "field":"description","headerFilter":"input","headerFilterPlaceholder":"Search description"}
+            {"title":"Description", "field":"description","formatter": "textarea", "headerFilter":"input","headerFilterPlaceholder":"Search description"}
             ]
         }
     ],
@@ -455,7 +455,7 @@
         "comment": "",
         "columns" : [
             {"title":"Detail","field":"detail","headerFilter":"input","headerFilterPlaceholder":"Search detail"},
-            {"title":"Description", "field":"description","headerFilter":"input","headerFilterPlaceholder":"Search description"}
+            {"title":"Description", "field":"description","formatter": "textarea", "headerFilter":"input","headerFilterPlaceholder":"Search description"}
             ]
         }
     ],
@@ -601,7 +601,7 @@
         "comment": "",
         "columns" : [
             {"title":"Detail","field":"detail","headerFilter":"input","headerFilterPlaceholder":"Search detail"},
-            {"title":"Description", "field":"description","headerFilter":"input","headerFilterPlaceholder":"Search description"}
+            {"title":"Description", "field":"description","formatter": "textarea", "headerFilter":"input","headerFilterPlaceholder":"Search description"}
             ]
         }
     ]
