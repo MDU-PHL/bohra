@@ -408,7 +408,7 @@ process VERSION_SPADES {
     """
     else
     """
-    echo -e Assembly file suppliaed'\t'Not Applicable'\t'${params.contigs_file} | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
+    echo -e Assembly file supplied'\t'Not Applicable'\t'${params.contigs_file} | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
     """
 }
 
@@ -439,7 +439,7 @@ process VERSION_SKESA {
     """
     else
     """
-    echo -e Assembly file suppliaed'\t'Not Applicable'\t'${params.contigs_file} | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
+    echo -e Assembly file supplied'\t'Not Applicable'\t'${params.contigs_file} | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
     """
 }
 
@@ -469,7 +469,7 @@ process VERSION_SHOVILL {
         """
     else
         """
-        echo -e Assembly file suppliaed'\t'Not Applicable'\t'${params.contigs_file} | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
+        echo -e Assembly file supplied'\t'Not Applicable'\t'${params.contigs_file} | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
         """
 }
 
