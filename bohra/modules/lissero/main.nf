@@ -29,13 +29,13 @@ process LISSERO {
     tuple val(meta), path(contigs), val(species_obs)
 
     output:
-    tuple val(meta), path('typer.txt'), emit: typer
+    tuple val(meta), path("typer_${getSoftwareName(task.process)}.txt"), emit: typer
 
     script:
     """
     echo -e Isolate'\n'${meta.id} >> tmp.tab
     lissero $contigs | sed 's/contigs\\.fa/$meta.id/g'  > lissero.tab
-    paste tmp.tab lissero.tab | csvtk -t rename -f SEROTYPE -n Serotype | csvtk -t cut -f -ID,-COMMENT > typer.txt
+    paste tmp.tab lissero.tab | csvtk -t rename -f SEROTYPE -n Serotype | csvtk -t cut -f -ID,-COMMENT > typer_${getSoftwareName(task.process)}.txt
     rm -f tmp.tab
     """
     

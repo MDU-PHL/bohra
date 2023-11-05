@@ -13,7 +13,7 @@ process EMMTYPER {
     
     cpus options.args2// args2 needs to be cpus for shovill
     cache 'lenient'
-    errorStrategy 'ignore'
+    // errorStrategy 'ignore'
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/spades" : 'bioconda::spades=3.15.2') : null) 
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
@@ -28,13 +28,13 @@ process EMMTYPER {
     tuple val(meta), path(contigs), val(species)
 
     output:
-    tuple val(meta), path('typer.txt'), emit: typer
+    tuple val(meta), path("typer_${getSoftwareName(task.process)}.txt"), emit: typer
 
     script:
     """
     echo -e ${meta.id} >> tmp.tab
-    emmtpyer $contigs > emmtyper.tab
-    paste tmp.tab emmtyper.tab | csvtk add-header -n 'Isolate,Num_clusters,emm_type,emm_like,emm_cluster' > typer.txt
+    emmtyper $contigs > emmtyper.tab
+    paste tmp.tab emmtyper.tab | csvtk -t cut -f -2 |csvtk -t add-header -n 'Isolate,Num_clusters,emm_type,emm_like,emm_cluster' > typer_${getSoftwareName(task.process)}.txt
     rm -f tmp.tab
     """
     

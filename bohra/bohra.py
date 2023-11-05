@@ -47,7 +47,15 @@ def test_bohra(args):
 
 def main():
     # setup the parser
-  
+    # Check if CONDA_PREFIX is set
+    conda_var = os.getenv('CONDA_PREFIX')
+    if conda_var is None:
+        # Set the default value
+        conda_prefix = 'NO CONDA INSTALLED'
+        # Set the default value
+    else:
+        conda_prefix = f"{pathlib.Path(os.getenv('CONDA_PREFIX')).parent}"
+    
     parser = argparse.ArgumentParser(description=f'Bohra - a bacterial genomics pipeline - version {version}',formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-v', '--version', action='version', version='%(prog)s ' + version)
     # options for running
@@ -77,7 +85,7 @@ def main():
     parser_run.add_argument('--no_phylo',action="store_true", help = "Set if you do NOT want to generate a phylogentic tree.")
     parser_run.add_argument('--config', default = f"", help='An additional config file, required if running on a non-local machine, ie slurm, cloud. For help see documentation at https://github.com/MDU-PHL/bohra or https://www.nextflow.io/docs/latest/executor.html') # don't need this
     parser_run.add_argument('--profile', default = f"", help='The resource profile to use. Defaults to local, if using an alternative config file, this calue should represent the name of a profile provided') 
-    parser_run.add_argument('--conda_path', default = f"{pathlib.Path(os.getenv('CONDA_PREFIX')).parent}", help='The path to where your pre-installed conda envs are stored, defaults to installing conda envs in your work directory. This can be provided in your profiles settings as well - it assumes you have pre-configured all of your conda environments for each process run by bohra, this is an advanced setting. Please take care.') 
+    parser_run.add_argument('--conda_path', default = conda_prefix, help='The path to where your pre-installed conda envs are stored, defaults to installing conda envs in your work directory. This can be provided in your profiles settings as well - it assumes you have pre-configured all of your conda environments for each process run by bohra, this is an advanced setting. Please take care.') 
     parser_run.add_argument('--blast_db', default = f"{os.getenv('BLAST_DB', '')}", help='Path to the mlst blast_db, defaults to what is installed in the environment.') 
     parser_run.add_argument('--data_dir', default = f"{os.getenv('PUBMLST_DB','')}", help='Path to the mlst datadir, defaults to what is installed in the environment.') 
     parser_run.add_argument('--mlst_exclude',default = f"", help='Space delimited list of mlst schemes to exclude.', nargs='+')

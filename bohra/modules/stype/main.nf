@@ -27,7 +27,7 @@ process STYPE {
     tuple val(meta), path(contigs), val(species)
 
     output:
-    tuple val(meta), path('typer.txt'), emit: typer
+    tuple val(meta), path("typer_${getSoftwareName(task.process)}.txt"), emit: typer
     
 
     script:
@@ -35,7 +35,7 @@ process STYPE {
     stype run -c $contigs -px $meta.id
     csvtk cut -f 'genome,h1,h2,o_antigen,serogroup,serovar' $meta.id/sistr_filtered.csv \
     | csvtk rename -f 'genome,serogroup,serovar' -n 'Isolate,Serogroup,Serovar'  \
-    | csvtk csv2tab > typer.txt
+    | csvtk csv2tab > typer_${getSoftwareName(task.process)}.txt
     """
     
 }

@@ -49,6 +49,16 @@
             {"title":"Conda environment", "field":"conda_env","headerFilter":"input","headerFilterPlaceholder":"Search conda env"},
             {"title": "Version", "field":"version","headerFilter":"input"}
             ]
+        },
+        {"file":"details.txt", 
+        "title": "Pipeline details", 
+        "type": "table", 
+        "link":"pipeline-details",
+        "comment": "",
+        "columns" : [
+            {"title":"Detail","field":"detail","headerFilter":"input","headerFilterPlaceholder":"Search detail"},
+            {"title":"Description", "field":"description","formatter": "textarea", "headerFilter":"input","headerFilterPlaceholder":"Search description"}
+            ]
         }
         ],
     "snps":[
@@ -122,6 +132,16 @@
             {"title":"Conda environment", "field":"conda_env","headerFilter":"input","headerFilterPlaceholder":"Search conda env"},
             {"title": "Version", "field":"version","headerFilter":"input"}
             ]
+        },
+        {"file":"details.txt", 
+        "title": "Pipeline details", 
+        "type": "table", 
+        "link":"pipeline-details",
+        "comment": "",
+        "columns" : [
+            {"title":"Detail","field":"detail","headerFilter":"input","headerFilterPlaceholder":"Search detail"},
+            {"title":"Description", "field":"description","formatter": "textarea", "headerFilter":"input","headerFilterPlaceholder":"Search description"}
+            ]
         }
     ],
         
@@ -184,6 +204,16 @@
             {"title":"Tool","field":"tool","headerFilter":"input","headerFilterPlaceholder":"Search tool"},
             {"title":"Conda environment", "field":"conda_env","headerFilter":"input","headerFilterPlaceholder":"Search conda env"},
             {"title": "Version", "field":"version","headerFilter":"input"}
+            ]
+        },
+        {"file":"details.txt", 
+        "title": "Pipeline details", 
+        "type": "table", 
+        "link":"pipeline-details",
+        "comment": "",
+        "columns" : [
+            {"title":"Detail","field":"detail","headerFilter":"input","headerFilterPlaceholder":"Search detail"},
+            {"title":"Description", "field":"description","formatter": "textarea", "headerFilter":"input","headerFilterPlaceholder":"Search description"}
             ]
         }
     ],
@@ -281,6 +311,16 @@
             {"title":"Tool","field":"tool","headerFilter":"input","headerFilterPlaceholder":"Search tool"},
             {"title":"Conda environment", "field":"conda_env","headerFilter":"input","headerFilterPlaceholder":"Search conda env"},
             {"title": "Version", "field":"version","headerFilter":"input"}
+            ]
+        },
+        {"file":"details.txt", 
+        "title": "Pipeline details", 
+        "type": "table", 
+        "link":"pipeline-details",
+        "comment": "",
+        "columns" : [
+            {"title":"Detail","field":"detail","headerFilter":"input","headerFilterPlaceholder":"Search detail"},
+            {"title":"Description", "field":"description","formatter": "textarea", "headerFilter":"input","headerFilterPlaceholder":"Search description"}
             ]
         }
     ],
@@ -406,6 +446,16 @@
             {"title":"Tool","field":"tool","headerFilter":"input","headerFilterPlaceholder":"Search tool"},
             {"title":"Conda environment", "field":"conda_env","headerFilter":"input","headerFilterPlaceholder":"Search conda env"},
             {"title": "Version", "field":"version","headerFilter":"input"}
+            ]
+        },
+        {"file":"details.txt", 
+        "title": "Pipeline details", 
+        "type": "table", 
+        "link":"pipeline-details",
+        "comment": "",
+        "columns" : [
+            {"title":"Detail","field":"detail","headerFilter":"input","headerFilterPlaceholder":"Search detail"},
+            {"title":"Description", "field":"description","formatter": "textarea", "headerFilter":"input","headerFilterPlaceholder":"Search description"}
             ]
         }
     ],
@@ -542,6 +592,16 @@
             {"title":"Tool","field":"tool","headerFilter":"input","headerFilterPlaceholder":"Search tool"},
             {"title":"Conda environment", "field":"conda_env","headerFilter":"input","headerFilterPlaceholder":"Search conda env"},
             {"title": "Version", "field":"version","headerFilter":"input"}
+            ]
+        },
+        {"file":"details.txt", 
+        "title": "Pipeline details", 
+        "type": "table", 
+        "link":"pipeline-details",
+        "comment": "",
+        "columns" : [
+            {"title":"Detail","field":"detail","headerFilter":"input","headerFilterPlaceholder":"Search detail"},
+            {"title":"Description", "field":"description","formatter": "textarea", "headerFilter":"input","headerFilterPlaceholder":"Search description"}
             ]
         }
     ]

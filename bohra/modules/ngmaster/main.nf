@@ -29,14 +29,15 @@ process NGMASTER {
     tuple val(meta), path(contigs), val(species)
 
     output:
-    tuple val(meta), path('typer.txt'), emit: typer
+    tuple val(meta), path("typer_${getSoftwareName(task.process)}.txt"), emit: typer
+    
     
 
     script:
     """
     echo -e Isolate'\n'${meta.id} >> tmp.tab
     ngmaster  $contigs  > ngmaster.tab
-    paste tmp.tab ngmaster.tab | csvtk -t cut -f -2> typer.txt
+    paste tmp.tab ngmaster.tab | csvtk -t cut -f -2> typer_${getSoftwareName(task.process)}.txt
     rm -f tmp.tab
     """
     

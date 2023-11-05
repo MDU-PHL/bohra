@@ -399,11 +399,16 @@ process VERSION_SPADES {
     }
 
     output:
-    path "version_spades.txt", emit: version
+    path "version_assembler.txt", emit: version
 
     script:
+    if( params.contigs_file == 'no_contigs')
     """
     echo -e spades'\t'\$CONDA_PREFIX'\t'\$(spades.py -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_spades.txt
+    """
+    else
+    """
+    echo -e Assembly file supplied'\t'Not Applicable'\t'${params.contigs_file} | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
     """
 }
 
@@ -425,11 +430,16 @@ process VERSION_SKESA {
     }
 
     output:
-    path "version_skesa.txt", emit: version
+    path "version_assembler.txt", emit: version
 
     script:
+    if( params.contigs_file == 'no_contigs')
     """
-    echo -e skesa'\t'\$CONDA_PREFIX'\t'\$(skesa -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_skesa.txt
+    echo -e skesa'\t'\$CONDA_PREFIX'\t'\$(skesa -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
+    """
+    else
+    """
+    echo -e Assembly file supplied'\t'Not Applicable'\t'${params.contigs_file} | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
     """
 }
 
@@ -450,12 +460,17 @@ process VERSION_SHOVILL {
         conda null
     }
     output:
-    path "version_shovill.txt", emit: version
+    path "version_assembler.txt", emit: version
 
-    script:
-    """
-    echo -e shovill'\t'\$CONDA_PREFIX'\t'\$(shovill -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_shovill.txt
-    """
+    script: 
+    if( params.contigs_file == 'no_contigs' )
+        """
+        echo -e shovill'\t'\$CONDA_PREFIX'\t'\$(shovill -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
+        """
+    else
+        """
+        echo -e Assembly file supplied'\t'Not Applicable'\t'${params.contigs_file} | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
+        """
 }
 
 

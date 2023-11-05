@@ -445,7 +445,7 @@ class RunSnpDetection(object):
 
         if reads != '' and self._path_exists(reads):
             
-            tab = pandas.read_csv(reads, sep = '\t', header = None)
+            tab = pandas.read_csv(reads, sep = '\t', header = None, dtype = str)
             if self._check_shape(tab.shape[1]):
                 LOGGER.info(f"File {reads} is in correct format.")
             else:
@@ -462,7 +462,7 @@ class RunSnpDetection(object):
     def _check_contigs(self, contigs):
 
         if contigs != '' and self._path_exists(pathlib.Path(contigs)):
-            tab = pandas.read_csv(contigs, sep = '\t', header = None)
+            tab = pandas.read_csv(contigs, sep = '\t', header = None, dtype = str)
             if self._check_shape(tab.shape[1], reads = False):
                 LOGGER.info(f"File {contigs} is in correct format.")
                 return True
@@ -640,6 +640,14 @@ class RunSnpDetection(object):
 Please select a mode to run, choices are 'analysis' or 'finish'")
                 raise SystemExit
 
+    def _write_details(self,cmd, reference, mask):
+
+        col1 = ['Reference file', 'Mask file', 'Working directory', 'User', 'Date', 'Pipeline', 'Nextflow command']
+        col2 = [reference, mask,self.workdir,self.user,self.day,self.pipeline, cmd]
+        df = pandas.DataFrame({'detail':col1,'description':col2})
+        LOGGER.info(f"Saving pipeline details")
+        subprocess.run(f"mkdir -p {self.workdir}/report", shell = True)
+        df.to_csv(f"{self.workdir}/report/details.txt", index =False, sep = '\t')
 
     def run_pipeline(self):
         '''
@@ -693,7 +701,10 @@ Please select a mode to run, choices are 'analysis' or 'finish'")
                         contigs = contigs_file, cpus = cpus, config = config, assembler = self.assembler, 
                         mask_string = mask_string, reference = reference, run_iqtree = run_iqtree,profile = self.profile,
                         isolates = isolates_list, day = self.day, user = self.user, 
-                        species = self.abritamr_args, gubbins = self.gubbins, blast_db = self.blast_db if self.blast_db != '' else 'no_db', data_dir = self.data_dir if self.data_dir != '' else 'no_db', job_id = self.job_id)
+                        species = self.abritamr_args, gubbins = self.gubbins, 
+                        blast_db = self.blast_db if self.blast_db != '' else 'no_db', 
+                        data_dir = self.data_dir if self.data_dir != '' else 'no_db', job_id = self.job_id)
+        self._write_details(cmd = cmd, reference = reference, mask = mask_string)
         self._run_cmd(cmd)
 
 

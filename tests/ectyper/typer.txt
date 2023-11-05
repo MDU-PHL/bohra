@@ -1,0 +1,2 @@
+Isolate	O-type	H-type	Serotype	Evidence	GeneScores	AlleleKeys	GeneIdentities(%)	GeneCoverages(%)	GeneContigNames	GeneRanges	GeneLengths	Database	Warnings
+for_testing	O121	H19	O121:H19	Based on 3 allele(s)	wzx:1;wzy:1;fliC:0.98;	O121-1-wzx-origin;O121-5-wzy-origin;H19-4-fliC;	100;100;98.362;	100;100;100;	JASV01000004;JASV01000004;JASV01000004;	611493-612887;608851-610041;478738-480569;	1395;1191;1832;	v1.0 (11-03-2020)	-

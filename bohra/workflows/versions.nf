@@ -281,3 +281,4 @@ workflow FULL_VERSIONS {
     emit:
         versions = CSVTK_CONCAT.out.collated
 }
+

@@ -2,6 +2,7 @@
 include { initOptions; saveFiles; getSoftwareName } from './functions'
 
 params.options = [:]
+
 def options    = initOptions(params.options)
 
 process ECTYPER {
@@ -28,7 +29,7 @@ process ECTYPER {
     tuple val(meta), path(contigs), val(species)
 
     output:
-    tuple val(meta), path('typer.txt'), emit: typer
+    tuple val(meta), path("typer_${getSoftwareName(task.process)}.txt"), emit: typer
 
     
 
@@ -36,7 +37,7 @@ process ECTYPER {
     """
     echo -e Isolate'\n'${meta.id} >> tmp.tab
     ectyper -i $contigs -o ectyper 
-    paste tmp.tab ectyper/output.tsv | csvtk -t cut -f -Name,-Species,-QC > typer.txt
+    paste tmp.tab ectyper/output.tsv | csvtk -t cut -f -Name,-Species,-QC > typer_${getSoftwareName(task.process)}.txt
     rm -f tmp.tab
     """
     

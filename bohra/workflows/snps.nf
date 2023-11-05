@@ -20,15 +20,17 @@ workflow RUN_SNPS {
         SNIPPY_QC ( SNIPPY.out.aln )
         alns =  SNIPPY.out.aln.map { cfg, aln -> aln.getParent() }.collect()
         SNIPPY_CORE ( alns, reference )  
-        SNP_DISTS ( SNIPPY_CORE.out.core_aln )
-
+        
         core_aln =  SNIPPY_CORE.out.core_aln
 
         if ( params.gubbins ){
-            SNIPPY_CLEAN ( SNIPPY_CORE.out.core_full )
+            SNIPPY_CLEAN ( SNIPPY_CORE.out.core_full_aln )
             GUBBINS ( SNIPPY_CLEAN.out.cleaned )
             core_aln = GUBBINS.out.gubbins
         }
+        
+        SNP_DISTS ( core_aln )
+
         if (params.run_iqtree ){
             IQTREE ( core_aln, SNIPPY_CORE.out.core_full_aln)
             tree = IQTREE.out.newick

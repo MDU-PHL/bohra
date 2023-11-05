@@ -19,7 +19,7 @@ process KLEBORATE {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-kleborate"
         } else {
-            conda 'kleborate csvtk'
+            conda 'bioconda::kleborate bioconda::csvtk'
         }
         
     } else {
@@ -29,7 +29,7 @@ process KLEBORATE {
     tuple val(meta), path(contigs), val(species)
 
     output:
-    tuple val(meta), path('typer.txt'), emit: typer
+    tuple val(meta), path("typer_${getSoftwareName(task.process)}.txt"), emit: typer
     
     
 
@@ -37,7 +37,7 @@ process KLEBORATE {
     """
     echo -e Isolate'\n'${meta.id} >> tmp.tab
     kleborate -o kleborate.tab -a $contigs
-    paste tmp.tab kleborate.tab | csvtk -t rename -f species -n Species | csvtk -t cut -f -strain,-ST > typer.txt
+    paste tmp.tab kleborate.tab | csvtk -t rename -f species -n Species | csvtk -t cut -f -strain,-ST > typer_${getSoftwareName(task.process)}.txt
     rm -f tmp.tab
     """
     

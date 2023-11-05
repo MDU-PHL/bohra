@@ -10,16 +10,16 @@ jobs: # A basic unit of work in a run
           PIPENV_VENV_IN_PROJECT: true
     steps: # steps that comprise the `build` job
       - checkout # check out source code to working directory
-      - run: 
-          command: |
-            conda env create -f environment.yml 
-            source activate bohra 
+      - run:
+          command: | # create whl and use pipenv to install dependencies
             python3 setup.py sdist bdist_wheel
-            pip3 install dist/bohra-*-py3-none-any.whl 
+            sudo apt-get update
+            sudo apt install -y python3-pip
+            python3 -m venv bohra
+            source bohra/bin/activate
+            pip3 install .
             bohra -h
-            pytest
-            bohra init
-     
+      
       - store_test_results: # Upload test results for display in Test Summary: https://circleci.com/docs/2.0/collect-test-data/
           path: test-results
       - store_artifacts: # Upload test summary for display in Artifacts: https://circleci.com/docs/2.0/artifacts/

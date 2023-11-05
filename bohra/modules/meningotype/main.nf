@@ -28,14 +28,14 @@ process MENINGOTYPE {
     tuple val(meta), path(contigs), val(species)
 
     output:
-    tuple val(meta), path('typer.txt'), emit: typer
+    tuple val(meta), path("typer_${getSoftwareName(task.process)}.txt"), emit: typer
     
 
     script:
     """
     echo -e Isolate'\n'${meta.id} >> tmp.tab
     meningotype --all $contigs  > meningotype.tab
-    paste tmp.tab meningotype.tab | csvtk -t rename -f SEROGROUP -n Serogroup | csvtk -t cut -f -SAMPLE_ID,-MLST > typer.txt
+    paste tmp.tab meningotype.tab | csvtk -t rename -f SEROGROUP -n Serogroup | csvtk -t cut -f -SAMPLE_ID,-MLST >typer_${getSoftwareName(task.process)}.txt
     rm -f tmp.tab
     """
     

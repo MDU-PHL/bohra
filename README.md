@@ -13,9 +13,9 @@ For detailed usage information please see our [wiki](https://github.com/MDU-PHL/
 * babykraken download as part of the dependency installation.
 * Addition of typers
     * [Kleborate](https://github.com/klebgenomics/Kleborate/wiki)
-    * [stype](https://github.com/MDU-PHLsalmonella_typing) (NATA accredited ISO1589)
-    * [meningotype](https://github.com/MDU-PHL/meningotype) (NATA accredited ISO1589)
-    * [lissero](https://github.com/MDU-PHL/lissero) (NATA accredited ISO1589)
+    * [stype](https://github.com/MDU-PHL/salmonella_typing) (NATA accredited ISO15189)
+    * [meningotype](https://github.com/MDU-PHL/meningotype) (NATA accredited ISO15189)
+    * [lissero](https://github.com/MDU-PHL/lissero) (NATA accredited ISO15189)
     * [ngmaster](https://github.com/MDU-PHL/ngmaster)
     * [ectyper](https://github.com/phac-nml/ecoli_serotyping)
 
