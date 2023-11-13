@@ -61,7 +61,7 @@ def check_masked(mask_file, df):
             masked.extend(l)
 
     df['masked'] = numpy.where(df['index'].isin(masked), 'masked', 'unmasked')
-    
+    print(df)
     return df
 
 def get_contig_breaks(_dict):
@@ -126,6 +126,17 @@ def _plot_snpdensity(reference,wd, isos, mask_file = ''):
     domain = ['masked', 'unmasked']
     range_ = ['#d9dcde', '#216cb8']
     # do bar graphs
+    if mask_file != 'no_mask':
+        bar = alt.Chart(df).mark_bar().encode(
+            x=alt.X('index:Q', bin=alt.Bin(maxbins=_maxbins), title = "Core genome position.", axis=alt.Axis(ticks=False)),
+            y=alt.Y('sum(vars):Q',title = "Variants observed (per 500 bp)"),
+            color=alt.Color('masked').scale(domain=domain, range=range_).legend(None)
+        )
+    else:
+        bar = alt.Chart(df).mark_bar(color = '#d9dcde').encode(
+            x=alt.X('index:Q', bin=alt.Bin(maxbins=_maxbins), title = "Core genome position.", axis=alt.Axis(ticks=False)),
+            y=alt.Y('sum(vars):Q',title = "Variants observed (per 500 bp)"),
+        )
     bar = alt.Chart(df).mark_bar().encode(
         x=alt.X('index:Q', bin=alt.Bin(maxbins=_maxbins), title = "Core genome position.", axis=alt.Axis(ticks=False)),
         y=alt.Y('sum(vars):Q',title = "Variants observed (per 500 bp)"),
