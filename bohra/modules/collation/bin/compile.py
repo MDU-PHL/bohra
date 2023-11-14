@@ -48,20 +48,23 @@ def get_bin_size(_dict):
         print(f"Something has gone wrong - the maxbins value should be > 0.")
     return _maxbins
 
-def check_masked(mask_file, df):
+def check_masked(mask_file, df,wd, _dict ):
 
     masked = []
-    if mask_file != '' and pathlib.Path(mask_file).exists():
-        mask = pandas.read_csv(f"{mask_file}", sep = '\t', header = None, names = ['CHR','Pos1','Pos2'])
+    if mask_file != '' and pathlib.Path(wd,mask_file).exists():
+        print('blocking out masked regions')
+        mask = pandas.read_csv(f"{pathlib.Path(wd,mask_file)}", sep = '\t', header = None, names = ['CHR','Pos1','Pos2'])
         mask['CHR'] = mask['CHR'].astype(str)
-        
+        print(mask)
+        print(_dict)
         for row in mask.iterrows():
-            off = d[row[1]['CHR']]['offset']
+            # print(row[1])
+            off = _dict[row[1]['CHR']]['offset']
             l = list(range(row[1]['Pos1'] + off, row[1]['Pos2']+off +1))
             masked.extend(l)
 
-    df['masked'] = numpy.where(df['index'].isin(masked), 'masked', 'unmasked')
-    print(df)
+    df['mask'] = numpy.where(df['index'].isin(masked), 'masked', 'unmasked')
+    
     return df
 
 def get_contig_breaks(_dict):
@@ -119,24 +122,21 @@ def _plot_snpdensity(reference,wd, isos, mask_file = ''):
             data[pos + offset] = vars[var][pos]
     df = pandas.DataFrame.from_dict(data, orient='index',columns=['vars']).reset_index()
     # check if mask file used - if yes grey it out in the graph.
-    df = check_masked(mask_file = mask_file, df = df)
+    df = check_masked(mask_file = mask_file, df = df, wd = wd, _dict = _dict)
     # get positions of the contig breaks
     for_contigs = get_contig_breaks(_dict = _dict)
     # set colours
     domain = ['masked', 'unmasked']
     range_ = ['#d9dcde', '#216cb8']
     # do bar graphs
-    if mask_file != 'no_mask':
-        bar = alt.Chart(df).mark_bar().encode(
-            x=alt.X('index:Q', bin=alt.Bin(maxbins=_maxbins), title = "Core genome position.", axis=alt.Axis(ticks=False)),
-            y=alt.Y('sum(vars):Q',title = "Variants observed (per 500 bp)"),
-            color=alt.Color('masked').scale(domain=domain, range=range_).legend(None)
-        )
-    else:
-        bar = alt.Chart(df).mark_bar(color = '#d9dcde').encode(
-            x=alt.X('index:Q', bin=alt.Bin(maxbins=_maxbins), title = "Core genome position.", axis=alt.Axis(ticks=False)),
-            y=alt.Y('sum(vars):Q',title = "Variants observed (per 500 bp)"),
-        )
+    print(mask_file)
+    print(df[df['mask'] == 'masked'])
+    # if mask_file != 'no_mask':
+    bar = alt.Chart(df).mark_bar().encode(
+        x=alt.X('index:Q', bin=alt.Bin(maxbins=_maxbins), title = "Core genome position.", axis=alt.Axis(ticks=False)),
+        y=alt.Y('sum(vars):Q',title = "Variants observed (per 500 bp)"),
+        color=alt.Color('mask', scale = alt.Scale(domain=domain, range=range_), legend=None)
+    )
 
     # generate list of graphs for addition of vertical lines
     graphs = [bar]
