@@ -137,11 +137,7 @@ def _plot_snpdensity(reference,wd, isos, mask_file = ''):
             x=alt.X('index:Q', bin=alt.Bin(maxbins=_maxbins), title = "Core genome position.", axis=alt.Axis(ticks=False)),
             y=alt.Y('sum(vars):Q',title = "Variants observed (per 500 bp)"),
         )
-    bar = alt.Chart(df).mark_bar().encode(
-        x=alt.X('index:Q', bin=alt.Bin(maxbins=_maxbins), title = "Core genome position.", axis=alt.Axis(ticks=False)),
-        y=alt.Y('sum(vars):Q',title = "Variants observed (per 500 bp)"),
-        color=alt.Color('masked').scale(domain=domain, range=range_).legend(None)
-    )
+
     # generate list of graphs for addition of vertical lines
     graphs = [bar]
     if for_contigs != []:
