@@ -38,8 +38,9 @@ process KRAKEN2 {
     kraken2  $read_files \
     --threads $task.cpus \
     --report kraken2.tab \
-    --memory-mapping \
+    --output - \
     -db $kraken \
-    $options.args
+    --memory-mapping \
+    $options.args 2> /dev/null
     """
 }
