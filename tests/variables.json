@@ -40,6 +40,12 @@
         "input": "reads",
         "ref": "asm/Lm_Cluster1_J1-108.fa"
     },
+    "kraken2": {
+        "truth" : "",
+        "main": "kraken2/main.nf",
+        "input": "reads",
+        "ref": "/tmp/pluspf"
+    },
     "snippy_core": {
         "truth" : "snippy_core/core.aln",
         "main": "snippy_core/main.nf",

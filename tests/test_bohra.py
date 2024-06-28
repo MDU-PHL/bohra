@@ -28,8 +28,8 @@ def get_paths(tool):
         cp= script_path / get_input(tool)
         tr = script_path / get_truth(tool)
         return nf,cp,tr
-def get_reference():
-        return script_path / f"{cfg['snippy']['ref']}"
+def get_reference(tool):
+        return script_path / f"{cfg[tool]['ref']}"
 
 def clean():
 
@@ -58,8 +58,18 @@ def test_nf_snp_dists():
 @pytest.mark.nf_snps
 def test_nf_snippy_core():
         nf,cp,tr = get_paths("snippy_core")
-        ref = get_reference()
+        ref = get_reference(tool = 'snippy')
         cmd = f"nextflow run {nf} --aln_path {cp} --outdir {outdir} --reference {ref} --mask_string no_mask --publish_dir_mode copy --enable_conda true -with-conda --truth {tr}"
+        proc = subprocess.run(cmd, shell=True, capture_output=True)
+        
+        assert proc.returncode == 0
+        clean()
+
+@pytest.mark.nf_kraken
+def test_nf_kraken():
+        nf,cp,tr = get_paths("kraken2")
+        ref = get_reference(tool = 'kraken2')
+        cmd = f"nextflow run {nf} --read_path {cp}  --kraken2_db {ref} --publish_dir_mode copy --profile mdu --enable_conda true -with-conda "
         proc = subprocess.run(cmd, shell=True, capture_output=True)
         
         assert proc.returncode == 0
