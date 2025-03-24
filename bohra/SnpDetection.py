@@ -62,6 +62,7 @@ class RunSnpDetection(object):
         self.kraken_db = args.kraken_db
         self.blast_db = args.blast_db
         self.data_dir = args.data_dir
+        self.mobsuite_db = args.mobsuite_db
         self.workdir = pathlib.Path(args.workdir)        
         LOGGER.info(f"\033[1mBohra is being run in {self.workdir} by {self.user} on {self.day}.\033[0m")
         
@@ -315,6 +316,17 @@ class RunSnpDetection(object):
             else:
                 LOGGER.warning('You do not have a default kraken2 DB. You have 4 options \n1). bohra run --kraken_db to point to a specific directory \n2). do not perform speciation \n3). set a KRAKEN2_DEFAULT_DB environment variable or 4). use bohra krakendb_download.')
         
+    def _check_mobsuite_db(self):
+        
+        if self.mobsuite_db != "no_db":
+            LOGGER.info(f"Checking mobsuite database setup.")
+            if pathlib.Path(self.mobsuite_db).exists() and os.access(self.mobsuite_db, os.W_OK) :
+                LOGGER.info(f"Your mobsuite database is set up and should be ready to go.")
+            else:
+                LOGGER.critical(f"Your mobsuite database is not configured properly. Please check your setup and try again.")
+                raise SystemExit
+        else:
+            LOGGER.info(f"You are using the default mobsuite database in your enviornment. May the force be with you.")
 
     def _get_db(self, _type):
 
@@ -402,6 +414,7 @@ class RunSnpDetection(object):
                 raise SystemExit
         LOGGER.info(f"Now checking kraken2 DB")
         self._check_kraken2DB(checking = checking)
+        self._check_mobsuite_db()
         software_versions.append(f"kraken2 DB: {self.kraken_db}")
         if not checking:
             # print(checking)
@@ -614,7 +627,8 @@ class RunSnpDetection(object):
         conda_path = f"--conda_path {self.conda_path}" if self.conda_path != '' else ''
         snippy_opts = self._generate_snippy_params()
         spades_opts = self._generate_spades_args()
-        parameters = f"--job_id {job_id} --mode {mode} --run_iqtree {run_iqtree} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} --mask_string {mask_string} --reference {reference} --contigs_file {contigs} --species {species if species != '' else 'no_species'} --outdir {self.workdir} --isolates {isolates} --user {user} --day {day} --gubbins {gubbins} --blast_db {blast_db} --data_dir {data_dir} {conda} {conda_path} {snippy_opts} {spades_opts}"
+
+        parameters = f"--job_id {job_id} --mode {mode} --run_iqtree {run_iqtree} --run_kraken {run_kraken} --kraken2_db {kraken2_db} --assembler {assembler} --mask_string {mask_string} --reference {reference} --contigs_file {contigs} --species {species if species != '' else 'no_species'} --outdir {self.workdir} --isolates {isolates} --user {user} --day {day} --gubbins {gubbins} --blast_db {blast_db} --data_dir {data_dir} --mobsuite_db {self.mobsuite_db} {conda} {conda_path} {snippy_opts} {spades_opts}"
         options = f"-with-report bohra_{day}_report.html -with-trace -profile {profile} {resume} {cpu} {config} {'-with-conda' if self.use_conda else ''}"
 
         cmd = f"{stub} {parameters} {options}"
