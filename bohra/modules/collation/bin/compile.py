@@ -55,8 +55,6 @@ def check_masked(mask_file, df,wd, _dict ):
         print('blocking out masked regions')
         mask = pandas.read_csv(f"{pathlib.Path(wd,mask_file)}", sep = '\t', header = None, names = ['CHR','Pos1','Pos2'])
         mask['CHR'] = mask['CHR'].astype(str)
-        print(mask)
-        print(_dict)
         for row in mask.iterrows():
             # print(row[1])
             off = _dict[row[1]['CHR']]['offset']

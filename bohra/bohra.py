@@ -89,6 +89,7 @@ def main():
     parser_run.add_argument('--blast_db', default = f"{os.getenv('BLAST_DB', '')}", help='Path to the mlst blast_db, defaults to what is installed in the environment.') 
     parser_run.add_argument('--data_dir', default = f"{os.getenv('PUBMLST_DB','')}", help='Path to the mlst datadir, defaults to what is installed in the environment.') 
     parser_run.add_argument('--mlst_exclude',default = f"", help='Space delimited list of mlst schemes to exclude.', nargs='+')
+    parser_run.add_argument('--mobsuite_db', default = f"{os.getenv('MOBSUITE_DB','')}", help='Path to the mobsuite_db, defaults to what is installed in the environment.') 
     parser_run.add_argument('--proceed', action="store_true", help = "If you would like to proceed straigt to the pipeline.")
     parser_run.add_argument('--gubbins',  action = 'store_true', help = 'Set to use gubbins for recombination correction.')
     parser_run.add_argument('--keep', default = 'N', choices= ['Y', 'N'], help = 'If you are rerunning bohra over an exisiting directory set --keep to \'Y\' to archive report files - otherwise previous reprot files will be removed.')

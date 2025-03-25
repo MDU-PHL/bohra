@@ -35,8 +35,9 @@ process MOBSUITE {
     // tuple val(meta), path('spades.log'), emit: log
 
     script:
+    def db = params.mobsuite_db != 'no_db'  ?  "--database $params.mobsuite_db" : ""
     """
-    mob_recon -i $asm -s $meta.id -n $task.cpus -o mob
+    mob_recon -i $asm -s $meta.id -n $task.cpus -o mob $db
     cp mob/* .
     if [ ! -f mobtyper_results.txt ];then
         touch mobtyper_results.txt
