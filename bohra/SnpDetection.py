@@ -62,7 +62,7 @@ class RunSnpDetection(object):
         self.kraken_db = args.kraken_db
         self.blast_db = args.blast_db
         self.data_dir = args.data_dir
-        self.mobsuite_db = args.mobsuite_db
+        self.mobsuite_db = args.mobsuite_db if args.mobsuite_db != "" else "no_db"
         self.workdir = pathlib.Path(args.workdir)        
         LOGGER.info(f"\033[1mBohra is being run in {self.workdir} by {self.user} on {self.day}.\033[0m")
         
@@ -644,7 +644,6 @@ class RunSnpDetection(object):
         
         if self.proceed:
             return self._run_subprocess(cmd= cmd)
-        
         else:
 
             try:
