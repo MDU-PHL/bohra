@@ -319,7 +319,7 @@ class RunSnpDetection(object):
     def _check_mobsuite_db(self):
         
         if self.mobsuite_db != "no_db":
-            LOGGER.info(f"Checking mobsuite database setup.")
+            
             if pathlib.Path(self.mobsuite_db).exists() and os.access(self.mobsuite_db, os.W_OK) :
                 LOGGER.info(f"Your mobsuite database is set up and should be ready to go.")
             else:
@@ -414,6 +414,7 @@ class RunSnpDetection(object):
                 raise SystemExit
         LOGGER.info(f"Now checking kraken2 DB")
         self._check_kraken2DB(checking = checking)
+        LOGGER.info(f"Checking mobsuite database setup.")
         self._check_mobsuite_db()
         software_versions.append(f"kraken2 DB: {self.kraken_db}")
         if not checking:
@@ -674,6 +675,8 @@ Please select a mode to run, choices are 'analysis' or 'finish'")
         else:
             LOGGER.info(f"You are running with conda - wise decision!! Will now ensure that kraken DB is configured properly.")
             self._check_kraken2DB(checking = False)
+            LOGGER.info(f"Checking mobsuite database setup.")
+            self._check_mobsuite_db()
             LOGGER.info(f"Now looking for MLST setup")
             self._check_mlstdb()
         # input files
