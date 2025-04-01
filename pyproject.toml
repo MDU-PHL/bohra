@@ -44,7 +44,7 @@ tests = [
 ]
 
 [project.scripts]
-bohra = "bohra.bohra:main"
+bohra = "bohra.bohra:cli"
 
 [project.urls]
 Homepage = "https://github.com/kristyhoran/bohra"
