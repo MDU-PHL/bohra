@@ -7,7 +7,12 @@ name = "bohra"
 dynamic = ["version"]
 description = "A bioinformatics pipeline for analysing short read Illumina data microbiological public health."
 readme = "README.md"
-license = ""
+license = "GPL-3.0-or-later"
+keywords = [
+    "bioinformatics",
+    "microbiology",
+    "public health"
+]
 requires-python = ">= 3.11"
 authors = [
     { name = "Kristy Horan", email = "kristyhoran15@gmail.com" },
@@ -45,9 +50,9 @@ bohra = "bohra.bohra:main"
 Homepage = "https://github.com/kristyhoran/bohra"
 
 [tool.hatch.version]
-path = "bohra/__init__.py"
+path = "bohra/version.py"
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "/bohra",
+    "/bohra/*","/bohra/modules/*","bohra/templates/*", "bohra/workflows/*", 
 ]
