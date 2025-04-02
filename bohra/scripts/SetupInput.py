@@ -1,7 +1,7 @@
 import pathlib
 import datetime
 import logging
-from bohra.scripts.Utils import CustomFormatter
+from bohra.scripts.Utils import CustomFormatter, _check_path
 # Logger
 # Logger
 LOGGER =logging.getLogger(__name__) 
@@ -42,12 +42,7 @@ class SetupInputFiles(object):
             LOGGER.critical(f"Path provided : {path} does not exist - please try again.")
             return False
         
-    def _extract_isolates(self, isolate_file):
-        
-        with open(isolate_file, 'r') as f:
-            isolates = f.read().strip().split('\n')
-        
-        return isolates
+   
     
     def _get_isolate_list(self, _dir,  ext= f"*.f*q.gz"):
 
@@ -127,26 +122,24 @@ def _extract_isolates(isolate_ids):
     
     return isolates
 
-def _check_path(path):
-    """
-    Check if path provided exists and is accessible
-    :input - path to where reads/contigs are
-    :output - boolean 
-    """ 
-    LOGGER.info(f"Checking for {path}")
-    if pathlib.Path(path).exists():
-        LOGGER.info(f"{path} exists.")
-        return True
-    else:
-        LOGGER.critical(f"Path provided : {path} does not exist - please try again.")
-        raise SystemExit
     
 def find_data( reads,
                 contigs,
                 isolate_ids,
                 path):
 
+
+    """
+    Find data in the path provided
+    :input - path to reads/contigs
+                isolate_ids - file containing isolate ids
+                reads - boolean
+                contigs - boolean
+    :output - list of data
+    """
+    LOGGER.info(f"Finding data in {path}")
     if path != '' and _check_path(path):
+        LOGGER.info(f"Path provided : {path} exists.")
         if isolate_ids != '': 
             isolates = _extract_isolates(isolate_file= isolate_ids) if _check_path(isolate_ids) else []
         else:

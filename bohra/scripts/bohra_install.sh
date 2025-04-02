@@ -3,7 +3,7 @@
 # Each environment will be prefaced with 'bohra-' to distinguish them from other
 # possible installations that the user has.
 
-ENV_PREFIX="bohra-test"
+ENV_PREFIX=$1
 # UPDATE=$1
 # abort if any step fails
 set -e

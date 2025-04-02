@@ -1,4 +1,6 @@
 import logging
+import pathlib
+
 
 class CustomFormatter(logging.Formatter):
     """Logging Formatter to add colors and count warning / errors"""
@@ -22,3 +24,20 @@ class CustomFormatter(logging.Formatter):
         log_fmt = self.FORMATS.get(record.levelno)
         formatter = logging.Formatter(log_fmt,datefmt='%m/%d/%Y %I:%M:%S %p')
         return formatter.format(record)
+    
+
+
+def _check_path(path):
+    """
+    Check if path provided exists and is accessible
+    :input - path to where reads/contigs are
+    :output - boolean 
+    """ 
+    
+    if pathlib.Path(path).exists():
+        
+        return True
+    else:
+        
+        raise SystemExit
+    
