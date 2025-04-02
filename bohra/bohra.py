@@ -29,6 +29,19 @@ from bohra.commands.pipelines.ska import ska
 from bohra.commands.check import check
 from bohra.commands.install import install 
 from bohra.commands.generate_input import generate_input
+from bohra.commands.test import test
+
+
+def _show_usage_error(self, file=None):
+    if file is None:
+        file = get_text_stderr()
+    color = None
+    if self.ctx is not None:
+        color = self.ctx.color
+        click.echo(self.ctx.get_help() + '\n', file=file, color=color)
+    click.echo('Error: %s' % self.format_message(), file=file, color=color)
+
+UsageError.show = _show_usage_error
 
 @click.group()
 def cli():
@@ -41,15 +54,17 @@ def run():
     """
     pass
 
+cli.add_command(check.check)
+cli.add_command(install.install_deps)
+cli.add_command(generate_input.generate_input)
+cli.add_command(test.test)
+
 run.add_command(preview.preview)
 run.add_command(assemble.assemble)
 run.add_command(snps.snps)
 run.add_command(default.default)
 run.add_command(amr_typing.amr_typing)
 run.add_command(ska.ska)
-cli.add_command(check.check)
-cli.add_command(install.install_deps)
-cli.add_command(generate_input.generate_input)
 
 
 if __name__ == '__main__':
