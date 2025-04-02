@@ -1,11 +1,18 @@
 import click
 import pathlib
 import os
+import json
 
+cfg_file = f"{pathlib.Path(__file__).parent.parent.parent.parent.resolve() / 'bohra_defaults.json'}"
+with open(cfg_file, 'r') as f:
+    CFG = json.load(f)
 
 @click.command()
 @click.option('--reads', '-r',
               help='Path to reads file, which is a tab-delimited with 3 columns <isolatename>  <path_to_read1> <path_to_read2>.',
+              default='')
+@click.option('--contigs', '-c', 
+              help='Path to contigs file, which is a tab-delimited with 3 columns <isolatename>  <path_to_contigs>. OPTIONAL if you already have assemblies.', 
               default='')
 @click.option('--reference', '-ref', 
               help='Path to reference (.gbk or .fa)', 
@@ -13,11 +20,22 @@ import os
 @click.option('--mask', '-m', 
               default='', 
               help='Path to mask file if used (.bed)')
+@click.option('--abritamr_args',
+              required=False,
+              help="Set if you would like to use point mutations, please provide a valid species.", 
+              type=click.Choice(CFG["abritamr_species"]))
 @click.option('--kraken_db', '-k',
               default=os.getenv("KRAKEN2_DEFAULT_DB", ''),
               metavar='KRAKEN2_DEFAULT_DB',
               show_default=True,
               help="Path to DB for use with kraken2, if no DB present speciation will not be performed.")
+@click.option('--assembler', '-a',
+              default='shovill', 
+              help='Assembler to use (shovill uses spades > 3.14 with --isolate mode).',
+              type=click.Choice(['shovill', 'skesa', 'spades']))
+@click.option('--spades_args',
+              default="", 
+              help="Use to add arguments to spades (when running with --assembler spades) for example: '--cov-cutoff auto' ")
 @click.option('--cpus',
               help='Number of max CPU cores to run, will define how many rules are run at a time, if 0 then the avail cpus will be determined at time of launch', 
               default=0)
@@ -46,6 +64,19 @@ import os
 @click.option('--conda_path',       
               default=pathlib.Path(os.getenv('CONDA_PREFIX', '')), 
               help='The path to where your pre-installed conda envs are stored, defaults to installing conda envs in your work directory. This can be provided in your profiles settings as well - it assumes you have pre-configured all of your conda environments for each process run by bohra, this is an advanced setting. Please take care.')
+@click.option('--blast_db',
+              default=f"{os.getenv('BLAST_DB', '')}", 
+              help='Path to the mlst blast_db, defaults to what is installed in the environment.')
+@click.option('--data_dir',     
+              default=f"{os.getenv('PUBMLST_DB','')}", 
+              help='Path to the mlst datadir, defaults to what is installed in the environment.')
+@click.option('--mlst_exclude','-me',
+              default=[], 
+              help='mlst schemes to exclude - multiple possible ie -me scheme1 -me scheme2 -me scheme3',
+              multiple=True)
+@click.option('--mobsuite_db',
+              default=f"{os.getenv('MOBSUITE_DB','')}", 
+              help='Path to the mobsuite_db, defaults to what is installed in the bohra-mob_suite environment.')
 @click.option('--gubbins',
               is_flag=True, 
               help='Set to use gubbins for recombination correction.')
@@ -71,8 +102,8 @@ import os
 @click.option('--profile',
               default=f"", 
               help='The resource profile to use. Defaults to local, if using an alternative config file, this value should represent the name of a profile provided')
-def snps():
+def full():
     """
-    Run bohra for snp detection +/- phylogeny
+    Run bohra in full 
     """
-    print("Running preview...")
+    print("Running full pipeline...")

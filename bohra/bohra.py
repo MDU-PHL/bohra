@@ -26,6 +26,7 @@ from bohra.commands.pipelines.default import default
 from bohra.commands.pipelines.snps import snps
 from bohra.commands.pipelines.amr_typing import amr_typing
 from bohra.commands.pipelines.ska import ska
+from bohra.commands.pipelines.full import full
 from bohra.commands.check import check
 from bohra.commands.install import install 
 from bohra.commands.generate_input import generate_input
@@ -65,6 +66,7 @@ run.add_command(snps.snps)
 run.add_command(default.default)
 run.add_command(amr_typing.amr_typing)
 run.add_command(ska.ska)
+run.add_command(full.full)
 
 
 if __name__ == '__main__':
