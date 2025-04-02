@@ -88,7 +88,7 @@ for key in "${!TOOLS[@]}";do
             if [[ "$key" == "$ENV_PREFIX-mob_suite" ]]; then
                 echo "will need to add in db download $key"
                 echo "Will now initialise the mob_suite databases"
-                conda activate $key
+                conda activate $key && \
                 mob_init
                 continue
             fi
