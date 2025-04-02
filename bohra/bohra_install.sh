@@ -4,6 +4,7 @@
 # possible installations that the user has.
 
 ENV_PREFIX="bohra"
+# UPDATE=$1
 # abort if any step fails
 set -e
 # resets to base env
@@ -114,17 +115,12 @@ su=$(check_installation $ENV_PREFIX-mob_suite)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-mob_suite can not be found. Now setting up $ENV_PREFIX-mob_suite
-        $INSTALLER create -y -n $ENV_PREFIX-mob_suite csvtk mob_suite=3.0.2 numpy=1.21.1
+        $INSTALLER create -y -n $ENV_PREFIX-mob_suite mob_suite=3.1.9
+        echo "Will now initialise the mob_suite databases"
+        conda activate $ENV_PREFIX-mob_suite
+        mob_init
     else
         echo $ENV_PREFIX-mob_suite is already setup. Nothing left to do
-        conda activate $ENV_PREFIX-mob_suite
-        if [ -d $CONDA_PREFIX/lib/python3.8/site-packages/mob_suite/databases ]
-            then
-                echo mob_suite database is present
-            else
-                echo mob_suite databases are not present - will now install at $CONDA_PREFIX/lib/python3.8/site-packages/mob_suite/databases
-                mob_init
-        fi
 fi
 # panaroo
 echo "Checking set up for $ENV_PREFIX-panaroo"
@@ -144,9 +140,15 @@ su=$(check_installation $ENV_PREFIX-abritamr)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-abritamr can not be found. Now setting up $ENV_PREFIX-abritamr
-        $INSTALLER create -y -n $ENV_PREFIX-abritamr csvtk abritamr=1.0.14
+        $INSTALLER create -y -n $ENV_PREFIX-abritamr csvtk abritamr=1.0.19
     else
-        echo $ENV_PREFIX-abritamr is already setup. Nothing left to do
+        if [[ $UPDATE -eq 1 ]]
+        then
+            echo Now updating up $ENV_PREFIX-abritamr
+            conda activate $ENV_PREFIX-abritamr
+            $INSTALLER update -n $ENV_PREFIX-abritamr abritamr
+        fi
+            echo $ENV_PREFIX-abritamr is already setup. Nothing left to do
 fi
 # # gubbins
 # # echo "Setting up $ENV_PREFIX-gubbins"
@@ -356,7 +358,7 @@ if [[ $su -eq 1 ]]
         echo $ENV_PREFIX-emmtyper is already setup. Nothing left to do
 fi
 
-echo The dependencies for bohra are installed in your default conda path - go forth and analyse!!
+
 
 if [[ -z $KRAKEN2_DEFAULT_DB ]]; then
   
@@ -375,5 +377,6 @@ if [[ -z $KRAKEN2_DEFAULT_DB ]]; then
 
    
 fi
+echo The dependencies for bohra are installed in your default conda path - go forth and analyse!!
 
 echo Please contact us at https://github.com/MDU-PHL/bohra for any issues or concerns

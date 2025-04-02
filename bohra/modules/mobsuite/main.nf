@@ -18,7 +18,7 @@ process MOBSUITE {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-mob_suite"
         } else {
-            conda 'bioconda::mob_suite=3.0.2 csvtk'
+            conda 'bioconda::mob_suite=3.0.2'
         }
     } else {
         conda null
