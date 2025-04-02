@@ -81,7 +81,7 @@ for key in "${!TOOLS[@]}";do
             $INSTALLER create --force -y -n $key ${TOOLS[$key]}
             if [[ "$key" == "$ENV_PREFIX-stype" ]]; then
                 echo "will install $key from github"
-                conda activate $key
+                conda activate $key && \
                 pip3 install 'git+https://github.com/MDU-PHL/salmonella_typing'
                 continue
             fi
