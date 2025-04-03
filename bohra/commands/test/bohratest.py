@@ -1,14 +1,12 @@
 import click
 import pathlib
 import os
-
+from bohra.launcher.TestBohra import run_tests
 
 @click.command()
 def test():
     """
     Check that bohra is installed correctly and runs as expected.
     """
-    print("Testing Bohra installation...")
-    print("This will take some time.")
-    print("Please be patient.")
     
+    run_tests()

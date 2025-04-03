@@ -125,16 +125,14 @@ def _extract_isolates(isolate_ids:str):
     return isolates
 
     
-def find_data( reads:bool,
-                contigs:bool,
+def find_data( input_type:str,
                 isolate_ids:str,
                 path:str):
     """
     Find data in the path provided
     :input - path to reads/contigs
                 isolate_ids - file containing isolate ids
-                reads - boolean
-                contigs - boolean
+                input_type - type of input data (reads, asm)
     :output - list of data
     """
     LOGGER.info(f"Finding data in {path}")
@@ -144,7 +142,7 @@ def find_data( reads:bool,
             isolates = _extract_isolates(isolate_file= isolate_ids) if _check_path(isolate_ids) else []
         else:
             isolates = []
-        _glob_sequences(path = path, isolates= isolates, sequence_type = 'reads' if reads else 'asm')
+        _glob_sequences(path = path, isolates= isolates, sequence_type = input_type)
     else:
         LOGGER.critical(f"There seems to be a problem with your read path. Please provide a valid path to the reads you wish to include")
         raise SystemExit

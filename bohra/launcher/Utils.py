@@ -1,6 +1,6 @@
 import logging
 import pathlib
-
+import subprocess
 
 class CustomFormatter(logging.Formatter):
     """Logging Formatter to add colors and count warning / errors"""
@@ -40,4 +40,10 @@ def _check_path(path):
     else:
         
         raise SystemExit
+
+
+def _run_subprocess(self, cmd):
+
     
+    p = subprocess.run(cmd, shell = True)
+    return p
