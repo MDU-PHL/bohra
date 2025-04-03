@@ -3,11 +3,9 @@ import pathlib
 import os
 import json
 
-cfg_file = f"{pathlib.Path(__file__).parent.parent.parent.parent.resolve() / 'bohra_defaults.json'}"
-with open(cfg_file, 'r') as f:
-    CFG = json.load(f)
 
 @click.command()
+
 @click.option('--reads', '-r',
               help='Path to reads file, which is a tab-delimited with 3 columns <isolatename>  <path_to_read1> <path_to_read2>.',
               default='')
@@ -20,10 +18,6 @@ with open(cfg_file, 'r') as f:
 @click.option('--mask', '-m', 
               default='', 
               help='Path to mask file if used (.bed)')
-@click.option('--abritamr_args',
-              required=False,
-              help="Set if you would like to use point mutations, please provide a valid species.", 
-              type=click.Choice(CFG["abritamr_species"]))
 @click.option('--kraken_db', '-k',
               default=os.getenv("KRAKEN2_DEFAULT_DB", ''),
               metavar='KRAKEN2_DEFAULT_DB',
@@ -54,6 +48,21 @@ with open(cfg_file, 'r') as f:
 @click.option('--mincov', '-mc',
               help='Snippy - minimum site depth to for calling alleles.', 
               default='10')
+@click.option('--tree_builder', '-tb',
+              default='fasttree',
+              help='The tree builder to use, default is \'fasttree\'',
+              type=click.Choice(['fasttree', 'iqtree']))
+@click.option('--cluster',
+              is_flag=True, 
+              help='Set if you want to do heirarchical clustering.')
+@click.option('--cluster_method', '-cm',
+              help='The clustering method to use, default is \'single-linkage\'', 
+              type=click.Choice(['single-linkage', 'average', 'complete', 'centroid', 'median', 'ward', 'weighted']),
+              default='single-linkage')
+@click.option('--cluster_threshold', '-ct',
+              help='Comma separated list of thresholds to use for clustering, default is \'10\'',
+              type=str, 
+              default=10)
 @click.option('--workdir', '-w',
               default=pathlib.Path.cwd().absolute(), 
               help='The directory where Bohra will be run, default is current directory', 

@@ -1,7 +1,7 @@
 import click
 
 
-from bohra.scripts.InstallDeps import install_dependencies
+from bohra.launcher.InstallDeps import install_dependencies
 
 @click.command()
 @click.option('--prefix','-p',

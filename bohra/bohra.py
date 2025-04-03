@@ -27,10 +27,12 @@ from bohra.commands.pipelines.snps import snps
 from bohra.commands.pipelines.amr_typing import amr_typing
 from bohra.commands.pipelines.ska import ska
 from bohra.commands.pipelines.full import full
+from bohra.commands.pipelines.custom import custom
+from bohra.commands.pipelines.tb import tb
 from bohra.commands.check import check
 from bohra.commands.install import install 
 from bohra.commands.generate_input import generate_input
-from bohra.commands.test import test
+from bohra.commands.test import bohratest
 
 
 def _show_usage_error(self, file=None):
@@ -58,7 +60,7 @@ def run():
 cli.add_command(check.check)
 cli.add_command(install.install_deps)
 cli.add_command(generate_input.generate_input)
-cli.add_command(test.test)
+cli.add_command(bohratest.test)
 
 run.add_command(preview.preview)
 run.add_command(assemble.assemble)
@@ -67,6 +69,8 @@ run.add_command(default.default)
 run.add_command(amr_typing.amr_typing)
 run.add_command(ska.ska)
 run.add_command(full.full)
+run.add_command(custom.custom)
+run.add_command(tb.tb)
 
 
 if __name__ == '__main__':

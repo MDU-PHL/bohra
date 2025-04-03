@@ -7,12 +7,6 @@ import os
 @click.option('--reads', '-r',
               help='Path to reads file, which is a tab-delimited with 3 columns <isolatename>  <path_to_read1> <path_to_read2>.',
               default='')
-@click.option('--reference', '-ref', 
-              help='Path to reference (.gbk or .fa)', 
-              default='')
-@click.option('--mask', '-m', 
-              default='', 
-              help='Path to mask file if used (.bed)')
 @click.option('--kraken_db', '-k',
               default=os.getenv("KRAKEN2_DEFAULT_DB", ''),
               metavar='KRAKEN2_DEFAULT_DB',
@@ -46,24 +40,21 @@ import os
 @click.option('--cluster_threshold', '-ct',
               help='Comma separated list of thresholds to use for clustering, default is \'10\'',
               type=str, 
-              default='10')
-@click.option('--workdir', '-w',
-              default=pathlib.Path.cwd().absolute(), 
-              help='The directory where Bohra will be run, default is current directory', 
-              type=click.Path(exists=True))
+              default='5,12,20')
 @click.option('--tree_builder', '-tb',
               default='fasttree',
               help='The tree builder to use, default is \'fasttree\'',
               type=click.Choice(['fasttree', 'iqtree']))
+@click.option('--workdir', '-w',
+              default=pathlib.Path.cwd().absolute(), 
+              help='The directory where Bohra will be run, default is current directory', 
+              type=click.Path(exists=True))
 @click.option('--no_phylo',
               is_flag=True, 
               help='Set if you do NOT want to generate a phylogentic tree.')
 @click.option('--conda_path',       
               default=pathlib.Path(os.getenv('CONDA_PREFIX', '')), 
               help='The path to where your pre-installed conda envs are stored, defaults to installing conda envs in your work directory. This can be provided in your profiles settings as well - it assumes you have pre-configured all of your conda environments for each process run by bohra, this is an advanced setting. Please take care.')
-@click.option('--gubbins',
-              is_flag=True, 
-              help='Set to use gubbins for recombination correction.')
 @click.option('--keep',
               default='N', 
               type=click.Choice(['Y', 'N']), 
@@ -83,8 +74,8 @@ import os
 @click.option('--profile',
               default=f"", 
               help='The resource profile to use. Defaults to local, if using an alternative config file, this value should represent the name of a profile provided')
-def snps():
+def tb():
     """
-    Run bohra for snp detection +/- phylogeny
+    Run a Mtb pipeline using Bohra. This pipeline will run a series of steps to generate a phylogenetic tree and report for the provided reads.
     """
-    print("Running preview...")
+    print("Running bohra tb...")

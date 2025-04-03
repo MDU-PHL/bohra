@@ -4,7 +4,7 @@
 # possible installations that the user has.
 
 ENV_PREFIX=$1
-# UPDATE=$1
+UPDATE=$2
 # abort if any step fails
 set -e
 # resets to base env

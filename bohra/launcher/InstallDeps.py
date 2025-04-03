@@ -1,5 +1,5 @@
 
-from bohra.scripts.Utils import CustomFormatter
+from bohra.launcher.Utils import CustomFormatter
 
 import logging
 import subprocess
