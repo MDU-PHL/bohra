@@ -1,7 +1,7 @@
 import pathlib
 import datetime
 import logging
-from bohra.scripts.Utils import CustomFormatter, _check_path
+from bohra.launcher.Utils import CustomFormatter, _check_path
 # Logger
 # Logger
 LOGGER =logging.getLogger(__name__) 
@@ -17,53 +17,52 @@ LOGGER.addHandler(ch)
 LOGGER.addHandler(fh)
 
 
-class SetupInputFiles(object):
-    def __init__(self, 
-                 
-                 ):
-
-        self.read_path = args.read_path
-        self.isolate_list = args.isolate_list
-        self.now = datetime.datetime.today().strftime("%d_%m_%y_%H")
-        self.day = datetime.datetime.today().strftime('%Y-%m-%d')
-
-    def _check_path(self,path):
-
-        """
-        Check if path provided exists
-        :input - path to where reads/contigs/inputfile are
-        :output - boolean 
-        """
-        LOGGER.info(f"Checking for {path}")
-        if pathlib.Path(path).exists():
-            LOGGER.info(f"{path} exists.")
-            return True
-        else:
-            LOGGER.critical(f"Path provided : {path} does not exist - please try again.")
-            return False
-        
-   
+CFG = {
+    "reads": {
+        "ext":"*.f*q.gz",
+        "num_expected":2,
+    },
+    "pe-reads": {
+        "ext":"*.f*q.gz",
+        "num_expected":2
+    },
+    "se-reads": {
+        "ext":"*.f*q*",
+        "num_expected":1
+    },
+    "ont": {
+        "ext":"*.f*q*",
+        "num_expected":1
+    },
+    "asm": {
+        "ext":"*.f*a",
+        "num_expected":1
+    }
+}
+  
     
-    def _get_isolate_list(self, _dir,  ext= f"*.f*q.gz"):
+def _get_isolate_list(_dir: pathlib.Path,
+                      isolates: list, 
+                      ext: str = f"*.f*q.gz") -> list:
+    """
+    Retrieve a list of unique isolate names from files in the specified directory.
 
-        all_data = sorted(_dir.rglob(ext))
-
-        iso_found = set()
-
-        for reads in all_data:
-            nme = reads.name.split('_')[0]
-
-            iso_found.add(nme)
-        
-        LOGGER.info(f"Found {len(list(iso_found))} distinct sample names at path {_dir}")
-        return list(iso_found)
+    :param _dir: Path to the directory containing the files.
+    :param isolates: A list of isolate names to filter the results. If empty, all isolates are returned.
+    :param ext: File extension pattern to search for (default is "*.f*q.gz").
+    :return: A list of unique isolate names found in the directory.
+    """
+    iso_found = _get_isolate_list(_dir=_dir, ext="*.f*q.gz")
     
-    
+    all_data = sorted(_dir.rglob(ext))
 
-def _glob_reads(self, _dir, isolates):
+    iso_found = set()
 
-    iso_found = self._get_isolate_list(_dir = _dir, ext = "*.f*q.gz")
-    
+    for reads in all_data:
+        nme = reads.name.split('_')[0]
+
+        iso_found.add(nme)
+
     isolist = []
     if isolates != []:
 
@@ -73,45 +72,48 @@ def _glob_reads(self, _dir, isolates):
                     isolist.append(i)
     else:
         isolist = iso_found
-
-    lines = []
-
-    for iso in isolist:
-
-        reads = sorted(_dir.rglob(f"*{iso}*.f*q.gz"))
-        if len(reads) == 2:
-            LOGGER.info(f"Now add reads for {iso}")
-            lines.append(f"{iso}\t{reads[0]}\t{reads[1]}")
-        elif len(reads) <2:
-            LOGGER.warning(f"There do not appear to be 2 reads for {iso}. Skipping")
-        else:
-            LOGGER.warning(f"There appear to be more than 2 reads available for {iso}. Skipping")
-    if lines != []:
-        LOGGER.info(f"Saving reads file as isolates.tab")
-        pathlib.Path('isolates.tab').write_text('\n'.join(lines))
-    else:
-        LOGGER.warning(f"It appears that no reads have been found. Please check your input and try again.")
     
-    return True
+    LOGGER.info(f"Found {len(list(iso_found))} distinct sample names at path {_dir}")
+    return list(iso_found)
+
+def _glob_sequences(_dir: pathlib.Path, 
+                    isolates: list, 
+                    sequence_type: str) -> bool:
+    """
+    Process and validate sequence files for the specified sequence type.
+
+    :param _dir: Path to the directory containing sequence files.
+    :param isolates: A list of isolate names to filter the results.
+    :param sequence_type: Type of sequence data to process (e.g., 'reads', 'asm').
+    :return: True if processing is successful, otherwise raises an error.
+    """
+    if sequence_type in CFG:
+        isolist = _get_isolate_list(_dir=_dir, isolates=isolates, ext=CFG[sequence_type]["ext"])
+
+        lines = []
+
+        for iso in isolist:
+            reads = sorted(_dir.rglob(f"*{iso}*.f*q.gz"))
+            if len(reads) == CFG[sequence_type]['num_expected']:
+                LOGGER.info(f"Now add reads for {iso}")
+                lines.append(f"{iso}\t{reads[0]}\t{reads[1]}")
+            elif len(reads) < CFG[sequence_type]['num_expected']:
+                LOGGER.warning(f"There do not appear to be {CFG[sequence_type]['num_expected']} reads for {iso}. Skipping")
+            else:
+                LOGGER.warning(f"There appear to be more than {CFG[sequence_type]['num_expected']} reads available for {iso}. Skipping")
+        if lines != []:
+            LOGGER.info(f"Saving reads file as isolates.tab")
+            pathlib.Path(f"{sequence_type}.tab").write_text('\n'.join(lines))
+        else:
+            LOGGER.warning(f"It appears that no reads have been found. Please check your input and try again.")
+        
+        return True
+    else:
+        LOGGER.critical(f"An error has occurred somewhere - {sequence_type} is not a valid type of input data.")
+        raise SystemExit
 
         
-def _glob_data(path, isolates =[], data_type = 'reads'):
-
-    """
-    glob path provided for data
-    :input - path provided.
-                data type (reads or contigs - default to reads)
-                
-    :output - list of data
-    """
-
-    _dir = pathlib.Path(path).resolve()
-
-    if data_type == 'reads':
-
-        _glob_reads(_dir = _dir, isolates= isolates)
-
-def _extract_isolates(isolate_ids):
+def _extract_isolates(isolate_ids:str):
     """
     Extract isolates from isolate_ids file
     :input - path to isolate_ids file
@@ -123,12 +125,10 @@ def _extract_isolates(isolate_ids):
     return isolates
 
     
-def find_data( reads,
-                contigs,
-                isolate_ids,
-                path):
-
-
+def find_data( reads:bool,
+                contigs:bool,
+                isolate_ids:str,
+                path:str):
     """
     Find data in the path provided
     :input - path to reads/contigs
@@ -144,7 +144,7 @@ def find_data( reads,
             isolates = _extract_isolates(isolate_file= isolate_ids) if _check_path(isolate_ids) else []
         else:
             isolates = []
-        _glob_data(path = path, isolates= isolates, datatype = 'reads' if reads else 'contigs')
+        _glob_sequences(path = path, isolates= isolates, sequence_type = 'reads' if reads else 'asm')
     else:
         LOGGER.critical(f"There seems to be a problem with your read path. Please provide a valid path to the reads you wish to include")
         raise SystemExit
