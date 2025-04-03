@@ -83,18 +83,40 @@ for key in "${!TOOLS[@]}";do
                 echo "will install $key from github"
                 conda activate $key && \
                 pip3 install 'git+https://github.com/MDU-PHL/salmonella_typing'
-                continue
+                # continue
             fi
             if [[ "$key" == "$ENV_PREFIX-mob_suite" ]]; then
                 echo "will need to add in db download $key"
                 echo "Will now initialise the mob_suite databases"
                 conda activate $key && \
                 mob_init
-                continue
+                # continue
             fi
         else
             echo $key is already setup. Nothing left to do
         fi
-    continue
+    # continue
     
     done
+
+if [[ -z $KRAKEN2_DEFAULT_DB ]]; then
+  
+  echo KRAKEN2_DEFAUT_DB is undefined. Would you like to download babykraken database?
+  read -p "Download babykraken (10MB) (Y/N)? " download
+    if [ "$download" != "${download#[Yy]}" ] ;then 
+    
+        echo Downloading babykraken now.
+        curl -L https://github.com/MDU-PHL/babykraken/blob/master/dist/babykraken.tar.gz?raw=true | tar xz
+        echo babykraken has been downloaded. Please use --kraken_db $(pwd)/babykraken to run kraken2
+        
+    else
+        
+        echo Okey dokey .. hopefully you remember to provide a kraken path when you run bohra
+    fi
+
+   
+fi
+
+echo The dependencies for bohra are installed in your default conda path - go forth and analyse!!
+
+echo Please contact us at https://github.com/MDU-PHL/bohra for any issues or concerns
