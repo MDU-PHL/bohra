@@ -33,7 +33,7 @@ process SKA_BUILD {
     tuple val(meta), path(sequence)
 
     output:
-    tuple val(meta), path("${meta.id}.skf"), emit: sketch
+    tuple val(meta), path("${meta.id}.skf"), emit: skf
 
     script:
     input_files = meta.pe_reads ? "$sequence[0]\t$sequence[0]" : sequence
