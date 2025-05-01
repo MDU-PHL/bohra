@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
 
-include { SNIPPY } from './../modules/snippy/main' 
+include { RUN_SNPS } from './../subworkflows/snippy' 
 include { SNIPPY_CORE } from './../modules/snippy_core/main' 
 include { SNP_DISTS } from './../modules/snp_dists/main' 
 include { SNIPPY_QC } from './../modules/collation/main' 
@@ -16,8 +16,22 @@ workflow RUN_SNPS {
         reads
         reference
     main:
-
+        if ( params.modules.contains("snippy") ){
+            SNIPPY ( reads.combine( reference ) )  
+            SNIPPY_QC ( SNIPPY.out.aln )
+            alns =  SNIPPY.out.aln.map { cfg, aln -> aln.getParent() }.collect()
+        } else {
+            alns = reads
+        }
     // will import from subworkflows based on the modules selected
+    // ska
+    // snippy 
+    // trees
+    // dists
+    // clusters
+    // stats - where applicable
+
+    
         
     // emit:
         

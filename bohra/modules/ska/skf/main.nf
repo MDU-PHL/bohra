@@ -4,14 +4,12 @@ include { initOptions; saveFiles; getSoftwareName } from './functions'
 params.options = [:]
 def options    = initOptions(params.options)
 
-module_dir = moduleDir + "/bin"
-
-
-process SKA_DISTANCE {
-
+process SKA_BUILD {
+    tag "$meta.id"
     label 'process_medium'
-    publishDir "${params.outdir}/report",
-        mode: params.publish_dir_mode
+    publishDir "${params.outdir}",
+        mode: params.publish_dir_mode,
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     
     
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/mash" : 'mash') : null) 
@@ -20,26 +18,28 @@ process SKA_DISTANCE {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-ska2"
         } else {
-            conda 'ska pandas'
+            conda 'ska2'
         }
     } else {
         conda null
     }
 
-    cache 'lenient'
     scratch true
     
+    cache 'lenient'
+    
+
     input:
-    val(merged_skf)
+    tuple val(meta), path(sequence)
 
     output:
-    path('ska_distance.tsv'), emit: distance_long
-    path('ska_distance_matrix.tsv'), emit: matrix
+    tuple val(meta), path("${meta.id}.skf"), emit: sketch
 
     script:
+    input_files = meta.pe_reads ? "$sequence[0]\t$sequence[0]" : sequence
     """
-    ska distance -m ${params.ska_min-freq} $merged_skf > ska_distance.tsv 
-    ${module_dir}/make_matrix.py ska_distance.tsv
+    echo -e "$meta.id\t$input_files" > tmp.tsv
+    ska build -f tmp.csv -k $params.ska2_kszise -o $meta.id
     """
-        
+    
 }

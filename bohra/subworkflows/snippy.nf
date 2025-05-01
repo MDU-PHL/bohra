@@ -4,10 +4,10 @@ include { SNIPPY } from './../modules/snippy/main'
 include { SNIPPY_CORE } from './../modules/snippy_core/main' 
 include { SNP_DISTS } from './../modules/snp_dists/main' 
 include { SNIPPY_QC } from './../modules/collation/main' 
-// include { GUBBINS } from './../modules/gubbins/main' 
+include { GUBBINS } from './../modules/gubbins/main' 
 include { SNIPPY_CLEAN } from './../modules/snippy_clean/main' 
-include { IQTREE } from './../modules/iqtree/main' 
 include { CSVTK_CONCAT } from './../modules/csvtk/main'
+include { CORE_SNP_FILTER } from './../modules/core_snp_filter/main'
 
 
 workflow RUN_SNPS {
@@ -21,7 +21,8 @@ workflow RUN_SNPS {
         SNIPPY_QC ( SNIPPY.out.aln )
         alns =  SNIPPY.out.aln.map { cfg, aln -> aln.getParent() }.collect()
         SNIPPY_CORE ( alns, reference )  
-        core_aln =  SNIPPY_CORE.out.core_aln
+        CORE_SNP_FILTER ( SNIPPY_CORE.out.core_full_aln )
+        core_aln =  CORE_SNP_FILTER.out.aln
         core_full_aln = SNIPPY_CORE.out.core_full_aln
         SNIPPY_CLEAN ( core_full_aln )
         cleaned_aln = SNIPPY_CLEAN.out.cleaned
