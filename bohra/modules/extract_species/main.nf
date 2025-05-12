@@ -6,7 +6,7 @@ module_dir = moduleDir + "/bin"
 params.options = [:]
 def options    = initOptions(params.options)
 
-process KRAKEN2 {
+process EXTRACT_SPECIES {
     tag "$meta.id"
     label 'process_high'
     publishDir "${params.outdir}",
@@ -15,34 +15,27 @@ process KRAKEN2 {
     
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/bohra-kraken2"
+            conda "${params.conda_path}/bohra-sylph"
         } else {
-            conda 'kraken2=2.1.2'
+            conda 'sylph pandas'
         }
     } else {
         conda null
     }
     cache 'lenient'
-    // scratch true
+    scratch true
     
     input:
-    tuple val(meta), path(sequences)
-    
+    tuple val(meta), path(species_obs)
+    val(tool)
 
     output:
-    tuple val(meta), path('kraken2.tab'), emit: species_raw
-    tuple val(meta), path('species.txt'), emit: species
+    tuple val(meta), stdout, emit: extracted_species
+    
 
     script:
-    def input_file = meta.input_type != "pe_reads" ?"$sequences" : "--paired ${sequences[0]} ${sequences[1]}"
+    
     """
-    kraken2  $input_file \
-    --threads $task.cpus \
-    --report kraken2.tab \
-    --output - \
-    -db $params.kraken2_db \
-    --memory-mapping 2> /dev/null
-
-    $module_dir/collate_kraken2.py $meta.id kraken2.tab species.txt
+    $module_dir/wrangle_file.py $tool $species_obs
     """
 }

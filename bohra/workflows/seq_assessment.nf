@@ -12,8 +12,7 @@ workflow READ_ANALYSIS {
 
     take:
         reads_pe
-        // asm
-        // contigs
+        
         
     main:
         
@@ -23,10 +22,11 @@ workflow READ_ANALYSIS {
         COMBD = SEQKIT_STATS.out.stats.join( SEQKIT_GC.out.stats )
         COMBD = COMBD.join( KMC.out.genome_size )
         COLLATE_STATS_ISOLATE ( COMBD )
-
-        // COLLATE_SEQS ( COLLATE_STATS_ISOLATE.out.read_assessment.map { cfg, stats -> stats }.collect() )
+        seq_stats = COLLATE_STATS_ISOLATE.out.read_assessment.map { cfg, seq -> seq }.collect()
+        seq_stats = seq_stats.map { files -> tuple("read_assessment", files) }
+        CSVTK_CONCAT ( seq_stats )
     emit:
-        read_stats  = COLLATE_STATS_ISOLATE.out.read_assessment
+        read_stats  = CSVTK_CONCAT.out.collated
         
 
 }
@@ -41,14 +41,14 @@ workflow ASSEMBLY_ANALYSIS {
         SEQKIT_GC ( contigs )
         SEQKIT_STATS ( contigs )
         PROKKA ( contigs )
-        APS = RUN_PROKKA.out.prokka_txt.join( SEQKIT_STATS.out.stats )
+        APS = PROKKA.out.prokka_txt.join( SEQKIT_STATS.out.stats )
         COLLATE_ASM ( APS )
-        // asm_stats = CSVTK_CONCAT ( COLLATE_ASM.out.assembly.map { cfg, asm -> asm }.collect().map { files -> tuple("assembly", files)} )
+        asm_stats = COLLATE_ASM.out.assembly.map { cfg, asm -> asm }.collect()
+        asm_stats = asm_stats.map { files -> tuple("assembly_assesment", files) }
         
+        CSVTK_CONCAT ( asm_stats )
     emit:
-        // contigs
-        assembly_stats = COLLATE_ASM.out.assembly
-        gff = RUN_PROKKA.out.gff
-        prokka_txt = RUN_PROKKA.out.prokka_txt
+        assembly_stats = CSVTK_CONCAT.out.collated
+        
         
 }

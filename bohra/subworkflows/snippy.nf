@@ -40,7 +40,7 @@ workflow RUN_SNPS {
         
         dists = SNP_DISTS.out.distances
         aln = core_aln
-        core_full_aln = core_full_aln
+        // core_full_aln = core_full_aln
         // cleaned_aln = cleaned_aln
         stats = all_core_stats
         clusters = SNP_CLUSTER.out.clusters

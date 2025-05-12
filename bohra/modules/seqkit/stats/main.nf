@@ -38,13 +38,13 @@ process SEQKIT_STATS {
 
     script:
     def input_type = options.args2
-    if ( input_type == 'contigs'){
+    if ( input_type == 'asm'){
     """
-    cat $input_files | seqkit stats --all -T  > assembly_statistics.txt
+    cat $input_files | seqkit stats --all -T -i ${meta.id} > assembly_statistics.txt
     """
     } else {   
     """
-    cat ${input_files[0]} ${input_files[1]} | seqkit stats -T --all > read_statistics.txt
+    cat ${input_files[0]} ${input_files[1]} | seqkit stats -T -i ${meta.id} --all > read_statistics.txt
     """ 
     }
     

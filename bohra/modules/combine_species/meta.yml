@@ -1,0 +1,62 @@
+name: kraken2
+description: Use kraken2 to indentify species from single or paired end reads
+keywords:
+  - speciation
+  - kraken2
+tools:
+  - kraken2:
+      description: |
+        The second version of the Kraken taxonomic sequence classification system
+      documentation: https://github.com/DerrickWood/kraken2
+      doi: https://doi.org/10.1186/s13059-019-1891-0
+params:
+  - outdir:
+      type: string
+      description: |
+        The pipeline's output directory. By default, the module will
+        output files into `$params.outdir/<SOFTWARE>`
+  - publish_dir_mode:
+      type: string
+      description: |
+        Value for the Nextflow `publishDir` mode parameter.
+        Available: symlink, rellink, link, copy, copyNoFollow, move.
+  - enable_conda:
+      type: boolean
+      description: |
+        Run the module with Conda using the software specified
+        via the `conda` directive
+  - singularity_pull_docker_container:
+      type: boolean
+      description: |
+        Instead of directly downloading Singularity images for use with Singularity,
+        force the workflow to pull and convert Docker containers instead.
+
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - reads:
+      type: file
+      description: |
+        List of input FastQ files of size 1 and 2 for single-end and paired-end data,
+        respectively.
+
+output:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - report:
+      type: file
+      description: The report file from kraken2
+      pattern: "*.kraken2.tab"
+  - version:
+      type: file
+      description: File containing software version
+      pattern: "*.{version.txt}"
+authors:
+  - "@kristyhoran"
+  

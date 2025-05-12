@@ -1,6 +1,8 @@
 // Import generic module functions
 include { initOptions; saveFiles; getSoftwareName } from './functions'
 
+module_dir = moduleDir + "/bin"
+
 params.options = [:]
 def options    = initOptions(params.options)
 
@@ -40,6 +42,7 @@ process MLST {
     def exclude = params.mlst_exclude != '' ? "--exclude ${params.mlst_exclude}" : ""
     """
     mlst --json mlst.json --label $meta.id --nopath $contigs $_blast_db $_publst_db  $exclude > mlst.txt
+    $module_dir/add_header_mlst.py mlst.json
     """
     
 }

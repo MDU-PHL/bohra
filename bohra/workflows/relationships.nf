@@ -1,28 +1,43 @@
 #!/usr/bin/env nextflow
 
 include { RUN_SNPS } from './../subworkflows/snippy' 
-include { SNIPPY_CORE } from './../modules/snippy_core/main' 
-include { SNP_DISTS } from './../modules/snp_dists/main' 
-include { SNIPPY_QC } from './../modules/collation/main' 
-include { GUBBINS } from './../modules/gubbins/main' 
-include { SNIPPY_CLEAN } from './../modules/snippy_clean/main' 
-include { IQTREE } from './../modules/iqtree/main' 
-include { CSVTK_CONCAT } from './../modules/csvtk/main'
+include { RUN_SKA } from './../subworkflows/ska'
+include { MAKE_TREE } from './../subworkflows/trees'
 
-
-workflow RUN_SNPS {
+workflow RELATIONSHIPS {
 
     take:
         reads
         reference
     main:
         if ( params.modules.contains("snippy") ){
-            SNIPPY ( reads.combine( reference ) )  
-            SNIPPY_QC ( SNIPPY.out.aln )
-            alns =  SNIPPY.out.aln.map { cfg, aln -> aln.getParent() }.collect()
-        } else {
-            alns = reads
+            RUN_SNPS ( reads, reference )
+            dists = RUN_SNPS.out.dists
+            clusters = RUN_SNPS.out.clusters
+            stats = RUN_SNPS.out.stats
+            core_aln = RUN_SNPS.out.aln
+            core_full_aln = RUN_SNPS.out.core_full_al
+        } 
+        else if ( params.modules.contains("ska")) {
+            SKA ( reads )
+            dists = RUN_SKA.out.dists
+            clusters = RUN_SKA.out.clusters
+            stats = RUN_SKA.out.stats
+            core_aln = RUN_SKA.out.aln
+            
         }
+        if (params.tree_input == "snippy" & params.modules.contains("tree")) {
+            
+            MAKE_TREE ( RUN_SNPS.out.aln, RUN_SNPS.out.core_full_aln )
+            tree = MAKE_TREE.out.newick
+        } else if (params.tree_input == "ska" & params.modules.contains("tree")) {
+            MAKE_TREE ( RUN_SKA.out.aln )
+            tree = MAKE_TREE.out.newick
+        } else {
+            tree = Channel.empty()
+        }
+        
+        
     // will import from subworkflows based on the modules selected
     // ska
     // snippy 
@@ -33,11 +48,11 @@ workflow RUN_SNPS {
 
     
         
-    // emit:
+    emit:
         
-        // dists = SNP_DISTS.out.distances
-        // clusters = SNP_DISTS.out.clusters
-        // tree = tree
-        // core_stats = all_core_stats
+        dists 
+        clusters
+        tree 
+        stats 
 }
 

@@ -6,27 +6,6 @@ module_dir = moduleDir + "/bin"
 params.options = [:]
 def options    = initOptions(params.options)
 
-process COLLATE_KRAKEN2_ISOLATE {
-    tag "$meta.id"
-    label 'process_medium'
-    publishDir "${params.outdir}",
-        mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
-    cache 'lenient' 
-    
-    input:
-    tuple val(meta), path(kraken2)
-    
-    output:
-    tuple val(meta), path('species.txt'), emit: species
-
-    script:
-    def prefix   = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
-    """
-    $module_dir/collate_kraken2.py $meta.id $kraken2 species.txt
-    """
-    
-}
 
 process COLLATE_STATS_ISOLATE {
     
