@@ -39,18 +39,16 @@ workflow RUN_SPECIES_ASM {
     take:
         sequences
     main:
-        
+        species = sequences.map { cfg, files -> tuple(cfg, "no_results") }
+        species_raw = sequences.map { cfg, files -> tuple(cfg, "no_results") }
+        species_obs = sequences.map { cfg, files -> tuple(cfg, "no_results") }
         if ( params.use_kraken2 ) {
             RUN_KRAKEN ( sequences )
             species_raw = RUN_KRAKEN.out.species_raw
             species = RUN_KRAKEN.out.species
             species_obs = RUN_KRAKEN.out.species_obs
             
-        } else {
-            species = sequences.map { cfg, files -> tuple(cfg, "no_results") }
-            species_raw = sequences.map { cfg, files -> tuple(cfg, "no_results") }
-            species_obs = sequences.map { cfg, files -> tuple(cfg, "no_results") }
-        }
+        } 
 
     //    println species_obs.view()
         
@@ -75,19 +73,28 @@ workflow COMBINE_SPECIES {
         
         sp_res = reads_results.map { cfg,species -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, species.trim() ) }
         asm_res = asm_results.map { cfg,species -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, species.trim() ) }
-        observed_species =  asm_res.join( sp_res ).map { key, cfg_asm, species_obs_asm, cfg_reads, species_obs_reads -> tuple(cfg_reads, species_obs_reads,species_obs_asm ) }
+        
+        observed_species =  sp_res.join(asm_res, remainder:true).map( v -> { v.size() == 4 ? v[1..3] : [v[1],v[2],v[4]]} )
+                                                                 .map { cfg, species_reads, species_asm -> tuple(cfg, species_reads ? species_reads : 'no_results', species_asm ? species_asm: 'no_results') }
+        println observed_species.view()
+    //                 // .map { key, cfg_asm, species_obs_asm, cfg_reads, species_obs_reads -> tuple(cfg_reads, species_obs_reads,species_obs_asm ) }
+    //     // .map { key, cfg_asm, species_obs_asm, cfg_reads, species_obs_reads -> tuple(cfg_reads, species_obs_reads,species_obs_asm ) }
+    //     // println observed_species.view()
         COMBINE_SPECIES_VALS ( observed_species )
         species_obs = COMBINE_SPECIES_VALS.out.extracted_species
-        reads_results = reads_result_file.map { cfg,file -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, file ) }
-        asm_results = asm_result_file.map { cfg,file -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, file ) }
-        species = reads_results.join( asm_results )
-                    .map { key, cfg_reads, file_reads, cfg_asm, file_asm -> tuple(cfg_reads, file_reads, file_asm) }
+        reads_results_files = reads_result_file.map { cfg,file -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, file ) }
+        asm_results_files = asm_result_file.map { cfg,file -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, file ) }
+        species = reads_results_files.join( asm_results_files, remainder: true )
+                    .map( v -> { v.size() == 4 ? v[1..3] : [v[1],v[2],v[4]]} )
+                    .map { cfg, species_reads, species_asm -> tuple(cfg, species_reads ? species_reads : 'no_results', species_asm ? species_asm: 'no_results') }
+        println species.view()
+        
         COMBINE_SPECIES_REPORT ( species )
         species_report = COMBINE_SPECIES_REPORT.out.species_report
 
         species_stats = species_report.map { cfg, sp -> sp }.collect()
         species_stats = species_stats.map { files -> tuple("speciation", files) }
-        println species_stats.view()
+        // println species_stats.view()
         CSVTK_CONCAT ( species_stats )
 
 

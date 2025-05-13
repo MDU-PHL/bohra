@@ -17,9 +17,9 @@ workflow RELATIONSHIPS {
             clusters = RUN_SNPS.out.clusters
             stats = RUN_SNPS.out.stats
             core_aln = RUN_SNPS.out.aln
-            core_full_aln = RUN_SNPS.out.core_full_al
+            core_full_aln = RUN_SNPS.out.core_full_aln
         } 
-        else if ( params.modules.contains("ska")) {
+        else if ( params.modules.contains("ska") ) {
             // add in a join to combine reads and asm
             SKA ( reads )
             dists = RUN_SKA.out.dists

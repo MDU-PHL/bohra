@@ -20,7 +20,7 @@ workflow MAKE_TREE {
             VERYFASTTREE ( core_aln )
             tree = VERYFASTTREE.out.newick
         }
-        tree = tree.ifEmpty( 'not_available' )`
+        tree = tree.ifEmpty( 'not_available' )
     emit:
         
         tree = tree

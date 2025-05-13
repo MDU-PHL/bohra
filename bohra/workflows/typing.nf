@@ -35,7 +35,7 @@ workflow RUN_TYPING {
         inferreds = inferreds.map { files -> tuple("inferred_antibiogram", files) }
         reportables = RUN_ABRITAMR.out.abritamr_reportable.map{ cfg, file -> file}.collect()
         reportables = reportables.map { files -> tuple("reportable_amr_genes", files) }
-        println plasmids.view()
+        // println plasmids.view()
         resistome = CONCAT_RESISTOMES ( resistomes )
         virulome = CONCAT_VIRULENCE ( virulences )
         plasmid = CONCAT_PLASMID ( plasmids )

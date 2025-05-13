@@ -59,6 +59,7 @@ include { READ_ANALYSIS;ASSEMBLY_ANALYSIS } from './workflows/seq_assessment'
 include { RUN_ASSEMBLE } from './workflows/assemble'
 include { RUN_SPECIES_READS; RUN_SPECIES_ASM; COMBINE_SPECIES } from './workflows/species'
 include { RUN_TYPING } from './workflows/typing'
+include { RELATIONSHIPS } from './workflows/relationships'
 
 workflow {
     // Sequence assessment for reads and assemblies
@@ -98,10 +99,14 @@ workflow {
         
         RUN_SPECIES_READS ( reads_pe )
         RUN_SPECIES_ASM ( asm )
+        
         reads_species_obs = RUN_SPECIES_READS.out.species_obs
         asm_species_obs = RUN_SPECIES_ASM.out.species_obs
-        
-
+        // println asm_species_obs.view()
+        // println reads_species_obs.view()
+        sp_res = reads_species_obs.map { cfg,species -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, species.trim() ) }
+        asm_res = asm_species_obs.map { cfg,species -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, species.trim() ) }
+        println sp_res.join(asm_res, remainder:true).map( v -> { v.size() == 4 ? v[1..3] : [v[1],v[2],v[4]]} ).view()
         COMBINE_SPECIES ( 
             RUN_SPECIES_READS.out.species_obs, 
             RUN_SPECIES_READS.out.species,
@@ -110,27 +115,46 @@ workflow {
             )
         
        
-        species_tmp = COMBINE_SPECIES.out.species_obs
-                                            .map { cfg, species_obs -> tuple(cfg.id, cfg, species_obs.trim() ) }
-        reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
-        reads_pe = reads.join( species_tmp )
-                                .map { id, cfg_reads, files, cfg_spieces,  species_obs -> tuple(cfg_reads + [species:species_obs.trim()] , files) }
+        // species_tmp = COMBINE_SPECIES.out.species_obs
+        //                                     .map { cfg, species_obs -> tuple(cfg.id, cfg, species_obs.trim() ) }
+        // reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
+        // reads_pe = reads.join( species_tmp )
+        //                         .map { id, cfg_reads, files, cfg_spieces,  species_obs -> tuple(cfg_reads + [species:species_obs.trim()] , files) }
                             
-        asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
-        asm = asm_tmp.join( species_tmp )
-                                .map { id, cfg_asm, files, cfg_spieces, species_obs -> tuple(cfg_asm + [species:species_obs.trim()] , files) }
+        // asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
+        // asm = asm_tmp.join( species_tmp )
+        //                         .map { id, cfg_asm, files, cfg_spieces, species_obs -> tuple(cfg_asm + [species:species_obs.trim()] , files) }
         
-        // generate summay file for species
-        species_report = COMBINE_SPECIES.out.species_summary
-        results = results.concat( species_report )
+        // // generate summay file for species
+        // species_report = COMBINE_SPECIES.out.species_summary
+        // results = results.concat( species_report )
         
     }
     
     if (params.modules.contains("typing") ){
         // assembly is only done if the input is reads
         RUN_TYPING ( asm, reads_pe )
-       
+        resistome = RUN_TYPING.out.resistome
+        virulome = RUN_TYPING.out.virulome
+        plasmid = RUN_TYPING.out.plasmid
+        inferred = RUN_TYPING.out.inferred.ifEmpty { "no_results" }
+        reportable = RUN_TYPING.out.reportable
+        serotypes = RUN_TYPING.out.serotypes
+        mlst = RUN_TYPING.out.mlst
+        results = results.concat( resistome )
+        results = results.concat( virulome )
+        results = results.concat( plasmid )
+        results = results.concat( inferred )
+        results = results.concat( reportable )
+        results = results.concat( serotypes )
+        results = results.concat( mlst )
+    }
+
+    if (params.modules.contains("snippy") || (params.modules.contains("ska"))){
         
+        reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
+        asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
+
     }
 
     // snps  

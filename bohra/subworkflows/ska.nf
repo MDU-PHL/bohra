@@ -4,7 +4,7 @@ include { SKA_ALIGN } from './../modules/ska/align/main'
 include { SKA_DISTANCE } from './../modules/ska/distance/main' 
 include { SKA_MERGE } from './../modules/ska/merge/main' 
 include {SKA_BUILD} from './../modules/ska/skf/main'
-inlcude { SNP_CLUSTER } from './../modules/cluster/main'
+include { SNP_CLUSTER } from './../modules/cluster/main'
 
 workflow RUN_SKA {
     take:
