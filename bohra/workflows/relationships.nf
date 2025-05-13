@@ -7,12 +7,11 @@ include { MAKE_TREE } from './../subworkflows/trees'
 workflow RELATIONSHIPS {
 
     take:
-        reads
-        asm
+        sequences
         reference
     main:
         if ( params.modules.contains("snippy") ){
-            RUN_SNPS ( reads, reference )
+            RUN_SNPS ( sequences, reference )
             dists = RUN_SNPS.out.dists
             clusters = RUN_SNPS.out.clusters
             stats = RUN_SNPS.out.stats
@@ -21,7 +20,7 @@ workflow RELATIONSHIPS {
         } 
         else if ( params.modules.contains("ska") ) {
             // add in a join to combine reads and asm
-            SKA ( reads )
+            SKA ( sequences )
             dists = RUN_SKA.out.dists
             clusters = RUN_SKA.out.clusters
             stats = RUN_SKA.out.stats

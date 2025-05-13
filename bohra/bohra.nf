@@ -27,7 +27,7 @@ input_file = file(params.isolates) // need to make this an input file
     reader =   input_file.newReader()
     reader.eachLine { line ->
     line = line.split("\t")
-        println "The line is : $line"
+        // println "The line is : $line"
         samples[line[0]] = line[1]
         asms[line[0]] = line[2]
         asmblr[line[0]] = line[3]
@@ -106,7 +106,7 @@ workflow {
         // println reads_species_obs.view()
         sp_res = reads_species_obs.map { cfg,species -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, species.trim() ) }
         asm_res = asm_species_obs.map { cfg,species -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, species.trim() ) }
-        println sp_res.join(asm_res, remainder:true).map( v -> { v.size() == 4 ? v[1..3] : [v[1],v[2],v[4]]} ).view()
+        // println sp_res.join(asm_res, remainder:true).map( v -> { v.size() == 4 ? v[1..3] : [v[1],v[2],v[4]]} ).view()
         COMBINE_SPECIES ( 
             RUN_SPECIES_READS.out.species_obs, 
             RUN_SPECIES_READS.out.species,
@@ -115,19 +115,19 @@ workflow {
             )
         
        
-        // species_tmp = COMBINE_SPECIES.out.species_obs
-        //                                     .map { cfg, species_obs -> tuple(cfg.id, cfg, species_obs.trim() ) }
-        // reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
-        // reads_pe = reads.join( species_tmp )
-        //                         .map { id, cfg_reads, files, cfg_spieces,  species_obs -> tuple(cfg_reads + [species:species_obs.trim()] , files) }
+        species_tmp = COMBINE_SPECIES.out.species_obs
+                                            .map { cfg, species_obs -> tuple(cfg.id, cfg, species_obs.trim() ) }
+        reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
+        reads_pe = reads.join( species_tmp )
+                                .map { id, cfg_reads, files, cfg_spieces,  species_obs -> tuple(cfg_reads + [species:species_obs.trim()] , files) }
                             
-        // asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
-        // asm = asm_tmp.join( species_tmp )
-        //                         .map { id, cfg_asm, files, cfg_spieces, species_obs -> tuple(cfg_asm + [species:species_obs.trim()] , files) }
+        asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
+        asm = asm_tmp.join( species_tmp )
+                                .map { id, cfg_asm, files, cfg_spieces, species_obs -> tuple(cfg_asm + [species:species_obs.trim()] , files) }
         
-        // // generate summay file for species
-        // species_report = COMBINE_SPECIES.out.species_summary
-        // results = results.concat( species_report )
+        // generate summay file for species
+        species_report = COMBINE_SPECIES.out.species_summary
+        results = results.concat( species_report )
         
     }
     
@@ -152,8 +152,25 @@ workflow {
 
     if (params.modules.contains("snippy") || (params.modules.contains("ska"))){
         
-        reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
-        asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
+        if (params.modules.contains("snippy") ){
+            sequences = reads_pe
+            // RUN_SNIPPY ( reads_pe, Channel.from(file(params.reference)) )
+        } else if (params.modules.contains("ska") ){
+            reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
+            asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
+            sequences = reads.join(asm_tmp, remainder:true).map( v -> { v.size() == 4 ? v[1] ? [v[1],v[2]] : [v[2],v[3]]  : [v[1],v[2]]} )
+           
+        }
+        RELATIONSHIPS ( sequences, Channel.fromPath(params.reference) )
+        // reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
+        // asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
+
+        // sp_res = reads_results.map { cfg,species -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, species.trim() ) }
+        // asm_res = asm_results.map { cfg,species -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, species.trim() ) }
+        
+        // observed_species =  sp_res.join(asm_res, remainder:true).map( v -> { v.size() == 4 ? v[1..3] : [v[1],v[2],v[4]]} )
+        //                                                          .map { cfg, species_reads, species_asm -> tuple(cfg, species_reads ? species_reads : 'no_results', species_asm ? species_asm: 'no_results') }
+        
 
     }
 
