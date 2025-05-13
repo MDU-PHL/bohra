@@ -10,19 +10,29 @@ process SNP_CLUSTER {
     publishDir "${params.outdir}/report",
         mode: params.publish_dir_mode
     
+    if ( params.enable_conda ) {
+        if (file("${params.conda_path}").exists()) {
+            conda "${params.conda_path}/bohra-cluster"
+        } else {
+            conda 'bioconda::pandas numpy scikit-learn'
+        }
+    } else {
+        conda null
+    }
+
     cache 'lenient'
     
     input:
     val(matrix) // this needs to be a list of sample! not .aln since snippy core uses relative path and the name of the folder to name results!
     
     output:
-    path('clusters_*.txt'), emit: clusters
+    path('clusters.txt'), emit: clusters
     
 
     script:
 
     """
-    $module_dir/cluster.py $matrix ${params.snpthresholds} ${params.linkage} ${params.jobname}
+    $module_dir/cluster.py $matrix ${params.snpthresholds} ${params.linkage} 
     """
     
 }

@@ -34,7 +34,7 @@ process SKA_ALIGN {
 
     script:
     """
-    ska align -o ska.aln $merged_skf -m ${params.ska_min-freq} ${params.ska_aln_args}
+    ska align -o ska.aln $merged_skf -m ${params.ska_minfreq} ${params.ska_alnargs}
     """
         
 }

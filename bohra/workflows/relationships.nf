@@ -20,11 +20,11 @@ workflow RELATIONSHIPS {
         } 
         else if ( params.modules.contains("ska") ) {
             // add in a join to combine reads and asm
-            SKA ( sequences )
-            dists = RUN_SKA.out.dists
-            clusters = RUN_SKA.out.clusters
-            stats = RUN_SKA.out.stats
-            core_aln = RUN_SKA.out.aln
+            RUN_SKA ( sequences )
+            // dists = RUN_SKA.out.dists
+            // clusters = RUN_SKA.out.clusters
+            // stats = RUN_SKA.out.stats
+            // core_aln = RUN_SKA.out.aln
             
         }
         if (params.tree_input == "snippy" & params.modules.contains("tree")) {
@@ -49,11 +49,11 @@ workflow RELATIONSHIPS {
 
     
         
-    emit:
+    // emit:
         
-        dists 
-        clusters
-        tree 
-        stats 
+    //     dists 
+    //     clusters
+    //     tree 
+    //     stats 
 }
 

@@ -13,7 +13,7 @@ def extract_unclustered(df, col, col1):
     return uc
 
 
-thresholds = sys.argv[2].split(',')
+thresholds = [int(i) for i in sys.argv[2].split(',')]
 # get distances into lists
 tabfile = sys.argv[1]
 if pathlib.Path(tabfile).exists():
@@ -41,12 +41,13 @@ if pathlib.Path(tabfile).exists():
 
     for level in thresholds:
         print(f"Clustering at {level}")
-        clustering = AgglomerativeClustering(n_clusters = None, affinity = 'precomputed',linkage = f"{sys.argv[3]}", distance_threshold =int(level)).fit(X)
+        clustering = AgglomerativeClustering(n_clusters = None, metric = 'precomputed',linkage = f"{sys.argv[3]}", distance_threshold =int(level)).fit(X)
         df = pandas.DataFrame(data = {'ID': isos, f"Tx:{level}": clustering.labels_})
         print(len(clustering.labels_))
         print(len(isos))
         print(df.shape)
         colname = f"Tx:{level-1}"
+        df = df.rename(columns={f"Tx:{level}": colname})
         print(len(df[f"{colname}"].unique()))
         df[f"{colname}"] = df[f"{colname}"] + 1
         df = df.fillna('')
@@ -64,4 +65,4 @@ if pathlib.Path(tabfile).exists():
         print(clusters.shape)
     clusters = clusters.fillna('')
 
-    clusters.to_csv(f'clusters_{sys.argv[4]}.txt', sep = '\t', index = False)
+    clusters.to_csv(f'clusters.txt', sep = '\t', index = False)

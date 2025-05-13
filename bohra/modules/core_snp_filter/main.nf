@@ -5,7 +5,7 @@ params.options = [:]
 def options    = initOptions(params.options)
 
 process CORE_SNP_FILTER {
-    tag "$meta.id"
+    
     label 'process_medium'
     publishDir "${params.outdir}/report",
         mode: params.publish_dir_mode
@@ -29,7 +29,7 @@ process CORE_SNP_FILTER {
 
     output:
     // tuple val(meta), path("${meta.id}/*"), emit: snippy_dir
-    tuple val(meta), path("${meta.id}/core.filtered.aln "), emit: aln
+    path("core.filtered.aln"), emit: aln
         
     script:
     """

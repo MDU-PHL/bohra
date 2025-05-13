@@ -24,7 +24,7 @@ process SKA_BUILD {
         conda null
     }
 
-    scratch true
+    // scratch true
     
     cache 'lenient'
     
@@ -36,7 +36,7 @@ process SKA_BUILD {
     tuple val(meta), path("${meta.id}.skf"), emit: skf
 
     script:
-    input_files = meta.input_type == "pe_reads" ? "$sequence[0]\t$sequence[1]" : sequence
+    input_files = meta.input_type == "pe_reads" ? sequence.join('\t') : sequence
     """
     echo -e "$meta.id\t$input_files" > tmp.tsv
     ska build -f tmp.csv -k $params.ska2_kszise -o $meta.id

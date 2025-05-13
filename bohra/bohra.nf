@@ -60,6 +60,7 @@ include { RUN_ASSEMBLE } from './workflows/assemble'
 include { RUN_SPECIES_READS; RUN_SPECIES_ASM; COMBINE_SPECIES } from './workflows/species'
 include { RUN_TYPING } from './workflows/typing'
 include { RELATIONSHIPS } from './workflows/relationships'
+include { PREVIEW_NEWICK } from './workflows/preview'
 
 workflow {
     // Sequence assessment for reads and assemblies
@@ -149,7 +150,12 @@ workflow {
         results = results.concat( serotypes )
         results = results.concat( mlst )
     }
-
+    if (params.modules.contains("mash")) {
+        reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
+            asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
+            sequences = reads.join(asm_tmp, remainder:true).map( v -> { v.size() == 4 ? v[1] ? [v[1],v[2]] : [v[2],v[3]]  : [v[1],v[2]]} )
+            PREVIEW_NEWICK ( sequences )
+    }
     if (params.modules.contains("snippy") || (params.modules.contains("ska"))){
         
         if (params.modules.contains("snippy") ){
