@@ -8,6 +8,7 @@ workflow RELATIONSHIPS {
 
     take:
         reads
+        asm
         reference
     main:
         if ( params.modules.contains("snippy") ){
@@ -19,6 +20,7 @@ workflow RELATIONSHIPS {
             core_full_aln = RUN_SNPS.out.core_full_al
         } 
         else if ( params.modules.contains("ska")) {
+            // add in a join to combine reads and asm
             SKA ( reads )
             dists = RUN_SKA.out.dists
             clusters = RUN_SKA.out.clusters

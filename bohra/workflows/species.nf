@@ -87,6 +87,7 @@ workflow COMBINE_SPECIES {
 
         species_stats = species_report.map { cfg, sp -> sp }.collect()
         species_stats = species_stats.map { files -> tuple("speciation", files) }
+        println species_stats.view()
         CSVTK_CONCAT ( species_stats )
 
 

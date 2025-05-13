@@ -58,7 +58,7 @@ println "Will run : $params.modules"
 include { READ_ANALYSIS;ASSEMBLY_ANALYSIS } from './workflows/seq_assessment'
 include { RUN_ASSEMBLE } from './workflows/assemble'
 include { RUN_SPECIES_READS; RUN_SPECIES_ASM; COMBINE_SPECIES } from './workflows/species'
-
+include { RUN_TYPING } from './workflows/typing'
 
 workflow {
     // Sequence assessment for reads and assemblies
@@ -123,6 +123,13 @@ workflow {
         // generate summay file for species
         species_report = COMBINE_SPECIES.out.species_summary
         results = results.concat( species_report )
+        
+    }
+    
+    if (params.modules.contains("typing") ){
+        // assembly is only done if the input is reads
+        RUN_TYPING ( asm, reads_pe )
+       
         
     }
 

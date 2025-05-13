@@ -1,10 +1,10 @@
 // Import generic module functions
 include { initOptions; saveFiles; getSoftwareName } from './functions'
-
+module_dir = moduleDir + "/bin"
 params.options = [:]
 def options    = initOptions(params.options)
 
-process CSVTK_CONCAT {
+process JSON_COMBINE {
 
     label 'process_medium'
     publishDir "${params.outdir}",
@@ -13,15 +13,15 @@ process CSVTK_CONCAT {
     
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/csvtk" : 'bioconda::csvtk') : null)
     
-    if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/bohra-csvtk"
-        } else {
-            conda 'bioconda::csvtk'
-        }
-    } else {
-        conda null
-    }
+    // if ( params.enable_conda ) {
+    //     if (file("${params.conda_path}").exists()) {
+    //         conda "${params.conda_path}/bohra-csvtk"
+    //     } else {
+    //         conda 'bioconda::csvtk'
+    //     }
+    // } else {
+    //     conda null
+    // }
 
     cache 'lenient'
     
@@ -29,13 +29,13 @@ process CSVTK_CONCAT {
     tuple val(output_name), val(input)
 
     output:
-    path("*.txt"), emit: collated
+    path("*.json"), emit: collated
 
     script:
     // Added soft-links to original fastqs for consistent naming in MultiQC
     def input_files = input.join(' ')
     """
-    csvtk concat -u '' -t $input_files > ${output_name}.txt
+    $module_dir/combine.py $input_files > ${output_name}.json
     """
         
 }

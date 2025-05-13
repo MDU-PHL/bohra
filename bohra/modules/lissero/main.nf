@@ -26,14 +26,14 @@ process LISSERO {
         conda null
     }
     input:
-    tuple val(meta), path(contigs), val(species_obs)
+    tuple val(meta), path(contigs)
 
     output:
     tuple val(meta), path("typer_${getSoftwareName(task.process)}.txt"), emit: typer
 
     script:
     """
-    echo -e Isolate'\n'${meta.id} >> tmp.tab
+    echo -e Isolate'\t'Typer_toolname'\n'${meta.id}'\t'${getSoftwareName(task.process)} >> tmp.tab
     lissero $contigs | sed 's/contigs\\.fa/$meta.id/g'  > lissero.tab
     paste tmp.tab lissero.tab | csvtk -t rename -f SEROTYPE -n Serotype | csvtk -t cut -f -ID,-COMMENT > typer_${getSoftwareName(task.process)}.txt
     rm -f tmp.tab

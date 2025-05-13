@@ -11,17 +11,18 @@ include {CSVTK_CONCAT } from './../modules/csvtk/main'
 workflow SEROTYPES {
     
     take:
-        typing_input
+        asm
+        reads
         
     main:
         
-        listeria = typing_input.filter { cfg, contigs -> cfg.species == 'Listeria monocytogenes'}
-        nmen = typing_input.filter { cfg, contigs -> cfg.species == 'Neisseria meningitidis'}
-        ngono = typing_input.filter { cfg, contigs -> cfg.species == 'Neisseria gonorrhoeae'}
-        salmonella = typing_input.filter { cfg, contigs -> cfg.species =~ 'Salmonella'}
-        klebs = typing_input.filter { cfg, contigs -> cfg.species =~ 'Klebsiella'}
-        ecoli = typing_input.filter { cfg, contigs -> cfg.species == 'Escherichia coli'}
-        igas = typing_input.filter { cfg, contigs -> cfg.species == 'Streptococcus pyogenes'}
+        listeria = asm.filter { cfg, contigs -> cfg.species == 'Listeria monocytogenes'}
+        nmen = asm.filter { cfg, contigs -> cfg.species == 'Neisseria meningitidis'}
+        ngono = asm.filter { cfg, contigs -> cfg.species == 'Neisseria gonorrhoeae'}
+        salmonella = asm.filter { cfg, contigs -> cfg.species =~ 'Salmonella'}
+        klebs = asm.filter { cfg, contigs -> cfg.species =~ 'Klebsiella'}
+        ecoli = asm.filter { cfg, contigs -> cfg.species == 'Escherichia coli'}
+        igas = asm.filter { cfg, contigs -> cfg.species == 'Streptococcus pyogenes'}
         // add in shigella
         LISSERO ( listeria )
         lissero_typers = LISSERO.out.typer.map {cfg, typer -> typer }.collect()
