@@ -30,16 +30,18 @@ process SKA_BUILD {
     
 
     input:
-    tuple val(meta), path(sequence)
+    tuple val(meta), val(sequence)
 
     output:
     tuple val(meta), path("${meta.id}.skf"), emit: skf
 
     script:
     input_files = meta.input_type == "pe_reads" ? sequence.join('\t') : sequence
+    
     """
     echo -e "$meta.id\t$input_files" > tmp.tsv
-    ska build -f tmp.csv -k $params.ska2_kszise -o $meta.id
+    ska build -f tmp.tsv -k $params.ska2_kszise -o $meta.id
     """
+    
     
 }

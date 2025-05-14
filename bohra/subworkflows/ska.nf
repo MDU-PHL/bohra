@@ -12,19 +12,20 @@ workflow RUN_SKA {
 
         
     main:
-        println sequence.view()
+        // println sequence.view()
         SKA_BUILD ( sequence )
 
-        // skf =  SKA_BUILD.out.skf.map { cfg, skf -> skf }.collect()
+        skf =  SKA_BUILD.out.skf.map { cfg, skf -> skf }.collect()
         // println skf.view()
-        // SKA_MERGE ( skf )
-        // merged_skf = SKA_MERGE.out.merged_skf
-    //     SKA_ALIGN ( merged_skf )
-    //     SKA_DISTANCE ( merged_skf )
-    //     SNP_CLUSTER ( SKA_DISTANCE.out.matrix )
-    // emit:
-    //     stats = SKA_DISTANCE.out.distance_long
-    //     dists = SKA_DISTANCE.out.matrix
-    //     aln = SKA_ALIGN.out.aln
-    //     clusters = SNP_CLUSTER.out.clusters
+        SKA_MERGE ( skf )
+        merged_skf = SKA_MERGE.out.merged_skf
+        println merged_skf.view()
+        SKA_ALIGN ( merged_skf )
+        SKA_DISTANCE ( merged_skf )
+        SNP_CLUSTER ( SKA_DISTANCE.out.matrix )
+    emit:
+        stats = SKA_DISTANCE.out.distance_long
+        dists = SKA_DISTANCE.out.matrix
+        aln = SKA_ALIGN.out.aln
+        clusters = SNP_CLUSTER.out.clusters
 }

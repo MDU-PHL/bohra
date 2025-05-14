@@ -152,9 +152,10 @@ workflow {
     }
     if (params.modules.contains("mash")) {
         reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
-            asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
-            sequences = reads.join(asm_tmp, remainder:true).map( v -> { v.size() == 4 ? v[1] ? [v[1],v[2]] : [v[2],v[3]]  : [v[1],v[2]]} )
-            PREVIEW_NEWICK ( sequences )
+        asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
+        sequences = reads.join(asm_tmp, remainder:true).map( v -> { v.size() == 4 ? v[1] ? [v[1],v[2]] : [v[2],v[3]]  : [v[1],v[2]]} )
+        PREVIEW_NEWICK ( sequences )
+        results = results.concat( PREVIEW_NEWICK.out.nwk )
     }
     if (params.modules.contains("snippy") || (params.modules.contains("ska"))){
         

@@ -5,7 +5,7 @@ params.options = [:]
 def options    = initOptions(params.options)
 
 process SKA_MERGE {
-    tag "$meta.id"
+    
     label 'process_medium'
     publishDir "${params.outdir}/report",
         mode: params.publish_dir_mode
@@ -29,7 +29,7 @@ process SKA_MERGE {
     val(skf)
 
     output:
-    tuple val(meta), path("${meta.id}.skf"), emit: sketch
+    path("merged.skf"), emit: merged_skf
 
     script:
     def skfs = skf.join(' ')

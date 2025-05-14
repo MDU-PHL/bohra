@@ -27,16 +27,16 @@ workflow RELATIONSHIPS {
             // core_aln = RUN_SKA.out.aln
             
         }
-        if (params.tree_input == "snippy" & params.modules.contains("tree")) {
+        // if (params.tree_input == "snippy" & params.modules.contains("tree")) {
             
-            MAKE_TREE ( RUN_SNPS.out.aln, RUN_SNPS.out.core_full_aln )
-            tree = MAKE_TREE.out.newick
-        } else if (params.tree_input == "ska" & params.modules.contains("tree")) {
-            MAKE_TREE ( RUN_SKA.out.aln )
-            tree = MAKE_TREE.out.newick
-        } else {
-            tree = Channel.empty()
-        }
+        //     MAKE_TREE ( RUN_SNPS.out.aln, RUN_SNPS.out.core_full_aln )
+        //     tree = MAKE_TREE.out.newick
+        // } else if (params.tree_input == "ska" & params.modules.contains("tree")) {
+        //     MAKE_TREE ( RUN_SKA.out.aln )
+        //     tree = MAKE_TREE.out.newick
+        // } else {
+        //     tree = Channel.empty()
+        // }
         
         
     // will import from subworkflows based on the modules selected
