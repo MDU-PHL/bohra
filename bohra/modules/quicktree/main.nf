@@ -27,14 +27,14 @@ process QUICKTREE {
     cache 'lenient'
     
     input:
-    path(preview_distances)
+    path(distances)
 
     output:
-    path('preview.newick'), emit: preveiw_tree
+    path('distance.newick'), emit: preveiw_tree
 
     script:
     """
-    quicktree -in m -out t $preview_distances  | nw_order -c n - > preview.newick
+    quicktree -in m -out t $distances  | nw_order -c n - > distance.newick
     """
         
 }

@@ -31,11 +31,11 @@ process IQTREE {
         path(full_aln)
 
     output:
-        path('core.newick'), emit: newick
-    
+        path('snps.newick'), emit: newick
+    def const = full_aln == "no_full_aln" ? "" : "-fconst \$(snp-sites -C $full_aln)"
     script:    
     """
-    iqtree -fconst \$(snp-sites -C $full_aln) \\
+    iqtree $const \\
     -s $aln -pre core \\
     -m GTR+G4 -bb 1000 -ntmax $task.cpus \\
     -nt AUTO -st DNA

@@ -31,7 +31,7 @@ process SKA_ALIGN {
 
     output:
     path('ska.aln'), emit: aln
-
+    
     script:
     """
     ska align -o ska.aln $merged_skf -m ${params.ska_minfreq} ${params.ska_alnargs}

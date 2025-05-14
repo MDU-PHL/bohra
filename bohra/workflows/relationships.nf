@@ -21,39 +21,23 @@ workflow RELATIONSHIPS {
         else if ( params.modules.contains("ska") ) {
             // add in a join to combine reads and asm
             RUN_SKA ( sequences )
-            // dists = RUN_SKA.out.dists
-            // clusters = RUN_SKA.out.clusters
-            // stats = RUN_SKA.out.stats
-            // core_aln = RUN_SKA.out.aln
+            dists = RUN_SKA.out.dists
+            clusters = RUN_SKA.out.clusters
+            stats = RUN_SKA.out.stats
+            core_aln = RUN_SKA.out.aln
+            core_full_aln = Channel.empty().ifEmpty( 'no_full_aln' )
             
         }
-        // if (params.tree_input == "snippy" & params.modules.contains("tree")) {
-            
-        //     MAKE_TREE ( RUN_SNPS.out.aln, RUN_SNPS.out.core_full_aln )
-        //     tree = MAKE_TREE.out.newick
-        // } else if (params.tree_input == "ska" & params.modules.contains("tree")) {
-        //     MAKE_TREE ( RUN_SKA.out.aln )
-        //     tree = MAKE_TREE.out.newick
-        // } else {
-        //     tree = Channel.empty()
-        // }
         
-        
-    // will import from subworkflows based on the modules selected
-    // ska
-    // snippy 
-    // trees
-    // dists
-    // clusters
-    // stats - where applicable
+
 
     
         
-    // emit:
-        
-    //     dists 
-    //     clusters
-    //     tree 
-    //     stats 
+    emit:
+        core_full_aln
+        core_aln
+        dists 
+        clusters
+        stats 
 }
 

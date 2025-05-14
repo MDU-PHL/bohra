@@ -61,6 +61,7 @@ include { RUN_SPECIES_READS; RUN_SPECIES_ASM; COMBINE_SPECIES } from './workflow
 include { RUN_TYPING } from './workflows/typing'
 include { RELATIONSHIPS } from './workflows/relationships'
 include { PREVIEW_NEWICK } from './workflows/preview'
+include { TREE_GENERATION } from './workflows/tree'
 
 workflow {
     // Sequence assessment for reads and assemblies
@@ -157,7 +158,7 @@ workflow {
         PREVIEW_NEWICK ( sequences )
         results = results.concat( PREVIEW_NEWICK.out.nwk )
     }
-    if (params.modules.contains("snippy") || (params.modules.contains("ska"))){
+    if (params.modules.contains("snippy") || (params.modules.contains("ska")) || (params.modules.contains("mash"))){
         
         if (params.modules.contains("snippy") ){
             sequences = reads_pe
@@ -169,6 +170,16 @@ workflow {
            
         }
         RELATIONSHIPS ( sequences, Channel.fromPath(params.reference) )
+        
+        results = results.concat( RELATIONSHIPS.out.dists )
+        results = results.concat( RELATIONSHIPS.out.clusters )
+        results = results.concat( RELATIONSHIPS.out.stats )
+
+
+        if(params.modules.contains("tree")) {
+
+            TREE_GENERATION ( RELATIONSHIPS.dists, RELATIONSHIPS.core_aln, RELATIONSHIPS.core_full_aln )
+        }
         // reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
         // asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
 

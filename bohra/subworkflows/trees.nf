@@ -3,9 +3,11 @@
  
 include { IQTREE } from './../modules/iqtree/main' 
 include { VERYFASTTREE } from './../modules/veryfasttree/main' 
+include { LOWER_TRIANGLE } from './../modules/lower_triangle/main'
+include { QUICKTREE } from './../modules/quicktree/main' 
 
 
-workflow MAKE_TREE {
+workflow MAKE_SNP_TREE {
 
     take:
         core_aln
@@ -26,3 +28,24 @@ workflow MAKE_TREE {
         tree = tree
 }
 
+
+workflow MAKE_DIST_TREE {
+
+    take:
+        dist
+        
+    main:
+        tree = Channel.empty()
+
+        if (params.modules.contains("ska") || params.modules.contains("snippy") ){
+            LOWER_TRIANGLE ( dist )
+            dist = LOWER_TRIANGLE.out.triangle
+
+        }
+        QUICKTREE ( dist )
+        tree = QUICKTREE.out.newick
+        tree = tree.ifEmpty( 'not_available' )
+    emit:
+        
+        tree = tree
+}

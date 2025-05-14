@@ -19,7 +19,8 @@ workflow RUN_SKA {
         // println skf.view()
         SKA_MERGE ( skf )
         merged_skf = SKA_MERGE.out.merged_skf
-        println merged_skf.view()
+        // println merged_skf.view()
+        
         SKA_ALIGN ( merged_skf )
         SKA_DISTANCE ( merged_skf )
         SNP_CLUSTER ( SKA_DISTANCE.out.matrix )
