@@ -2,20 +2,20 @@
 
 include { MASH_SKETCH } from './../modules/mash/sketch/main'
 include { MASH_TRIANGLE } from './../modules/mash/triangle/main'
-include { QUICKTREE } from './../modules/quicktree/main' 
 
 
-workflow PREVIEW_NEWICK {
+
+workflow RUN_MASH {
 
     take:
-        preview
+        sequences
     main:
-        MASH_SKETCH ( preview ) 
+        MASH_SKETCH ( sequences ) 
         sketches = MASH_SKETCH.out.sketch.map { cfg, sketch -> sketch }.collect()
         MASH_TRIANGLE ( sketches )
-        QUICKTREE ( MASH_TRIANGLE.out.mash_distances )
+        
     emit:
-        nwk = QUICKTREE.out.preveiw_tree
+        dists = MASH_TRIANGLE.out.dists
        
 
 }

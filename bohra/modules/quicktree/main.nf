@@ -27,10 +27,10 @@ process QUICKTREE {
     cache 'lenient'
     
     input:
-    path(distances)
+    val(distances)
 
     output:
-    path('distance.newick'), emit: preveiw_tree
+    path('distance.newick'), emit: newick
 
     script:
     """

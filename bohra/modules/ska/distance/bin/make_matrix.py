@@ -21,7 +21,7 @@ def make_matrix(df, col1, col2, vals) -> pd.DataFrame:
     matrix = df.pivot(index = col1, columns = col2, values = vals).reindex(index = idx, columns = idx).fillna(0, downcast = 'infer').pipe(lambda x: x+x.values.T)
     # Reindex to include all values
     matrix = matrix.reset_index()
-    matrix = matrix.rename(columns = {col1: 'Sample'})
+    matrix = matrix.rename(columns = {col1: 'Isolate'})
 
     return matrix
 

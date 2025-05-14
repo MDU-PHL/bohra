@@ -44,7 +44,7 @@ workflow MAKE_DIST_TREE {
         }
         QUICKTREE ( dist )
         tree = QUICKTREE.out.newick
-        tree = tree.ifEmpty( 'not_available' )
+    
     emit:
         
         tree = tree

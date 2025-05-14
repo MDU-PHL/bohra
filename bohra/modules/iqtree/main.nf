@@ -24,22 +24,34 @@ process IQTREE {
     }
 
     cache 'lenient'
-    scratch true
+    // scratch true
       
     input:
         path(aln)
-        path(full_aln)
+        val(full_aln)
 
     output:
         path('snps.newick'), emit: newick
-    def const = full_aln == "no_full_aln" ? "" : "-fconst \$(snp-sites -C $full_aln)"
-    script:    
-    """
-    iqtree $const \\
-    -s $aln -pre core \\
-    -m GTR+G4 -bb 1000 -ntmax $task.cpus \\
-    -nt AUTO -st DNA
-    cp core.treefile core.newick
-    """
+    
+    script:
+    if (full_aln == "no_full_aln") {
+        """
+        iqtree \\
+        -s $aln -pre snps \\
+        -m GTR+G4 -bb 1000 -ntmax $task.cpus \\
+        -nt AUTO -st DNA
+        cp snps.treefile snps.newick
+        """
+    } else {
+         """
+        iqtree -fconst \$(snp-sites -C $full_aln) \\
+        -s $aln -pre snps \\
+        -m GTR+G4 -bb 1000 -ntmax $task.cpus \\
+        -nt AUTO -st DNA
+        cp snps.treefile snps.newick
+        """ 
+    }
+        
+    
         
 }

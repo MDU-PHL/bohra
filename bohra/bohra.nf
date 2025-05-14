@@ -60,8 +60,7 @@ include { RUN_ASSEMBLE } from './workflows/assemble'
 include { RUN_SPECIES_READS; RUN_SPECIES_ASM; COMBINE_SPECIES } from './workflows/species'
 include { RUN_TYPING } from './workflows/typing'
 include { RELATIONSHIPS } from './workflows/relationships'
-include { PREVIEW_NEWICK } from './workflows/preview'
-include { TREE_GENERATION } from './workflows/tree'
+include { TREE_GENERATION } from './workflows/tree_generator'
 
 workflow {
     // Sequence assessment for reads and assemblies
@@ -151,44 +150,24 @@ workflow {
         results = results.concat( serotypes )
         results = results.concat( mlst )
     }
-    if (params.modules.contains("mash")) {
-        reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
-        asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
-        sequences = reads.join(asm_tmp, remainder:true).map( v -> { v.size() == 4 ? v[1] ? [v[1],v[2]] : [v[2],v[3]]  : [v[1],v[2]]} )
-        PREVIEW_NEWICK ( sequences )
-        results = results.concat( PREVIEW_NEWICK.out.nwk )
-    }
+    
     if (params.modules.contains("snippy") || (params.modules.contains("ska")) || (params.modules.contains("mash"))){
         
         if (params.modules.contains("snippy") ){
             sequences = reads_pe
             // RUN_SNIPPY ( reads_pe, Channel.from(file(params.reference)) )
-        } else if (params.modules.contains("ska") ){
+        } else if (params.modules.contains("ska") || params.modules.contains("mash") ){
             reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
             asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
             sequences = reads.join(asm_tmp, remainder:true).map( v -> { v.size() == 4 ? v[1] ? [v[1],v[2]] : [v[2],v[3]]  : [v[1],v[2]]} )
            
-        }
+        } 
         RELATIONSHIPS ( sequences, Channel.fromPath(params.reference) )
         
         results = results.concat( RELATIONSHIPS.out.dists )
         results = results.concat( RELATIONSHIPS.out.clusters )
         results = results.concat( RELATIONSHIPS.out.stats )
-
-
-        if(params.modules.contains("tree")) {
-
-            TREE_GENERATION ( RELATIONSHIPS.dists, RELATIONSHIPS.core_aln, RELATIONSHIPS.core_full_aln )
-        }
-        // reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
-        // asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
-
-        // sp_res = reads_results.map { cfg,species -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, species.trim() ) }
-        // asm_res = asm_results.map { cfg,species -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, species.trim() ) }
-        
-        // observed_species =  sp_res.join(asm_res, remainder:true).map( v -> { v.size() == 4 ? v[1..3] : [v[1],v[2],v[4]]} )
-        //                                                          .map { cfg, species_reads, species_asm -> tuple(cfg, species_reads ? species_reads : 'no_results', species_asm ? species_asm: 'no_results') }
-        
+        results = results.concat( RELATIONSHIPS.out.tree)
 
     }
 

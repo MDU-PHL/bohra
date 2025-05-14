@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 import numpy as np
 import pandas as pd
 import sys
@@ -41,7 +42,7 @@ def get_lower_triangular_matrix(matrix, isos):
 #Example
 matrix = pd.read_csv(sys.argv[1], sep='\t')
 isos = matrix.iloc[:, 0].values
-
-lower_triangle = get_lower_triangular_matrix(matrix.set_index("Isolate").values.tolist(), isos)
+iso_col = matrix.columns[0]
+lower_triangle = get_lower_triangular_matrix(matrix.set_index(iso_col).values.tolist(), isos)
 print(lower_triangle)
 
