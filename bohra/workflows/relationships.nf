@@ -42,20 +42,12 @@ workflow RELATIONSHIPS {
         }
         
         
-    // will import from subworkflows based on the modules selected
-    // ska
-    // snippy 
-    // trees
-    // dists
-    // clusters
-    // stats - where applicable
-
-    
         
-    // emit:
+    emit:
         
-    //     dists 
-    //     clusters
-    //     tree 
-    //     stats 
+        dists 
+        clusters
+        tree 
+        stats 
+        
 }
