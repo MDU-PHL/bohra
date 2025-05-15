@@ -8,10 +8,12 @@ workflow RUN_PANAROO {
     take:
         gff
     main:
-        PANAROO ( gff )       
+        PANAROO ( gff )     
+
         ROARY2SVG ( PANAROO.out.pangenome_csv )
     emit:
         svg = ROARY2SVG.out.pan_genome
         roary = PANAROO.out.pangenome_summary
+        version = PANAROO.out.version
 
 }
