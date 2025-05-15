@@ -79,6 +79,7 @@ workflow {
     
     
     results = Channel.empty()
+    // println reads_pe.view()
     // seq assessment is always done on every input
     READ_ANALYSIS ( reads_pe )
     read_stats = READ_ANALYSIS.out.read_stats

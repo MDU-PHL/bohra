@@ -2,7 +2,7 @@
 include { ABRITAMR; ABRITAMR_GENERAL;ABRITAMR_INFER;COMBINE_AMR } from './../modules/abritamr/main'
 include { JSON_COMBINE } from './../modules/json_combine/main'
 include { CSVTK_CONCAT; CSVTK_UNIQ } from './../modules/csvtk/main'
-include {VERSION_ABRITAMR } from './../modules/version/main'
+
 
 workflow RUN_ABRITAMR {
     
