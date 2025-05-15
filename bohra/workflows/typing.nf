@@ -23,7 +23,7 @@ workflow RUN_TYPING {
         mlst = RUN_MLST.out.collated_mlst
         RUN_MOBSUITE ( asm )
         RUN_ABRITAMR ( asm, RUN_MOBSUITE.out.contig_report )
-
+        versions = RUN_ABRITAMR.out.version.concat( RUN_MOBSUITE.out.version, RUN_MLST.out.version, SEROTYPES.out.collated_versions )
 
         resistomes= RUN_ABRITAMR.out.resistome.map{ cfg, file ->file}.collect()
         resistomes = resistomes.map { files -> tuple("resistome", files) }
@@ -50,5 +50,6 @@ workflow RUN_TYPING {
         reportable = reportable
         serotypes = serotypes
         mlst = mlst
+        versions = versions
 
 }

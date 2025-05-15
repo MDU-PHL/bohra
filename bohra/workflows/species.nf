@@ -4,7 +4,7 @@ include { RUN_SYLPH } from './../subworkflows/sylph'
 include { EXTRACT_SPECIES } from './../modules/extract_species/main'
 include { COMBINE_SPECIES_VALS } from './../modules/combine_species_vals/main'
 include { COMBINE_SPECIES_REPORT } from './../modules/combine_species/main'
-include { CSVTK_CONCAT } from './../modules/csvtk/main'
+include { CSVTK_CONCAT;CSVTK_UNIQ } from './../modules/csvtk/main'
 
 
 workflow RUN_SPECIES_READS {
@@ -18,12 +18,18 @@ workflow RUN_SPECIES_READS {
             species_raw = RUN_KRAKEN.out.species_raw
             species = RUN_KRAKEN.out.species
             species_obs = RUN_KRAKEN.out.species_obs
+            versions = RUN_KRAKEN.out.version.map { cfg, file -> file }.collect()
+                                         .map { files -> tuple("version_kraken2", files) }
+            CSVTK_UNIQ ( versions )
         } else {
             
             RUN_SYLPH ( sequences )
             species_raw = RUN_SYLPH.out.species_raw
             species = RUN_SYLPH.out.species
             species_obs = RUN_SYLPH.out.species_obs
+            versions = RUN_SYLPH.out.version.map { cfg, file -> file }.collect()
+                                         .map { files -> tuple("version_sylph", files) }
+            CSVTK_UNIQ ( versions )
         }
         
         // println species_obs.view()
@@ -31,6 +37,7 @@ workflow RUN_SPECIES_READS {
         species_raw  = species_raw
         species = species
         species_obs = species_obs
+        version = CSVTK_UNIQ.out.collated
 
 }
 
@@ -47,7 +54,9 @@ workflow RUN_SPECIES_ASM {
             species_raw = RUN_KRAKEN.out.species_raw
             species = RUN_KRAKEN.out.species
             species_obs = RUN_KRAKEN.out.species_obs
-            
+            versions = RUN_KRAKEN.out.version.map { cfg, file -> file }.collect()
+                                         .map { files -> tuple("version_kraken2", files) }
+            CSVTK_UNIQ ( versions )
         } 
 
     //    println species_obs.view()
@@ -57,6 +66,7 @@ workflow RUN_SPECIES_ASM {
         species_raw = species_raw
         species = species
         species_obs = species_obs
+        version = CSVTK_UNIQ.out.collated
         
 
 }
