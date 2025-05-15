@@ -31,11 +31,15 @@ process VERYFASTTREE {
         // path(full_aln)
 
     output:
-        path('bohra.newick'), emit: newick
-    
+        path('snps.newick'), emit: newick
+        path('version_veryfasttree.txt'), emit: version
+        
     script:    
     """
-    VeryFastTree -nt -gamma -gtr -threads $task.cpus $aln > bohra.newick
+    VeryFastTree -nt -gamma -gtr -threads $task.cpus $aln > tmp.newick
+    gotree reroot midpoi-i tmp.newick -o snp.newick
+    echo -e VeryFastTree'\t'\$CONDA_PREFIX'\t'\$(echo -e stype'\t'\$CONDA_PREFIX'\t'\$(stype -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_veryfasttree.txt
+    echo -e gotree'\t'\$CONDA_PREFIX'\t'\$(gotree version)  >> version_veryfasttree.txt
     """
         
 }

@@ -32,7 +32,7 @@ process ASSEMBLER_PE {
 
     output:
     tuple val(meta), path('contigs.fa') , emit: contigs
-    tuple val(meta), path('assembly.log') , emit: log
+    tuple val(meta), path('version_assembler.txt') , emit: version
 
     script:
     
@@ -41,34 +41,31 @@ process ASSEMBLER_PE {
         if [ -e $meta.asm ]
         then
             cp $meta.asm contigs.fa
-            echo "Using existing assembly file" >> assembly.log
+            echo -e Assembly file supplied'\t'Not Applicable'\t'${meta.asm} | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
         else
             echo "No assembly file found" >> assembly.log
         fi
         """
-    else if ( meta.asm == "no_contigs" && meta.assembler == "shovill" ) {
+    else if ( meta.asm == "no_contigs" && params.assembler == "shovill" ) {
         """
         shovill --R1 ${reads[0]} --R2 ${reads[1]} --outdir current --cpus $task.cpus --ram 16 
         cp current/contigs.fa contigs.fa
         version=\$(shovill --version)
-        echo "Assembled with shovill version: \$version" >> assembly.log
-        cat current/shovill.log >> assembly.log
+        echo -e shovill'\t'\$CONDA_PREFIX'\t'\$(shovill -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
         """
-    } else if (meta.asm == "no_contigs" && meta.assembler == "spades"  ) {
+    } else if (meta.asm == "no_contigs" && params.assembler == "spades"  ) {
         """
         tmp_dir=\$(mktemp -d)
         spades.py -1 ${reads[0]} -2 ${reads[1]} -o current -t $task.cpus $options.args2 --tmp-dir \$tmp_dir
         cp current/contigs.fasta contigs.fa
         rm -rf \$tmp_dir
-        version=\$(spades.py --version)
-        echo "Assembled with spades version: \$version" >> assembly.log
+        echo -e spades'\t'\$CONDA_PREFIX'\t'\$(spades.py -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_spades.txt
         """
-    } else if (meta.asm == "no_contigs" && meta.assembler == "skesa"  ) {
+    } else if (meta.asm == "no_contigs" && params.assembler == "skesa"  ) {
         """
         skesa --fastq ${reads[0]},${reads[1]} --cores $task.cpus --vector_percent 1.0 \
         --contigs_out contigs.fa
-        version=\$(skesa --version)
-        echo "Assembled with skesa version: \$version" >> assembly.log
+        echo -e skesa'\t'\$CONDA_PREFIX'\t'\$(skesa -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
         """
     } else {
         """

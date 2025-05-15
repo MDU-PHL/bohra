@@ -15,17 +15,22 @@ workflow MAKE_SNP_TREE {
         
     main:
         tree = Channel.empty()
+        version = Channel.empty()
         if (params.modules.contains("iqtree") ){
             IQTREE ( core_aln, core_full_aln)
             tree = IQTREE.out.newick
+            version = IQTREE.out.version
+            // version = CSVTK_UNIQ ( versions )
         } else if ( params.modules.contains("veryfasttree") ){
             VERYFASTTREE ( core_aln )
             tree = VERYFASTTREE.out.newick
+            version = VERYFASTTREE.out.version
         }
         tree = tree.ifEmpty( 'not_available' )
     emit:
         
         tree = tree
+        version
 }
 
 

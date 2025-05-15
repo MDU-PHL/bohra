@@ -1,7 +1,8 @@
 #!/usr/bin/env nextflow
 include { ABRITAMR; ABRITAMR_GENERAL;ABRITAMR_INFER;COMBINE_AMR } from './../modules/abritamr/main'
 include { JSON_COMBINE } from './../modules/json_combine/main'
-include { CSVTK_CONCAT } from './../modules/csvtk/main'
+include { CSVTK_CONCAT; CSVTK_UNIQ } from './../modules/csvtk/main'
+include {VERSION_ABRITAMR } from './../modules/version/main'
 
 workflow RUN_ABRITAMR {
     
@@ -36,8 +37,9 @@ workflow RUN_ABRITAMR {
                                             .map {id, cfg_matches, file_mathces, cfg_partials, file_partials, cfg_plasmid, file_plasmid, cfg_amrout, file_amrout -> tuple(cfg_matches, file_mathces, file_partials, file_plasmid, file_amrout) }
                                             
         COMBINE_AMR ( for_collation )
-
-
+        versions = ABRITAMR.out.version.map { cfg, file -> file }.collect()
+                                        .map { files -> tuple("version_abritamr", files) }
+        CSVTK_UNIQ ( versions )
         // println ABRITAMR.out.amrfinder_out.view()
     emit:
         
@@ -46,6 +48,7 @@ workflow RUN_ABRITAMR {
         abritamr_infer = ABRITAMR_INFER.out.inferred
         plasmid = COMBINE_AMR.out.plasmid
         resistome = COMBINE_AMR.out.resistome
+        version = CSVTK_UNIQ.out.collated
 }
 
 workflow CONCAT_RESISTOMES {

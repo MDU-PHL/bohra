@@ -35,16 +35,19 @@ process SEQKIT_STATS {
 
     output:
     tuple val(meta), path('*_statistics.txt'), emit: stats
+    tuple val(meta), path('version_seqkit.txt'), emit: version
 
     script:
     def input_type = options.args2
     if ( input_type == 'asm'){
     """
     cat $input_files | seqkit stats --all -T -i ${meta.id} > assembly_statistics.txt
+    echo -e seqkit'\t'\$CONDA_PREFIX'\t'\$(seqkit version) | csvtk add-header -t -n 'tool,conda_env,version' > version_seqkit.txt
     """
     } else {   
     """
     cat ${input_files[0]} ${input_files[1]} | seqkit stats -T -i ${meta.id} --all > read_statistics.txt
+    echo -e seqkit'\t'\$CONDA_PREFIX'\t'\$(seqkit version) | csvtk add-header -t -n 'tool,conda_env,version' > version_seqkit.txt
     """ 
     }
     

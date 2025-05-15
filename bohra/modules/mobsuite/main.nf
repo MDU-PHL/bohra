@@ -31,7 +31,7 @@ process MOBSUITE {
     tuple val(meta), path('contig_report.txt'), emit: contig_report
     tuple val(meta), path('mobtyper_results.txt'), emit: mobs
     tuple val(meta), path('*.fasta') optional true
-
+    tuble val(meta), path("version_mobsuite.txt"), emit: version
     // tuple val(meta), path('spades.log'), emit: log
 
     script:
@@ -42,6 +42,7 @@ process MOBSUITE {
     if [ ! -f mobtyper_results.txt ];then
         touch mobtyper_results.txt
     fi
+    echo -e mobsuite'\t'\$CONDA_PREFIX'\t'\$(mob_recon -V) | csvtk add-header -t -n 'tool,conda_env,version' > version_mobsuite.txt
     """
     
 }

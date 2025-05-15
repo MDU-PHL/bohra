@@ -18,7 +18,7 @@ process QUICKTREE {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-quicktree"
         } else {
-            conda 'bioconda::bioconda::quicktree=2.5 newick_utils'
+            conda 'bioconda::bioconda::quicktree=2.5 gotree'
         }
     } else {
         conda null
@@ -34,7 +34,10 @@ process QUICKTREE {
 
     script:
     """
-    quicktree -in m -out t $distances  | nw_order -c n - > distance.newick
+    quicktree -in m -out t $distances  > tmp.newick
+    gotree reroot midpoi-i tmp.newick -o distance.newick
+    echo -e quicktree'\t'\$CONDA_PREFIX'\t'\$(quicktree -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_quicktree.txt
+    echo -e gotree'\t'\$CONDA_PREFIX'\t'\$(gotree version)  >> version_quicktree.txt
     """
         
 }

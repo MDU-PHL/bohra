@@ -30,7 +30,7 @@ process KLEBORATE {
 
     output:
     tuple val(meta), path("typer_${getSoftwareName(task.process)}.txt"), emit: typer
-    
+    tuple val(meta), path("version_kleborate.txt"), emit: version
     
 
     script:
@@ -39,6 +39,7 @@ process KLEBORATE {
     kleborate -o kleborate.tab -a $contigs
     paste tmp.tab kleborate.tab | csvtk -t rename -f species -n Species | csvtk -t cut -f -strain,-ST > typer_${getSoftwareName(task.process)}.txt
     rm -f tmp.tab
+    echo -e kleborate'\t'\$CONDA_PREFIX'\t'\$(kleborate --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_kleborate.txt
     """
     
 }

@@ -40,7 +40,7 @@ process ABRITAMR {
     tuple val(meta),path('summary_matches.txt'), emit: abritamr_matches
     tuple val(meta),path('summary_partials.txt'), emit: abritamr_partials
     tuple val(meta),path('amrfinder.out'), emit: amrfinder_out
-
+    tuple val(meta), path('version_abritamr.txt'), emit: version
     script:
     
     
@@ -48,6 +48,7 @@ process ABRITAMR {
     sp=\$($module_dir/extract_species.py $params.available_species $contigs)
     abritamr run -c $contigs -px ${meta.id} -j $task.cpus \$sp
     cp ${meta.id}/* .
+    echo -e abritamr'\t'\$CONDA_PREFIX'\t'\$(abritamr -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_abritamr.txt
     """
 }
 

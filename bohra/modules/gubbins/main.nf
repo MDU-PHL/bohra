@@ -26,13 +26,15 @@ process GUBBINS {
 
     output:
     path('gubbins.aln'), emit: gubbins
-
+    path("version_gubbins.txt"), emit: version
     // tuple val(meta), path('spades.log'), emit: log
 
     script:
     """
     run_gubbins.py -c $task.cpus  --prefix clean $cleaned
     snp-sites -c clean.filtered_polymorphic_sites.fasta > gubbins.aln
+    echo -e gubbins'\t'\$CONDA_PREFIX'\t'\$(run_gubbins.py --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_gubbins.txt
+    echo -e snp-sites'\t'\$CONDA_PREFIX'\t'\$(snp-sites -V)  >> version_gubbins.txt
     """
     
 }

@@ -34,6 +34,7 @@ process SNIPPY {
     tuple val(meta), path("${meta.id}/snps.vcf"), emit: vcf
     tuple val(meta), path("${meta.id}/snps.log"), emit: log
     tuple val(meta), path("${meta.id}/snps.tab"), emit: tab
+    tuple val(meta), path("version_snippy.txt"), emit: version
     
 
     script:
@@ -45,6 +46,7 @@ process SNIPPY {
     --mincov ${params.mincov} --minfrac ${params.minfrac} \\
     --minqual ${params.minqual} \\
     --force --cpus $task.cpus
+    echo -e snippy'\t'\$CONDA_PREFIX'\t'\$(snippy -v 2>&1) | csvtk add-header -t -n 'tool,conda_env,version' > version_snippy.txt
     """
     
 }

@@ -18,6 +18,9 @@ workflow RUN_SNPS {
     main:
         
         SNIPPY ( reads.combine( reference ) )  
+        versions = SNIPPY.out.version.map { cfg, file -> file }.collect()
+                                        .map { files -> tuple("version_snippy", files) }
+        CSVTK_UNIQ ( versions )
         SNIPPY_QC ( SNIPPY.out.aln )
         alns =  SNIPPY.out.aln.map { cfg, aln -> aln.getParent() }.collect()
         SNIPPY_CORE ( alns, reference )  

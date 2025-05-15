@@ -29,13 +29,15 @@ process EMMTYPER {
 
     output:
     tuple val(meta), path("typer_${getSoftwareName(task.process)}.txt"), emit: typer
-
+    tuple val(meta), path("version_emmtyper.txt"), emit: version
+    
     script:
     """
     echo -e ${meta.id} >> tmp.tab
     emmtyper $contigs > emmtyper.tab
     paste tmp.tab emmtyper.tab | csvtk -t cut -f -2 |csvtk -t add-header -n 'Isolate,Num_clusters,emm_type,emm_like,emm_cluster' > typer_${getSoftwareName(task.process)}.txt
     rm -f tmp.tab
+    echo -e emmtyper'\t'\$CONDA_PREFIX'\t'\$(emmtyper --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_emmtyper.txt
     """
     
 }

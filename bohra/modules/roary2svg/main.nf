@@ -11,7 +11,15 @@ process ROARY2SVG {
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"report", publish_id:'report') }
-    
+    if ( params.enable_conda ) {
+        if (file("${params.conda_path}").exists()) {
+            conda "${params.conda_path}/bohra-roary2svg"
+        } else {
+            conda 'bioconda::perl-list-moreutils'
+        }
+    } else {
+        conda null
+    }
     cache 'lenient'
     scratch true
     // afterScript "rm -fr /tmp/\$USER/*"

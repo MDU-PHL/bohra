@@ -14,7 +14,9 @@ workflow RUN_SKA {
     main:
         // println sequence.view()
         SKA_BUILD ( sequence )
-
+        versions = SKA_BUILD.out.version.map { cfg, file -> file }.collect()
+                                        .map { files -> tuple("version_ska", files) }
+        CSVTK_UNIQ ( versions )
         skf =  SKA_BUILD.out.skf.map { cfg, skf -> skf }.collect()
         // println skf.view()
         SKA_MERGE ( skf )
@@ -29,4 +31,5 @@ workflow RUN_SKA {
         dists = SKA_DISTANCE.out.matrix
         aln = SKA_ALIGN.out.aln
         clusters = SNP_CLUSTER.out.clusters
+        versions = CSVTK_UNIQ.out.collated
 }

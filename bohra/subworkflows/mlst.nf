@@ -13,7 +13,11 @@ workflow RUN_MLST {
         mlst = MLST.out.mlst.map { cfg,file -> file}.collect().map { files -> tuple("mlst", files)}
         CSVTK_CONCAT ( mlst )
         collated_mlst = CSVTK_CONCAT.out.collated
+        versions = MLST.out.version.map { cfg, file -> file }.collect()
+                                        .map { files -> tuple("version_mlst", files) }
+        CSVTK_UNIQ ( versions )
     emit:
         collated_mlst
+        version = CSVTK_UNIQ.out.collated
 
 }

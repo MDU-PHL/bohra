@@ -30,7 +30,7 @@ process ECTYPER {
 
     output:
     tuple val(meta), path("typer_${getSoftwareName(task.process)}.txt"), emit: typer
-
+    tuple val(meta), path("version_ectyper.txt"), emit: version
     
 
     script:
@@ -39,6 +39,7 @@ process ECTYPER {
     ectyper -i $contigs -o ectyper 
     paste tmp.tab ectyper/output.tsv | csvtk -t cut -f -Name,-Species,-QC > typer_${getSoftwareName(task.process)}.txt
     rm -f tmp.tab
+    echo -e ectyper'\t'\$CONDA_PREFIX'\t'\$(ectyper --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_ectyper.txt
     """
     
 }

@@ -30,7 +30,7 @@ process NGMASTER {
 
     output:
     tuple val(meta), path("typer_${getSoftwareName(task.process)}.txt"), emit: typer
-    
+    tuple val(meta), path("version_ngmaster.txt"), emit: version
     
 
     script:
@@ -39,6 +39,7 @@ process NGMASTER {
     ngmaster  $contigs  > ngmaster.tab
     paste tmp.tab ngmaster.tab | csvtk -t cut -f -2> typer_${getSoftwareName(task.process)}.txt
     rm -f tmp.tab
+    echo -e ngmaster'\t'\$CONDA_PREFIX'\t'\$(ngmaster --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_ngmaster.txt
     """
     
 }

@@ -26,22 +26,33 @@ workflow SEROTYPES {
         // add in shigella
         LISSERO ( listeria )
         lissero_typers = LISSERO.out.typer.map {cfg, typer -> typer }.collect()
+        lissero_version = LISSERO.out.version.map {cfg, version -> version }.collect()
         STYPE ( salmonella )
         salmo_typers = STYPE.out.typer.map {cfg, typer -> typer }.collect()
+        salmo_version = STYPE.out.version.map {cfg, version -> version }.collect()
         MENINGOTYPE ( nmen )
         nmen_typers = MENINGOTYPE.out.typer.map {cfg, typer -> typer }.collect()
+        nmen_version = MENINGOTYPE.out.version.map {cfg, version -> version }.collect()
         NGMASTER ( ngono )
         ngono_typers = NGMASTER.out.typer.map {cfg, typer -> typer }.collect()
+        ngono_version = NGMASTER.out.version.map {cfg, version -> version }.collect()
         KLEBORATE ( klebs )
         klebs_typers = KLEBORATE.out.typer.map {cfg, typer -> typer }.collect()
+        klebs_version = KLEBORATE.out.version.map {cfg, version -> version }.collect()
         ECTYPER ( ecoli )
         ecoli_typers = ECTYPER.out.typer.map {cfg, typer -> typer }.collect()
+        ecoli_version = ECTYPER.out.version.map {cfg, version -> version }.collect()
         EMMTYPER ( igas )
         emm_typers = EMMTYPER.out.typer.map {cfg, typer -> typer }.collect()
+        emm_version = EMMTYPER.out.version.map {cfg, version -> version }.collect()
         typers = lissero_typers.concat ( salmo_typers, nmen_typers, ngono_typers, klebs_typers, ecoli_typers,emm_typers ).map { files -> tuple("typer", files)}
+        versions = lissero_version.concat ( salmo_version, nmen_version, ngono_version, klebs_version, ecoli_version, emm_version ).map { files -> tuple("version_serotypes", files)}
         CSVTK_CONCAT ( typers )
+        CSVTK_UNIQ ( versions )
+        collated_versions = CSVTK_UNIQ.out.collated
         collated_typers = CSVTK_CONCAT.out.collated
     emit:
         collated_typers
+        collated_versions
 
 }

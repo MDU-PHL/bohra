@@ -60,8 +60,8 @@ include { RUN_ASSEMBLE } from './workflows/assemble'
 include { RUN_SPECIES_READS; RUN_SPECIES_ASM; COMBINE_SPECIES } from './workflows/species'
 include { RUN_TYPING } from './workflows/typing'
 include { RELATIONSHIPS } from './workflows/relationships'
-include { TREE_GENERATION } from './workflows/tree_generator'
-
+// include { TREE_GENERATION } from './workflows/tree_generator'
+include { RUN_PANAROO } from './workflows/pangenome'
 workflow {
     // Sequence assessment for reads and assemblies
     // then depending on the workflow run the appropriate analysis
@@ -83,6 +83,7 @@ workflow {
     READ_ANALYSIS ( reads_pe )
     read_stats = READ_ANALYSIS.out.read_stats
     results = results.concat( read_stats)
+    versions = READ_ANALYSIS.out.versions
     // if there is assembly in the modules list then generate an assembly and run assembly analysis
     if (params.modules.contains("assemble") ){
         // assembly is only done if the input is reads
@@ -171,6 +172,15 @@ workflow {
 
     }
 
+    if (params.modules.contains("pangenome")){
+        gff = ASSEMBLY_ANALYSIS.out.gff
+        RUN_PANAROO ( gff )
+
+        results = results.concat( RUN_PANAROO.out.svg )
+        results = results.concat( RUN_PANAROO.out.roary )
+    }
+
+    println results.view()
     // snps  
         // is default for tree building
     // ska

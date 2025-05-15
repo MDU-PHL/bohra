@@ -13,9 +13,12 @@ workflow RUN_MASH {
         MASH_SKETCH ( sequences ) 
         sketches = MASH_SKETCH.out.sketch.map { cfg, sketch -> sketch }.collect()
         MASH_TRIANGLE ( sketches )
-        
+        versions = MASH_SKETCH.out.version.map { cfg, file -> file }.collect()
+                                        .map { files -> tuple("version_mash", files) }
+        CSVTK_UNIQ ( versions )
     emit:
         dists = MASH_TRIANGLE.out.dists
+        versions = CSVTK_UNIQ.out.collated
        
 
 }

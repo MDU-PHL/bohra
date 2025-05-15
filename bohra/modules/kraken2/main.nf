@@ -44,5 +44,6 @@ process KRAKEN2 {
     --memory-mapping 2> /dev/null
 
     $module_dir/collate_kraken2.py $meta.id kraken2.tab species.txt
+    echo -e kraken2'\t'\$CONDA_PREFIX'\t'\$(kraken2 --version | grep version)'\t'$params.kraken2_db | csvtk add-header -t -n 'tool,conda_env,version,database' > version_kraken2.txt
     """
 }

@@ -32,7 +32,8 @@ process PANAROO {
     path('summary_statistics.txt'), emit: pangenome_summary
     path('gene_presence_absence_roary.csv'), emit: pangenome_csv
     path('panaroo/*')
-
+    path('version_panaroo.txt'), emit: version
+    
     script:
     def gffs_str = gffs.join(' ')
     """
@@ -41,5 +42,6 @@ process PANAROO {
     csvtk add-header -t -T -n 'Genes,Range,Total' panaroo/summary_statistics.txt > summary_statistics.txt
     cp panaroo/gene_presence_absence_roary.csv .
     ln -sf panaroo $launchDir/
+    echo -e panaroo'\t'\$CONDA_PREFIX'\t'\$(panaroo --version ) | csvtk add-header -t -n 'tool,conda_env,version' > version_panaroo.txt
     """
 }

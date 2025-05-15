@@ -34,10 +34,12 @@ process MASH_SKETCH {
 
     output:
     tuple val(meta), path('*.msh'), emit: sketch
+    tuple val(meta), path('version_mash.txt'), emit: version
 
     script:
     """
     mash sketch -r ${reads[0]} -m 5 -k 21 -C $meta.id -o ${meta.id}
+    echo -e mash'\t'\$CONDA_PREFIX'\t'\$(mash --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_mash.txt
     """
     
 }

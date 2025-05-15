@@ -17,7 +17,7 @@ process IQTREE {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-iqtree"
         } else {
-            conda 'iqtree=2.1.4 snp-sites=2.5.1'
+            conda 'iqtree=2.1.4 snp-sites=2.5.1 gotree'
         }
     } else {
         conda null
@@ -32,6 +32,7 @@ process IQTREE {
 
     output:
         path('snps.newick'), emit: newick
+        path('version_iqtree.txt'), emit: version
     
     script:
     if (full_aln == "no_full_aln") {
@@ -40,7 +41,9 @@ process IQTREE {
         -s $aln -pre snps \\
         -m GTR+G4 -bb 1000 -ntmax $task.cpus \\
         -nt AUTO -st DNA
-        cp snps.treefile snps.newick
+        gotree reroot midpoi-i snps.treefile -o snps.newick
+        echo -e iQtree'\t'\$CONDA_PREFIX'\t'\$(iqtree --version | grep version) | csvtk add-header -t -n 'tool,conda_env,version' > version_iqtree.txt
+        echo -e gotree'\t'\$CONDA_PREFIX'\t'\$(gotree version)  >> version_iqtree.txt
         """
     } else {
          """
@@ -48,7 +51,9 @@ process IQTREE {
         -s $aln -pre snps \\
         -m GTR+G4 -bb 1000 -ntmax $task.cpus \\
         -nt AUTO -st DNA
-        cp snps.treefile snps.newick
+        gotree reroot midpoi-i snps.treefile -o snps.newick
+        echo -e iQtree'\t'\$CONDA_PREFIX'\t'\$(iqtree --version | grep version) | csvtk add-header -t -n 'tool,conda_env,version' > version_iqtree.txt
+        echo -e gotree'\t'\$CONDA_PREFIX'\t'\$(gotree version)  >> version_iqtree.txt
         """ 
     }
         

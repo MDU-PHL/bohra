@@ -35,14 +35,17 @@ process MLST {
     output:
     tuple val(meta), path('mlst.txt'), emit: mlst
     tuple val(meta), path('mlst.json'), emit: json
+    tuple val(meta), path('version_mlst.txt'), emit: version
 
     script:
     def _blast_db = params.blast_db  ? "--blastdb ${params.blast_db}" : ""
     def _publst_db = params.data_dir  ? "--datadir ${params.data_dir}" : ""
+    def _mlst_db = params.blast_db  ? "${params.blast_db}|$params.data_dir" : "default to conda path"
     def exclude = params.mlst_exclude != '' ? "--exclude ${params.mlst_exclude}" : ""
     """
     mlst --json mlst.json --label $meta.id --nopath $contigs $_blast_db $_publst_db  $exclude > mlst.txt
     $module_dir/add_header_mlst.py mlst.json
+    echo -e mlst'\t'\$CONDA_PREFIX'\t'\$(mlst -v)'\t'$_mlst_db | csvtk add-header -t -n 'tool,conda_env,version,database' > version_mlst.txt
     """
     
 }

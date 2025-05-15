@@ -34,12 +34,13 @@ process SEQKIT_GC {
 
     output:
     tuple val(meta), path('read_qual.txt'), emit: stats
-
+    tuple val(meta), path('version_seqkit.txt'), emit: version
     script:
     """
     cat ${input_files[0]} ${input_files[1]} \
     | seqkit fx2tab -H --name --only-id --avg-qual --gc \
     | csvtk summary -t -i -f 2:mean,3:mean > read_qual.txt
+    echo -e seqkit'\t'\$CONDA_PREFIX'\t'\$(seqkit version) | csvtk add-header -t -n 'tool,conda_env,version' > version_seqkit.txt
     """
 
     

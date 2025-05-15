@@ -29,7 +29,7 @@ process MENINGOTYPE {
 
     output:
     tuple val(meta), path("typer_${getSoftwareName(task.process)}.txt"), emit: typer
-    
+    tuple val(meta), path("version_meningotype.txt"), emit: version
 
     script:
     """
@@ -37,6 +37,7 @@ process MENINGOTYPE {
     meningotype --all $contigs  > meningotype.tab
     paste tmp.tab meningotype.tab | csvtk -t rename -f SEROGROUP -n Serogroup | csvtk -t cut -f -SAMPLE_ID,-MLST >typer_${getSoftwareName(task.process)}.txt
     rm -f tmp.tab
+    echo -e meningotype'\t'\$CONDA_PREFIX'\t'\$(meningotype --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_meningotype.txt
     """
     
 }

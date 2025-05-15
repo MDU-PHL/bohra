@@ -36,6 +36,7 @@ process STYPE {
     csvtk cut -f 'genome,h1,h2,o_antigen,serogroup,serovar' $meta.id/sistr_filtered.csv \
     | csvtk rename -f 'genome,serogroup,serovar' -n 'Isolate,Serogroup,Serovar'  \
     | csvtk csv2tab > typer_${getSoftwareName(task.process)}.txt
+    echo -e stype'\t'\$CONDA_PREFIX'\t'\$(stype -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_stype.txt
     """
     
 }
