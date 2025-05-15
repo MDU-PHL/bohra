@@ -24,9 +24,17 @@ workflow READ_ANALYSIS {
         COLLATE_STATS_ISOLATE ( COMBD )
         seq_stats = COLLATE_STATS_ISOLATE.out.read_assessment.map { cfg, seq -> seq }.collect()
         seq_stats = seq_stats.map { files -> tuple("read_assessment", files) }
+        versions_seqkit = SEQKIT_STATS.out.version.map { cfg, file -> file }.collect()
+                                         .map { files -> tuple("version_seqkit", files) }
+        VERSION_SEQKIT_READS ( versions_seqkit )
+        versions_kmc = KMC.out.version.map { cfg, file -> file }.collect()
+                                         .map { files -> tuple("version_kmc", files) }
+        VERSION_KMC ( versions_kmc )
         CSVTK_CONCAT ( seq_stats )
     emit:
         read_stats  = CSVTK_CONCAT.out.collated
+        version_seqkit_reads = VERSION_SEQKIT_READS.out.collated
+        version_kmc = VERSION_KMC.out.collated
         
 
 }
@@ -45,10 +53,59 @@ workflow ASSEMBLY_ANALYSIS {
         COLLATE_ASM ( APS )
         asm_stats = COLLATE_ASM.out.assembly.map { cfg, asm -> asm }.collect()
         asm_stats = asm_stats.map { files -> tuple("assembly_assesment", files) }
-        
+        versions_prokka = PROKKA.out.version.map { cfg, file -> file }.collect()
+                                         .map { files -> tuple("version_prokka", files) }
+        versions_seqkit = SEQKIT_STATS.out.version.map { cfg, file -> file }.collect()
+                                         .map { files -> tuple("version_seqkit", files) }
+        VERSION_PROKKA ( versions_prokka )
+        VERSION_SEQKIT_ASM ( versions_seqkit )
+
         CSVTK_CONCAT ( asm_stats )
     emit:
         assembly_stats = CSVTK_CONCAT.out.collated
+        version_prokka = VERSION_PROKKA.out.version
+        version_seqkit_asm = VERSION_SEQKIT_ASM.out.version
         
         
+}
+
+workflow VERSION_PROKKA {
+    take:
+        prokka
+    main:
+        
+        CSVTK_UNIQ ( prokka )
+    emit:
+        version = CSVTK_UNIQ.out.collated
+}
+
+workflow VERSION_KMC {
+    take:
+        kmc
+    main:
+        
+        CSVTK_UNIQ ( prokka )
+    emit:
+        version = CSVTK_UNIQ.out.collated
+}
+
+workflow VERSION_SEQKIT_READS {
+    take:
+        seqkit
+    main:
+        
+        CSVTK_UNIQ ( seqkit )
+    emit:
+        version = CSVTK_UNIQ.out.collated
+}
+
+
+workflow VERSION_SEQKIT_ASM {
+    take:
+        seqkit
+    main:
+        
+        CSVTK_UNIQ ( seqkit )
+    emit:
+        version = CSVTK_UNIQ.out.collated
 }
