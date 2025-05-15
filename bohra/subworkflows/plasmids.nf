@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
 include { MOBSUITE } from './../modules/mobsuite/main'
-include {CSVTK_CONCAT } from './../modules/csvtk/main'
+include {CSVTK_CONCAT;CSVTK_UNIQ } from './../modules/csvtk/main'
 
 workflow RUN_MOBSUITE {
     

@@ -49,8 +49,10 @@ workflow MAKE_DIST_TREE {
         }
         QUICKTREE ( dist )
         tree = QUICKTREE.out.newick
+
     
     emit:
         
         tree = tree
+        version = QUICKTREE.out.version
 }

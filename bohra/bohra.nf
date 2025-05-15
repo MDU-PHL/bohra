@@ -83,25 +83,28 @@ workflow {
     READ_ANALYSIS ( reads_pe )
     read_stats = READ_ANALYSIS.out.read_stats
     results = results.concat( read_stats)
-    versions = READ_ANALYSIS.out.versions
+    versions = READ_ANALYSIS.out.version_seqkit_reads
+    versions = versions.concat( READ_ANALYSIS.out.version_kmc )
     // if there is assembly in the modules list then generate an assembly and run assembly analysis
     if (params.modules.contains("assemble") ){
         // assembly is only done if the input is reads
         RUN_ASSEMBLE ( reads_pe )
         // RUN_ASSEMBLE ( reads_ont )
         asm = RUN_ASSEMBLE.out.contigs
+        versions = versions.concat( RUN_ASSEMBLE.out.versions )
         
     } 
     ASSEMBLY_ANALYSIS ( asm )
     assembly_stats = ASSEMBLY_ANALYSIS.out.assembly_stats
+    versions = versions.concat( ASSEMBLY_ANALYSIS.out.prokka_version, ASSEMBLY_ANALYSIS.out.version_seqkit_asm )
     // update the results with the assembly stats
     results = results.concat( assembly_stats )
-
+    
     if (params.modules.contains("species") ){
         
         RUN_SPECIES_READS ( reads_pe )
         RUN_SPECIES_ASM ( asm )
-        
+        versions = versions.concat( RUN_SPECIES_READS.out.version, RUN_SPECIES_ASM.out.version )
         reads_species_obs = RUN_SPECIES_READS.out.species_obs
         asm_species_obs = RUN_SPECIES_ASM.out.species_obs
         // println asm_species_obs.view()
@@ -150,12 +153,14 @@ workflow {
         results = results.concat( reportable )
         results = results.concat( serotypes )
         results = results.concat( mlst )
+        versions = versions.concat( RUN_TYPING.out.versions )
     }
     
     if (params.modules.contains("snippy") || (params.modules.contains("ska")) || (params.modules.contains("mash"))){
         
         if (params.modules.contains("snippy") ){
             sequences = reads_pe
+            
             // RUN_SNIPPY ( reads_pe, Channel.from(file(params.reference)) )
         } else if (params.modules.contains("ska") || params.modules.contains("mash") ){
             reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
@@ -169,6 +174,8 @@ workflow {
         results = results.concat( RELATIONSHIPS.out.clusters )
         results = results.concat( RELATIONSHIPS.out.stats )
         results = results.concat( RELATIONSHIPS.out.tree)
+        versions = versions.concat( RELATIONSHIPS.out.version )
+        versions = versions.concat( RELATIONSHIPS.out.tree_version )
 
     }
 
@@ -178,9 +185,11 @@ workflow {
 
         results = results.concat( RUN_PANAROO.out.svg )
         results = results.concat( RUN_PANAROO.out.roary )
+        versions = versions.concat( RUN_PANAROO.out.version )
     }
 
     println results.view()
+    println versions.view()
     // snps  
         // is default for tree building
     // ska

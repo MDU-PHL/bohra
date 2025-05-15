@@ -6,7 +6,7 @@ include { NGMASTER } from './../modules/ngmaster/main'
 include { KLEBORATE } from './../modules/kleborate/main'
 include { ECTYPER } from './../modules/ectyper/main'
 include { EMMTYPER } from './../modules/emmtyper/main'
-include {CSVTK_CONCAT } from './../modules/csvtk/main'
+include {CSVTK_CONCAT;CSVTK_UNIQ } from './../modules/csvtk/main'
 
 workflow SEROTYPES {
     

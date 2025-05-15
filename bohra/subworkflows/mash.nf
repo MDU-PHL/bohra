@@ -2,7 +2,7 @@
 
 include { MASH_SKETCH } from './../modules/mash/sketch/main'
 include { MASH_TRIANGLE } from './../modules/mash/triangle/main'
-
+include { CSVTK_UNIQ } from './../modules/csvtk/main'
 
 
 workflow RUN_MASH {

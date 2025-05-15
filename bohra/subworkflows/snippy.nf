@@ -6,7 +6,7 @@ include { SNP_DISTS } from './../modules/snp_dists/main'
 include { SNIPPY_QC } from './../modules/collation/main' 
 include { GUBBINS } from './../modules/gubbins/main' 
 include { SNIPPY_CLEAN } from './../modules/snippy_clean/main' 
-include { CSVTK_CONCAT } from './../modules/csvtk/main'
+include { CSVTK_CONCAT;CSVTK_UNIQ } from './../modules/csvtk/main'
 include { CORE_SNP_FILTER } from './../modules/core_snp_filter/main'
 include { SNP_CLUSTER } from './../modules/cluster/main'
 

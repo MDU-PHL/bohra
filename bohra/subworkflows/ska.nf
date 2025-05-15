@@ -5,7 +5,7 @@ include { SKA_DISTANCE } from './../modules/ska/distance/main'
 include { SKA_MERGE } from './../modules/ska/merge/main' 
 include {SKA_BUILD} from './../modules/ska/skf/main'
 include { SNP_CLUSTER } from './../modules/cluster/main'
-
+include { CSVTK_UNIQ } from './../modules/csvtk/main'
 workflow RUN_SKA {
     take:
         sequence

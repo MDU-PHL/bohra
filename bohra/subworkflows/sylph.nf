@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 include { SYLPH } from './../modules/sylph'
 include { EXTRACT_SPECIES } from './../modules/extract_species/main'
-
+include { CSVTK_UNIQ } from './../modules/csvtk/main'
 
 
 workflow RUN_SYLPH {

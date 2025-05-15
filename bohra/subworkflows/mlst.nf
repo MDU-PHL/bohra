@@ -1,6 +1,6 @@
 #!/usr/bin/env nextflow
 include { MLST } from './../modules/mlst/main'
-include {CSVTK_CONCAT } from './../modules/csvtk/main'
+include {CSVTK_CONCAT;CSVTK_UNIQ } from './../modules/csvtk/main'
 
 workflow RUN_MLST {
     
