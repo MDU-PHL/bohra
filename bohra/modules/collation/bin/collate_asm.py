@@ -16,7 +16,7 @@ def combine(prokka, asm, isolate, output):
     cds = gff[gff['cond'] == 'CDS'][isolate].values[0].replace("\"","").strip()
     # print(rrna)
     # print(cds)
-    # print(df)
+    print(df)
     bp = df['sum_len'].values[0]
     contigs = df['num_seqs'].values[0]
     mincontigs = df['min_len'].values[0]

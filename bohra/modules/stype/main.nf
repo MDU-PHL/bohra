@@ -28,6 +28,7 @@ process STYPE {
 
     output:
     tuple val(meta), path("typer_${getSoftwareName(task.process)}.txt"), emit: typer
+    tuple val(meta), path("version_stype.txt"), emit: version
     
 
     script:

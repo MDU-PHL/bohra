@@ -46,8 +46,10 @@ workflow ASSEMBLY_ANALYSIS {
         contigs
         
     main:
+        println contigs.view()
         SEQKIT_GC ( contigs )
         SEQKIT_STATS ( contigs )
+        println SEQKIT_STATS.out.stats.view()
         PROKKA ( contigs )
         APS = PROKKA.out.prokka_txt.join( SEQKIT_STATS.out.stats )
         COLLATE_ASM ( APS )

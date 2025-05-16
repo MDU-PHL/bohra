@@ -31,6 +31,7 @@ process SYLPH {
     output:
     tuple val(meta), path('sylph_raw.tsv'), emit: species_raw
     tuple val(meta), path('sylph.tsv'), emit: species
+    tuple val(meta), path('version_sylph.txt'), emit: version
 
 
 
@@ -39,6 +40,6 @@ process SYLPH {
     """
     sylph profile $params.sylph_db $input -o sylph_raw.tsv  -t $task.cpus 
     $module_dir/wrangle_file.py $meta.id sylph_raw.tsv > sylph.tsv
-    echo -e sylph'\t'\$CONDA_PREFIX'\t'\$(sylph --version)'\t'$params.sylph_db | csvtk add-header -t -n 'tool,conda_env,version,database' > version_stype.txt
+    echo -e sylph'\t'\$CONDA_PREFIX'\t'\$(sylph --version)'\t'${params.sylph_db} | csvtk add-header -t -n 'tool,conda_env,version,database' > version_sylph.txt
     """
 }
