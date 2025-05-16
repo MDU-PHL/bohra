@@ -11,6 +11,8 @@ workflow RELATIONSHIPS {
         sequences
         reference
     main:
+        version = Channel.empty().ifEmpty( 'no_version' )
+        tree_version = Channel.empty().ifEmpty( 'no_tree_version' )
         if ( params.modules.contains("snippy") ){
             RUN_SNPS ( sequences, reference )
             dists = RUN_SNPS.out.dists
@@ -36,9 +38,9 @@ workflow RELATIONSHIPS {
             MAKE_SNP_TREE ( core_aln, core_full_aln )
             tree = MAKE_TREE.out.newick
             tree_version = MAKE_TREE.out.version
-        } else if (params.tree_input == "dist" & params.modules.contains("tree")) {
+        } else if (params.tree_input == "distance" & params.modules.contains("tree")) {
             MAKE_DIST_TREE ( dists )
-            tree = MAKE_DIST_TREE.out.newick
+            tree = MAKE_DIST_TREE.out.tree
             tree_version = MAKE_DIST_TREE.out.version
         } else {
             tree = Channel.empty()

@@ -42,6 +42,6 @@ process PANAROO {
     csvtk add-header -t -T -n 'Genes,Range,Total' panaroo/summary_statistics.txt > summary_statistics.txt
     cp panaroo/gene_presence_absence_roary.csv .
     ln -sf panaroo $launchDir/
-    echo -e panaroo'\t'\$CONDA_PREFIX'\t'\$(panaroo --version ) | csvtk add-header -t -n 'tool,conda_env,version' > version_panaroo.txt
+    echo -e panaroo'\t'\$CONDA_PREFIX'\t'\$(panaroo --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_panaroo.txt
     """
 }

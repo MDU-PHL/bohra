@@ -31,11 +31,12 @@ process QUICKTREE {
 
     output:
     path('distance.newick'), emit: newick
+    path('version_quicktree.txt'), emit: version
 
     script:
     """
     quicktree -in m -out t $distances  > tmp.newick
-    gotree reroot midpoi-i tmp.newick -o distance.newick
+    gotree reroot midpoint -i tmp.newick -o distance.newick
     echo -e quicktree'\t'\$CONDA_PREFIX'\t'\$(quicktree -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_quicktree.txt
     echo -e gotree'\t'\$CONDA_PREFIX'\t'\$(gotree version)  >> version_quicktree.txt
     """

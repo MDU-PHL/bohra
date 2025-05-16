@@ -426,7 +426,7 @@ process VERSION_NO_ASM {
 
     script:
     """
-    echo -e Assembly file supplied'\t'Not Applicable'\t'${params.contigs_file} | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
+    echo -e User supplied'\t'Not Applicable'\t'${params.contigs_file} | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
     """
 }
 

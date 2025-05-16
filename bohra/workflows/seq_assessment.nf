@@ -51,6 +51,7 @@ workflow ASSEMBLY_ANALYSIS {
         SEQKIT_STATS ( contigs )
         println SEQKIT_STATS.out.stats.view()
         PROKKA ( contigs )
+        gff = PROKKA.out.gff.map { cfg, files -> files }.collect()
         APS = PROKKA.out.prokka_txt.join( SEQKIT_STATS.out.stats )
         COLLATE_ASM ( APS )
         asm_stats = COLLATE_ASM.out.assembly.map { cfg, asm -> asm }.collect()
@@ -67,6 +68,7 @@ workflow ASSEMBLY_ANALYSIS {
         assembly_stats = CSVTK_CONCAT.out.collated
         version_prokka = VERSION_PROKKA.out.version
         version_seqkit_asm = VERSION_SEQKIT_ASM.out.version
+        gff
         
         
 }

@@ -157,37 +157,37 @@ workflow {
         versions = versions.concat( RUN_TYPING.out.versions )
     }
     
-    // if (params.modules.contains("snippy") || (params.modules.contains("ska")) || (params.modules.contains("mash"))){
+    if (params.modules.contains("snippy") || (params.modules.contains("ska")) || (params.modules.contains("mash"))){
         
-    //     if (params.modules.contains("snippy") ){
-    //         sequences = reads_pe
+        if (params.modules.contains("snippy") ){
+            sequences = reads_pe
             
-    //         // RUN_SNIPPY ( reads_pe, Channel.from(file(params.reference)) )
-    //     } else if (params.modules.contains("ska") || params.modules.contains("mash") ){
-    //         reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
-    //         asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
-    //         sequences = reads.join(asm_tmp, remainder:true).map( v -> { v.size() == 4 ? v[1] ? [v[1],v[2]] : [v[2],v[3]]  : [v[1],v[2]]} )
+            // RUN_SNIPPY ( reads_pe, Channel.from(file(params.reference)) )
+        } else if (params.modules.contains("ska") || params.modules.contains("mash") ){
+            reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
+            asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
+            sequences = reads.join(asm_tmp, remainder:true).map( v -> { v.size() == 4 ? v[1] ? [v[1],v[2]] : [v[2],v[3]]  : [v[1],v[2]]} )
            
-    //     } 
-    //     RELATIONSHIPS ( sequences, Channel.fromPath(params.reference) )
+        } 
+        RELATIONSHIPS ( sequences, Channel.fromPath(params.reference) )
         
-    //     results = results.concat( RELATIONSHIPS.out.dists )
-    //     results = results.concat( RELATIONSHIPS.out.clusters )
-    //     results = results.concat( RELATIONSHIPS.out.stats )
-    //     results = results.concat( RELATIONSHIPS.out.tree)
-    //     versions = versions.concat( RELATIONSHIPS.out.version )
-    //     versions = versions.concat( RELATIONSHIPS.out.tree_version )
+        results = results.concat( RELATIONSHIPS.out.dists )
+        results = results.concat( RELATIONSHIPS.out.clusters )
+        results = results.concat( RELATIONSHIPS.out.stats )
+        results = results.concat( RELATIONSHIPS.out.tree)
+        versions = versions.concat( RELATIONSHIPS.out.version )
+        versions = versions.concat( RELATIONSHIPS.out.tree_version )
 
-    // }
+    }
 
-    // if (params.modules.contains("pangenome")){
-    //     gff = ASSEMBLY_ANALYSIS.out.gff
-    //     RUN_PANAROO ( gff )
+    if (params.modules.contains("pangenome")){
+        gff = ASSEMBLY_ANALYSIS.out.gff
+        RUN_PANAROO ( gff )
 
-    //     results = results.concat( RUN_PANAROO.out.svg )
-    //     results = results.concat( RUN_PANAROO.out.roary )
-    //     versions = versions.concat( RUN_PANAROO.out.version )
-    // }
+        results = results.concat( RUN_PANAROO.out.svg )
+        results = results.concat( RUN_PANAROO.out.roary )
+        versions = versions.concat( RUN_PANAROO.out.version )
+    }
 
     // println results.view()
     // println versions.view()

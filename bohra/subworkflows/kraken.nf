@@ -2,6 +2,7 @@
 // include { COLLATE_KRAKEN2_ISOLATE} from './../modules/collation/main'
 include { KRAKEN2 } from './../modules/kraken2'
 include { EXTRACT_SPECIES } from './../modules/extract_species/main'
+include { CSVTK_UNIQ } from './../modules/csvtk/main'
 
 
 workflow RUN_KRAKEN {

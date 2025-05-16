@@ -47,5 +47,6 @@ workflow RUN_SNPS {
         // cleaned_aln = cleaned_aln
         stats = all_core_stats
         clusters = SNP_CLUSTER.out.clusters
+        version = CSVTK_UNIQ.out.collated
 
 }
