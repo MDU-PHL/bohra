@@ -99,7 +99,7 @@ def _get_other_files(results_files: list,ouput:list) -> str:
     """
     other_files = []
     for file in results_files:
-        if file not in ouput and pathlib.Path(file).exists() and ("txt" in file or "tsv" in file):
+        if file not in ouput and pathlib.Path(file).exists() and ("txt" in file or "tsv" in file or "json" in file):
             other_files.append(f"-f {file}")
         
 

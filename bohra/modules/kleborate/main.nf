@@ -26,9 +26,10 @@ process KLEBORATE {
         conda null
     }
     input:
-    tuple val(meta), path(contigs), val(species)
+    tuple val(meta), path(contigs)
 
     output:
+    // tuple val(meta), path("kleborate.tab"), emit: raw_klebs
     tuple val(meta), path("typer_${getSoftwareName(task.process)}.txt"), emit: typer
     tuple val(meta), path("version_kleborate.txt"), emit: version
     
@@ -36,10 +37,11 @@ process KLEBORATE {
     script:
     """
     echo -e Isolate'\t'Typing_tool'\n'${meta.id}'\t'kleborate >> tmp.tab
-    kleborate -o kleborate.tab -a $contigs
-    paste tmp.tab kleborate.tab | csvtk -t rename -f species -n Species | csvtk -t cut -f K_locus,O_locus,rmpA2 > typer_${getSoftwareName(task.process)}.txt
+    kleborate -k -o kleborate.tab -a $contigs
+    paste tmp.tab kleborate.tab | csvtk -t rename -f species -n Species | csvtk -t cut -f Isolate,Typing_tool,virulence_score,Yersiniabactin,YbST,Colibactin,CbST,Aerobactin,AbST,Salmochelin,SmST,RmpADC,RmST,rmpA2,wzi,K_locus,K_type,O_locus,O_type > typer_${getSoftwareName(task.process)}.txt
     rm -f tmp.tab
     echo -e kleborate'\t'\$CONDA_PREFIX'\t'\$(kleborate --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_kleborate.txt
     """
     
 }
+

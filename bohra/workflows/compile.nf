@@ -16,10 +16,10 @@ workflow RUN_COMPILE {
 
         results = CSVTK_UNIQ.out.collated.concat ( results ).collect()
         println results.view()
-        RUN_SMRYZR ( results )
+    //     RUN_SMRYZR ( results )
 
 
-    emit:
-        report = RUN_SMRYZR.out.report
+    // emit:
+    //     report = RUN_SMRYZR.out.report
 
 }
