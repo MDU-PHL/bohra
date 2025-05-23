@@ -73,17 +73,17 @@ process ABRITAMR_GENERAL {
         conda null
     }
 
-    scratch true
+    // scratch true
     input:
     tuple val(meta), path(summary_matches), path(summary_partials)
 
     output:
-    tuple val(meta), path("reportable_amr_matches.csv"), emit: reportable
+    tuple val(meta), path("reportable_amr_matches.txt"), emit: reportable
 
     """
     echo "ISOLATE,SPECIES_EXP,SPECIES_OBS,TEST_QC\n${meta.id},${meta.species},${meta.species},PASS" > qc.tmp.csv
     abritamr report -q qc.tmp.csv -r bohra -m $summary_matches -p $summary_partials --sop general --sop_name reportable
-    csvtk xlsx2csv -n reportable bohra_reportable.xlsx | csvtk csv2tab > reportable_amr_matches.csv
+    csvtk xlsx2csv -n reportable bohra_reportable.xlsx | csvtk rename -f 'MDU sample ID,Resistance genes (alleles) detected,Resistance genes (alleles) det (non-rpt)' -n 'Isolate,Reportable AMR mechanisms,Other AMR mechanisms' | csvtk cut -f 'Isolate,Reportable AMR mechanisms,Other AMR mechanisms' |  csvtk csv2tab > reportable_amr_matches.txt
     """
     
 }
