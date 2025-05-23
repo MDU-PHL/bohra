@@ -46,10 +46,10 @@ workflow ASSEMBLY_ANALYSIS {
         contigs
         
     main:
-        println contigs.view()
+        // println contigs.view()
         SEQKIT_GC ( contigs )
         SEQKIT_STATS ( contigs )
-        println SEQKIT_STATS.out.stats.view()
+        // println SEQKIT_STATS.out.stats.view()
         PROKKA ( contigs )
         gff = PROKKA.out.gff.map { cfg, files -> files }.collect()
         APS = PROKKA.out.prokka_txt.join( SEQKIT_STATS.out.stats )

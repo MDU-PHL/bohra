@@ -26,52 +26,36 @@ def sp = [:]
 input_file = file(params.isolates) // need to make this an input file 
     reader =   input_file.newReader()
     reader.eachLine { line ->
+    if (!line.startsWith("Isolate") & !line.startsWith("#")) {
+        
     line = line.split("\t")
         // println "The line is : $line"
         samples[line[0]] = line[1]
         asms[line[0]] = line[2]
         asmblr[line[0]] = line[3]
         sp[line[0]] = line[4]
+     }
     }
-// get reads
+
 println "Will run : $params.modules"
-// get assemblies
 
-// println "The reads are : $reads_pe"
-// println "The assemblies are : $asm"
-
-// println  reads_pe.view()
-// println asm.view()
-// println joint_input.view()
-// "speciation",
-//     "snps",
-//     "ska",
-//     "tree",
-//     "mlst",
-//     "plasmid", 
-//     "abritamr",
-//     "assembly",
-//     "typing",
-//     "pangenome"
-//     "preview"
-//    "tb"
 include { READ_ANALYSIS;ASSEMBLY_ANALYSIS } from './workflows/seq_assessment'
 include { RUN_ASSEMBLE } from './workflows/assemble'
 include { RUN_SPECIES_READS; RUN_SPECIES_ASM; COMBINE_SPECIES } from './workflows/species'
 include { RUN_TYPING } from './workflows/typing'
 include { RELATIONSHIPS } from './workflows/relationships'
-// include { TREE_GENERATION } from './workflows/tree_generator'
 include { RUN_PANAROO } from './workflows/pangenome'
+include { RUN_COMPILE } from './workflows/compile'
+
 workflow {
     // Sequence assessment for reads and assemblies
     // then depending on the workflow run the appropriate analysis
-    // println "The samples are : $samples"
     reads_pe = Channel.fromFilePairs(["${params.outdir}/*/R{1,2}.fastq.gz"])
                     .filter { sample, files -> samples.containsKey(files[0].getParent().getName())}
                     .map { sample, files -> tuple([id: files[0].getParent().getName(),modules: samples[files[0].getParent().getName()],input_type:'pe_reads', asm :asms[files[0].getParent().getName()], assembler:asmblr[files[0].getParent().getName()], species:sp[files[0].getParent().getName()] ], files)}
-    reads_ont = Channel.fromPath( ["${params.outdir}/*/read_ont.fastq.gz","${params.outdir}/*/read_ont.fastq"])       
-                .filter { files -> samples.containsKey(files.getParent().getName())} 
-                .map {  files -> tuple([id: files.getParent().getName(), modules:samples[files.getParent().getName()], input_type:'ont_reads', asm :asms[files.getParent().getName()],assembler:asmblr[files.getParent().getName()],species:sp[files.getParent().getName()]], files)}
+    // reads_ont = Channel.fromPath( ["${params.outdir}/*/read_ont.fastq.gz","${params.outdir}/*/read_ont.fastq"])       
+    //             .filter { files -> samples.containsKey(files.getParent().getName())} 
+    //             .map {  files -> tuple([id: files.getParent().getName(), modules:samples[files.getParent().getName()], input_type:'ont_reads', asm :asms[files.getParent().getName()],assembler:asmblr[files.getParent().getName()],species:sp[files.getParent().getName()]], files)}
     
     asm = Channel.fromPath( ["${params.outdir}/*/contigs.fa"])       
                 .filter { files -> samples.containsKey(files.getParent().getName())} 
@@ -79,7 +63,6 @@ workflow {
     
     
     results = Channel.empty()
-    // println reads_pe.view()
     // seq assessment is always done on every input
     READ_ANALYSIS ( reads_pe )
     read_stats = READ_ANALYSIS.out.read_stats
@@ -190,12 +173,5 @@ workflow {
     }
 
     // println results.view()
-    // println versions.view()
-    // snps  
-        // is default for tree building
-    // ska
-    // tree
-
-    // typing
-    // pangenome
+    RUN_COMPILE ( results, versions )
 }

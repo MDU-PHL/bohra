@@ -27,6 +27,7 @@ workflow RUN_SNPS {
         CORE_SNP_FILTER ( SNIPPY_CORE.out.core_full_aln )
         core_aln =  CORE_SNP_FILTER.out.aln
         core_full_aln = SNIPPY_CORE.out.core_full_aln
+        core_vcf = SNIPPY_CORE.out.core_vcf
         SNIPPY_CLEAN ( core_full_aln )
         cleaned_aln = SNIPPY_CLEAN.out.cleaned
         
@@ -37,13 +38,14 @@ workflow RUN_SNPS {
         
         SNP_DISTS ( core_aln )
         SNP_CLUSTER ( SNP_DISTS.out.distances )
-        stats = SNIPPY_QC.out.snippy_qc.map { cfg, core_stats -> core_stats }.collect().map { files -> tuple("core_genome", files)}
+        stats = SNIPPY_QC.out.snippy_qc.map { cfg, core_stats -> core_stats }.collect().map { files -> tuple("core_genome_stats", files)}
         all_core_stats = CSVTK_CONCAT ( stats )
     emit:
         
         dists = SNP_DISTS.out.distances
         aln = core_aln
         core_full_aln = core_full_aln
+        core_vcf = core_vcf
         // cleaned_aln = cleaned_aln
         stats = all_core_stats
         clusters = SNP_CLUSTER.out.clusters

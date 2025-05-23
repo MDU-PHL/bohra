@@ -36,7 +36,7 @@ process MASH_TRIANGLE {
     script:
     def input_files = sketches.join(' ')
     """
-    mash triangle -C $input_files > mash_distances.tab
+    mash triangle -C $input_files > mash_distances.tsv
     """
         
 }

@@ -30,14 +30,14 @@ process SNP_DISTS {
     path(core) 
 
     output:
-    path('distances.tab'), emit: distances
+    path('distances.tsv'), emit: distances
     path('version_snpdists.txt'), emit: version
 
     script:
     
     """
-    snp-dists $core | csvtk rename -t -f 1 -n Isolate > distances.tab
-    echo -e snp-dists'\t'\$CONDA_PREFIX'\t'\$(snp-dists -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_snpdists.txt
+    snp-dists $core | csvtk rename -t -f 1 -n Isolate > distances.tsv
+    echo -e snp-dists'\t'\$CONDA_PREFIX'\t'\$(snp-dists -v 2>&1) | csvtk add-header -t -n 'tool,conda_env,version' > version_snpdists.txt
     """
     
 }

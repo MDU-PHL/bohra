@@ -41,7 +41,7 @@ process IQTREE {
         -s $aln -pre snps \\
         -m GTR+G4 -bb 1000 -ntmax $task.cpus \\
         -nt AUTO -st DNA
-        gotree reroot midpoi-i snps.treefile -o snps.newick
+        gotree reroot midpoint -i snps.treefile -o snps.newick
         echo -e iQtree'\t'\$CONDA_PREFIX'\t'\$(iqtree --version | grep version) | csvtk add-header -t -n 'tool,conda_env,version' > version_iqtree.txt
         echo -e gotree'\t'\$CONDA_PREFIX'\t'\$(gotree version)  >> version_iqtree.txt
         """
@@ -51,7 +51,7 @@ process IQTREE {
         -s $aln -pre snps \\
         -m GTR+G4 -bb 1000 -ntmax $task.cpus \\
         -nt AUTO -st DNA
-        gotree reroot midpoi-i snps.treefile -o snps.newick
+        gotree reroot midpoint -i snps.treefile -o snps.newick
         echo -e iQtree'\t'\$CONDA_PREFIX'\t'\$(iqtree --version | grep version) | csvtk add-header -t -n 'tool,conda_env,version' > version_iqtree.txt
         echo -e gotree'\t'\$CONDA_PREFIX'\t'\$(gotree version)  >> version_iqtree.txt
         """ 

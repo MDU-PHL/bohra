@@ -39,7 +39,7 @@ process SKA_DISTANCE {
     script:
     """
     ska distance -m ${params.ska_minfreq} $merged_skf > ska_distance.tsv 
-    ${module_dir}/make_matrix.py ska_distance.tsv
+    ${module_dir}/make_matrix.py distances.tsv
     """
         
 }
