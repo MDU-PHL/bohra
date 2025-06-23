@@ -4,6 +4,7 @@ import pandas as pd
 import pathlib
 import os
 import logging
+import shutil
 
 # Logger
 LOGGER =logging.getLogger(__name__) 
@@ -35,6 +36,8 @@ def _open_input_file(_file:str) -> pd.DataFrame:
         LOGGER.critical(f"Input file {_file} does not exist or is not accessible.")
         raise SystemExit
     else:
+        LOGGER.info(f"Backing up original file {_file} to {pathlib.Path(_file)}.bak.")
+        shutil.copy(_file, f"{pathlib.Path(_file)}.bak")
         return pd.read_csv(_file, engine='python', sep = None, dtype = str)
 
 def _check_data_format(df:pd.DataFrame) -> pd.DataFrame:
@@ -69,12 +72,15 @@ def _check_data_format(df:pd.DataFrame) -> pd.DataFrame:
             columns.append(col)
     if not schk:
         df["species"] = "not_supplied"
-    
+    df['assembly'] = df['assembly'].fillna('no_contigs')
     for col in df.columns:
         if col not in columns:
             columns.append(col)
 
     df = df[columns]
+    LOGGER.info(f"Saving input file with columns {','.join(columns)} to {pathlib.Path('input_checked.tsv')}.")
+    df.to_csv('input_checked.tsv', sep='\t', index=False, header=True)
+
     return df
 
 def _check_sequence_file(_file:str) -> bool:
@@ -135,7 +141,7 @@ def _make_workdir(_input:pd.DataFrame, workdir:str) -> bool:
                     except Exception as e:
                         LOGGER.critical(f"Could not link {user_supplied} to {wd / row[1][columns[0]]}/{input_types[input_type]}. Error: {e}")
                         raise SystemExit
-    return True
+    return "input_checked.tsv"
 
 # class RunSnpDetection(object):
 #     '''
