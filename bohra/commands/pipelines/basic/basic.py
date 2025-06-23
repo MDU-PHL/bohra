@@ -1,14 +1,9 @@
 import click
 import pathlib
 import os
-import json
 
-
-cfg_file = f"{pathlib.Path(__file__).parent.parent.parent.parent.resolve() / 'bohra_defaults.json'}"
-with open(cfg_file, 'r') as f:
-    CFG = json.load(f)
-
-@click.command()# common to all pipelines
+@click.command()
+# common to all pipelines
 @click.option('--input_file', '-i',
               help='Path to reads file, which is a tab-delimited with 3 columns <isolatename>  <path_to_read1> <path_to_read2>.',
               default='')
@@ -24,34 +19,6 @@ with open(cfg_file, 'r') as f:
 @click.option('--speciation/--no-speciation',
               is_flag=True, 
               help='Speciation will be performed by deafult - use --no-speciation if you do not need species detected.')
-
-
-# pipeline specific options
-@click.option('--assembler', '-a',
-              default='shovill', 
-              help='Assembler to use (shovill uses spades > 3.14 < 4 with --isolate mode).',
-              type=click.Choice(['shovill', 'skesa', 'spades']))
-@click.option('--spades_args',
-              default="", 
-              help="Use to add arguments to spades (when running with --assembler spades) for example: '--cov-cutoff auto' ")
-@click.option('--abritamr_args',
-              required=False,
-              help="Set if you would like to use point mutations, please provide a valid species.", 
-              type=click.Choice(CFG["abritamr_species"]))
-@click.option('--blast_db',
-              default=f"{os.getenv('BLAST_DB', '')}", 
-              help='Path to the mlst blast_db, defaults to what is installed in the environment.')
-@click.option('--data_dir',     
-              default=f"{os.getenv('PUBMLST_DB','')}", 
-              help='Path to the mlst datadir, defaults to what is installed in the environment.')
-@click.option('--mlst_exclude','-me',
-              default=[], 
-              help='mlst schemes to exclude - multiple possible ie -me scheme1 -me scheme2 -me scheme3',
-              multiple=True)
-@click.option('--mobsuite_db',
-              default=f"{os.getenv('MOBSUITE_DB','')}", 
-              help='Path to the mobsuite_db, defaults to what is installed in the bohra-mob_suite environment.')
-
 
 # resource options common to all pipelines
 @click.option('--cpus',
@@ -83,8 +50,18 @@ with open(cfg_file, 'r') as f:
 @click.option('--profile',
               default=f"", 
               help='The resource profile to use. Defaults to local, if using an alternative config file, this value should represent the name of a profile provided')
-def amr_typing():
+def basic(input_file: str,
+          sylph_db: str,
+          kraken_db: str,
+          speciation: bool,
+          conda_path: str,
+          keep: str,
+          proceed: bool,
+          force: bool,
+          no_conda: bool,
+          nfconfig: str,
+          profile: str):
     """
-    Run bohra in amr_typing mode
+    Run bohra for basic sequence assessment
     """
-    print("Running amr and typing...")
+    print("Running basic...")

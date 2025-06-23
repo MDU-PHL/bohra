@@ -4,21 +4,33 @@ import os
 
 
 @click.command()
-@click.option('--reads', '-r',
+# common to all pipelines
+@click.option('--input_file', '-i',
               help='Path to reads file, which is a tab-delimited with 3 columns <isolatename>  <path_to_read1> <path_to_read2>.',
               default='')
+@click.option('--sylph_db', '-k',
+              default="",
+              show_default=True,
+              help="Path to DB for use with sylph")
 @click.option('--kraken_db', '-k',
               default=os.getenv("KRAKEN2_DEFAULT_DB", ''),
               metavar='KRAKEN2_DEFAULT_DB',
               show_default=True,
-              help="Path to DB for use with kraken2, if no DB present speciation will not be performed.")
+              help="Path to DB for use with kraken2")
+@click.option('--speciation/--no-speciation',
+              is_flag=True, 
+              help='Speciation will be performed by deafult - use --no-speciation if you do not need species detected.')
+
+# pipeline specific options
 @click.option('--assembler', '-a',
               default='shovill', 
-              help='Assembler to use (shovill uses spades > 3.14 with --isolate mode).',
+              help='Assembler to use (shovill uses spades > 3.14 < 4 with --isolate mode).',
               type=click.Choice(['shovill', 'skesa', 'spades']))
 @click.option('--spades_args',
               default="", 
               help="Use to add arguments to spades (when running with --assembler spades) for example: '--cov-cutoff auto' ")
+
+# resource options common to all pipelines
 @click.option('--cpus',
               help='Number of max CPU cores to run, will define how many rules are run at a time, if 0 then the avail cpus will be determined at time of launch', 
               default=0)
@@ -26,12 +38,9 @@ import os
               default=pathlib.Path.cwd().absolute(), 
               help='The directory where Bohra will be run, default is current directory', 
               type=click.Path(exists=True))
-@click.option('--no_phylo',
-              is_flag=True, 
-              help='Set if you do NOT want to generate a phylogentic tree.')
 @click.option('--conda_path',       
               default=pathlib.Path(os.getenv('CONDA_PREFIX', '')), 
-              help='The path to where your pre-installed conda envs are stored, defaults to installing conda envs in your work directory. This can be provided in your profiles settings as well - it assumes you have pre-configured all of your conda environments for each process run by bohra, this is an advanced setting. Please take care.')
+              help='The path to where your pre-installed conda bohra-envs are stored. This can be provided in your profiles settings as well - it assumes you have pre-configured all of your conda environments for each process run by bohra, this is an advanced setting. Please take care if you are changing it.')
 @click.option('--keep',
               default='N', 
               type=click.Choice(['Y', 'N']), 
@@ -45,17 +54,26 @@ import os
 @click.option('--no-conda',
               is_flag=True, 
               help='Set if you DO NOT WANT to use separate conda environments for each nextflow process.')
-@click.option('--check',
-              is_flag=True, 
-              help='Check that dependencies are installed correctly.')
 @click.option('--nfconfig','-nfcfg',
               default = f"", 
               help='An additional config file, required if running on a non-local machine, ie slurm, cloud. For help see documentation at https://github.com/MDU-PHL/bohra or https://www.nextflow.io/docs/latest/executor.html',) # don't need this
 @click.option('--profile',
               default=f"", 
               help='The resource profile to use. Defaults to local, if using an alternative config file, this value should represent the name of a profile provided')
-def assemble():
+def assemble(input_file: str,
+             assembler: str,
+             spades_args: str,
+             sylph_db: str,
+             kraken_db: str,
+             speciation: bool,
+             conda_path: str,
+             keep: str,
+             proceed: bool,
+             force: bool,
+             no_conda: bool,
+             nfconfig: str,
+             profile: str):
     """
-    Run bohra in assemble mode
+    Run bohra in assemble mode, speciation can be turned off with --no-speciation.
     """
     print("Running assemble...")

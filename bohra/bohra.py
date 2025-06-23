@@ -20,15 +20,17 @@ from bohra.version import version
 from click.exceptions import UsageError
 from click._compat import get_text_stderr
 
-from bohra.commands.pipelines.preview import preview
-from bohra.commands.pipelines.assemble import assemble
-from bohra.commands.pipelines.default import default
-from bohra.commands.pipelines.snps import snps
-from bohra.commands.pipelines.amr_typing import amr_typing
-from bohra.commands.pipelines.ska import ska
-from bohra.commands.pipelines.full import full
-from bohra.commands.pipelines.custom import custom
-from bohra.commands.pipelines.tb import tb
+from bohra.launcher.Utils import _get_cmd_options
+# from bohra.commands.pipelines.mash import mash
+# from bohra.commands.pipelines.basic import basic
+# from bohra.commands.pipelines.assemble import assemble
+# from bohra.commands.pipelines.default import default
+# from bohra.commands.pipelines.snps import snps
+# from bohra.commands.pipelines.amr_typing import amr_typing
+# from bohra.commands.pipelines.ska import ska
+# from bohra.commands.pipelines.full import full
+# from bohra.commands.pipelines.custom import custom
+# from bohra.commands.pipelines.tb import tb
 from bohra.commands.check import check
 from bohra.commands.install import install 
 from bohra.commands.generate_input import generate_input
@@ -57,20 +59,49 @@ def run():
     """
     pass
 
+
+
+def create_subcommand_with_options(name, options_dict):
+    f"""Dynamically created a subcommand with options from a list."""
+
+    @run.command(name=name, help = f"Help for the {name}.")
+    def dynamic_subcommand(**kwargs):
+        # """A dynamically generated subcommand {name}."""
+        click.echo(f"Running {name} subcommand with options:")
+        for key, value in kwargs.items():
+            click.echo(f"  {key}: {value}")
+
+    # Add options dynamically
+    # print(options_list)
+    for opt in options_dict:
+        click.option(
+            f"--{opt['name']}",
+            # type=option_type,
+            default=opt.get('default', None),
+            help=opt.get('help', ''),
+        )(dynamic_subcommand) # Apply the decorator to the function
+
+    return dynamic_subcommand
+
+cmd_opts = _get_cmd_options()
+
+for opt in cmd_opts:
+    create_subcommand_with_options(name = opt, options_dict = cmd_opts[opt])
+
 cli.add_command(check.check)
 cli.add_command(install.install_deps)
 cli.add_command(generate_input.generate_input)
 cli.add_command(bohratest.test)
-
-run.add_command(preview.preview)
-run.add_command(assemble.assemble)
-run.add_command(snps.snps)
-run.add_command(default.default)
-run.add_command(amr_typing.amr_typing)
-run.add_command(ska.ska)
-run.add_command(full.full)
-run.add_command(custom.custom)
-run.add_command(tb.tb)
+# run.add_command(basic.basic)
+# run.add_command(mash.preview)
+# run.add_command(assemble.assemble)
+# run.add_command(snps.snps)
+# run.add_command(default.default)
+# run.add_command(amr_typing.amr_typing)
+# run.add_command(ska.ska)
+# run.add_command(full.full)
+# run.add_command(custom.custom)
+# run.add_command(tb.tb)
 
 
 if __name__ == '__main__':

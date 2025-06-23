@@ -26,15 +26,7 @@ classifiers = [
     "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
 dependencies = [
-    "altair>=5",
-    "biopython>=1.70",
-    "jinja2",
-    "numpy==1.23.1",
-    "packaging",
-    "pandas",
-    "psutil",
     "pytest",
-    "sh",
 ]
 
 [project.optional-dependencies]

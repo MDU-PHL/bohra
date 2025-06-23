@@ -54,20 +54,20 @@ def _make_annotation_file(input_file: list, result_files:list, annot_cols : list
 
     """
     df = pd.DataFrame()
-    print(input_file)
+    # print(input_file)
     if len(annot_cols) > 0 and pathlib.Path(input_file).exists():
         # check if the file exists
         cols = ["Isolate"]
         cols.extend(annot_cols)
         df = pd.read_csv(input_file, sep = '\t', usecols = cols)
 
-        print(df)
+        # print(df)
     cluster_path = [i for i in result_files if "cluster" in i]
     if len(cluster_path) != []:
         cluster_path = cluster_path[0]
         clst = pd.read_csv(cluster_path, sep = '\t')
         clst = clst.rename(columns = {"ID":"Isolate"})
-        print(clst)
+        # print(clst)
         if not df.empty:
             df = df.merge(clst, how = 'left', on ="Isolate")
         else:

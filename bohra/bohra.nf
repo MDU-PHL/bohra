@@ -43,6 +43,7 @@ include { READ_ANALYSIS;ASSEMBLY_ANALYSIS } from './workflows/seq_assessment'
 include { RUN_ASSEMBLE } from './workflows/assemble'
 include { RUN_SPECIES_READS; RUN_SPECIES_ASM; COMBINE_SPECIES } from './workflows/species'
 include { RUN_TYPING } from './workflows/typing'
+include { RUN_TBTAMR } from './workflows/tbtamr'
 include { RELATIONSHIPS } from './workflows/relationships'
 include { RUN_PANAROO } from './workflows/pangenome'
 include { RUN_COMPILE } from './workflows/compile'
@@ -52,14 +53,14 @@ workflow {
     // then depending on the workflow run the appropriate analysis
     reads_pe = Channel.fromFilePairs(["${params.outdir}/*/R{1,2}.fastq.gz"])
                     .filter { sample, files -> samples.containsKey(files[0].getParent().getName())}
-                    .map { sample, files -> tuple([id: files[0].getParent().getName(),modules: samples[files[0].getParent().getName()],input_type:'pe_reads', asm :asms[files[0].getParent().getName()], assembler:asmblr[files[0].getParent().getName()], species:sp[files[0].getParent().getName()] ], files)}
+                    .map { sample, files -> tuple([id: files[0].getParent().getName(),input_type:'pe_reads', asm :asms[files[0].getParent().getName()],  species:sp[files[0].getParent().getName()] ], files)}
     // reads_ont = Channel.fromPath( ["${params.outdir}/*/read_ont.fastq.gz","${params.outdir}/*/read_ont.fastq"])       
     //             .filter { files -> samples.containsKey(files.getParent().getName())} 
     //             .map {  files -> tuple([id: files.getParent().getName(), modules:samples[files.getParent().getName()], input_type:'ont_reads', asm :asms[files.getParent().getName()],assembler:asmblr[files.getParent().getName()],species:sp[files.getParent().getName()]], files)}
     
     asm = Channel.fromPath( ["${params.outdir}/*/contigs.fa"])       
                 .filter { files -> samples.containsKey(files.getParent().getName())} 
-                .map {  files -> tuple([id: files.getParent().getName(), modules:samples[files.getParent().getName()], input_type:'asm', asm :files,assembler:asmblr[files.getParent().getName()],species:sp[files.getParent().getName()]], files)}
+                .map {  files -> tuple([id: files.getParent().getName(), input_type:'asm', asm :files,species:sp[files.getParent().getName()]], files)}
     
     
     results = Channel.empty()
@@ -120,6 +121,12 @@ workflow {
         
     }
     
+    if (params.modules.contains("mtb")){
+        RUN_TBTAMR ( reads_pe)
+        results = results.concat( RUN_TBTAMR.out.results )
+        versions = versions.concat( RUN_TBTAMR.out.version )
+    }
+
     if (params.modules.contains("typing") ){
         // assembly is only done if the input is reads
         RUN_TYPING ( asm, reads_pe )
@@ -155,6 +162,7 @@ workflow {
         RELATIONSHIPS ( sequences, Channel.fromPath(params.reference) )
         
         results = results.concat( RELATIONSHIPS.out.dists )
+        results = results.concat( RELATIONSHIPS.out.core_vcf )
         results = results.concat( RELATIONSHIPS.out.clusters )
         results = results.concat( RELATIONSHIPS.out.stats )
         results = results.concat( RELATIONSHIPS.out.tree)
