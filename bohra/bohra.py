@@ -36,7 +36,7 @@ def _show_usage_error(self, file=None):
     if self.ctx is not None:
         color = self.ctx.color
         click.echo(self.ctx.get_help() + '\n', file=file, color=color)
-    
+    click.echo('ERROR: %s' % self.format_message(), file=file, color=color)
 
 UsageError.show = _show_usage_error
 
@@ -58,16 +58,14 @@ def create_subcommand_with_options(name, options_dict):
 
     @run.command(name=name, help = f"Help for the {name} pipeline.")
     def run_subcommand(**kwargs):
-        try:
-            if len(sys.argv) > 3:
-                run_bohra(pipeline=name, kwargs=kwargs)
-            else:
-                raise UsageError(f"You must supply some information to run {name} pipeline.")
-        except Exception as e:
-            raise UsageError(f"An error occurred while running the {name} pipeline: {e}")
+        # try:
+        if len(sys.argv) > 3:
+            run_bohra(pipeline=name, kwargs=kwargs)
+        else:
+            raise UsageError(f"You did not supply any input. Please supply some input to run the {name} pipeline.")
+        # except Exception as e:
+        #     raise UsageError(f"An error occurred while running the {name} pipeline: {e}")
 
-    # Add options dynamically
-    # print(options_list)
     for opt in options_dict:
         click.option(
             f"--{opt['name']}",
@@ -75,7 +73,7 @@ def create_subcommand_with_options(name, options_dict):
             default=opt.get('default', None),
             help=opt.get('help', ''),
             show_default= True,
-            # is_flag= opt.get('is_flag', False),
+            is_flag= opt.get('is_flag', False),
         )(run_subcommand) # Apply the decorator to the function
 
     return run_subcommand

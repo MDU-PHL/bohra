@@ -1,5 +1,7 @@
 from bohra.launcher.Utils import CustomFormatter, _check_path, _run_subprocess, _get_required_columns, _get_columns_list
 from bohra.launcher.BohraSetupFiles import _open_input_file, _check_data_format, _make_workdir
+from bohra.launcher.BohraSetupResources import _get_profile, _set_cpu_limit_local
+from bohra.launcher.BohraBasic import _setup_basic_args
 import pandas as pd
 import pathlib
 import os
@@ -30,15 +32,48 @@ def _setup_working_directory(input_file:str,
     
     return True
 
-def _check_compute_resources(cpus:int,) -> bool:
-    pass
+def _init_command_dict(profile:str, cpus:int) -> dict:
 
+    return {"params":[
+        f"--profile {profile}",
+        f"-executor.cpus {cpus}"
+                ], "modules":[]}
 
+def _funcs() -> dict:
+    """Returns a dictionary of functions to be used in the pipeline."""
+    
+    return {
+        "basic": _setup_basic_args,
+        "assembly": _setup_assembly_args,
+        "amr_typing": _setup_typing_args,
+    }
 
 def run_bohra(
         pipeline: str,
         kwargs: dict) -> bool:
     
+    print(f"Running the {pipeline} pipeline with the following parameters:"
+          f"\n{kwargs}")
+    LOGGER.info(f"Checking on the setup for the {pipeline} pipeline.")
+    profile = _get_profile(profile_config=kwargs.get('profile_config', ''),
+                 profile=kwargs.get('profile', 'lcl'))
+    max_cpus = int(_set_cpu_limit_local(cpus=kwargs.get('cpus', 0)))
+    LOGGER.info(f"Using {int(max_cpus)} CPUs for the {pipeline} pipeline.")
     
-    print(f"Running pipeline: {pipeline} with options: {kwargs}")
+    command = _init_command_dict(profile=profile, cpus=max_cpus)
+    
+    if _make_workdir(workdir=kwargs["workdir"],   
+                  _input=kwargs["input_file"]):
+    # add in the workdir and input file to the command to be run
+        command["params"].append(f"--workdir {kwargs['workdir']}")
+        LOGGER.info(f"Working directory {kwargs['workdir']} added to command successfully.")
+        command["params"].append(f"--isolates {kwargs['input_file']}")
+        LOGGER.info(f"Input file {kwargs['input_file']} added to command successfully.")
+        command = _setup_basic_args(kwargs=kwargs, command=command)
 
+
+        print(f"Command to be run: {command}")
+    else:
+        LOGGER.error(f"Failed to create the working directory {kwargs['workdir']}.")
+        raise SystemError
+        

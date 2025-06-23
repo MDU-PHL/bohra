@@ -28,26 +28,24 @@ LOGGER.addHandler(fh)
 def _get_profile(profile_config: str = '',
                  profile:str = "lcl") -> str:
 
-    # get hostname
     LOGGER.info(f"Tyring to find your profile.")
     # profile = 'lcl'
     if profile_config != '' and _check_path(profile_config):
-        with open(profile_config, 'r') as j:
-            _cfg = json.load(j)
+        with open(profile_config, 'r') as f:
+            _cfg = f.read().strip().split()
 
-        p = subprocess.run('hostname', shell = True, capture_output = True, encoding = "utf-8")
-        host = p.stdout.strip()
-        LOGGER.info(f"Host is : {host}")
-        if host in _cfg:
-            profile = _cfg[host]
-    # if profile == 'no_config':
-    #     LOGGER.critical(f"It seems you on an MDU system and trying to run on a head node. Please move to a compute node and try again.")
-    #     raise SystemExit
+        for line in _cfg:
+            if profile == line:
+                LOGGER.info(f"Found the profile {profile} in the config file {profile_config}.")
+                return profile
+        
+        LOGGER.warning(f"The profile {profile} is not found in the config file {profile_config}. Using the default profile 'lcl'.")
+    profile = 'lcl'
     LOGGER.info(f"You are running bohra with the {profile} profile.")
     return profile
         
-def _set_cpu_limit_local(cpus):
-# should be used when executor is local
+def _set_cpu_limit_local(cpus: int = 0) -> int:
+
     total_cores = os.cpu_count()
     one,five,fifteen = psutil.getloadavg()
     avail = total_cores - max(one,five,fifteen)

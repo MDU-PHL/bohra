@@ -42,12 +42,19 @@ def _check_path(path):
     :output - boolean 
     """ 
     
-    if pathlib.Path(path).exists():
-        
+    if pathlib.Path(path).exists() and os.access(path, os.R_OK):
         return True
     else:
-        
-        raise SystemExit
+        return False
+
+def _check_size_file( path:str):
+    '''
+    check the size of a file
+    '''
+    s = path.stat().st_size
+    return s
+
+
 
 
 def _run_subprocess(self, cmd):
@@ -82,13 +89,50 @@ def _get_columns_list() -> list:
     ]
 
 
+def _is_speciation(speciation: str) -> str:
+
+    if speciation != "none":
+        return speciation
+    else:
+        return False
+
+
+def _species_tool(speciation:str) -> str:
+    
+    if speciation != 'none':
+        return f"--use_{speciation} true"
+    
+
+def _check_species_database(speciation:str, database:str) -> str:
+    
+    if _check_path(database) and speciation != "kraken2":
+        return f"--{speciation}_db {database}"
+    elif _check_path(database) and speciation == "kraken2":
+        if pathlib.Path(database).is_dir():
+                kmerfiles = sorted(pathlib.Path(database).glob('*'))
+                s = []
+                for k in range(len(kmerfiles)):
+                    s.append(_check_size_file(pathlib.Path(database) / kmerfiles[k]))
+                if 0 not in s:
+                    return f"--{speciation}_db {database}"
+        else:
+            return False
+    else:
+        return False
+
+
+
+
 def _get_pipelines(pipeline:str) -> list:
     """
     Get the list of pipelines available
     :return: list of pipelines
     """
     pipelines = {
-        
+       "basic":"",
+        "assemble":"assemble", 
+        "amr_typing":"typing",
+        "tb":"mtb"
         
     }
 
@@ -110,6 +154,16 @@ def _resource_opt() -> list:
             "name":"conda_path",
             "help":"The path to where your pre-installed conda bohra-envs are stored. This can be provided in your profiles settings as well - it assumes you have pre-configured all of your conda environments for each process run by bohra, this is an advanced setting. Please take care if you are changing it.",
             "default":pathlib.Path(os.getenv('CONDA_PREFIX', ''))
+        },
+        {
+            "name":"profile",
+            "help":"The profile to use for running the pipeline. If not using defaults, you will need to have nextflow config set up - ist should be set as an environment variable - see docs for help. If not set, it will default to 'lcl'.",
+            "default":"lcl",
+        },
+        {
+            "name":"profile_config",
+            "help":"Path to the profile config file.",
+            "default":f"{pathlib.Path( os.getenv('TST_NFCFG', ''))}",
         },
         {
             "name":"keep",
@@ -150,13 +204,19 @@ def _get_common_options() -> list:
             "show_default":True
         },
         {
+            "name":"job_name",
+            "short_name":"-j",
+            "help":"Name of the job to be run, this will be used to name the output report html.",
+            "default":"bohra",
+        },
+        {
             "name":"sylph_db",
             "help":"Path to DB for use with sylph",
             "default":"",
             "show_default":True
         },
         {
-            "name":"kraken_db",
+            "name":"kraken2_db",
             "help":"Path to DB for use with kraken2",
             "default":os.getenv("KRAKEN2_DEFAULT_DB", ''),
             "metavar":'KRAKEN2_DEFAULT_DB',
@@ -164,9 +224,9 @@ def _get_common_options() -> list:
         },
         {
             "name":"speciation",
-            "help":"Speciation will be performed by deafult. Use --no-speciation if you do not need species detected.",
-            "is_flag":True,
-            "default":True
+            "help":"Speciation will be performed by deafult. Use none if you do not need species detected.",
+            "type":click.Choice(['kraken2', 'sylph', 'none']),
+            "default":"sylph"
         }
     ]
 
@@ -251,7 +311,8 @@ def _get_cmd_options() -> dict:
                 "short_name":"-cm",
                 "help":"The clustering method to use, default is 'single-linkage'",
                 "type":click.Choice(['single-linkage', 'average', 'complete', 'centroid', 'median', 'ward', 'weighted']),
-                "default":"single-linkage"
+                "default":"single-linkage",
+    
             },
             {
                 "name":"cluster_threshold",
@@ -283,7 +344,8 @@ def _get_cmd_options() -> dict:
             {
                 "name":"gubbins",
                 "help":"Set to use gubbins for recombination correction - only when using snippy.",
-                "is_flag":True
+                "is_flag":True,
+                "default":False
             },
             {
                 "name":"snippy_args",
@@ -295,30 +357,36 @@ def _get_cmd_options() -> dict:
                 "name":"minmap",
                 "short_name":"-mp",
                 "help":"Snippy - minimum read mapping quality to consider.",
-                "default":"60"
+                "default":60
             },
             {
                 "name":"basequal",
                 "short_name":"-bq",
                 "help":"Snippy - Minimum base quality to consider.",
-                "default":"13"
+                "default":13
             },
             {
                 "name":"minqual",
                 "short_name":"-mq",
                 "help":"Snippy - minimum QUALITY in VCF column 6",
-                "default":"100"
+                "default":100
             },
             {
                 "name":"minfrac",
                 "short_name":"-mf",
                 "help":"Snippy - minimum proportion for variant evidence",
-                "default":"0"
+                "default":0
+            },
+            {
+                "name":"fuzzy_core_prop",
+                "help":"Snippy - proportion of core genome to use for fuzzy core genome analysis.",
+                "default":1.0,
+                "type":float
             },
             {
                 "name":"ska_minfreq",
                 "help":"Ska - minimum frequency for variant calling.",
-                "default":"0.9"
+                "default":0.9
             },
             {
                 "name": "ska_alnargs",
@@ -328,18 +396,13 @@ def _get_cmd_options() -> dict:
             {
                 "name":"ska2_kszise",
                 "help":"Ska - kmer size for ska2, default is 31.",
-                "default":"31"
-            },
-            {
-                "name":"fuzzy_core_prop",
-                "help":"Proportion of core genome to use for fuzzy core genome analysis.",
-                "default":1.0,
-                "type":float
+                "default":31
             },
             {
                 "name":"cluster",
                 "help":"Set if you want to do hierarchical clustering.",
-                "is_flag":True
+                "is_flag":True,
+                "default":True
             },
             {
                 "name":"cluster_method",
@@ -358,7 +421,8 @@ def _get_cmd_options() -> dict:
             {
                 "name":"no_phylo",
                 "help":"Set if you do NOT want to generate a phylogenetic tree.",
-                "is_flag":True
+                "is_flag":True,
+                "default":False
             },
             {
                 "name":"tree_input",
@@ -370,8 +434,9 @@ def _get_cmd_options() -> dict:
             {
                 "name":"tree_builder",
                 "help":"Tree builder to use for comparative analysis.",
-                "default":"",
-                "type":click.Choice(['veryfasttree', 'iqtree'])
+                "default":"veryfasttree",
+                "type":click.Choice(['veryfasttree', 'iqtree']),
+                
             },
             
         ]
@@ -394,33 +459,3 @@ def _get_cmd_options() -> dict:
     cmd_opt["tb"] = tb
 
     return cmd_opt
-
-# @click.option('--cpus',
-#               help='Number of max CPU cores to run, will define how many rules are run at a time, if 0 then the avail cpus will be determined at time of launch', 
-#               default=0)
-# @click.option('--workdir', '-w',
-#               default=pathlib.Path.cwd().absolute(), 
-#               help='The directory where Bohra will be run, default is current directory', 
-#               type=click.Path(exists=True))
-# @click.option('--conda_path',       
-#               default=pathlib.Path(os.getenv('CONDA_PREFIX', '')), 
-#               help='The path to where your pre-installed conda bohra-envs are stored. This can be provided in your profiles settings as well - it assumes you have pre-configured all of your conda environments for each process run by bohra, this is an advanced setting. Please take care if you are changing it.')
-# @click.option('--keep',
-#               default='N', 
-#               type=click.Choice(['Y', 'N']), 
-#               help='If you are rerunning bohra over an exisiting directory set --keep to \'Y\' to archive report files - otherwise previous report files will be removed.')
-# @click.option('--proceed',
-#               is_flag=True, 
-#               help='If you would like to proceed straigt to the pipeline.')
-# @click.option('--force', '-f',
-#               is_flag=True, 
-#               help='Add if you would like to force a complete restart of the pipeline. All previous logs will be lost.')
-# @click.option('--no-conda',
-#               is_flag=True, 
-#               help='Set if you DO NOT WANT to use separate conda environments for each nextflow process.')
-# @click.option('--nfconfig','-nfcfg',
-#               default = f"", 
-#               help='An additional config file, required if running on a non-local machine, ie slurm, cloud. For help see documentation at https://github.com/MDU-PHL/bohra or https://www.nextflow.io/docs/latest/executor.html',) # don't need this
-# @click.option('--profile',
-#               default=f"", 
-#               help='The resource profile to use. Defaults to local, if using an alternative config file, this value should represent the name of a profile provided')

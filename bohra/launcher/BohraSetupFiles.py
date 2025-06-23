@@ -27,11 +27,12 @@ def _open_input_file(_file:str) -> pd.DataFrame:
     :param _file: path to input file
     :return: pandas dataframe
     """
-    if not _check_path(_file):
-        LOGGER.critical(f"Input file {_file} does not exist or is not accessible.")
-        raise SystemExit
-    elif _file == "":
+    LOGGER.info(f"Opening input file {_file}.")
+    if _file == "":
         LOGGER.critical(f"Input file cannot be empty. Please try again.")
+        raise SystemExit
+    elif not _check_path(_file):
+        LOGGER.critical(f"Input file {_file} does not exist or is not accessible.")
         raise SystemExit
     else:
         return pd.read_csv(_file, engine='python', sep = None, dtype = str)
@@ -42,11 +43,12 @@ def _check_data_format(df:pd.DataFrame) -> pd.DataFrame:
     :param df: pandas dataframe
     :return: pd.DataFrame
     """
+    
     columns_req = _get_required_columns()
     columns = []
     # check if all required columns are present
     for col in columns_req["required"]:
-        if col not in df.columns:
+        if col not in df.columns.tolist():
             LOGGER.critical(f"Column {col} is missing from input file.")
             raise SystemExit
         else:
@@ -54,10 +56,10 @@ def _check_data_format(df:pd.DataFrame) -> pd.DataFrame:
     # check if all must have columns are present
     mchk = False
     for col in columns_req["must_have"]:
-        if col in df.columns:
-            chk = True
+        if col in df.columns.tolist():
+            mchk = True
     if mchk == False:
-        LOGGER.critical(f"Must have at least on of {','.join(columns_req['must_have'])} in your input file.")
+        LOGGER.critical(f"Must have at least one of {','.join(columns_req['must_have'])} in your input file.")
         raise SystemExit
     # check if all optional columns are present
     schk = False
@@ -73,7 +75,6 @@ def _check_data_format(df:pd.DataFrame) -> pd.DataFrame:
             columns.append(col)
 
     df = df[columns]
-
     return df
 
 def _check_sequence_file(_file:str) -> bool:
@@ -111,18 +112,26 @@ def _make_workdir(_input:pd.DataFrame, workdir:str) -> bool:
 
     columns = _get_columns_list()
     if _check_path(workdir):
-
+        
         wd = pathlib.Path(workdir)
-        input_types = _get_input_types(cols_provided=_input.columns.tolist(), cols_required=columns)
-        for row in _input.iterrows():
-            LOGGER.info(f"Creating directory {row[1][columns[0]]} in {workdir}")
-            pathlib.Path(f"{wd / row[1][columns[0]]}").mkdir(parents=True, exist_ok=True)
+        input_table = _open_input_file(_file=_input)
+        input_table = _check_data_format(df=input_table)
+        
+        input_types = _get_input_types(cols_provided=input_table.columns.tolist(), cols_required=columns)
+        for row in input_table.iterrows():
+            
             for input_type in input_types:
                 user_supplied = row[1][input_type]
                 LOGGER.info(f"Linking {user_supplied} to {wd / row[1][columns[0]]}/{input_types[input_type]}")
                 if _check_sequence_file(pathlib.Path(user_supplied)):
                     try:
-                        pathlib.Path(user_supplied).symlink_to(wd / row[1][columns[0]] / input_types[input_type])
+                        LOGGER.info(f"Creating directory {row[1][columns[0]]} in {workdir}")
+                        target = pathlib.Path(wd / row[1][columns[0]] / input_types[input_type])
+                        if not target.exists():
+                            pathlib.Path(f"{wd / row[1][columns[0]]}").mkdir(parents=True, exist_ok=True)
+                            target.symlink_to(user_supplied)
+                        else:
+                            LOGGER.warning(f"File {target} already exists. Skipping link creation.")
                     except Exception as e:
                         LOGGER.critical(f"Could not link {user_supplied} to {wd / row[1][columns[0]]}/{input_types[input_type]}. Error: {e}")
                         raise SystemExit
