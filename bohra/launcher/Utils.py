@@ -245,6 +245,27 @@ def _get_cmd_options() -> dict:
                 "default":f"{os.getenv('MOBSUITE_DB','')}"
             }
         ],
+        "tb":[
+            {
+                "name":"cluster",
+                "help":"Set if you want to do hierarchical clustering.",
+                "is_flag":True
+            },
+            {
+                "name":"cluster_method",
+                "short_name":"-cm",
+                "help":"The clustering method to use, default is 'single-linkage'",
+                "type":click.Choice(['single-linkage', 'average', 'complete', 'centroid', 'median', 'ward', 'weighted']),
+                "default":"single-linkage"
+            },
+            {
+                "name":"cluster_threshold",
+                "short_name":"-ct",
+                "help":"Comma separated list of thresholds to use for clustering, default is '10'",
+                "type":str,
+                "default":"10"
+            },
+        ],
         "full": [
             {   "name":"comparative_tool",
                 "type":click.Choice(CFG["comparative_tools"]),
@@ -372,6 +393,10 @@ def _get_cmd_options() -> dict:
     comp.extend(all_options["full"])
     comp.extend(resource_options)
     cmd_opt["comparative"] = comp
+    tb = common_options.copy()
+    tb.extend(all_options["tb"])
+    tb.extend(resource_options)
+    cmd_opt["tb"] = tb
 
     return cmd_opt
 

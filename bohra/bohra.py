@@ -92,16 +92,7 @@ cli.add_command(check.check)
 cli.add_command(install.install_deps)
 cli.add_command(generate_input.generate_input)
 cli.add_command(bohratest.test)
-# run.add_command(basic.basic)
-# run.add_command(mash.preview)
-# run.add_command(assemble.assemble)
-# run.add_command(snps.snps)
-# run.add_command(default.default)
-# run.add_command(amr_typing.amr_typing)
-# run.add_command(ska.ska)
-# run.add_command(full.full)
-# run.add_command(custom.custom)
-# run.add_command(tb.tb)
+
 
 
 if __name__ == '__main__':
