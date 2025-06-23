@@ -35,39 +35,10 @@ def _check_compute_resources(cpus:int,) -> bool:
 
 
 
-def run_bohra(input_file:str,
-              reference:str='',
-              mask:str='',
-              speciation:str="",
-              kraken_db:str='',
-              sylph_db:str='',
-              spades_args:str='',
-              assembler:str='shovill',
-              minmap:int=60,
-              basequal:int=13,
-              minqual:int=100,
-              minfrac:float=0.0,
-              mincov:int=10,
-              fuzzy_core_prop:float=1.0,
-              tree_builder:str='',
-              cluster:bool=False,
-              cluster_method:str='single-linkage',
-              cluster_threshold:str='10',
-              blast_db:str='',
-              data_dir:str='',
-              mlst_exclude:list=None,
-              modules:list=None,
-              mobsuite_db:str='',
-              gubbins:bool=False,
-              keep:str='N',
-              proceed:bool=False,
-              force:bool=False,
-              nfconfig:str='',
-              profile:str='local',
-              cpus:int=0,
-              workdir:str="",
-              conda_path:str='',
-              no_conda:bool=False,
-              pipeline:str='default',):
-    pass
+def run_bohra(
+        pipeline: str,
+        kwargs: dict) -> bool:
+    
+    
+    print(f"Running pipeline: {pipeline} with options: {kwargs}")
 

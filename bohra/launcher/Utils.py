@@ -140,21 +140,6 @@ def _get_common_options() -> list:
     Get the common options available for each pipeline
     :return: list of options
     """
-#     @click.option('--input_file', '-i',
-#               help='Path to reads file, which is a tab-delimited with 3 columns <isolatename>  <path_to_read1> <path_to_read2>.',
-#               default='')
-# @click.option('--sylph_db', '-k',
-#               default="",
-#               show_default=True,
-#               help="Path to DB for use with sylph")
-# @click.option('--kraken_db', '-k',
-#               default=os.getenv("KRAKEN2_DEFAULT_DB", ''),
-#               metavar='KRAKEN2_DEFAULT_DB',
-#               show_default=True,
-#               help="Path to DB for use with kraken2")
-# @click.option('--speciation/--no-speciation',
-#               is_flag=True, 
-#               help='Speciation will be performed by deafult - use --no-speciation if you do not need species detected.')
 
     common_options = [
         {

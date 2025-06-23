@@ -14,6 +14,7 @@ Bohra is modular allowing the user to choose between calling SNPs and generating
 # import logging
 # import argparse
 import click
+import sys
 
 from bohra.SnpDetection import RunSnpDetection, SetupInputFiles, InitBohra, TestBohra
 from bohra.version import version
@@ -21,20 +22,11 @@ from click.exceptions import UsageError
 from click._compat import get_text_stderr
 
 from bohra.launcher.Utils import _get_cmd_options
-# from bohra.commands.pipelines.mash import mash
-# from bohra.commands.pipelines.basic import basic
-# from bohra.commands.pipelines.assemble import assemble
-# from bohra.commands.pipelines.default import default
-# from bohra.commands.pipelines.snps import snps
-# from bohra.commands.pipelines.amr_typing import amr_typing
-# from bohra.commands.pipelines.ska import ska
-# from bohra.commands.pipelines.full import full
-# from bohra.commands.pipelines.custom import custom
-# from bohra.commands.pipelines.tb import tb
 from bohra.commands.check import check
 from bohra.commands.install import install 
 from bohra.commands.generate_input import generate_input
 from bohra.commands.test import bohratest
+from bohra.launcher.BohraRun import run_bohra
 
 
 def _show_usage_error(self, file=None):
@@ -44,15 +36,15 @@ def _show_usage_error(self, file=None):
     if self.ctx is not None:
         color = self.ctx.color
         click.echo(self.ctx.get_help() + '\n', file=file, color=color)
-    click.echo('Error: %s' % self.format_message(), file=file, color=color)
+    
 
 UsageError.show = _show_usage_error
 
-@click.group()
+@click.group(no_args_is_help=True,invoke_without_command=True)
 def cli():
     pass
 
-@cli.group()
+@cli.group(no_args_is_help=True,invoke_without_command=True)
 def run():
     """
     Run the Bohra pipeline.
@@ -66,11 +58,13 @@ def create_subcommand_with_options(name, options_dict):
 
     @run.command(name=name, help = f"Help for the {name} pipeline.")
     def run_subcommand(**kwargs):
-        # """A dynamically generated subcommand {name}."""
-        click.echo(f"Running {name} subcommand with options:")
-        
-        for key, value in kwargs.items():
-            click.echo(f"  {key}: {value}")
+        try:
+            if len(sys.argv) > 3:
+                run_bohra(pipeline=name, kwargs=kwargs)
+            else:
+                raise UsageError(f"You must supply some information to run {name} pipeline.")
+        except Exception as e:
+            raise UsageError(f"An error occurred while running the {name} pipeline: {e}")
 
     # Add options dynamically
     # print(options_list)
