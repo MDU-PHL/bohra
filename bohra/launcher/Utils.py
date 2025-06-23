@@ -120,12 +120,14 @@ def _resource_opt() -> list:
         {
             "name":"force",
             "help":"Add if you would like to force a complete restart of the pipeline. All previous logs will be lost.",
-            "is_flag":True
+            "is_flag":True,
+            "default":False
         },
         {
             "name":"no_conda",
             "help":"Set if you DO NOT WANT to use separate conda environments for each nextflow process.",
-            "is_flag":True
+            "is_flag":True,
+            "default":False
         },
     
     ]
@@ -178,7 +180,8 @@ def _get_common_options() -> list:
         {
             "name":"speciation",
             "help":"Speciation will be performed by deafult. Use --no-speciation if you do not need species detected.",
-            "is_flag":True
+            "is_flag":True,
+            "default":True
         }
     ]
 
@@ -217,12 +220,6 @@ def _get_cmd_options() -> dict:
         ],
         "amr_typing": [
             {
-                "name":"abritamr_args",
-                "help":"Set if you would like to use point mutations, please provide a valid species.",
-                "required":False,
-                "type":click.Choice(CFG["abritamr_species"])  # Replace with actual species list
-            },
-            {
                 "name":"blast_db",
                 "help":"Path to the mlst blast_db, defaults to what is installed in the environment.",
                 "default":f"{os.getenv('BLAST_DB', '')}"
@@ -247,9 +244,22 @@ def _get_cmd_options() -> dict:
         ],
         "tb":[
             {
+                "name":"reference_genome",
+                "short_name":"-ref",
+                "help":"The default reference genome for TB, if you want to use a different one please provide the path to the .fasta file.",
+                "default":f"{pathlib.Path(__file__).parent.parent.resolve() / 'references' / 'tb' / 'NC_000962.3.fasta'}"
+            },
+            {
+                "name":"mask",
+                "short_name":"-m",
+                "help":"Default mask file for TB, if you want to use a different one please provide the path to the .bed file.",
+                "default":f"{pathlib.Path(__file__).parent.parent.resolve() / 'references' / 'tb' / 'mask.bed'}"
+            },
+            {
                 "name":"cluster",
                 "help":"Set if you want to do hierarchical clustering.",
-                "is_flag":True
+                "is_flag":True,
+                "default":True
             },
             {
                 "name":"cluster_method",
@@ -261,9 +271,9 @@ def _get_cmd_options() -> dict:
             {
                 "name":"cluster_threshold",
                 "short_name":"-ct",
-                "help":"Comma separated list of thresholds to use for clustering, default is '10'",
+                "help":"Comma separated list of thresholds to use for clustering",
                 "type":str,
-                "default":"10"
+                "default":"5,12"
             },
         ],
         "full": [

@@ -64,10 +64,11 @@ def run():
 def create_subcommand_with_options(name, options_dict):
     f"""Dynamically created a subcommand with options from a list."""
 
-    @run.command(name=name, help = f"Help for the {name}.")
-    def dynamic_subcommand(**kwargs):
+    @run.command(name=name, help = f"Help for the {name} pipeline.")
+    def run_subcommand(**kwargs):
         # """A dynamically generated subcommand {name}."""
         click.echo(f"Running {name} subcommand with options:")
+        
         for key, value in kwargs.items():
             click.echo(f"  {key}: {value}")
 
@@ -76,12 +77,14 @@ def create_subcommand_with_options(name, options_dict):
     for opt in options_dict:
         click.option(
             f"--{opt['name']}",
-            # type=option_type,
+            type=opt.get('type', None),
             default=opt.get('default', None),
             help=opt.get('help', ''),
-        )(dynamic_subcommand) # Apply the decorator to the function
+            show_default= True,
+            # is_flag= opt.get('is_flag', False),
+        )(run_subcommand) # Apply the decorator to the function
 
-    return dynamic_subcommand
+    return run_subcommand
 
 cmd_opts = _get_cmd_options()
 
