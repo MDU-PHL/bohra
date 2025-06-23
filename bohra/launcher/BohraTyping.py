@@ -31,7 +31,7 @@ def _missing_reads(input_table: pd.DataFrame) -> bool:
     elif not noctg.empty:
         res = False
         for row in noctg.iterrows():
-            if not _check_sequence_file(row[1]['r1']):
+            if not _check_sequence_file(pathlib.Path(row[1]['r1'])):
                 LOGGER.warning(f"Missing reads for {row[1]['Isolate']}.")
                 res =  True
         
@@ -60,7 +60,5 @@ def _setup_typing_args(kwargs:dict, command:dict) -> dict:
     input_table = _open_input_file(kwargs['input_file'])
     command = _assembly_required(input_table = input_table, command = command, kwargs=kwargs)
     command['modules'].append('typing')
-    
-
     
     return command
