@@ -21,6 +21,7 @@ LOGGER.addHandler(fh)
 
 
 
+
 def _is_speciation(speciation: str) -> str:
 
     if speciation != "none":
@@ -53,23 +54,32 @@ def _check_species_database(speciation:str, database:str) -> str:
         return False
 
 
+def _accessory_params(kwargs:dict, command:dict) -> list:
+    """Returns a list of accessory parameters for the command."""
+    
+    if kwargs['use_conda']:
 
+        if _check_path(kwargs['conda_path']):
+            command['params'].append(f"--conda_path {kwargs['conda_path']}")
+            command['params'].append("-with-conda")
+    if not kwargs['force']:
+        command['params'].append("-resume")
+
+    command['params'].append(f"--background_color {kwargs['background_color']}  --text_color {kwargs['text_color']} --job_id {kwargs['job_name']}")
+    return command
 
 
 def _setup_basic_args(kwargs:dict, command:dict) -> dict:
 
-    mods = command.get('modules', [])
-    params = command.get('params', [])
+    
     spn = _is_speciation(kwargs["speciation"])
     if spn:
-        mods.append(spn)
-        params.append(_species_tool(kwargs["speciation"]))
+        command['modules'].append(spn)
+        command['params'].append(_species_tool(kwargs["speciation"]))
         chk_db = _check_species_database(kwargs["speciation"], kwargs[f"{kwargs['speciation']}_db"])
         if chk_db:
-            params.append(chk_db)
+            command['params'].append(chk_db)
     
-    
-    command['modules'] = mods
-    command['params'] = params
+    command = _accessory_params(kwargs=kwargs, command=command)
 
     return command

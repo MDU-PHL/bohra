@@ -89,40 +89,6 @@ def _get_columns_list() -> list:
     ]
 
 
-def _is_speciation(speciation: str) -> str:
-
-    if speciation != "none":
-        return speciation
-    else:
-        return False
-
-
-def _species_tool(speciation:str) -> str:
-    
-    if speciation != 'none':
-        return f"--use_{speciation} true"
-    
-
-def _check_species_database(speciation:str, database:str) -> str:
-    
-    if _check_path(database) and speciation != "kraken2":
-        return f"--{speciation}_db {database}"
-    elif _check_path(database) and speciation == "kraken2":
-        if pathlib.Path(database).is_dir():
-                kmerfiles = sorted(pathlib.Path(database).glob('*'))
-                s = []
-                for k in range(len(kmerfiles)):
-                    s.append(_check_size_file(pathlib.Path(database) / kmerfiles[k]))
-                if 0 not in s:
-                    return f"--{speciation}_db {database}"
-        else:
-            return False
-    else:
-        return False
-
-
-
-
 def _get_pipelines(pipeline:str) -> list:
     """
     Get the list of pipelines available
@@ -151,6 +117,12 @@ def _resource_opt() -> list:
             "type":click.Path(exists=True)
         },
         {
+            "name":"use_conda",
+            "help":"Use separate conda environments for each nextflow process.",
+            "is_flag":True,
+            "default":True
+        },
+        {
             "name":"conda_path",
             "help":"The path to where your pre-installed conda bohra-envs are stored. This can be provided in your profiles settings as well - it assumes you have pre-configured all of your conda environments for each process run by bohra, this is an advanced setting. Please take care if you are changing it.",
             "default":pathlib.Path(os.getenv('CONDA_PREFIX', ''))
@@ -177,12 +149,7 @@ def _resource_opt() -> list:
             "is_flag":True,
             "default":False
         },
-        {
-            "name":"no_conda",
-            "help":"Set if you DO NOT WANT to use separate conda environments for each nextflow process.",
-            "is_flag":True,
-            "default":False
-        },
+        
     
     ]
 
@@ -227,6 +194,16 @@ def _get_common_options() -> list:
             "help":"Speciation will be performed by deafult. Use none if you do not need species detected.",
             "type":click.Choice(['kraken2', 'sylph', 'none']),
             "default":"sylph"
+        },
+        {
+            "name":"text_color",
+            "help":"Color to use for the text in the report html. Default is 'white'.",
+            "default":"#ffffff",
+        },
+        {
+            "name":"background_color",
+            "help":"Color to use for the background in the report html. Default is '#343a40'.",
+            "default":"#343a40",
         }
     ]
 
@@ -438,6 +415,11 @@ def _get_cmd_options() -> dict:
                 "type":click.Choice(['veryfasttree', 'iqtree']),
                 
             },
+            {
+                "name":"annotations",
+                "help":"Comma separated list of annotations to use for the tree, default is 'Tx:cluster_threshold'. MUST be present in the input file.",
+                "default":"",
+            }
             
         ]
     }

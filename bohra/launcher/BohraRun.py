@@ -2,6 +2,7 @@ from bohra.launcher.Utils import CustomFormatter, _check_path, _run_subprocess, 
 from bohra.launcher.BohraSetupFiles import _open_input_file, _check_data_format, _make_workdir
 from bohra.launcher.BohraSetupResources import _get_profile, _set_cpu_limit_local
 from bohra.launcher.BohraBasic import _setup_basic_args
+from bohra.launcher.BohraAssembly import _setup_assembly_args
 import pandas as pd
 import pathlib
 import os
@@ -36,15 +37,19 @@ def _init_command_dict(profile:str, cpus:int) -> dict:
 
     return {"params":[
         f"--profile {profile}",
-        f"-executor.cpus {cpus}"
+        f"-executor.cpus {cpus}",
+        "-with-trace"
                 ], "modules":[]}
+
+def _check_assembly_req(kwargs: dict) -> bool:
+
+    pass
 
 def _funcs() -> dict:
     """Returns a dictionary of functions to be used in the pipeline."""
     
     return {
-        "basic": _setup_basic_args,
-        "assembly": _setup_assembly_args,
+        "assemble": _setup_assembly_args,
         "amr_typing": _setup_typing_args,
     }
 
@@ -65,12 +70,12 @@ def run_bohra(
     if _make_workdir(workdir=kwargs["workdir"],   
                   _input=kwargs["input_file"]):
     # add in the workdir and input file to the command to be run
-        command["params"].append(f"--workdir {kwargs['workdir']}")
+        command["params"].append(f"--outdir {kwargs['workdir']}")
         LOGGER.info(f"Working directory {kwargs['workdir']} added to command successfully.")
         command["params"].append(f"--isolates {kwargs['input_file']}")
         LOGGER.info(f"Input file {kwargs['input_file']} added to command successfully.")
         command = _setup_basic_args(kwargs=kwargs, command=command)
-
+        command = _funcs()[pipeline](kwargs=kwargs, command=command)
 
         print(f"Command to be run: {command}")
     else:
