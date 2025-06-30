@@ -278,7 +278,7 @@ def _get_cmd_options() -> dict:
                 "default":f"{pathlib.Path(__file__).parent.parent.resolve() / 'references' / 'tb' / 'mask.bed'}"
             },
             {
-                "name":"cluster",
+                "name":"cluster/--no-cluster",
                 "help":"Set if you want to do hierarchical clustering.",
                 "is_flag":True,
                 "default":True
@@ -396,10 +396,10 @@ def _get_cmd_options() -> dict:
                 "default":"10"
             },
             {
-                "name":"no_phylo",
+                "name":"phylo",
                 "help":"Set if you do NOT want to generate a phylogenetic tree.",
                 "is_flag":True,
-                "default":False
+                "default":True
             },
             {
                 "name":"tree_input",

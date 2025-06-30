@@ -4,6 +4,7 @@ from bohra.launcher.BohraSetupResources import _get_profile, _set_cpu_limit_loca
 from bohra.launcher.BohraBasic import _setup_basic_args
 from bohra.launcher.BohraAssembly import _setup_assembly_args
 from bohra.launcher.BohraTyping import _setup_typing_args
+from bohra.launcher.BohraComparative import _setup_comparative_args
 import pandas as pd
 import pathlib
 import os
@@ -52,6 +53,7 @@ def _funcs() -> dict:
     return {
         "assemble": [_setup_assembly_args],
         "amr_typing":[ _setup_assembly_args, _setup_typing_args],
+        "full":[ _setup_comparative_args, ],
     }
 
 def run_bohra(
