@@ -35,6 +35,7 @@ def _get_annotation(input_file:str, mtb:bool) -> str:
     if mtb:
         annot_cols.extend(['Phylogenetic lineage', "Predicted drug resistance"])
     return ','.join(annot_cols) if annot_cols else ""
+
 def _setup_comparative_args(kwargs:dict, command:dict, mtb:bool) -> dict:
     
     if mtb:

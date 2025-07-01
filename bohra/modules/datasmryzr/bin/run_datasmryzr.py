@@ -47,25 +47,31 @@ def _extract_core_genome_report(results_files: list, output:list) -> str:
             return f"-cgr {file}",output
     return "",output
 
-def _make_annotation_file(input_file: list, result_files:list, annot_cols : list) -> str:
+def _make_annotation_file(input_file: list, result_files:list, annot_cols : str) -> str:
     """
 
     Extract the annotation file from the input files
 
     """
     df = pd.DataFrame()
-    # print(input_file)
+    annot_cols = annot_cols.split(",") if annot_cols else []
+    print(annot_cols)
+    print(pathlib.Path(input_file).exists())
     if len(annot_cols) > 0 and pathlib.Path(input_file).exists():
         # check if the file exists
         cols = ["Isolate"]
-        cols.extend(annot_cols)
-        df = pd.read_csv(input_file, sep = '\t', usecols = cols)
-
+        # cols.extend(annot_cols)
+        df = pd.read_csv(input_file, sep = '\t')
+        for a in annot_cols:
+            if a in df.columns:
+                cols.append(a)
+        df = df[cols]
         # print(df)
         
     for _file in result_files:
+        print(_file)
         if "cluster" in _file:
-
+            print("Found cluster file")
             clst = pd.read_csv(_file, sep = '\t')
             clst = clst.rename(columns = {"ID":"Isolate"})
             # print(clst)
@@ -74,18 +80,25 @@ def _make_annotation_file(input_file: list, result_files:list, annot_cols : list
             else:
                 df = clst
         else:
-            tmp = pd.read_csv(_file, sep = '\t')
-            tmp_cols = ["Isolate"]
-            for col in tmp.columns:
-                if col in annot_cols:
-                    tmp_cols.append(col)
-            if tmp_cols != ["Isolate"]:
-                tmp = tmp[tmp_cols]
-                if not df.empty:
-                    df = df.merge(tmp, how = 'left', on ="Isolate")
-                else:
-                    df = tmp
-
+            try:
+                tmp = pd.read_csv(_file, sep = '\t')
+                # print(tmp)
+                tmp_cols = ["Isolate"]
+                for col in tmp.columns:
+                    if col in annot_cols:
+                        tmp_cols.append(col)
+                # print(tmp_cols)
+                if tmp_cols != ["Isolate"]:
+                    tmp = tmp[tmp_cols]
+                    print(tmp)
+                    # print(df)
+                    if not df.empty:
+                        df = df.merge(tmp, how = 'left', on ="Isolate")
+                    else:
+                        df = tmp
+            except Exception as e:
+                print(f"Error reading file {_file}: {e}")
+        print(df)
     
     if not df.empty:
         df.to_csv("annotation_file.tsv", sep = '\t', index = False)
@@ -145,16 +158,16 @@ def _run_datasmryzr(tree:str,
         return p.stdout.decode()
 
 def _compile(args):
-
-    output = []
-    tree,output = _extract_tree(args.results_files, output)
+    print(f"{args.annot_cols}")
+    print(args.results_files)
+    tree,output = _extract_tree(args.results_files, args.job_id)
     distance_matrix,output = _extract_distance_matrix(args.results_files, output)
     core_genome,output = _extract_core_genome(args.results_files, output)
     core_genome_report,output = _extract_core_genome_report(args.results_files, output)
     other_files = _get_other_files(args.results_files,output)
     reference = _get_reference(args.reference)
     mask = _get_mask(args.mask)
-    annotation = _make_annotation_file(args.input_file, args.results_files, args.annot_cols.split(","))
+    annotation = _make_annotation_file(args.input_file, args.results_files, f"{args.annot_cols}")
 
     p = _run_datasmryzr(tree,
                         distance_matrix,
@@ -166,7 +179,7 @@ def _compile(args):
                         annotation,
                         args.bkgd,
                         args.text_color,
-                        f"-t {args.job_id}")
+                        args.job_id)
     
 
 
@@ -199,8 +212,7 @@ def set_parsers():
         default = '')
     parser.add_argument('--text_color',
         help='',
-        default = '')
-    
+        default = '',)
     
     
     parser.set_defaults(func=_compile)

@@ -37,7 +37,7 @@ def summarise_tbtamr(input_file: str, output_file: str) -> None:
     drs = set([ i.split('-')[0].strip() for i in df.columns if 'mech' in i])
 
     for dr in drs:
-        df[dr] = df[[f"{dr} - mechanism", f"{dr} - interpretation", f"{dr} - confidence"]].apply(
+        df[dr] = df[[f"{dr} - mechanisms", f"{dr} - interpretation", f"{dr} - confidence"]].apply(
             lambda x: _smoosh_results(x), axis=1
         )
     

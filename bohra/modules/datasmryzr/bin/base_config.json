@@ -1,0 +1,15 @@
+{
+    "comments":{
+    "resistome": "* indicative of 90 - 99% identity and >90% coverage to a known resistance gene; ^ indicative of 90 - 99% identity and 50%< coverage <90% to a known resistance gene; text in bracket indicates the AMR mechanim is possible on a plasmid (ACCESSION plasmid_species)"
+},
+    "datatype": {
+        "MLST":"input",
+        "ST":"input"
+    },
+    "categorical_columns": [
+        "MLST",
+        "ST"
+    ],
+    "id_column": "Isolate"
+
+}

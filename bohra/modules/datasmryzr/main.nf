@@ -38,10 +38,11 @@ process RUN_SMRYZR {
     """
     $module_dir/run_datasmryzr.py --job_id ${params.job_id} \
     --mask ${params.mask} --reference ${params.reference} \
-    --input_file ${params.isolates} \
-    --annot_cols ${params.annot_cols} \
+    --input_file ${launchDir}/${params.isolates} \
+    --annot_cols '${params.annot_cols}' \
     --bkgd '${params.background_color}' \
     --text_color '${params.text_color}' \
-    --results_files ${input_files} 
+    --results_files ${input_files} \
+    
     """
 }
