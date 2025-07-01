@@ -50,9 +50,8 @@ def _assembly_required(input_table: pd.DataFrame, command:dict, kwargs:dict, mtb
     """Check if assembly is required based on the provided arguments."""
     LOGGER.info("Checking if assembly is required.")
     
-    ctg_list = [i for i in input_table['assembly'].unique().tolist() if i != 'no_contigs']
 
-    if 'no_contigs' in input_table['assembly'].unique().tolist() and len(ctg_list) > 0:
+    if 'no_contigs' in input_table['assembly'].unique().tolist():
         LOGGER.info("Assembly is required in order to run the pipeline")
         command = _setup_assembly_args(kwargs, command, mtb)
     else:
