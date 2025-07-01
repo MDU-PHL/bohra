@@ -21,6 +21,15 @@ LOGGER.addHandler(ch)
 LOGGER.addHandler(fh)
 
 
+def _check_databases(path :str, dtbtype:str) -> dict:
+    
+    if path == "":
+        LOGGER.info(f"No database path provided using default databases installed for {dtbtype}.")
+        
+        return f"--{dtbtype} no_db"
+    elif _check_path(path):
+        return f"--{dtbtype} {path}"
+
 
 def _missing_reads(input_table: pd.DataFrame) -> bool:
 
@@ -37,7 +46,7 @@ def _missing_reads(input_table: pd.DataFrame) -> bool:
         
     return res
 
-def _assembly_required(input_table: pd.DataFrame, command:dict, kwargs:dict) -> dict:
+def _assembly_required(input_table: pd.DataFrame, command:dict, kwargs:dict, mtb:False) -> dict:
     """Check if assembly is required based on the provided arguments."""
     LOGGER.info("Checking if assembly is required.")
     
@@ -45,7 +54,7 @@ def _assembly_required(input_table: pd.DataFrame, command:dict, kwargs:dict) -> 
 
     if 'no_contigs' in input_table['assembly'].unique().tolist() and len(ctg_list) > 0:
         LOGGER.info("Assembly is required in order to run the pipeline")
-        command = _setup_assembly_args(kwargs, command)
+        command = _setup_assembly_args(kwargs, command, mtb)
     else:
         LOGGER.info("Assembly is not required.")
     
@@ -55,10 +64,19 @@ def _assembly_required(input_table: pd.DataFrame, command:dict, kwargs:dict) -> 
         
     return command
         
-def _setup_typing_args(kwargs:dict, command:dict) -> dict:
+def _setup_typing_args(kwargs:dict, command:dict, mtb:False) -> dict:
 
+    typing_dbs = ["blast_db", "data_dir", "mobsuite_db"]
     input_table = _open_input_file(kwargs['input_file'])
-    command = _assembly_required(input_table = input_table, command = command, kwargs=kwargs)
+    command = _assembly_required(input_table = input_table, command = command, kwargs=kwargs, mtb=mtb)
     command['modules'].append('typing')
+    for d in typing_dbs:
+        db = _check_databases(path = kwargs[d], dtbtype = d)
+        command["params"].append(db)
+
+    exclude = eval(kwargs['mlst_exclude'])
     
+    if exclude != []:
+        command['params'].append(f"--mlst_exclude {','.join(exclude)}")
+
     return command

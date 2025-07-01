@@ -24,7 +24,7 @@ process PROKKA {
         conda null
     }
 
-    scratch true
+    // scratch true
     
     input:
     tuple val(meta), path(contigs)

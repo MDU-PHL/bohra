@@ -33,7 +33,7 @@ process CORE_SNP_FILTER {
         
     script:
     """
-    coresnpfilter -c ${params.coresnpfilter_prop} -e $core_full_aln > core.filtered.aln 
+    coresnpfilter -c ${params.fuzzy_core_prop} -e $core_full_aln > core.filtered.aln 
     echo -e core-snp-filter'\t'\$CONDA_PREFIX'\t'\$(coresnpfilter --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_spades.txt
     """
     

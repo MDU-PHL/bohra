@@ -30,15 +30,15 @@ input_file = file(params.isolates) // need to make this an input file
         
     line = line.split("\t")
         // println "The line is : $line"
-        samples[line[0]] = line[1]
-        asms[line[0]] = line[2]
-        asmblr[line[0]] = line[3]
-        sp[line[0]] = line[4]
+        samples[line[0]] = line[0]
+        asms[line[0]] = line[4]
+        // asmblr[line[0]] = line[3]
+        sp[line[0]] = line[1]
      }
     }
 
 println "Will run : $params.modules"
-
+println samples
 include { READ_ANALYSIS;ASSEMBLY_ANALYSIS } from './workflows/seq_assessment'
 include { RUN_ASSEMBLE } from './workflows/assemble'
 include { RUN_SPECIES_READS; RUN_SPECIES_ASM; COMBINE_SPECIES } from './workflows/species'
@@ -64,6 +64,7 @@ workflow {
     
     
     results = Channel.empty()
+    // println reads_pe.view()
     // seq assessment is always done on every input
     READ_ANALYSIS ( reads_pe )
     read_stats = READ_ANALYSIS.out.read_stats
@@ -122,14 +123,18 @@ workflow {
     }
     
     if (params.modules.contains("mtb")){
-        RUN_TBTAMR ( reads_pe)
+        RUN_TBTAMR ( reads_pe )
         results = results.concat( RUN_TBTAMR.out.results )
         versions = versions.concat( RUN_TBTAMR.out.version )
     }
 
     if (params.modules.contains("typing") ){
         // assembly is only done if the input is reads
-        RUN_TYPING ( asm, reads_pe )
+        // find any tb as plasmid and mlst and abritamr no good - use tbtamr
+        asm_typing = asm.filter { cfg, asm -> cfg.species != 'Mycobacterium tuberculosis' }
+        reads_nottb = reads_pe.filter { cfg, reads -> cfg.species != 'Mycobacterium tuberculosis' }
+        reads_tb = reads_pe.filter { cfg, reads -> cfg.species == 'Mycobacterium tuberculosis' }
+        RUN_TYPING ( asm_typing, reads_nottb )
         resistome = RUN_TYPING.out.resistome
         virulome = RUN_TYPING.out.virulome
         plasmid = RUN_TYPING.out.plasmid
@@ -145,6 +150,9 @@ workflow {
         results = results.concat( serotypes )
         results = results.concat( mlst )
         versions = versions.concat( RUN_TYPING.out.versions )
+        RUN_TBTAMR ( reads_tb)
+        results = results.concat( RUN_TBTAMR.out.results )
+        versions = versions.concat( RUN_TBTAMR.out.version )
     }
     
     if (params.modules.contains("snippy") || (params.modules.contains("ska")) || (params.modules.contains("mash"))){
@@ -159,6 +167,7 @@ workflow {
             sequences = reads.join(asm_tmp, remainder:true).map( v -> { v.size() == 4 ? v[1] ? [v[1],v[2]] : [v[2],v[3]]  : [v[1],v[2]]} )
            
         } 
+
         RELATIONSHIPS ( sequences, Channel.fromPath(params.reference) )
         
         results = results.concat( RELATIONSHIPS.out.dists )

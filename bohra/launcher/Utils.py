@@ -2,8 +2,11 @@ import logging
 import pathlib
 import subprocess
 import click
+import shutil
+from shutil import SameFileError
 import os
 import json
+import pandas as pd
 
 class CustomFormatter(logging.Formatter):
     """Logging Formatter to add colors and count warning / errors"""
@@ -130,12 +133,12 @@ def _resource_opt() -> list:
         {
             "name":"profile",
             "help":"The profile to use for running the pipeline. If not using defaults, you will need to have nextflow config set up - ist should be set as an environment variable - see docs for help. If not set, it will default to 'lcl'.",
-            "default":"lcl",
+            "default":os.getenv('TST_NF_PROFILE', 'lcl'),
         },
         {
             "name":"profile_config",
             "help":"Path to the profile config file.",
-            "default":f"{pathlib.Path( os.getenv('TST_NFCFG', ''))}",
+            "default":f"{pathlib.Path( os.getenv('TST_NFCFG', ''))}", # need to change this to reflect the ENV variable or the default supplied with bohra
         },
         {
             "name":"keep",
@@ -179,7 +182,7 @@ def _get_common_options() -> list:
         {
             "name":"sylph_db",
             "help":"Path to DB for use with sylph",
-            "default":"",
+            "default":os.getenv("SYLPH_DEFAULT_DB", ''),
             "show_default":True
         },
         {
@@ -208,7 +211,6 @@ def _get_common_options() -> list:
     ]
 
     return common_options
-
 
 def _get_cmd_options() -> dict:
     """
@@ -265,6 +267,12 @@ def _get_cmd_options() -> dict:
             }
         ],
         "tb":[
+            {   "name":"comparative_tool",
+                "type":click.Choice(CFG["comparative_tools"]),
+                "help": "Tool to use for comparative genomics.",
+                "default": "snippy",
+                "show_default": True
+            },
             {
                 "name":"reference_genome",
                 "short_name":"-ref",
@@ -278,7 +286,58 @@ def _get_cmd_options() -> dict:
                 "default":f"{pathlib.Path(__file__).parent.parent.resolve() / 'references' / 'tb' / 'mask.bed'}"
             },
             {
-                "name":"cluster/--no-cluster",
+                "name":"snippy_args",
+                "help":"Additional arguments for snippy, if using snippy for comparative analysis.",
+                "default":""
+            },
+
+            {
+                "name":"minmap",
+                "short_name":"-mp",
+                "help":"Snippy - minimum read mapping quality to consider.",
+                "default":60
+            },
+            {
+                "name":"basequal",
+                "short_name":"-bq",
+                "help":"Snippy - Minimum base quality to consider.",
+                "default":13
+            },
+            {
+                "name":"minqual",
+                "short_name":"-mq",
+                "help":"Snippy - minimum QUALITY in VCF column 6",
+                "default":100
+            },
+            {
+                "name":"minfrac",
+                "short_name":"-mf",
+                "help":"Snippy - minimum proportion for variant evidence",
+                "default":0
+            },
+            {
+                "name":"fuzzy_core_prop",
+                "help":"Snippy - proportion of core genome to use for fuzzy core genome analysis.",
+                "default":1.0,
+                "type":float
+            },
+            {
+                "name":"ska_minfreq",
+                "help":"Ska - minimum frequency for variant calling.",
+                "default":0.9
+            },
+            {
+                "name": "ska_alnargs",
+                "help":"Ska - additional arguments for alignment.",
+                "default":""
+            },
+            {
+                "name":"ska2_kszise",
+                "help":"Ska - kmer size for ska2, default is 31.",
+                "default":31
+            },
+            {
+                "name":"cluster",
                 "help":"Set if you want to do hierarchical clustering.",
                 "is_flag":True,
                 "default":True
@@ -287,8 +346,8 @@ def _get_cmd_options() -> dict:
                 "name":"cluster_method",
                 "short_name":"-cm",
                 "help":"The clustering method to use, default is 'single-linkage'",
-                "type":click.Choice(['single-linkage', 'average', 'complete', 'centroid', 'median', 'ward', 'weighted']),
-                "default":"single-linkage",
+                "type":click.Choice(['single', 'average', 'complete', 'centroid', 'median', 'ward', 'weighted']),
+                "default":"single",
     
             },
             {
@@ -298,6 +357,31 @@ def _get_cmd_options() -> dict:
                 "type":str,
                 "default":"5,12"
             },
+            {
+                "name":"phylo",
+                "help":"Set if you do want to generate a phylogenetic tree.",
+                "is_flag":True,
+                "default":True
+            },
+            {
+                "name":"tree_input",
+                type:click.Choice(["distance", "alignment"]),
+                "help":"Input type for tree building, either 'distance' or 'alignment'.",
+                "default":"alignment"
+
+            },
+            {
+                "name":"tree_builder",
+                "help":"Tree builder to use for comparative analysis.",
+                "default":"veryfasttree",
+                "type":click.Choice(['veryfasttree', 'iqtree']),
+                
+            },
+            {
+                "name":"annotations",
+                "help":"Comma separated list of annotations to use for the tree, default is 'Tx:cluster_threshold'. MUST be present in the input file.",
+                "default":"",
+            }
         ],
         "full": [
             {   "name":"comparative_tool",
@@ -318,6 +402,7 @@ def _get_cmd_options() -> dict:
                 "help":"Path to mask file for snippy, if using snippy for comparative analysis.",
                 "default":""
             },
+            
             {
                 "name":"gubbins",
                 "help":"Set to use gubbins for recombination correction - only when using snippy.",
@@ -384,9 +469,9 @@ def _get_cmd_options() -> dict:
             {
                 "name":"cluster_method",
                 "short_name":"-cm",
-                "help":"The clustering method to use, default is 'single-linkage'",
-                "type":click.Choice(['single-linkage', 'average', 'complete', 'centroid', 'median', 'ward', 'weighted']),
-                "default":"single-linkage"
+                "help":"The clustering method to use, default is 'single'",
+                "type":click.Choice(['single', 'average', 'complete', 'centroid', 'median', 'ward', 'weighted']),
+                "default":"single"
             },
             {
                 "name":"cluster_threshold",
@@ -397,7 +482,7 @@ def _get_cmd_options() -> dict:
             },
             {
                 "name":"phylo",
-                "help":"Set if you do NOT want to generate a phylogenetic tree.",
+                "help":"Set if you do want to generate a phylogenetic tree.",
                 "is_flag":True,
                 "default":True
             },
@@ -441,3 +526,85 @@ def _get_cmd_options() -> dict:
     cmd_opt["tb"] = tb
 
     return cmd_opt
+
+
+def _compartive_args(tool:str,kwargs:dict, command:dict) -> dict:
+    """
+    Get the comparative arguments available for each pipeline
+    :return: list of options
+    """
+    comparative_args = {
+        "snippy":["snippy_args",
+            "minmap",
+            "basequal",
+            "minqual",
+            "minfrac",
+            "fuzzy_core_prop"],
+        "ska":["ska_minfreq",
+               "ska_alnargs",
+            "ska2_kszise"
+    ]
+    }
+
+    for arg in comparative_args[tool]:
+        if kwargs[arg] != "":
+            command['params'].append(f"--{arg} {kwargs[arg]}")
+    if kwargs['cluster']:
+        for arg in ["cluster_method", "cluster_threshold"]:
+            if kwargs[arg] != "":
+                command['params'].append(f"--{arg} {kwargs[arg]}")
+    return command
+
+ 
+
+def _compare_r1_r2(r1:str, r2:str) -> bool:
+    """Check if the R1 and R2 files are paired-end reads."""
+    
+    if r1 == "" or r2 == "":
+        return False
+    if _check_path(r1) and _check_path(r2):
+        return True
+    else:
+        return False    
+
+def _check_input_snippy(input_file:str) -> bool:
+    """Check if the input file is a valid snippy output."""
+    reads = False
+    if _check_path(input_file):
+        df = pd.read_csv(input_file, sep='\t')
+        df = df.fillna('')
+        for row in df.iterrows():
+            chk = _compare_r1_r2(r1=row[1]['r1'], r2=row[1]['r2'])
+            if  chk:
+                reads = True
+    
+    return reads
+
+def _check_reference(ref:str) -> bool:
+    """Check if the reference genome is a valid file."""
+    
+    if ref != "" and _check_path(ref):
+        try:
+            dst = pathlib.Path(ref).name
+            shutil.copy(ref, dst)
+            ref = f"{pathlib.Path.cwd() / dst}"
+        except SameFileError:
+            ref = f"{pathlib.Path.cwd() / dst}"
+        return ref
+    else:
+        return "no_ref"
+    
+def _check_mask(mask:str) -> bool:
+    """Check if the mask is a valid file."""
+    msk = "no_mask"
+    if  mask != "" and _check_path(mask):
+        try:
+            dst = pathlib.Path(mask).name
+            shutil.copy(mask, dst)
+            msk = f"{pathlib.Path.cwd() / dst}"
+        except SameFileError:
+            msk = f"{pathlib.Path.cwd() / dst}"
+        
+        msk = f"{pathlib.Path.cwd() / dst}"
+    
+    return msk

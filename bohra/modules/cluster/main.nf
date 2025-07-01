@@ -32,7 +32,7 @@ process SNP_CLUSTER {
     script:
 
     """
-    $module_dir/cluster.py $matrix ${params.snpthresholds} ${params.linkage} 
+    $module_dir/cluster.py $matrix ${params.cluster_threshold} ${params.cluster_method} 
     """
     
 }

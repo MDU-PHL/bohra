@@ -5,10 +5,13 @@ from bohra.launcher.BohraBasic import _setup_basic_args
 from bohra.launcher.BohraAssembly import _setup_assembly_args
 from bohra.launcher.BohraTyping import _setup_typing_args
 from bohra.launcher.BohraComparative import _setup_comparative_args
+from bohra.launcher.BohraPangenome import _setup_pangenome_args
+
 import pandas as pd
 import pathlib
 import os
 import logging
+import datetime
 
 # Logger
 LOGGER =logging.getLogger(__name__) 
@@ -24,6 +27,25 @@ LOGGER.addHandler(ch)
 LOGGER.addHandler(fh)
 
 
+def _check_keep(keep:str)->bool:
+
+    if keep.lower() in ["yes", "y", "true", "t"]:
+        now = datetime.datetime.today().strftime("%d_%m_%y_%H")
+        try:
+            cmd = f"cp -r {pathlib.Path.cwd() / 'report'} {pathlib.Path.cwd() / 'report_' + now + '_archive'}"
+            proc = _run_subprocess(cmd=cmd)
+            if proc.returncode == 0:
+                LOGGER.info(f"Report directory archived successfully to {pathlib.Path.cwd() / 'report_' + now + '_archive'}.")
+                return True
+            else:
+                LOGGER.error(f"Failed to archive the report directory. Command: {cmd}")
+                return False
+        except Exception as e:
+            LOGGER.error(f"An error occurred while archiving the report directory: {e}")
+            return False
+    else:
+        LOGGER.info("Report directory will be overridden by new results.")
+        return True
 
 def _setup_working_directory(input_file:str,
                              workdir : str) -> bool:
@@ -35,26 +57,41 @@ def _setup_working_directory(input_file:str,
     
     return True
 
-def _init_command_dict(profile:str, cpus:int) -> dict:
+def _init_command_dict(profile:str, cpus:int, job_name:str) -> dict:
 
     return {"params":[
         f"--profile {profile}",
         f"-executor.cpus {cpus}",
-        "-with-trace"
+        "-with-trace",
+        f"--job_id {job_name}",
                 ], "modules":[]}
 
-def _check_assembly_req(kwargs: dict) -> bool:
 
-    pass
 
 def _funcs() -> dict:
     """Returns a dictionary of functions to be used in the pipeline."""
     
+    
+
     return {
+        "basic":[],
         "assemble": [_setup_assembly_args],
-        "amr_typing":[ _setup_assembly_args, _setup_typing_args],
-        "full":[ _setup_comparative_args, ],
+        "amr_typing":[ _setup_typing_args],
+        "full":[_setup_typing_args, _setup_comparative_args, _setup_pangenome_args ],
+        "comparative":[ _setup_comparative_args ],
+        "tb":[ _setup_comparative_args ],
     }
+
+def _make_command(command: dict) -> str:
+    """Constructs the command string from the command dictionary."""
+    
+    cmd = f"nextflow -Dnxf.pool.type=sync run {pathlib.Path(__file__).parent.parent.resolve() / 'bohra.nf'} " 
+    
+    cmd += " ".join(command["params"])
+    if command["modules"]:
+        cmd += " --modules " + ",".join(command["modules"])
+    
+    return cmd
 
 def run_bohra(
         pipeline: str,
@@ -68,8 +105,9 @@ def run_bohra(
     max_cpus = int(_set_cpu_limit_local(cpus=kwargs.get('cpus', 0)))
     LOGGER.info(f"Using {int(max_cpus)} CPUs for the {pipeline} pipeline.")
     
-    command = _init_command_dict(profile=profile, cpus=max_cpus)
-    
+    command = _init_command_dict(profile=profile, cpus=max_cpus, job_name = kwargs.get('job_name', 'bohra'))
+    LOGGER.info(f"Checking if report directory needs to archived.")
+    _check_keep(keep = kwargs["keep"])
     if _make_workdir(workdir=kwargs["workdir"],   
                   _input=kwargs["input_file"]):
         # update kwargs with checked input file
@@ -80,11 +118,12 @@ def run_bohra(
         command["params"].append(f"--isolates {kwargs['input_file']}")
         LOGGER.info(f"Input file {kwargs['input_file']} added to command successfully.")
         command = _setup_basic_args(kwargs=kwargs, command=command)
+        mtb = True if pipeline == "tb" else False
         for _func in _funcs()[pipeline]:
-            command = _func(kwargs=kwargs, command=command)
+            command = _func(kwargs=kwargs, command=command, mtb = mtb)
         # command = _funcs()[pipeline](kwargs=kwargs, command=command)
-
-        print(f"Command to be run: {command}")
+        cmd = _make_command(command=command)
+        print(f"Please paste the following command to run the pipeline:\n\033[1m{cmd}\033[0m")
     else:
         LOGGER.error(f"Failed to create the working directory {kwargs['workdir']}.")
         raise SystemError

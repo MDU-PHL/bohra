@@ -62,16 +62,31 @@ def _make_annotation_file(input_file: list, result_files:list, annot_cols : list
         df = pd.read_csv(input_file, sep = '\t', usecols = cols)
 
         # print(df)
-    cluster_path = [i for i in result_files if "cluster" in i]
-    if len(cluster_path) != []:
-        cluster_path = cluster_path[0]
-        clst = pd.read_csv(cluster_path, sep = '\t')
-        clst = clst.rename(columns = {"ID":"Isolate"})
-        # print(clst)
-        if not df.empty:
-            df = df.merge(clst, how = 'left', on ="Isolate")
+        
+    for _file in result_files:
+        if "cluster" in _file:
+
+            clst = pd.read_csv(_file, sep = '\t')
+            clst = clst.rename(columns = {"ID":"Isolate"})
+            # print(clst)
+            if not df.empty:
+                df = df.merge(clst, how = 'left', on ="Isolate")
+            else:
+                df = clst
         else:
-            df = clst
+            tmp = pd.read_csv(_file, sep = '\t')
+            tmp_cols = ["Isolate"]
+            for col in tmp.columns:
+                if col in annot_cols:
+                    tmp_cols.append(col)
+            if tmp_cols != ["Isolate"]:
+                tmp = tmp[tmp_cols]
+                if not df.empty:
+                    df = df.merge(tmp, how = 'left', on ="Isolate")
+                else:
+                    df = tmp
+
+    
     if not df.empty:
         df.to_csv("annotation_file.tsv", sep = '\t', index = False)
     
@@ -113,7 +128,8 @@ def _run_datasmryzr(tree:str,
                     reference,mask:str, 
                     annotation:str, 
                     bkgd_color:str,
-                    text_color:str) -> str:    
+                    text_color:str,
+                    job_id:str) -> str:    
     """
     Run the datasmryzr pipeline
     """
@@ -149,7 +165,8 @@ def _compile(args):
                         mask,
                         annotation,
                         args.bkgd,
-                        args.text_color)
+                        args.text_color,
+                        f"-t {args.job_id}")
     
 
 

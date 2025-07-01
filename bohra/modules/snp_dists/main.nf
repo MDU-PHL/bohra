@@ -30,7 +30,7 @@ process SNP_DISTS {
     path(core) 
 
     output:
-    path('distances.tsv'), emit: distances
+    path('distances.tsv'), emit: matrix
     path('version_snpdists.txt'), emit: version
 
     script:

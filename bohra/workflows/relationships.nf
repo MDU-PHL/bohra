@@ -32,7 +32,7 @@ workflow RELATIONSHIPS {
             core_aln = RUN_SKA.out.aln
             core_full_aln = Channel.empty()
             core_vcf = Channel.empty()
-            version = RUN_SKA.out.version
+            version = RUN_SKA.out.versions
             
         } else if ( params.modules.contains("mash") ) {
             // add in a join to combine reads and asm

@@ -18,7 +18,7 @@ process SKA_BUILD {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-ska2"
         } else {
-            conda 'ska2'
+            conda 'ska2 csvtk'
         }
     } else {
         conda null
@@ -34,6 +34,7 @@ process SKA_BUILD {
 
     output:
     tuple val(meta), path("${meta.id}.skf"), emit: skf
+    tuple val(meta), path("version_ska.txt"), emit: version
 
     script:
     input_files = meta.input_type == "pe_reads" ? sequence.join('\t') : sequence
@@ -41,7 +42,7 @@ process SKA_BUILD {
     """
     echo -e "$meta.id\t$input_files" > tmp.tsv
     ska build -f tmp.tsv -k $params.ska2_kszise -o $meta.id
-    echo -e ska2'\t'\$CONDA_PREFIX'\t'\$(ska --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_snippy.txt
+    echo -e ska2'\t'\$CONDA_PREFIX'\t'\$(ska --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_ska.txt
     """
     
     

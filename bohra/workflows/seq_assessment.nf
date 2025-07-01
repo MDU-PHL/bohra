@@ -22,7 +22,7 @@ workflow READ_ANALYSIS {
         COMBD = SEQKIT_STATS.out.stats.join( SEQKIT_GC.out.stats )
         COMBD = COMBD.join( KMC.out.genome_size )
         COLLATE_STATS_ISOLATE ( COMBD )
-        seq_stats = COLLATE_STATS_ISOLATE.out.read_assessment.map { cfg, seq -> seq }.collect()
+        seq_stats = COLLATE_STATS_ISOLATE.out.read_assessment.map { cfg, seq -> seq }.collect() // TODO add in Q score
         seq_stats = seq_stats.map { files -> tuple("read_assessment", files) }
         versions_seqkit = SEQKIT_STATS.out.version.map { cfg, file -> file }.collect()
                                          .map { files -> tuple("version_seqkit", files) }

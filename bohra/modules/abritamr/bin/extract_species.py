@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
-import sys, json
+import sys, json, pathlib
 
 
-available_species = json.load(open(sys.argv[1], 'r'))
-species_obs = sys.argv[2]
+available_species = json.load(open(f"{pathlib.Path(__file__).parent.resolve() / 'species.json'}", 'r'))
+species_obs = sys.argv[1].strip()
 
 if species_obs.replace(" ", "_") in available_species['abritamr_species'] :
     print(f"-sp {species_obs.replace(' ', '_')}")

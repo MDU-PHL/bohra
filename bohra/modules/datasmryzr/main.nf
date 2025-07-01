@@ -10,7 +10,7 @@ process RUN_SMRYZR {
     
     label 'process_high'
     publishDir "${params.outdir}",
-        mode: params.publish_dir_mode,
+        mode: 'copy',
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"report") }
     
     if ( params.enable_conda ) {

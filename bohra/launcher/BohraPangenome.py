@@ -23,11 +23,8 @@ LOGGER.addHandler(fh)
 
 
 
-def _setup_assembly_args(kwargs:dict, command:dict, mtb:False) -> dict:
+def _setup_pangenome_args(kwargs:dict, command:dict, mtb:False) -> dict:
 
-    command['modules'].append('assemble')
-    command['params'].append(f"--assembler {kwargs['assembler']}")
-    if kwargs["spades_args"] != "":
-        command['params'].append(f"--spades_args {kwargs['spades_args']}")
+    command['modules'].append('pangenome')
     
     return command

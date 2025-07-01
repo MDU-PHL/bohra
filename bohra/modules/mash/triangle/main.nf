@@ -31,12 +31,12 @@ process MASH_TRIANGLE {
     val(sketches)
 
     output:
-    path('mash_distances.tab'), emit: dists
+    path('distances.tsv'), emit: dists
 
     script:
     def input_files = sketches.join(' ')
     """
-    mash triangle -C $input_files > mash_distances.tsv
+    mash triangle -C $input_files > distances.tsv
     """
         
 }

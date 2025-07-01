@@ -8,6 +8,7 @@ include { SEROTYPES } from './../subworkflows/serotypes'
 include { RUN_MLST } from './../subworkflows/mlst'
 include {RUN_MOBSUITE} from './../subworkflows/plasmids'
 include { RUN_ABRITAMR;CONCAT_INFERRED;CONCAT_PLASMID;CONCAT_REPORTABLE;CONCAT_RESISTOMES;CONCAT_VIRULENCE } from './../subworkflows/abritamr'
+include { RUN_TBTAMR } from './../workflows/tbtamr'
 // include {CSVTK_CONCAT } from './../modules/csvtk/main'
 
 
@@ -17,14 +18,14 @@ workflow RUN_TYPING {
         asm
         reads
     main:
-        SEROTYPES ( asm, reads )
-        serotypes = SEROTYPES.out.collated_typers
+        
         RUN_MLST ( asm )
         mlst = RUN_MLST.out.collated_mlst
+        SEROTYPES ( asm, reads )
+        serotypes = SEROTYPES.out.collated_typers
         RUN_MOBSUITE ( asm )
         RUN_ABRITAMR ( asm, RUN_MOBSUITE.out.contig_report )
         versions = RUN_ABRITAMR.out.version.concat( RUN_MOBSUITE.out.version, RUN_MLST.out.version, SEROTYPES.out.collated_versions )
-
         resistomes= RUN_ABRITAMR.out.resistome.map{ cfg, file ->file}.collect()
         resistomes = resistomes.map { files -> tuple("resistome", files) }
         virulences = RUN_ABRITAMR.out.abritamr_virulence.map{ cfg, file -> file}.collect()
@@ -41,7 +42,7 @@ workflow RUN_TYPING {
         plasmid = CONCAT_PLASMID ( plasmids )
         inferred = CONCAT_INFERRED ( inferreds )
         reportable = CONCAT_REPORTABLE ( reportables )
-        // species_stats.map { files -> tuple("speciation", files) }
+        
     emit:
         resistome = resistome
         virulome = virulome
@@ -51,5 +52,6 @@ workflow RUN_TYPING {
         serotypes = serotypes
         mlst = mlst
         versions = versions
+        
 
 }

@@ -29,4 +29,4 @@ def make_matrix(df, col1, col2, vals) -> pd.DataFrame:
 pth = sys.argv[1]
 df = pd.read_csv(pth, sep = '\t')
 matrix = make_matrix(df, 'Sample1', 'Sample2', 'Distance')
-matrix.to_csv("ska_distance_matrix.tsv", sep = '\t', index = False)
+matrix.to_csv("distances.tsv", sep = '\t', index = False)
