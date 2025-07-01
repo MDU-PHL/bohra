@@ -15,7 +15,7 @@ process RUN_SMRYZR {
     
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/datasmryzr"
+            conda "${params.conda_path}/bohra-datasmryzr"
         } else {
             conda 'datasmryzr'
         }

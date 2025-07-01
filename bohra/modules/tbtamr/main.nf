@@ -16,13 +16,14 @@ process TBTAMR {
     
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/tbtamr"
+            conda "${params.conda_path}/bohra-tbtamr"
         } else {
             conda 'bioconda::tbtamr=1.0.3 csvtk'
         }
     } else {
         conda null
     }
+    errorStrategy 'ignore'
     input:
     tuple val(meta), path(reads)
 

@@ -52,9 +52,9 @@ def _get_isolate_list(_dir: pathlib.Path,
     :param ext: File extension pattern to search for (default is "*.f*q.gz").
     :return: A list of unique isolate names found in the directory.
     """
-    iso_found = _get_isolate_list(_dir=_dir, ext="*.f*q.gz")
+    # iso_found = _get_isolate_list(_dir=_dir, isolates=isolates, ext="*.f*q.gz")
     
-    all_data = sorted(_dir.rglob(ext))
+    all_data = sorted(pathlib.Path(_dir).rglob(ext))
 
     iso_found = set()
 
@@ -93,7 +93,7 @@ def _glob_sequences(_dir: pathlib.Path,
         lines = []
 
         for iso in isolist:
-            reads = sorted(_dir.rglob(f"*{iso}*.f*q.gz"))
+            reads = sorted(pathlib.Path(_dir).rglob(f"*{iso}*.f*q.gz"))
             if len(reads) == CFG[sequence_type]['num_expected']:
                 LOGGER.info(f"Now add reads for {iso}")
                 lines.append(f"{iso}\t{reads[0]}\t{reads[1]}")
@@ -139,10 +139,10 @@ def find_data( input_type:str,
     if path != '' and _check_path(path):
         LOGGER.info(f"Path provided : {path} exists.")
         if isolate_ids != '': 
-            isolates = _extract_isolates(isolate_file= isolate_ids) if _check_path(isolate_ids) else []
+            isolates = _extract_isolates(isolate_ids= isolate_ids) if _check_path(isolate_ids) else []
         else:
             isolates = []
-        _glob_sequences(path = path, isolates= isolates, sequence_type = input_type)
+        _glob_sequences(_dir = path, isolates= isolates, sequence_type = input_type)
     else:
         LOGGER.critical(f"There seems to be a problem with your read path. Please provide a valid path to the reads you wish to include")
         raise SystemExit

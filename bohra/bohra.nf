@@ -31,9 +31,9 @@ input_file = file(params.isolates) // need to make this an input file
     line = line.split("\t")
         // println "The line is : $line"
         samples[line[0]] = line[0]
-        asms[line[0]] = line[4]
+        asms[line[0]] = line[3]
         // asmblr[line[0]] = line[3]
-        sp[line[0]] = line[1]
+        sp[line[0]] = line[4]
      }
     }
 
@@ -134,6 +134,7 @@ workflow {
         asm_typing = asm.filter { cfg, asm -> cfg.species != 'Mycobacterium tuberculosis' }
         reads_nottb = reads_pe.filter { cfg, reads -> cfg.species != 'Mycobacterium tuberculosis' }
         reads_tb = reads_pe.filter { cfg, reads -> cfg.species == 'Mycobacterium tuberculosis' }
+        println reads_nottb.view()
         RUN_TYPING ( asm_typing, reads_nottb )
         resistome = RUN_TYPING.out.resistome
         virulome = RUN_TYPING.out.virulome

@@ -13,15 +13,15 @@ process EXTRACT_SPECIES {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"${meta.id}", publish_id:meta.id) }
     
-    if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/bohra-sylph"
-        } else {
-            conda 'sylph pandas'
-        }
-    } else {
-        conda null
-    }
+    // if ( params.enable_conda ) {
+    //     if (file("${params.conda_path}").exists()) {
+    //         conda "${params.conda_path}/bohra-sylph"
+    //     } else {
+    //         conda 'sylph pandas'
+    //     }
+    // } else {
+    //     conda null
+    // }
     cache 'lenient'
     scratch true
     

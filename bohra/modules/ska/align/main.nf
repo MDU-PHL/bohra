@@ -17,7 +17,7 @@ process SKA_ALIGN {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-ska2"
         } else {
-            conda 'mash'
+            conda 'ska2 csvtk'
         }
     } else {
         conda null

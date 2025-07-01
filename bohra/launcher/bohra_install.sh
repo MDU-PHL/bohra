@@ -43,31 +43,38 @@ function check_installation(){
 
 
 declare -A TOOLS=([$ENV_PREFIX-csvtk]="csvtk=0.33" 
-[$ENV_PREFIX-mash]="mash=2.3"
-[$ENV_PREFIX-spades]="spades"
-[$ENV_PREFIX-skesa]="skesa"
-[$ENV_PREFIX-seqtk]="seqtk"
-[$ENV_PREFIX-seqkit]="seqkit==2.1.0"
-[$ENV_PREFIX-iqtree]="iqtree=2.2.0"
-[$ENV_PREFIX-quicktree]="quicktree=2.5 newick_utils"
-[$ENV_PREFIX-prokka]="prokka"
-[$ENV_PREFIX-snippy]="snpeff=5.0 snippy=4.4.5 snp-sites=2.5.1"
-[$ENV_PREFIX-shovill]="shovill=1.1.0"
-[$ENV_PREFIX-mlst]="mlst=2.19.0"
-[$ENV_PREFIX-kraken2]="kraken2=2.1.2"
-[$ENV_PREFIX-mob_suite]="mob_suite=3.1.9"
+[$ENV_PREFIX-mash]="mash=2.3 csvtk"
+[$ENV_PREFIX-spades]="spades=3.15.2 csvtk"
+[$ENV_PREFIX-skesa]="skesa csvtk"
+[$ENV_PREFIX-seqtk]="seqtk csvtk"
+[$ENV_PREFIX-seqkit]="seqkit==2.1.0 csvtk"
+[$ENV_PREFIX-iqtree]="iqtree=2.2.0 csvtk gotree=0.4.5"
+[$ENV_PREFIX-quicktree]="quicktree=2.5 gotree=0.4.5 csvtk"
+[$ENV_PREFIX-prokka]="prokka csvtk"
+[$ENV_PREFIX-snippy]="snpeff=5.0 snippy=4.4.5 snp-sites=2.5.1 csvtk"
+[$ENV_PREFIX-shovill]="shovill=1.1.0 csvtk"
+[$ENV_PREFIX-mlst]="mlst=2.19.0 csvtk"
+[$ENV_PREFIX-kraken2]="kraken2=2.1.2 csvtk"
+[$ENV_PREFIX-mob_suite]="mob_suite=3.1.9 csvtk"
 [$ENV_PREFIX-panaroo]="panaroo=1.2.9 csvtk"
-[$ENV_PREFIX-abritamr]="abritamr=1.0.19"
+[$ENV_PREFIX-abritamr]="abritamr=1.0.19 csvtk"
 [$ENV_PREFIX-gubbins]="csvtk=0.25 gubbins=2.4.1 snp-sites=2.5.1"
 [$ENV_PREFIX-snpdists]="snp-dists=0.8.2 csvtk=0.25"
 [$ENV_PREFIX-ectyper]="ectyper csvtk"
 [$ENV_PREFIX-emmtyper]="emmtyper csvtk"
-[$ENV_PREFIX-kleborate]="kleborate csvtk"
-[$ENV_PREFIX-kmc]="kmc"
+[$ENV_PREFIX-kleborate]="kleborate=2.3.2 csvtk"
+[$ENV_PREFIX-kmc]="kmc csvtk"
 [$ENV_PREFIX-lissero]="lissero csvtk"
 [$ENV_PREFIX-meningotype]="meningotype csvtk"
 [$ENV_PREFIX-ngmaster]="ngmaster csvtk"
 [$ENV_PREFIX-stype]="sistr_cmd=1.1.1 csvtk"
+[$ENV_PREFIX-tbtamr]="tbtamr=1.0.3 csvtk"
+[$ENV_PREFIX-veryfasttree]="veryfasttree csvtk gotree=0.4.5"
+[$ENV_PREFIX-datasmryzr]="python=3.11 csvtk"
+[$ENV_PREFIX-ska2]="ska2 csvtk"
+
+# [$ENV_PREFIX-tbtamr]="datasmryzr",
+
 )
 
 for key in "${!TOOLS[@]}";do
@@ -92,31 +99,39 @@ for key in "${!TOOLS[@]}";do
                 mob_init
                 # continue
             fi
+
+            if [[ "$key" == "$ENV_PREFIX-tbtamr" ]]; then
+                $INSTALLER create --force -y -n $key ${TOOLS[$key]}
+                echo "Will now finish installing tbtamr"
+                conda activate $key && \
+                pip3 install pysam joblib tqdm pydantic requests git+https://github.com/jodyphelan/pathogen-profiler@v4.3.0
+                # continue
+            fi
         else
             echo $key is already setup. Nothing left to do
         fi
-    # continue
+#     # continue
     
     done
 
-if [[ -z $KRAKEN2_DEFAULT_DB ]]; then
+# if [[ -z $KRAKEN2_DEFAULT_DB ]]; then
   
-  echo KRAKEN2_DEFAUT_DB is undefined. Would you like to download babykraken database?
-  read -p "Download babykraken (10MB) (Y/N)? " download
-    if [ "$download" != "${download#[Yy]}" ] ;then 
+#   echo KRAKEN2_DEFAUT_DB is undefined. Would you like to download babykraken database?
+#   read -p "Download babykraken (10MB) (Y/N)? " download
+#     if [ "$download" != "${download#[Yy]}" ] ;then 
     
-        echo Downloading babykraken now.
-        curl -L https://github.com/MDU-PHL/babykraken/blob/master/dist/babykraken.tar.gz?raw=true | tar xz
-        echo babykraken has been downloaded. Please use --kraken_db $(pwd)/babykraken to run kraken2
+#         echo Downloading babykraken now.
+#         curl -L https://github.com/MDU-PHL/babykraken/blob/master/dist/babykraken.tar.gz?raw=true | tar xz
+#         echo babykraken has been downloaded. Please use --kraken_db $(pwd)/babykraken to run kraken2
         
-    else
+#     else
         
-        echo Okey dokey .. hopefully you remember to provide a kraken path when you run bohra
-    fi
+#         echo Okey dokey .. hopefully you remember to provide a kraken path when you run bohra
+#     fi
 
    
-fi
+# fi
 
-echo The dependencies for bohra are installed in your default conda path - go forth and analyse!!
+# echo The dependencies for bohra are installed in your default conda path - go forth and analyse!!
 
-echo Please contact us at https://github.com/MDU-PHL/bohra for any issues or concerns
+# echo Please contact us at https://github.com/MDU-PHL/bohra for any issues or concerns

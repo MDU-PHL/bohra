@@ -33,6 +33,7 @@ dependencies = [
 tests = [
     "flake8",
     "pytest",
+    "pandas"
 ]
 
 [project.scripts]

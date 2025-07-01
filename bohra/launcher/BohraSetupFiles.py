@@ -48,14 +48,14 @@ def _check_data_format(df:pd.DataFrame) -> pd.DataFrame:
     """
     
     columns_req = _get_required_columns()
-    columns = []
+    columns = _get_columns_list()
     # check if all required columns are present
     for col in columns_req["required"]:
         if col not in df.columns.tolist():
             LOGGER.critical(f"Column {col} is missing from input file.")
             raise SystemExit
-        else:
-            columns.append(col)
+        # else:
+        #     columns.append(col)
     # check if all must have columns are present
     mchk = False
     for col in columns_req["must_have"]:
