@@ -72,6 +72,8 @@ declare -A TOOLS=([$ENV_PREFIX-csvtk]="csvtk=0.33"
 [$ENV_PREFIX-veryfasttree]="veryfasttree csvtk gotree=0.4.5"
 [$ENV_PREFIX-datasmryzr]="python=3.11 csvtk"
 [$ENV_PREFIX-ska2]="ska2 csvtk"
+[$ENV_PREFIX-core-snp-filter]="core-snp-filter csvtk"
+[$ENV_PREFIX-cluster]="numpy pandas scikit-learn csvtk"
 
 # [$ENV_PREFIX-tbtamr]="datasmryzr",
 

@@ -108,14 +108,15 @@ workflow {
        
         species_tmp = COMBINE_SPECIES.out.species_obs
                                             .map { cfg, species_obs -> tuple(cfg.id, cfg, species_obs.trim() ) }
+        // println species_tmp.view()
         reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
         reads_pe = reads.join( species_tmp )
                                 .map { id, cfg_reads, files, cfg_spieces,  species_obs -> tuple(cfg_reads + [species:species_obs.trim()] , files) }
-                            
+                         
         asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
         asm = asm_tmp.join( species_tmp )
                                 .map { id, cfg_asm, files, cfg_spieces, species_obs -> tuple(cfg_asm + [species:species_obs.trim()] , files) }
-        
+        println asm.view()
         // generate summay file for species
         species_report = COMBINE_SPECIES.out.species_summary
         results = results.concat( species_report )
@@ -132,9 +133,10 @@ workflow {
         // assembly is only done if the input is reads
         // find any tb as plasmid and mlst and abritamr no good - use tbtamr
         asm_typing = asm.filter { cfg, asm -> cfg.species != 'Mycobacterium tuberculosis' }
+        // println asm_typing.view()
         reads_nottb = reads_pe.filter { cfg, reads -> cfg.species != 'Mycobacterium tuberculosis' }
         reads_tb = reads_pe.filter { cfg, reads -> cfg.species == 'Mycobacterium tuberculosis' }
-        println reads_nottb.view()
+        // println reads_nottb.view()
         RUN_TYPING ( asm_typing, reads_nottb )
         resistome = RUN_TYPING.out.resistome
         virulome = RUN_TYPING.out.virulome
@@ -185,7 +187,7 @@ workflow {
         gff = ASSEMBLY_ANALYSIS.out.gff
         RUN_PANAROO ( gff )
 
-        results = results.concat( RUN_PANAROO.out.svg )
+        
         results = results.concat( RUN_PANAROO.out.roary )
         versions = versions.concat( RUN_PANAROO.out.version )
     }

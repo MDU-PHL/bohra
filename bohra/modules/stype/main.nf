@@ -33,10 +33,12 @@ process STYPE {
 
     script:
     """
+    echo -e Isolate'\t'Typing_tool'\n'${meta.id}'\t'stype >> tmp.tab
     stype run -c $contigs -px $meta.id
-    csvtk cut -f 'genome,h1,h2,o_antigen,serogroup,serovar' $meta.id/sistr_filtered.csv \
-    | csvtk rename -f 'genome,serogroup,serovar' -n 'Isolate,Serogroup,Serovar'  \
-    | csvtk csv2tab > typer_${getSoftwareName(task.process)}.txt
+    csvtk csv2tab $meta.id/sistr_filtered.csv > tmp.typer.tab
+    paste tmp.tab tmp.typer.tab > raw_typer.tab
+    csvtk -t cut -f 'genome,h1,h2,o_antigen,serogroup,serovar,Typing_tool' raw_typer.tab \
+    | csvtk -t rename -f 'genome,serogroup,serovar' -n 'Isolate,Serogroup,Serovar' > typer_${getSoftwareName(task.process)}.txt
     echo -e stype'\t'\$CONDA_PREFIX'\t'\$(stype -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_stype.txt
     """
     

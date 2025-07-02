@@ -9,6 +9,8 @@ asm_result = sys.argv[2]
 
 res = [ i for i in [reads_result.strip(), asm_result.strip()] if i != "no_results"]
 # print(res)
+res = list(set(res))
+# print(res)
 if len(res) == 0:
     print("no_result")
     sys.exit(0)

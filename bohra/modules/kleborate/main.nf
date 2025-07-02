@@ -38,7 +38,7 @@ process KLEBORATE {
     """
     echo -e Isolate'\t'Typing_tool'\n'${meta.id}'\t'kleborate >> tmp.tab
     kleborate -k -o kleborate.tab -a $contigs
-    paste tmp.tab kleborate.tab | csvtk -t rename -f species -n Species | csvtk -t cut -f Isolate,Typing_tool,virulence_score,Yersiniabactin,YbST,Colibactin,CbST,Aerobactin,AbST,Salmochelin,SmST,RmpADC,RmST,rmpA2,wzi,K_locus,K_type,O_locus,O_type > typer_${getSoftwareName(task.process)}.txt
+    paste tmp.tab kleborate.tab | csvtk -t rename -f species -n Species | csvtk -t cut -f Isolate,Typing_tool,Yersiniabactin,YbST,Colibactin,CbST,Aerobactin,AbST,Salmochelin,SmST,RmpADC,RmST,rmpA2,wzi,K_locus,K_type,O_locus,O_type > typer_${getSoftwareName(task.process)}.txt
     rm -f tmp.tab
     echo -e kleborate'\t'\$CONDA_PREFIX'\t'\$(kleborate --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_kleborate.txt
     """

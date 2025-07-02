@@ -2,6 +2,7 @@
 include { ABRITAMR; ABRITAMR_GENERAL;ABRITAMR_INFER;COMBINE_AMR } from './../modules/abritamr/main'
 include { JSON_COMBINE } from './../modules/json_combine/main'
 include { CSVTK_CONCAT; CSVTK_UNIQ } from './../modules/csvtk/main'
+include { CONCAT_FILES } from './../modules/utils/main'
 
 
 workflow RUN_ABRITAMR {
@@ -55,18 +56,18 @@ workflow CONCAT_RESISTOMES {
     take:
         resistomes
     main:
-        CSVTK_CONCAT ( resistomes )
+        CONCAT_FILES ( resistomes )
     emit:
-        collated_resistomes = CSVTK_CONCAT.out.collated
+        collated_resistomes = CONCAT_FILES.out.collated
 }
 
 workflow CONCAT_VIRULENCE {
     take:
         virulence
     main:
-        CSVTK_CONCAT ( virulence )
+        CONCAT_FILES ( virulence )
     emit:
-        collated_virulome = CSVTK_CONCAT.out.collated
+        collated_virulome = CONCAT_FILES.out.collated
 }
 
 workflow CONCAT_PLASMID {
@@ -82,16 +83,16 @@ workflow CONCAT_REPORTABLE {
     take:
         reportables
     main:
-        CSVTK_CONCAT ( reportables )
+        CONCAT_FILES ( reportables )
     emit:
-        collated_reportable = CSVTK_CONCAT.out.collated
+        collated_reportable = CONCAT_FILES.out.collated
 }
 
 workflow CONCAT_INFERRED {
     take:
         inferred
     main:
-        CSVTK_CONCAT ( inferred )
+        CONCAT_FILES ( inferred )
     emit:
-        collated_inferred = CSVTK_CONCAT.out.collated
+        collated_inferred = CONCAT_FILES.out.collated
 }

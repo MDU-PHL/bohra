@@ -7,7 +7,7 @@ include { KLEBORATE } from './../modules/kleborate/main'
 include { ECTYPER } from './../modules/ectyper/main'
 include { EMMTYPER } from './../modules/emmtyper/main'
 include {CSVTK_CONCAT;CSVTK_UNIQ } from './../modules/csvtk/main'
-
+include { CONCAT_FILES } from './../modules/utils/main'
 workflow SEROTYPES {
     
     take:
@@ -21,6 +21,7 @@ workflow SEROTYPES {
         ngono = asm.filter { cfg, contigs -> cfg.species == 'Neisseria gonorrhoeae'}
         salmonella = asm.filter { cfg, contigs -> cfg.species =~ 'Salmonella'}
         klebs = asm.filter { cfg, contigs -> cfg.species =~ 'Klebsiella'}
+
         ecoli = asm.filter { cfg, contigs -> cfg.species == 'Escherichia coli'}
         igas = asm.filter { cfg, contigs -> cfg.species == 'Streptococcus pyogenes'}
         // add in shigella
@@ -38,6 +39,7 @@ workflow SEROTYPES {
         ngono_version = NGMASTER.out.version.map {cfg, version -> version }.collect()
         KLEBORATE ( klebs )
         klebs_typers = KLEBORATE.out.typer.map {cfg, typer -> typer }.collect()
+        // println klebs_typers.view()
         klebs_version = KLEBORATE.out.version.map {cfg, version -> version }.collect()
         ECTYPER ( ecoli )
         ecoli_typers = ECTYPER.out.typer.map {cfg, typer -> typer }.collect()
@@ -45,12 +47,14 @@ workflow SEROTYPES {
         EMMTYPER ( igas )
         emm_typers = EMMTYPER.out.typer.map {cfg, typer -> typer }.collect()
         emm_version = EMMTYPER.out.version.map {cfg, version -> version }.collect()
-        typers = lissero_typers.concat ( salmo_typers, nmen_typers, ngono_typers, klebs_typers, ecoli_typers,emm_typers ).map { files -> tuple("typer", files)}
+        typers = lissero_typers.concat ( salmo_typers, nmen_typers, ngono_typers, klebs_typers, ecoli_typers,emm_typers ).flatten().toList().map { files -> tuple("typer", files)}
+        println typers.view()
+        // println KLEBORATE.out.typer.
         versions = lissero_version.concat ( salmo_version, nmen_version, ngono_version, klebs_version, ecoli_version, emm_version ).map { files -> tuple("version_serotypes", files)}
-        CSVTK_CONCAT ( typers )
+        CONCAT_FILES ( typers )
         CSVTK_UNIQ ( versions )
         collated_versions = CSVTK_UNIQ.out.collated
-        collated_typers = CSVTK_CONCAT.out.collated
+        collated_typers = CONCAT_FILES.out.collated
     emit:
         collated_typers
         collated_versions

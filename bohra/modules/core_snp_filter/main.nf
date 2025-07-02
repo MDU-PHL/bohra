@@ -13,7 +13,7 @@ process CORE_SNP_FILTER {
     
     // scratch true
     cache 'lenient'
-    
+    // errorStrategy 'ignore'
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/snippy" : 'bioconda::snippy=4.4.5') : null) 
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
@@ -30,11 +30,11 @@ process CORE_SNP_FILTER {
     output:
     // tuple val(meta), path("${meta.id}/*"), emit: snippy_dir
     path("core.filtered.aln"), emit: aln
-        
+    path("version_coresnp.txt"), emit: version
     script:
     """
     coresnpfilter -c ${params.fuzzy_core_prop} -e $core_full_aln > core.filtered.aln 
-    echo -e core-snp-filter'\t'\$CONDA_PREFIX'\t'\$(coresnpfilter --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_spades.txt
+    echo -e core-snp-filter'\t'\$CONDA_PREFIX'\t'\$(coresnpfilter --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_coresnp.txt
     """
     
 }

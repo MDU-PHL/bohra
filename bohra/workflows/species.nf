@@ -83,6 +83,7 @@ workflow COMBINE_SPECIES {
                                                                  .map { cfg, species_reads, species_asm -> tuple(cfg, species_reads ? species_reads : 'no_results', species_asm ? species_asm: 'no_results') }
         COMBINE_SPECIES_VALS ( observed_species )
         species_obs = COMBINE_SPECIES_VALS.out.extracted_species
+        // println species_obs.view()
         reads_results_files = reads_result_file.map { cfg,file -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, file ) }
         asm_results_files = asm_result_file.map { cfg,file -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, file ) }
         species = reads_results_files.join( asm_results_files, remainder: true )
@@ -92,7 +93,7 @@ workflow COMBINE_SPECIES {
         
         COMBINE_SPECIES_REPORT ( species )
         species_report = COMBINE_SPECIES_REPORT.out.species_report
-
+        // println species.view()
         species_stats = species_report.map { cfg, sp -> sp }.collect()
         species_stats = species_stats.map { files -> tuple("speciation", files) }
         

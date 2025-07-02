@@ -35,7 +35,7 @@ process CSVTK_CONCAT {
     // Added soft-links to original fastqs for consistent naming in MultiQC
     def input_files = input.join(' ')
     """
-    csvtk concat -u '' -t $input_files > ${output_name}.txt
+    csvtk -t concat -k -u '' $input_files > ${output_name}.txt
     """
         
 }

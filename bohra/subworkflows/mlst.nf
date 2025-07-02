@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 include { MLST } from './../modules/mlst/main'
 include {CSVTK_CONCAT;CSVTK_UNIQ } from './../modules/csvtk/main'
-
+include { CONCAT_FILES } from './../modules/utils/main'
 workflow RUN_MLST {
     
     take:
@@ -11,8 +11,8 @@ workflow RUN_MLST {
     main:
         MLST ( asm )
         mlst = MLST.out.mlst.map { cfg,file -> file}.collect().map { files -> tuple("mlst", files)}
-        CSVTK_CONCAT ( mlst )
-        collated_mlst = CSVTK_CONCAT.out.collated
+        CONCAT_FILES ( mlst )
+        collated_mlst = CONCAT_FILES.out.collated
         versions = MLST.out.version.map { cfg, file -> file }.collect()
                                         .map { files -> tuple("version_mlst", files) }
         CSVTK_UNIQ ( versions )

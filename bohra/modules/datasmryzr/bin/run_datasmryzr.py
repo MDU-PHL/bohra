@@ -3,6 +3,8 @@
 import sys,pandas as pd
 import argparse, subprocess,pathlib
 
+def _generate_summary_table(results_files: list) -> str:
+    pass
 
 def _extract_tree(results_files: list, output : list) -> str:
     """
@@ -127,6 +129,7 @@ def _get_other_files(results_files: list,ouput:list) -> str:
     """
     other_files = []
     for file in results_files:
+        # print(file)
         if file not in ouput and pathlib.Path(file).exists() and ("txt" in file or "tsv" in file or "json" in file):
             other_files.append(f"-f {file}")
         
