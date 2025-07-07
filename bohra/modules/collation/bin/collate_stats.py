@@ -9,8 +9,12 @@ def get_vals_seqtk(f):
         qscore = lines[1].split('\t')[3]
         bases = lines[1].split('\t')[0]
         gc= float(lines[1].split('\t')[1]) + float(lines[1].split('\t')[2])
-        return float(qscore), int(bases), round(gc,1)
-
+        try:
+            return round(float(qscore),1)
+        except ValueError:
+            print(f"Something has gone horribly wrong {qscore} can not be parsed to a float!!")
+            return 0.0
+        
 def sum_stats(f,cmd,col):
 
     p = subprocess.run(f"cat {f} | datamash {cmd} --header-in {col}", shell = True, capture_output = True, encoding= 'utf-8')
@@ -48,7 +52,7 @@ tab['Isolate'] = sys.argv[1]
 tab = tab.rename(columns = {'num_seqs': 'Reads', 'sum_len': 'Yield','min_len':'Min len','max_len':'Max len', 'avg_len':'Avg len', 'Q30(%)': 'Average quality (% >Q30)'})
 tab['Estimated average depth'] = get_dpth(genome_size = sys.argv[4], bases = tab['Yield'].values[0])
 tab['GC content'] = gcs[gcs.columns[0]].values[0]
-tab['Avgerage quality'] = gcs[gcs.columns[1]].values[0]
+tab['Average quality'] = get_vals_seqtk(sys.argv[5])
 tab = tab[['Isolate','Reads','Yield','GC content','Min len','Avg len','Max len','Average quality (% >Q30)','Estimated average depth']]
 tab.to_csv('read_assessment.txt', sep = '\t', index = False)
 

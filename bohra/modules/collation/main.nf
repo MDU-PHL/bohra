@@ -17,7 +17,7 @@ process COLLATE_STATS_ISOLATE {
     cache 'lenient' 
     
     input:
-    tuple val(meta), path(seqkit_stats), path(seqkit_qual), path(genome_size)
+    tuple val(meta), path(seqkit_stats), path(seqkit_qual), path(genome_size), path(qcscore)
 
     output:
     tuple val(meta), path ("read_assessment.txt"), emit: read_assessment
@@ -25,7 +25,7 @@ process COLLATE_STATS_ISOLATE {
     script:
     """
     ${module_dir}/collate_stats.py $meta.id $seqkit_stats  \
-    $seqkit_qual $genome_size read_assessment.txt
+    $seqkit_qual $genome_size $qcscore read_assessment.txt
     """
     
 }

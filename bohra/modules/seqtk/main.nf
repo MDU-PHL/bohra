@@ -27,11 +27,12 @@ process SEQTK {
 
     output:
     tuple val(meta), path('seqtk_stats.txt'), emit: seqtk_stats
-
+    tuple val(meta), path('version_seqtk.txt'), emit: version
     script:
     """
     echo -e Bases'\t'C%'\t'G%'\t'AvgQ > seqtk_stats.txt
-    cat ${reads[0]} ${reads[1]} | seqtk fqchk -q0 -  | grep ALL | cut -f2,4,5,8 >>seqtk_stats.txt
+    cat ${reads[0]} ${reads[1]} | seqtk fqchk -q0 -  | grep ALL | cut -f2,4,5,8 >> seqtk_stats.txt
+    echo -e seqtk'\t'\$CONDA_PREFIX'\t'\$(seqtk |& grep Version | cut -f2 -d ':' | xargs) | csvtk add-header -t -n 'tool,conda_env,version' > version_seqkit.txt
     """
     
 }

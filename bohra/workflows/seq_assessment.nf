@@ -19,8 +19,10 @@ workflow READ_ANALYSIS {
         SEQKIT_STATS ( reads_pe )
         SEQKIT_GC ( reads_pe )
         KMC ( reads_pe )
+        SEQTK ( reads_pe )
         COMBD = SEQKIT_STATS.out.stats.join( SEQKIT_GC.out.stats )
         COMBD = COMBD.join( KMC.out.genome_size )
+        COMBD = COMBD.join( SEQTK.out.seqtk_stats )
         COLLATE_STATS_ISOLATE ( COMBD )
         seq_stats = COLLATE_STATS_ISOLATE.out.read_assessment.map { cfg, seq -> seq }.collect() // TODO add in Q score
         seq_stats = seq_stats.map { files -> tuple("read_assessment", files) }
