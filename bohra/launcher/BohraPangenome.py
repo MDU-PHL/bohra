@@ -26,5 +26,5 @@ LOGGER.addHandler(fh)
 def _setup_pangenome_args(kwargs:dict, command:dict, mtb:False) -> dict:
 
     command['modules'].append('pangenome')
-    
+    command["params"].append(f"--pangenome_groups {kwargs['pangenome_groups']}")
     return command

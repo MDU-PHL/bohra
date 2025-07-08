@@ -44,16 +44,18 @@ def get_dpth(genome_size,bases):
     length = get_length(genome_size)
     dpth = int(bases)/length
     
-    return round(dpth, 1)
+    return round(dpth, 1),int(length)
 
 gcs = pandas.read_csv(sys.argv[3], sep = '\t')
 tab = pandas.read_csv(sys.argv[2], sep = '\t')
 tab['Isolate'] = sys.argv[1]
 tab = tab.rename(columns = {'num_seqs': 'Reads', 'sum_len': 'Yield','min_len':'Min len','max_len':'Max len', 'avg_len':'Avg len', 'Q30(%)': 'Average quality (% >Q30)'})
-tab['Estimated average depth'] = get_dpth(genome_size = sys.argv[4], bases = tab['Yield'].values[0])
+dpth,size = get_dpth(genome_size = sys.argv[4], bases = tab['Yield'].values[0])
+tab['Estimated average depth'] = dpth
+tab["Estimated genome size"] = size
 tab['GC content'] = gcs[gcs.columns[0]].values[0]
 tab['Average quality'] = get_vals_seqtk(sys.argv[5])
-tab = tab[['Isolate','Reads','Yield','GC content','Min len','Avg len','Max len','Average quality (% >Q30)','Estimated average depth']]
+tab = tab[['Isolate','Reads','Yield','GC content','Min len','Avg len','Max len','Average quality',"Estimated genome size", 'Estimated average depth']]
 tab.to_csv('read_assessment.txt', sep = '\t', index = False)
 
 

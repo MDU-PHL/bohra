@@ -23,7 +23,7 @@ process KRAKEN2 {
         conda null
     }
     cache 'lenient'
-    // scratch true
+    scratch true
     
     input:
     tuple val(meta), path(sequences)

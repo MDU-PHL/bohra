@@ -34,6 +34,7 @@ process SNIPPY {
     tuple val(meta), path("${meta.id}/snps.vcf"), emit: vcf
     tuple val(meta), path("${meta.id}/snps.log"), emit: log
     tuple val(meta), path("${meta.id}/snps.tab"), emit: tab
+    // tuple val(meta), path("${meta.id}/snps.bam"), emit
     tuple val(meta), path("version_snippy.txt"), emit: version
     
 

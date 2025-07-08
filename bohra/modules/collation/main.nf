@@ -15,7 +15,7 @@ process COLLATE_STATS_ISOLATE {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     cache 'lenient' 
-    
+    scratch true
     input:
     tuple val(meta), path(seqkit_stats), path(seqkit_qual), path(genome_size), path(qcscore)
 

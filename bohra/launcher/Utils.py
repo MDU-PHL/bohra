@@ -106,7 +106,7 @@ def _get_pipelines(pipeline:str) -> list:
     }
 
 def _resource_opt() -> list:
-
+    pwd = f"{pathlib.Path.cwd().absolute()}"
     resource_options = [
         {   
             "name":"cpus",
@@ -504,6 +504,13 @@ def _get_cmd_options() -> dict:
                 "name":"annotations",
                 "help":"Comma separated list of annotations to use for the tree, default is 'Tx:cluster_threshold'. MUST be present in the input file.",
                 "default":"",
+            },
+            {
+                "name":"pangenome_groups",
+                "short_name":"-pg",
+                "help":"Groups for analysis of pangenome data",
+                "type":click.Choice(["clusters","mlst"]),
+                "default":"clusters"
             }
             
         ]

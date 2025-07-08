@@ -48,7 +48,7 @@ workflow SEROTYPES {
         emm_typers = EMMTYPER.out.typer.map {cfg, typer -> typer }.collect()
         emm_version = EMMTYPER.out.version.map {cfg, version -> version }.collect()
         typers = lissero_typers.concat ( salmo_typers, nmen_typers, ngono_typers, klebs_typers, ecoli_typers,emm_typers ).flatten().toList().map { files -> tuple("typer", files)}
-        println typers.view()
+        // println typers.view()
         // println KLEBORATE.out.typer.
         versions = lissero_version.concat ( salmo_version, nmen_version, ngono_version, klebs_version, ecoli_version, emm_version ).map { files -> tuple("version_serotypes", files)}
         CONCAT_FILES ( typers )

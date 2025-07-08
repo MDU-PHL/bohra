@@ -24,7 +24,7 @@ process JSON_COMBINE {
     // }
 
     cache 'lenient'
-    
+    scratch true
     input:
     tuple val(output_name), val(input)
 

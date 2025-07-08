@@ -15,7 +15,7 @@ workflow RUN_COMPILE {
         CSVTK_UNIQ ( versions )
 
         results = CSVTK_UNIQ.out.collated.concat ( results ).collect()
-        println results.view()
+        // println results.view()
         RUN_SMRYZR ( results )
 
 

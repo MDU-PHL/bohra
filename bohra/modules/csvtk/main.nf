@@ -24,7 +24,7 @@ process CSVTK_CONCAT {
     }
 
     cache 'lenient'
-    
+    scratch true
     input:
     tuple val(output_name), val(input)
 

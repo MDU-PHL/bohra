@@ -38,7 +38,7 @@ input_file = file(params.isolates) // need to make this an input file
     }
 
 println "Will run : $params.modules"
-println samples
+// println samples
 include { READ_ANALYSIS;ASSEMBLY_ANALYSIS } from './workflows/seq_assessment'
 include { RUN_ASSEMBLE } from './workflows/assemble'
 include { RUN_SPECIES_READS; RUN_SPECIES_ASM; COMBINE_SPECIES } from './workflows/species'
@@ -78,6 +78,7 @@ workflow {
         // RUN_ASSEMBLE ( reads_ont )
         asm = RUN_ASSEMBLE.out.contigs
         versions = versions.concat( RUN_ASSEMBLE.out.versions )
+        results = results.concat( RUN_ASSEMBLE.out.insertiqr )
         
     } 
     ASSEMBLY_ANALYSIS ( asm )
@@ -116,7 +117,7 @@ workflow {
         asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
         asm = asm_tmp.join( species_tmp )
                                 .map { id, cfg_asm, files, cfg_spieces, species_obs -> tuple(cfg_asm + [species:species_obs.trim()] , files) }
-        println asm.view()
+        // println asm.view()
         // generate summay file for species
         species_report = COMBINE_SPECIES.out.species_summary
         results = results.concat( species_report )
@@ -145,6 +146,7 @@ workflow {
         reportable = RUN_TYPING.out.reportable
         serotypes = RUN_TYPING.out.serotypes
         mlst = RUN_TYPING.out.mlst
+      
         results = results.concat( resistome )
         results = results.concat( virulome )
         results = results.concat( plasmid )
@@ -172,7 +174,7 @@ workflow {
         } 
 
         RELATIONSHIPS ( sequences, Channel.fromPath(params.reference) )
-        
+      
         results = results.concat( RELATIONSHIPS.out.dists )
         results = results.concat( RELATIONSHIPS.out.core_vcf )
         results = results.concat( RELATIONSHIPS.out.clusters )
@@ -184,14 +186,22 @@ workflow {
     }
 
     if (params.modules.contains("pangenome")){
+
+        if( params.pangenome_groups == "clusters") {
+            groups = RELATIONSHIPS.out.clusters
+        } else if (params.pangenome_groups == "mlst") {
+            groups = RELATIONSHIPS.out.mlst
+        } 
         gff = ASSEMBLY_ANALYSIS.out.gff
-        RUN_PANAROO ( gff )
+        RUN_PANAROO ( gff,groups )
 
         
-        results = results.concat( RUN_PANAROO.out.roary )
+        results = results.concat( RUN_PANAROO.out.pangenome_rtab )
+        results = results.concat( RUN_PANAROO.out.classification )
+        results = results.concat( RUN_PANAROO.out.groups )
         versions = versions.concat( RUN_PANAROO.out.version )
     }
 
     // println results.view()
-    RUN_COMPILE ( results, versions )
+    // RUN_COMPILE ( results, versions )
 }

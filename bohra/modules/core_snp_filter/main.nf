@@ -11,7 +11,7 @@ process CORE_SNP_FILTER {
         mode: params.publish_dir_mode
         
     
-    // scratch true
+    scratch true
     cache 'lenient'
     // errorStrategy 'ignore'
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/snippy" : 'bioconda::snippy=4.4.5') : null) 

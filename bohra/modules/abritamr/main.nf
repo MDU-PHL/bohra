@@ -29,7 +29,7 @@ process ABRITAMR {
     }
 
     cache 'lenient' 
-    // scratch true
+    scratch true
     // afterScript "rm -fr /tmp/\$USER/*"
     
     input:
@@ -73,7 +73,7 @@ process ABRITAMR_GENERAL {
         conda null
     }
 
-    // scratch true
+    scratch true
     input:
     tuple val(meta), path(summary_matches), path(summary_partials)
 

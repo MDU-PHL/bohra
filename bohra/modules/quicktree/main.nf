@@ -25,7 +25,7 @@ process QUICKTREE {
     }
 
     cache 'lenient'
-    
+    scratch true
     input:
     val(distances)
 

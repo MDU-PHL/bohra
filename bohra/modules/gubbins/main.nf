@@ -9,7 +9,7 @@ process GUBBINS {
     label 'process_high'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode
-    
+    scratch true
     cache 'lenient'
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/gubbins" : 'gubbins=2.4.1 snp-sites=2.5.1') : null)
     if ( params.enable_conda ) {

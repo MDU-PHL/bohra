@@ -24,7 +24,7 @@ process IQTREE {
     }
 
     cache 'lenient'
-    // scratch true
+    scratch true
       
     input:
         path(aln)

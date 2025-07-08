@@ -22,7 +22,7 @@ process LOWER_TRIANGLE {
     //     conda null
     // }
     cache 'lenient'
-    // scratch true
+    scratch true
     
     input:
     path(distances)

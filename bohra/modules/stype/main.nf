@@ -24,7 +24,7 @@ process STYPE {
         conda null
     }
     input:
-    tuple val(meta), path(contigs), val(species)
+    tuple val(meta), path(contigs)
 
     output:
     tuple val(meta), path("typer_${getSoftwareName(task.process)}.txt"), emit: typer

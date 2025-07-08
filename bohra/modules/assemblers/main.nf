@@ -26,7 +26,7 @@ process ASSEMBLER_PE {
 
     cache 'lenient'
     // afterScript "rm -fr /tmp/\$USER/*"
-    // scratch true
+    scratch true
     input:
     tuple val(meta), path(reads)
 

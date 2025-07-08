@@ -12,7 +12,7 @@ process SEQKIT_GC {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     
     cache 'lenient'
-    
+    scratch true
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/seqkit" : 'csvtk seqkit=2.1.0') : null) 
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {

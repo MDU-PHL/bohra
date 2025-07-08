@@ -14,7 +14,7 @@ process NGMASTER {
     cpus options.args2// args2 needs to be cpus for shovill
     cache 'lenient'
     errorStrategy 'ignore'
-    
+    scratch true
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-ngmaster"

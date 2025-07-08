@@ -31,6 +31,7 @@ process PANAROO {
     output:
     path('pangenome_statistics.txt'), emit: pangenome_summary
     path('gene_presence_absence_roary.csv'), emit: pangenome_csv
+    path('gene_presence_absence.Rtab'), emit: pangenome_rtab
     path('panaroo/*')
     path('version_panaroo.txt'), emit: version
     
@@ -41,6 +42,7 @@ process PANAROO {
     panaroo -i $gffs_str -o panaroo --clean-mode strict
     csvtk add-header -t -T -n 'Genes,Range,Total' panaroo/summary_statistics.txt > pangenome_statistics.txt
     cp panaroo/gene_presence_absence_roary.csv .
+    cp panaroo/gene_presence_absence.Rtab gene_presence_absence.Rtab
     ln -sf panaroo $launchDir/
     echo -e panaroo'\t'\$CONDA_PREFIX'\t'\$(panaroo --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_panaroo.txt
     """

@@ -136,6 +136,36 @@ def _get_other_files(results_files: list,ouput:list) -> str:
 
     return " ".join(other_files) if other_files else ""
 
+def _extract_pangenome_classification(results_files: list, output:list) -> str:
+    """
+    Extract the pangenome summary from the results files
+    """
+    for file in results_files:
+        if pathlib.Path(file).exists() and "classification.tab" in file:
+            output.append(file)
+            return f"--pangenome_characterization {file}",output
+    return "",output
+
+def _extract_pangenome_rtab(results_files: list, output:list) -> str:
+    """
+    Extract the pangenome rtab from the results files
+    """
+    for file in results_files:
+        if pathlib.Path(file).exists() and "gene_presence_absence.Rtab" in file:
+            output.append(file)
+            return f"--pangenome_rtab {file}",output
+    return "",output
+
+def _extract_pangenome_groups(results_files: list, output:list) -> str:
+    """
+    Extract the pangenome groups from the results files
+    """
+    for file in results_files:
+        if pathlib.Path(file).exists() and "groups.txt" in file:
+            output.append(file)
+            return f"--pangenome_groups {file}",output
+    return "",output
+
 def _run_datasmryzr(tree:str,
                     distance_matrix:str,
                     core_genome:str,

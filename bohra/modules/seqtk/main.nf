@@ -12,6 +12,7 @@ process SEQTK {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     
     cache 'lenient'
+    scratch true
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/seqtk" : 'seqtk') : null) 
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
@@ -32,7 +33,7 @@ process SEQTK {
     """
     echo -e Bases'\t'C%'\t'G%'\t'AvgQ > seqtk_stats.txt
     cat ${reads[0]} ${reads[1]} | seqtk fqchk -q0 -  | grep ALL | cut -f2,4,5,8 >> seqtk_stats.txt
-    echo -e seqtk'\t'\$CONDA_PREFIX'\t'\$(seqtk |& grep Version | cut -f2 -d ':' | xargs) | csvtk add-header -t -n 'tool,conda_env,version' > version_seqkit.txt
+    echo -e seqtk'\t'\$CONDA_PREFIX'\t'\$(seqtk |& grep Version | cut -f2 -d ':' | xargs) | csvtk add-header -t -n 'tool,conda_env,version' > version_seqtk.txt
     """
     
 }
