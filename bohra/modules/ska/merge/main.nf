@@ -20,7 +20,7 @@ process SKA_MERGE {
         conda null
     }
 
-    // scratch true
+    scratch true
     
     cache 'lenient'
     

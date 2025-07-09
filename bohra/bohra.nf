@@ -203,5 +203,5 @@ workflow {
     }
 
     // println results.view()
-    // RUN_COMPILE ( results, versions )
+    RUN_COMPILE ( results, versions )
 }

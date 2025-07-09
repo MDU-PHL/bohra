@@ -86,17 +86,17 @@ def combine_plasmid_data(plasmid: pd.DataFrame, amrfinder: pd.DataFrame, contigs
         ag.append(",".join(sorted(amrfinder[amrfinder["Contig id"].isin(ctgs)]["Gene symbol"].unique())))
         rt.append(",".join(tmp["rep_type(s)"].unique()))
         child = {"Isolate": sid,}
-        child["mash_nearest_neighbor"] = p
-        child["mash_neighbor_identification"] = tmp["mash_neighbor_identification"].unique()[0]
-        child["Present_on_contigs"] = ",".join([f"{i.split()[0]}" for i in tmp["contig_id"].unique()])
-        child["rep_type"] = ",".join(tmp["rep_type(s)"].unique())
-        child["AMR_genes"] = ",".join(sorted(amrfinder[amrfinder["Contig id"].isin(ctgs)]["Gene symbol"].unique()))
+        child["Plasmid accession"] = p
+        child["Plasmid species"] = tmp["mash_neighbor_identification"].unique()[0]
+        child["Present on contigs"] = ",".join([f"{i.split()[0]}" for i in tmp["contig_id"].unique()])
+        child["Replicon type"] = ",".join(tmp["rep_type(s)"].unique())
+        child["AMR genes"] = ",".join(sorted(amrfinder[amrfinder["Contig id"].isin(ctgs)]["Gene symbol"].unique()))
         data["_children"].append(child)
-    data["mash_nearest_neighbor"] = "|".join(mnm)
-    data["mash_neighbor_identification"] = "|".join(mni)
-    data["Present_on_contigs"] = "|".join(poc)
-    data["AMR_genes"] = "|".join(ag)
-    data["rep_type"] = "|".join(rt)
+    data["Plasmid accession"] = "|".join(mnm) if mnm != [] else ""
+    data["Plasmid species"] = "|".join(mni) if mni != [] else ""
+    data["Present on contigs"] = "|".join(poc) if poc != [] else ""
+    data["AMR genes"] = "|".join(ag) if ag != [] else ""
+    data["Replicon type"] = "|".join(rt) if rt != [] else ""
     
     with open(f"plasmid.json", 'w') as f:
         json.dump(data, f, indent = 4)

@@ -22,7 +22,7 @@ process SNIPPY_CLEAN {
     } else {
         conda null
     }
-
+    scratch true
 
     input:
     path(full_core)

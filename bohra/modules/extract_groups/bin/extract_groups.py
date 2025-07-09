@@ -32,7 +32,8 @@ if "ST" in df.columns:
     df[["ID","MLST_alleles"]].to_csv("group.txt", sep="\t", index=False, header = False)
 else:
     cols = sorted([i.split(":")[-1] for i in df.columns if "Tx" in i])
-
+    df = df[df["Isolate"] != "Reference"]
+    uc = extract_unclustered(df, col=f"Tx:{cols[-1]}", col1="Isolate")
     df = df[df[f"Tx:{cols[-1]}"] != "UC"]
 
     df[["ID", f"Tx:{cols[-1]}"]].to_csv("group.txt", sep="\t", index=False, header = False)

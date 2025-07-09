@@ -24,7 +24,7 @@ process SKA_BUILD {
         conda null
     }
 
-    // scratch true
+    scratch true
     
     cache 'lenient'
     

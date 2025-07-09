@@ -11,7 +11,7 @@ process SNIPPY {
         mode: params.publish_dir_mode
         // saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     
-    // scratch true
+    scratch true
     cache 'lenient'
     
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/snippy" : 'bioconda::snippy=4.4.5') : null) 

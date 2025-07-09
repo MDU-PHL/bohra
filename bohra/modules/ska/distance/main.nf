@@ -27,7 +27,7 @@ process SKA_DISTANCE {
     }
 
     cache 'lenient'
-    // scratch true
+    scratch true
     
     input:
     val(merged_skf)

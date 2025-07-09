@@ -25,6 +25,7 @@ process SNP_DISTS {
     }
     
     cache 'lenient'
+    scratch true
     
     input:
     path(core) 

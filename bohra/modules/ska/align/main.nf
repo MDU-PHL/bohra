@@ -24,7 +24,7 @@ process SKA_ALIGN {
     }
 
     cache 'lenient'
-    // scratch true
+    scratch true
     
     input:
     val(merged_skf)

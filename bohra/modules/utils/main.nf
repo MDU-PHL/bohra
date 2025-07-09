@@ -11,6 +11,7 @@ process CONCAT_FILES {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
     
     errorStrategy 'ignore'
+    scratch true
 
     cache 'lenient'
     

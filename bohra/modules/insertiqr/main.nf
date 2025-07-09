@@ -37,7 +37,7 @@ process INSERTIQR {
     x=\$(csvtk summary -t -H -f 3:q1,3:q3 depth.txt | csvtk -t -H mutate2 -e '\$2-\$1' | cut -f3)
     y=\$(samtools stats ${meta.id}/snps.bam | grep 'insert size average' | cut -f 3)
     echo ${meta.id},\$x,\$y >> tmp.csv
-    csvtk add-header -n 'Isolate,iqr,insert' tmp.csv | csvtk csv2tab > insertiqr.txt
+    csvtk add-header -n 'Isolate,IQR depth,Insert size' tmp.csv | csvtk csv2tab > insertiqr.txt
     """
     
 }

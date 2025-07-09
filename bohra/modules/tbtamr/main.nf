@@ -24,6 +24,8 @@ process TBTAMR {
         conda null
     }
     errorStrategy 'ignore'
+    cache 'lenient'
+    scratch true // uncomment if you want to use scratch space, but this will not work
     input:
     tuple val(meta), path(reads)
 
