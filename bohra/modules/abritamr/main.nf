@@ -108,6 +108,7 @@ process ABRITAMR_INFER {
     } else {
         conda null
     }
+    scratch true
     input:
     tuple val(meta), path(summary_matches)
     

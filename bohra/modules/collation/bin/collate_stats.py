@@ -34,26 +34,41 @@ def get_length(genome_size):
 
     with open(genome_size, 'r') as f:
         x = f.read().strip().split('\n')[0].strip()
+        print(x)
         try:
             return int(x)
         except:
             print(f"Something has gone horribly wrong {x} can not be parsed to an int!!")
-            raise SystemExit
+            return 0
     
 def get_dpth(genome_size,bases):
     length = get_length(genome_size)
-    dpth = int(bases)/length
+    try:
+        dpth = int(bases)/length
+        return round(dpth, 1),int(length)
+    except:
+        print(f"Something has gone horribly wrong with the genome size {genome_size} {bases} can not be parsed to an int!!")
+        return 0.0, int(length)
     
-    return round(dpth, 1),int(length)
+def get_gcs(path):
 
-gcs = pandas.read_csv(sys.argv[3], sep = '\t')
+    try:
+        gcs = pandas.read_csv(path, sep = '\t')
+        return gcs[gcs.columns[0]].values[0]
+    except Exception as e:
+        print(f"Something has gone wrong with the GC content file {path} {e}")
+        return 0.0
+
 tab = pandas.read_csv(sys.argv[2], sep = '\t')
 tab['Isolate'] = sys.argv[1]
+print(tab)
+gcs = get_gcs(sys.argv[3])
+print(gcs)
 tab = tab.rename(columns = {'num_seqs': 'Reads', 'sum_len': 'Yield','min_len':'Min len','max_len':'Max len', 'avg_len':'Avg len', 'Q30(%)': 'Average quality (% >Q30)'})
 dpth,size = get_dpth(genome_size = sys.argv[4], bases = tab['Yield'].values[0])
 tab['Estimated average depth'] = dpth
 tab["Estimated genome size"] = size
-tab['GC content'] = gcs[gcs.columns[0]].values[0]
+tab['GC content'] = gcs
 tab['Average quality'] = get_vals_seqtk(sys.argv[5])
 tab = tab[['Isolate','Reads','Yield','GC content','Min len','Avg len','Max len','Average quality',"Estimated genome size", 'Estimated average depth']]
 tab.to_csv('read_assessment.txt', sep = '\t', index = False)

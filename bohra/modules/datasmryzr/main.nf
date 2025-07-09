@@ -23,7 +23,7 @@ process RUN_SMRYZR {
         conda null
     }
     cache 'lenient'
-    // scratch true
+    scratch true
     
     input:
     val(inputs)

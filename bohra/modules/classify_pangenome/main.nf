@@ -21,7 +21,7 @@ process CLASSIFY_PANGENOME {
     } else {
         conda null
     }
-    // scratch true
+    scratch true
     // errorStrategy 'ignore'
 
     input:
