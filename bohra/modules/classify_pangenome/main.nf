@@ -16,7 +16,7 @@ process CLASSIFY_PANGENOME {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-classify-pangenome"
         } else {
-            conda 'bioconda::r-data-table r-ggplot2 r-optparse'
+            conda 'conda-forge::r-data-table r-ggplot2 r-optparse'
         }
     } else {
         conda null
