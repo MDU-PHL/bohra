@@ -1,6 +1,6 @@
 {
     "comments":{
-    "resistome": "* indicative of 90 - 99% identity and >90% coverage to a known resistance gene; ^ indicative of 90 - 99% identity and 50%< coverage <90% to a known resistance gene; text in bracket indicates the AMR mechanim is possible on a plasmid (ACCESSION plasmid_species)"
+    "resistome": ["Resistome was identified using abritamr and mobsuite to determine if AMR mechanims identified from assemblies are possibly located on mobile elements.", "* indicative of 90 - 99% identity and >90% coverage to a known resistance gene", "^ indicative of 90 - 99% identity and 50%< coverage <90% to a known resistance gene", "text in bracket indicates the AMR mechanim is possible on a plasmid (PLASMID_ACCESSION PLASMID_SPECIES)"]
 },
     "datatype": {
         "MLST":"input",
@@ -10,6 +10,9 @@
         "MLST",
         "ST"
     ],
+   "menu": [
+    "summary"
+   ],
     "id_column": "Isolate"
 
 }
