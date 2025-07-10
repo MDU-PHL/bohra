@@ -41,6 +41,8 @@ def _show_usage_error(self, file=None):
 UsageError.show = _show_usage_error
 
 @click.group(no_args_is_help=True,invoke_without_command=True)
+@click.version_option(version, message='%(prog)s version %(version)s')
+@click.pass_context
 def cli():
     pass
 

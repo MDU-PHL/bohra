@@ -7,7 +7,7 @@ include { SEQKIT_GC } from './../modules/seqkit/fx2tab/main'
 include { KMC } from './../modules/kmc/main' 
 include { PROKKA } from './../modules/prokka/main'
 include { CSVTK_CONCAT;CSVTK_UNIQ } from './../modules/csvtk/main'
-
+include { BOHRA_VERSION } from './../modules/utils/main'
 workflow READ_ANALYSIS {   
 
     take:
@@ -15,7 +15,7 @@ workflow READ_ANALYSIS {
         
         
     main:
-        
+        BOHRA_VERSION (  )
         SEQKIT_STATS ( reads_pe )
         SEQKIT_GC ( reads_pe )
         KMC ( reads_pe )
@@ -37,6 +37,7 @@ workflow READ_ANALYSIS {
         read_stats  = CSVTK_CONCAT.out.collated
         version_seqkit_reads = VERSION_SEQKIT_READS.out.version
         version_kmc = VERSION_KMC.out.version
+        version_bohra = BOHRA_VERSION.out.collated
         
 
 }

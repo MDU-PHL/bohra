@@ -29,3 +29,26 @@ process CONCAT_FILES {
     """ 
         
 }
+
+
+process BOHRA_VERSION {
+    label 'process_medium'
+    publishDir "${params.outdir}",
+        mode: params.publish_dir_mode,
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
+    
+    errorStrategy 'ignore'
+    scratch true
+
+    cache 'lenient'
+
+    output:
+    path("version_bohra.txt"), emit: collated
+
+    script:
+    
+    """
+    echo -e bohra'\t'\$CONDA_PREFIX'\t'\$(bohra --version | cut -f 2,3 -d' ') | csvtk add-header -t -n 'tool,conda_env,version' > version_bohra.txt
+    """ 
+        
+}

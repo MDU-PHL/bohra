@@ -71,6 +71,7 @@ workflow {
     results = results.concat( read_stats)
     versions = READ_ANALYSIS.out.version_seqkit_reads
     versions = versions.concat( READ_ANALYSIS.out.version_kmc )
+    versions = versions.concat( READ_ANALYSIS.out.version_bohra )
     // if there is assembly in the modules list then generate an assembly and run assembly analysis
     if (params.modules.contains("assemble") ){
         // assembly is only done if the input is reads
