@@ -41,11 +41,11 @@ process RUN_SMRYZR {
     --input_file ${launchDir}/${params.isolates} \
     --annot_cols '${params.annot_cols}' \
     --cluster_method '${params.cluster_method}' \
-    --cluster_threshold '${params.cluster_threshold}' \ 
-    --pangenome_groups '${params.pangenome_groups}' \
+    --cluster_threshold '${params.cluster_threshold}' --pangenome_groups '${params.pangenome_groups}' \
+    --speciation '${params.speciation}' \
+    --kraken2_db '${params.kraken2_db}' \
     --bkgd '${params.background_color}' \
     --text_color '${params.text_color}' \
     --results_files ${input_files} \
-    
     """
 }

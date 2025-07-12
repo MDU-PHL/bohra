@@ -424,6 +424,14 @@ def set_parsers():
     help = '',
     default = ''
     )
+    parser.add_argument('--speciation',
+    help = '',
+    default = ''
+    )
+    parser.add_argument('--kraken2_db',
+    help = '',
+    default = ''
+    )
  
     
     parser.set_defaults(func=_compile)
