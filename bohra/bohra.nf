@@ -110,7 +110,7 @@ workflow {
        
         species_tmp = COMBINE_SPECIES.out.species_obs
                                             .map { cfg, species_obs -> tuple(cfg.id, cfg, species_obs.trim() ) }
-        // println species_tmp.view()
+        println species_tmp.view()
         reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
         reads_pe = reads.join( species_tmp )
                                 .map { id, cfg_reads, files, cfg_spieces,  species_obs -> tuple(cfg_reads + [species:species_obs.trim()] , files) }
@@ -118,8 +118,8 @@ workflow {
         asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
         asm = asm_tmp.join( species_tmp )
                                 .map { id, cfg_asm, files, cfg_spieces, species_obs -> tuple(cfg_asm + [species:species_obs.trim()] , files) }
-        // println asm.view()
-        // generate summay file for species
+        println asm.view()
+        // // generate summay file for species
         species_report = COMBINE_SPECIES.out.species_summary
         results = results.concat( species_report )
         
