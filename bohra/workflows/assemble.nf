@@ -4,6 +4,8 @@ include { ASSEMBLER_PE } from './../modules/assemblers/main'
 include { CSVTK_UNIQ } from './../modules/csvtk/main'
 include { INSERTIQR } from './../modules/insertiqr/main'
 include { CONCAT_FILES } from './../modules/utils/main'
+
+
 workflow RUN_ASSEMBLE {   
 
     take:

@@ -8,6 +8,7 @@ include { KMC } from './../modules/kmc/main'
 include { PROKKA } from './../modules/prokka/main'
 include { CSVTK_CONCAT;CSVTK_UNIQ } from './../modules/csvtk/main'
 include { BOHRA_VERSION } from './../modules/utils/main'
+
 workflow READ_ANALYSIS {   
 
     take:
@@ -50,6 +51,7 @@ workflow ASSEMBLY_ANALYSIS {
         
     main:
         // println contigs.view()
+        BOHRA_VERSION (  )
         SEQKIT_GC ( contigs )
         SEQKIT_STATS ( contigs )
         // println SEQKIT_STATS.out.stats.view()
@@ -71,6 +73,7 @@ workflow ASSEMBLY_ANALYSIS {
         assembly_stats = CSVTK_CONCAT.out.collated
         version_prokka = VERSION_PROKKA.out.version
         version_seqkit_asm = VERSION_SEQKIT_ASM.out.version
+        version_bohra = BOHRA_VERSION.out.collated
         gff
         
         

@@ -28,7 +28,6 @@ workflow RUN_SPECIES_READS {
             version = RUN_SYLPH.out.version
         }
         
-        // println species_obs.view()
     emit:
         species_raw  = species_raw
         species = species
@@ -55,9 +54,6 @@ workflow RUN_SPECIES_ASM {
         
         } 
 
-    //    println species_obs.view()
-        
-        
     emit:
         species_raw = species_raw
         species = species
@@ -78,32 +74,25 @@ workflow COMBINE_SPECIES {
         
         sp_res = reads_results.map { cfg,species -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, species.trim() ) }
         asm_res = asm_results.map { cfg,species -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, species.trim() ) }
-        // obs = sp_res.join(asm_res, remainder:true)
-        // .map( v -> { v.size() == 4 ? v[1..3] : [v[1],v[2],v[4]]} ).view()
-        // println sp_res.view()
-        // println asm_res.view()
+        
         observed_species =  sp_res.join(asm_res, remainder:true)
                                 .map( v -> v.findAll { it != null } )
                                 .map( v -> { v.size() < 4 ? v[1..-1] + 'no_results': [v[1],v[2],v[-1]]} )
                                 .map { cfg, species_reads, species_asm -> tuple(cfg, species_reads ? species_reads : 'no_results', species_asm ? species_asm: 'no_results') }
-        // println observed_species.view()
+        
         COMBINE_SPECIES_VALS ( observed_species )
         species_obs = COMBINE_SPECIES_VALS.out.extracted_species
-        // println species_obs.view()
+        
         reads_results_files = reads_result_file.map { cfg,files -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, files ) }
         
         asm_results_files = asm_result_file.map { cfg,file -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, file ) }
-        // println reads_results_files.view()
-        // println asm_results_files.view()
         species = reads_results_files.join( asm_results_files, remainder: true )
                     .map( v -> v.findAll { it != null } )
                                 .map( v -> { v.size() < 4 ? v[1..-1] + 'no_results': [v[1],v[2],v[-1]]} )
                                 .map { cfg, species_reads, species_asm -> tuple(cfg, species_reads ? species_reads : 'no_results', species_asm ? species_asm: 'no_results') }
         
-        // println species.view()
         COMBINE_SPECIES_REPORT ( species )
         species_report = COMBINE_SPECIES_REPORT.out.species_report
-    //     // println species.view()
         species_stats = species_report.map { cfg, sp -> sp }.collect()
         species_stats = species_stats.map { files -> tuple("speciation", files) }
         

@@ -42,7 +42,7 @@ process RUN_SMRYZR {
     --annot_cols '${params.annot_cols}' \
     --cluster_method '${params.cluster_method}' \
     --cluster_threshold '${params.cluster_threshold}' --pangenome_groups '${params.pangenome_groups}' \
-    --speciation '${params.speciation}' \
+    --speciation '${params.use_kraken2}' \
     --kraken2_db '${params.kraken2_db}' \
     --bkgd '${params.background_color}' \
     --text_color '${params.text_color}' \

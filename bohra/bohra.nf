@@ -95,11 +95,8 @@ workflow {
         versions = versions.concat( RUN_SPECIES_READS.out.version, RUN_SPECIES_ASM.out.version )
         reads_species_obs = RUN_SPECIES_READS.out.species_obs
         asm_species_obs = RUN_SPECIES_ASM.out.species_obs
-        // println asm_species_obs.view()
-        // println reads_species_obs.view()
         sp_res = reads_species_obs.map { cfg,species -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, species.trim() ) }
         asm_res = asm_species_obs.map { cfg,species -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, species.trim() ) }
-        // println sp_res.join(asm_res, remainder:true).map( v -> { v.size() == 4 ? v[1..3] : [v[1],v[2],v[4]]} ).view()
         COMBINE_SPECIES ( 
             RUN_SPECIES_READS.out.species_obs, 
             RUN_SPECIES_READS.out.species,
@@ -118,7 +115,7 @@ workflow {
         asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
         asm = asm_tmp.join( species_tmp )
                                 .map { id, cfg_asm, files, cfg_spieces, species_obs -> tuple(cfg_asm + [species:species_obs.trim()] , files) }
-        println asm.view()
+        
         // // generate summay file for species
         species_report = COMBINE_SPECIES.out.species_summary
         results = results.concat( species_report )

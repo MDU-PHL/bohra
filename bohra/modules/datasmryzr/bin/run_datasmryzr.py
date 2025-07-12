@@ -25,8 +25,18 @@ def check_species(species:list) -> str:
         return 1
     elif len(sp) > 1:
         return f"Species from reads: {species[0]} and assembly: {species[1]} are different."
-    
-def _generate_summary_table(results_files: list, output:list, min_coverage:40, minquality : 30) -> list:
+def check_val(val:float, min_val:float) -> str:
+    """
+    Check if the coverage is above the minimum coverage
+    """
+    if val == "":
+        return 1
+    elif int(val) >= min_val:
+        return 1
+    else:
+        return f"Coverage is {val}, should be at least {min_val}`"
+
+def _generate_summary_table(results_files: list, output:list, min_depth:40, minquality : 30, minaln:70) -> list:
     print("Generating summary table")
     list_of_filename = {
         "read_assessment.txt" : ["Isolate","Reads","GC content", "Estimated average depth"],
@@ -42,6 +52,7 @@ def _generate_summary_table(results_files: list, output:list, min_coverage:40, m
         # print(file)
         if pathlib.Path(file).name in list_of_filename and pathlib.Path(file).exists():
             df = pd.read_csv(file, sep = '\t')
+            
             cols_to_keep = []
             for col in list_of_filename[pathlib.Path(file).name]:
                 if col in df.columns:
@@ -52,7 +63,7 @@ def _generate_summary_table(results_files: list, output:list, min_coverage:40, m
                 summary = df
             else:
                 summary = pd.merge(summary, df, how = 'outer', on = "Isolate")
-
+    summary = summary.fillna("")
     summary = summary.rename(columns = {"Match 1 (reads)":"Species (reads)","Match 1 (asm)":"Species (assembly)"})
     # summary["Data assessment"] = "ok"
     # summary["Comment"] = ""
@@ -62,9 +73,9 @@ def _generate_summary_table(results_files: list, output:list, min_coverage:40, m
     summary["Species check"] = summary[sp_cols].apply(lambda x: check_species(x.tolist()), axis=1)
     
     if "Estimated average depth" in summary.columns:
-        summary["Coverage check"] = summary["Estimated average depth"].apply(lambda x: 1 if x >= min_coverage else f"Coverage is {x}x, should be at least {min_coverage}x")
+        summary["Coverage check"] = summary["Estimated average depth"].apply(lambda x: check_val(x, min_depth))
     if "% Aligned" in summary.columns:
-        summary["Alignment check"] = summary["% Aligned"].apply(lambda x: 1 if x >= min_coverage else f"Coverage is {x}%, should be at least {min_coverage}%")
+        summary["Alignment check"] = summary["% Aligned"].apply(lambda x:check_val(x, minaln))
 
     if "# Contigs" in summary.columns:
         bounds = check_asm(summary["# Contigs"].tolist())
@@ -318,20 +329,29 @@ def _run_datasmryzr(tree:str,
 
 def generate_config(cluster_method:str,
                     cluster_threshold:str,
-                    pangenome_groups:str):
+                    pangenome_groups:str,
+                    kraken2_db:str,
+                    speciation: str) -> None:
     
     key = {
         "GRP":pangenome_groups,
         "THRESHOLDS":cluster_threshold,
-        "METHOD":cluster_method}
+        "METHOD":cluster_method,
+        "KRAKEN2_DB": kraken2_db,}
+    
     with open(f"{pathlib.Path(__file__).parent / 'base_config.json'}","r") as j:
         cfg = j.read()
         
         for rpl in key:
             if key[rpl] != "":
                 cfg = cfg.replace(rpl, key[rpl])
-        print(cfg)
+        # print(cfg)
         dct = literal_eval(cfg)
+        if "speciation" in dct["comments"]:
+            sp = "kraken2" if speciation == "kraken2" else "sylph"
+            sprow = dct["comments"]["speciation"].get(sp, [])
+            dct["comments"]["speciation"] = sprow
+        print(dct["comments"]["speciation"])
     with open("bohra_config.json" , "w") as o:
         json.dump(dct, o , indent = 4)
 
@@ -343,6 +363,7 @@ def generate_config(cluster_method:str,
 def _compile(args):
     # print(f"{args.annot_cols}")
     # print(args.results_files)
+    # print(args.speciation)
     output = []
     results_files = args.results_files
     results_files = [i for i in results_files if pathlib.Path(i).exists()]
@@ -351,7 +372,7 @@ def _compile(args):
     distance_matrix,output = _extract_distance_matrix(results_files, output)
     core_genome,output = _extract_core_genome(results_files, output)
     core_genome_report,output = _extract_core_genome_report(results_files, output)
-    summary,output = _generate_summary_table(results_files, output, 40, 30)
+    summary,output = _generate_summary_table(results_files, output, 40, 30, 70)
     print(output)
     
     panclass,output = _extract_pangenome_classification(results_files, output)
@@ -363,7 +384,7 @@ def _compile(args):
     reference = _get_reference(args.reference)
     mask = _get_mask(args.mask)
     annotation = _make_annotation_file(args.input_file, results_files, f"{args.annot_cols}")
-    generate_config(args.cluster_method, args.cluster_threshold, args.pangenome_groups)
+    generate_config(args.cluster_method, args.cluster_threshold, args.pangenome_groups, args.kraken2_db, 'kraken2' if args.speciation == 'true' else "sylph")
     p = _run_datasmryzr(tree,
                         distance_matrix,
                         core_genome,

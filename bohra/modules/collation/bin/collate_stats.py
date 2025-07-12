@@ -66,11 +66,11 @@ gcs = get_gcs(sys.argv[3])
 print(gcs)
 tab = tab.rename(columns = {'num_seqs': 'Reads', 'sum_len': 'Yield','min_len':'Min len','max_len':'Max len', 'avg_len':'Avg len', 'Q30(%)': 'Average quality (% >Q30)'})
 dpth,size = get_dpth(genome_size = sys.argv[4], bases = tab['Yield'].values[0])
-tab['Estimated average depth'] = dpth
-tab["Estimated genome size"] = size
-tab['GC content'] = gcs
-tab['Average quality'] = get_vals_seqtk(sys.argv[5])
-tab = tab[['Isolate','Reads','Yield','GC content','Min len','Avg len','Max len','Average quality',"Estimated genome size", 'Estimated average depth']]
+tab['Est average depth'] = dpth
+tab["Est genome size"] = size
+tab['GC'] = gcs
+tab['Qscore'] = get_vals_seqtk(sys.argv[5])
+tab = tab[['Isolate','Reads','Yield','GC','Min len','Avg len','Max len','Qscore',"Est genome size", 'Est average depth']]
 tab.to_csv('read_assessment.txt', sep = '\t', index = False)
 
 
