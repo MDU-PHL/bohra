@@ -11,7 +11,7 @@ process EMMTYPER {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     
-    
+    cpus options.args2// args2 needs to be cpus for shovill
     cache 'lenient'
     scratch true
     // errorStrategy 'ignore'

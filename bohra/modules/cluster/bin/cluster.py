@@ -45,7 +45,7 @@ if pathlib.Path(tabfile).exists():
         df = pandas.DataFrame(data = {'ID': isos, f"Tx:{level}": clustering.labels_})
         print(len(clustering.labels_))
         print(len(isos))
-        print(df.shape)
+        print(df.shape) 
         colname = f"Tx:{level-1}"
         df = df.rename(columns={f"Tx:{level}": colname})
         print(len(df[f"{colname}"].unique()))

@@ -15,7 +15,7 @@ process RUN_SMRYZR {
     
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/bohra-datasmryzr"
+            conda "${params.conda_path}/datasmryzr"
         } else {
             conda 'datasmryzr'
         }
@@ -40,6 +40,9 @@ process RUN_SMRYZR {
     --mask ${params.mask} --reference ${params.reference} \
     --input_file ${launchDir}/${params.isolates} \
     --annot_cols '${params.annot_cols}' \
+    --cluster_method '${params.cluster_method}' \
+    --cluster_threshold '${params.cluster_threshold}' \ 
+    --pangenome_groups '${params.pangenome_groups}' \
     --bkgd '${params.background_color}' \
     --text_color '${params.text_color}' \
     --results_files ${input_files} \

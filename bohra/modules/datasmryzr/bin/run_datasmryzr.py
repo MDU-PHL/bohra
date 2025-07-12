@@ -4,6 +4,8 @@ import sys,pandas as pd
 import argparse, subprocess,pathlib
 import pandas as pd
 import numpy as np
+from ast import literal_eval
+import json 
 
 def check_asm(contigs:list)-> tuple:
 
@@ -303,7 +305,7 @@ def _run_datasmryzr(tree:str,
     """
     Run the datasmryzr pipeline
     """
-    cmd = f"datasmryzr -bg '{bkgd_color}' -fc '{text_color}' {other_files} {pangenome_classification} {pangenome_rtab} {pangenome_groups} {tree} {distance_matrix} {core_genome} {core_genome_report} {reference} {mask} {annotation}"
+    cmd = f"datasmryzr -c bohra_config.json -bg '{bkgd_color}' -fc '{text_color}' {other_files} {pangenome_classification} {pangenome_rtab} {pangenome_groups} {tree} {distance_matrix} {core_genome} {core_genome_report} {reference} {mask} {annotation}"
     print(cmd)
     p = subprocess.run(cmd, shell=True, capture_output=True)
     if p.returncode != 0:
@@ -313,6 +315,30 @@ def _run_datasmryzr(tree:str,
         print(p.stdout.decode())
         print("datasmryzr run complete")
         return p.stdout.decode()
+
+def generate_config(cluster_method:str,
+                    cluster_threshold:str,
+                    pangenome_groups:str):
+    
+    key = {
+        "GRP":pangenome_groups,
+        "THRESHOLDS":cluster_threshold,
+        "METHOD":cluster_method}
+    with open(f"{pathlib.Path(__file__).parent / 'base_config.json'}","r") as j:
+        cfg = j.read()
+        
+        for rpl in key:
+            if key[rpl] != "":
+                cfg = cfg.replace(rpl, key[rpl])
+        print(cfg)
+        dct = literal_eval(cfg)
+    with open("bohra_config.json" , "w") as o:
+        json.dump(dct, o , indent = 4)
+
+        
+
+    
+
 
 def _compile(args):
     # print(f"{args.annot_cols}")
@@ -337,6 +363,7 @@ def _compile(args):
     reference = _get_reference(args.reference)
     mask = _get_mask(args.mask)
     annotation = _make_annotation_file(args.input_file, results_files, f"{args.annot_cols}")
+    generate_config(args.cluster_method, args.cluster_threshold, args.pangenome_groups)
     p = _run_datasmryzr(tree,
                         distance_matrix,
                         core_genome,
@@ -385,7 +412,19 @@ def set_parsers():
     parser.add_argument('--text_color',
         help='',
         default = '',)
-    
+    parser.add_argument('--cluster_method',
+                        help = '',
+                        default = ''
+                        )
+    parser.add_argument('--cluster_threshold',
+    help = '',
+    default = ''
+    )
+    parser.add_argument('--pangenome_groups',
+    help = '',
+    default = ''
+    )
+ 
     
     parser.set_defaults(func=_compile)
     args = parser.parse_args()
