@@ -107,7 +107,7 @@ workflow {
        
         species_tmp = COMBINE_SPECIES.out.species_obs
                                             .map { cfg, species_obs -> tuple(cfg.id, cfg, species_obs.trim() ) }
-        println species_tmp.view()
+        // println species_tmp.view()
         reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
         reads_pe = reads.join( species_tmp )
                                 .map { id, cfg_reads, files, cfg_spieces,  species_obs -> tuple(cfg_reads + [species:species_obs.trim()] , files) }

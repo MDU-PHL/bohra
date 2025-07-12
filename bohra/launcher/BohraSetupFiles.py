@@ -54,29 +54,22 @@ def _check_data_format(df:pd.DataFrame) -> pd.DataFrame:
         if col not in df.columns.tolist():
             LOGGER.critical(f"Column {col} is missing from input file.")
             raise SystemExit
-        # else:
-        #     columns.append(col)
     # check if all must have columns are present
-    mchk = False
+    mchk = 0
     for col in columns_req["must_have"]:
         if col in df.columns.tolist():
-            mchk = True
-    if mchk == False:
+            mchk = mchk + 1
+    if mchk == 0:
         LOGGER.critical(f"Must have at least one of {','.join(columns_req['must_have'])} in your input file.")
         raise SystemExit
     # check if all optional columns are present
-    schk = False
-    for col in columns_req["optional"]:
-        if col in df.columns:
-            schk = True
-            columns.append(col)
-    if not schk:
-        df["species"] = "not_supplied"
-    df['assembly'] = df['assembly'].fillna('no_contigs')
+    for col in columns:
+        if col not in df.columns:
+            df[col] = "not_supplied"
+    
     for col in df.columns:
         if col not in columns:
             columns.append(col)
-
     df = df[columns]
     LOGGER.info(f"Saving input file with columns {','.join(columns)} to {pathlib.Path('input_checked.tsv')}.")
     df.to_csv('input_checked.tsv', sep='\t', index=False, header=True)
