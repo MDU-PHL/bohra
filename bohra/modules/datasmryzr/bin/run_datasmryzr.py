@@ -39,8 +39,8 @@ def check_val(val:float, min_val:float) -> str:
 def _generate_summary_table(results_files: list, output:list, min_depth:40, minquality : 30, minaln:70) -> list:
     print("Generating summary table")
     list_of_filename = {
-        "read_assessment.txt" : ["Isolate","Reads","GC content", "Estimated average depth"],
-        "assembly_assessment.txt":["Isolate","bp","# Contigs","N50"],
+        "read_assessment.txt" : ["Isolate","Reads","GC content", "Est average depth"],
+        "assembly_assesment.txt":["Isolate","bp","# Contigs","N50"],
         "core_genome_stats.txt":["Isolate","% Aligned"],
         "speciation.txt":["Isolate","Species (reads)","Match 1 (reads)", "Match 1 (asm)"],
         "mlst.txt":["Isolate","Scheme","ST"],
@@ -72,12 +72,13 @@ def _generate_summary_table(results_files: list, output:list, min_depth:40, minq
     # print(sp_cols)
     summary["Species check"] = summary[sp_cols].apply(lambda x: check_species(x.tolist()), axis=1)
     
-    if "Estimated average depth" in summary.columns:
-        summary["Coverage check"] = summary["Estimated average depth"].apply(lambda x: check_val(x, min_depth))
+    if "Est average depth" in summary.columns:
+        summary["Coverage check"] = summary["Est average depth"].apply(lambda x: check_val(x, min_depth))
     if "% Aligned" in summary.columns:
         summary["Alignment check"] = summary["% Aligned"].apply(lambda x:check_val(x, minaln))
 
     if "# Contigs" in summary.columns:
+        print("Checking number of contigs")
         bounds = check_asm(summary["# Contigs"].tolist())
         summary["Contigs check"] = summary["# Contigs"].apply(lambda x: 1 if bounds[0] <= x <= bounds[1] else f"Number of contigs is {x} is outside {bounds[0]} and {bounds[1]}")
 
@@ -317,15 +318,15 @@ def _run_datasmryzr(tree:str,
     Run the datasmryzr pipeline
     """
     cmd = f"datasmryzr -c bohra_config.json -bg '{bkgd_color}' -fc '{text_color}' {other_files} {pangenome_classification} {pangenome_rtab} {pangenome_groups} {tree} {distance_matrix} {core_genome} {core_genome_report} {reference} {mask} {annotation}"
-    print(cmd)
-    p = subprocess.run(cmd, shell=True, capture_output=True)
-    if p.returncode != 0:
-        print(p.stderr.decode())
-        raise Exception(f"Error running datasmryzr: {p.stderr.decode()}")
-    else:
-        print(p.stdout.decode())
-        print("datasmryzr run complete")
-        return p.stdout.decode()
+    # print(cmd)
+    # p = subprocess.run(cmd, shell=True, capture_output=True)
+    # if p.returncode != 0:
+    #     print(p.stderr.decode())
+    #     raise Exception(f"Error running datasmryzr: {p.stderr.decode()}")
+    # else:
+    #     print(p.stdout.decode())
+    #     print("datasmryzr run complete")
+    #     return p.stdout.decode()
 
 def generate_config(cluster_method:str,
                     cluster_threshold:str,
