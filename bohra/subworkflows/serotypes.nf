@@ -47,16 +47,93 @@ workflow SEROTYPES {
         EMMTYPER ( igas )
         emm_typers = EMMTYPER.out.typer.map {cfg, typer -> typer }.collect()
         emm_version = EMMTYPER.out.version.map {cfg, version -> version }.collect()
-        typers = lissero_typers.concat ( salmo_typers, nmen_typers, ngono_typers, klebs_typers, ecoli_typers,emm_typers ).flatten().toList().map { files -> tuple("typer", files)}
+        // typers = lissero_typers.concat ( salmo_typers, nmen_typers, ngono_typers, klebs_typers, ecoli_typers,emm_typers ).flatten().toList().map { files -> tuple("typer", files)}
         // println typers.view()
-        // println KLEBORATE.out.typer.
+        // println klebs_typers.view()
+        kleb_typing = CONCAT_KLEBORATE ( klebs_typers.map {files -> tuple("kleborate", files)} )
+        salmo_typing = CONCAT_SALMO ( salmo_typers.map {files -> tuple("stype", files)} )
+        lissero_typing = CONCAT_LISSERO ( lissero_typers.map {files -> tuple("lissero", files)} )
+        nmen_typing = CONCAT_MENINGOTYPE ( nmen_typers.map {files -> tuple("meningotype", files)} )
+        ngono_typing = CONCAT_NGMASTER ( ngono_typers.map {files -> tuple("ngmaster", files)} )
+        ecoli_typing = CONCAT_ECTYPER ( ecoli_typers.map {files -> tuple("ectyper", files)} )
+        emm_typing = CONCAT_EMMTYPER ( emm_typers.map {files -> tuple("emmtyper", files)} )
+        collated_typers =  lissero_typing.concat(kleb_typing,salmo_typing,nmen_typing,ngono_typing,ecoli_typing,emm_typing).view()
         versions = lissero_version.concat ( salmo_version, nmen_version, ngono_version, klebs_version, ecoli_version, emm_version ).map { files -> tuple("version_serotypes", files)}
-        CONCAT_FILES ( typers )
+        println collated_typers.toList().view()
+        // CONCAT_FILES ( typers )
         CSVTK_UNIQ ( versions )
         collated_versions = CSVTK_UNIQ.out.collated
-        collated_typers = CONCAT_FILES.out.collated
+        // collated_typers = CONCAT_FILES.out.collated
     emit:
-        collated_typers
+        collated_typers = collated_typers.toList()
         collated_versions
 
+}
+
+workflow CONCAT_KLEBORATE {
+    take:
+        klebs
+    main:
+        CONCAT_FILES ( klebs )
+    emit:
+        collated_klebs = CONCAT_FILES.out.collated
+}
+
+
+workflow CONCAT_EMMTYPER {
+    take:
+        emm
+    main:
+        CONCAT_FILES ( emm )
+    emit:
+        collated_emm = CONCAT_FILES.out.collated
+}
+
+
+workflow CONCAT_LISSERO {
+    take:
+        lissero
+    main:
+        CONCAT_FILES ( lissero )
+    emit:
+        collated_lissero = CONCAT_FILES.out.collated
+}
+
+
+workflow CONCAT_SALMO {
+    take:
+        salmo
+    main:
+        CONCAT_FILES ( salmo )
+    emit:
+        collated_salmo = CONCAT_FILES.out.collated
+}
+
+
+workflow CONCAT_NGMASTER {
+    take:
+        ngmaster
+    main:
+        CONCAT_FILES ( ngmaster )
+    emit:
+        collated_ngmaster = CONCAT_FILES.out.collated
+}
+
+
+workflow CONCAT_MENINGOTYPE {
+    take:
+        meningotype
+    main:
+        CONCAT_FILES ( meningotype )
+    emit:
+        collated_meningotype = CONCAT_FILES.out.collated
+}
+
+workflow CONCAT_ECTYPER {
+    take:
+        ecoli
+    main:
+        CONCAT_FILES ( ecoli )
+    emit:
+        collated_ectyper = CONCAT_FILES.out.collated
 }

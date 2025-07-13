@@ -46,28 +46,11 @@ def _missing_reads(input_table: pd.DataFrame) -> bool:
         
     return res
 
-def _assembly_required(input_table: pd.DataFrame, command:dict, kwargs:dict, mtb:False) -> dict:
-    """Check if assembly is required based on the provided arguments."""
-    LOGGER.info("Checking if assembly is required.")
-    
-
-    if 'no_reads' in input_table['assembly'].unique().tolist():
-        LOGGER.info("Assembly is required in order to run the pipeline")
-        command = _setup_assembly_args(kwargs, command, mtb)
-    else:
-        LOGGER.info("Assembly is not required.")
-    
-    if _missing_reads(input_table):
-        LOGGER.warning("Some reads are missing from the input file, were assemblies are not present. This may be an error. Note that the typing pipeline requires assemblies, you may get unexpected results.")
-        
-        
-    return command
-        
 def _setup_typing_args(kwargs:dict, command:dict, mtb:False) -> dict:
 
     typing_dbs = ["blast_db", "data_dir", "mobsuite_db"]
     input_table = _open_input_file(kwargs['input_file'])
-    command = _assembly_required(input_table = input_table, command = command, kwargs=kwargs, mtb=mtb)
+    command = _setup_assembly_args(kwargs, command, mtb)
     command['modules'].append('typing')
     for d in typing_dbs:
         db = _check_databases(path = kwargs[d], dtbtype = d)

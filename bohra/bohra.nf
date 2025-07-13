@@ -156,6 +156,7 @@ workflow {
         RUN_TBTAMR ( reads_tb)
         results = results.concat( RUN_TBTAMR.out.results )
         versions = versions.concat( RUN_TBTAMR.out.version )
+        println results.view()
     }
     
     if (params.modules.contains("snippy") || (params.modules.contains("ska")) || (params.modules.contains("mash"))){

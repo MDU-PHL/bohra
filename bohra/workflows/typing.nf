@@ -23,6 +23,7 @@ workflow RUN_TYPING {
         mlst = RUN_MLST.out.collated_mlst
         SEROTYPES ( asm, reads )
         serotypes = SEROTYPES.out.collated_typers
+        
         RUN_MOBSUITE ( asm )
         RUN_ABRITAMR ( asm, RUN_MOBSUITE.out.contig_report )
         versions = RUN_ABRITAMR.out.version.concat( RUN_MOBSUITE.out.version, RUN_MLST.out.version, SEROTYPES.out.collated_versions )
