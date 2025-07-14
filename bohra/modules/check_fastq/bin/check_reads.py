@@ -20,7 +20,7 @@ def _check_file_size(reads):
         if os.path.getsize(r) < 20000000:
             
             return 'FAIL_READ_FILE_TOO_SMALL'
-    return "FILES OK"
+    return "FILES_OK"
 
 reads = []
 for i in sys.argv[2:]:

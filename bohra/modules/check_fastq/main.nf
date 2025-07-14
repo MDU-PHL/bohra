@@ -19,7 +19,7 @@ process CHECK_FASTQ {
     tuple val(meta), path(sequences)
 
     output:
-    tuple val(meta), stdout, emit: job_type
+    tuple val(meta), stdout, emit: pe_check
     
     script:
     

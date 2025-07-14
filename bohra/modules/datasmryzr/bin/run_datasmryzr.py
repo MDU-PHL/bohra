@@ -49,10 +49,21 @@ def check_contigs(upper, lower, contigs:list) -> str:
     else:
         return f"Number of contigs: {contigs[0]} is outside the expected range of {lower} and {upper}."
 
+def check_filesize(filesize) -> str:
+    """
+    Check if the file size is above the minimum size
+    """
+    if filesize[1]:
+        return 1
+    if filesize[0] == ">20000000":
+        return 1
+    else:
+        return "File below recommended size of 20Mbp"
+
 def _generate_summary_table(results_files: list, output:list, min_depth:40, minquality : 30, minaln:70) -> list:
     print("Generating summary table")
     list_of_filename = {
-        "read_assessment.txt" : ["Isolate","Reads","GC content", "Est average depth"],
+        "read_assessment.txt" : ["Isolate","Reads","GC content", "Est average depth", "is_control", "filesize", "Qscore"],
         "assembly_assesment.txt":["Isolate","bp","# Contigs","N50"],
         "core_genome_stats.txt":["Isolate","% Aligned"],
         "speciation.txt":["Isolate","Species (reads)","Match 1 (reads)", "Match 1 (asm)"],
@@ -84,7 +95,8 @@ def _generate_summary_table(results_files: list, output:list, min_depth:40, minq
     sp_cols = [i for i in summary.columns if "Species" in i]
     # print(sp_cols)
     summary["Species check"] = summary[sp_cols].apply(lambda x: check_species(x.tolist()), axis=1)
-    
+    if "filesize" in summary.columns:
+        summary["File size check"] = summary[["filesize","is_control"]].apply(lambda x: check_filesize(x), axis=1)
     if "Est average depth" in summary.columns:
         summary["Coverage check"] = summary[["Est average depth","is_control"]].apply(lambda x: check_val(x, min_depth, "Avg depth"),axis=1)
     if "% Aligned" in summary.columns:
