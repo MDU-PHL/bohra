@@ -67,139 +67,140 @@ workflow {
     // println reads_pe.view()
     // seq assessment is always done on every input
     READ_ANALYSIS ( reads_pe )
-    // read_stats = READ_ANALYSIS.out.read_stats
-    // results = results.concat( read_stats)
-    // versions = READ_ANALYSIS.out.version_seqkit_reads
-    // versions = versions.concat( READ_ANALYSIS.out.version_kmc )
-    // versions = versions.concat( READ_ANALYSIS.out.version_bohra )
-    // // if there is assembly in the modules list then generate an assembly and run assembly analysis
+    read_stats = READ_ANALYSIS.out.read_stats
+    results = results.concat( read_stats)
+    versions = READ_ANALYSIS.out.version_seqkit_reads
+    versions = versions.concat( READ_ANALYSIS.out.version_kmc )
+    versions = versions.concat( READ_ANALYSIS.out.version_bohra )
+    reads_pe = READ_ANALYSIS.out.reads_pe
+    // if there is assembly in the modules list then generate an assembly and run assembly analysis
     
-    // if (params.modules.contains("assemble") ){
-    //     // assembly is only done if the input is reads
-    //     RUN_ASSEMBLE ( reads_pe.filter { cfg, files -> cfg.species != 'control' } )
-    //     // RUN_ASSEMBLE ( reads_ont )
-    //     asm = RUN_ASSEMBLE.out.contigs
-    //     versions = versions.concat( RUN_ASSEMBLE.out.versions )
-    //     results = results.concat( RUN_ASSEMBLE.out.insertiqr )
+    if (params.modules.contains("assemble") ){
+        // assembly is only done if the input is reads
+        RUN_ASSEMBLE ( reads_pe.filter { cfg, files -> cfg.species != 'control' } )
+        // RUN_ASSEMBLE ( reads_ont )
+        asm = RUN_ASSEMBLE.out.contigs
+        versions = versions.concat( RUN_ASSEMBLE.out.versions )
+        results = results.concat( RUN_ASSEMBLE.out.insertiqr )
         
-    // } 
-    // ASSEMBLY_ANALYSIS ( asm )
-    // assembly_stats = ASSEMBLY_ANALYSIS.out.assembly_stats
-    // versions = versions.concat( ASSEMBLY_ANALYSIS.out.version_prokka, ASSEMBLY_ANALYSIS.out.version_seqkit_asm )
-    // // update the results with the assembly stats
-    // results = results.concat( assembly_stats )
+    } 
+    ASSEMBLY_ANALYSIS ( asm )
+    assembly_stats = ASSEMBLY_ANALYSIS.out.assembly_stats
+    versions = versions.concat( ASSEMBLY_ANALYSIS.out.version_prokka, ASSEMBLY_ANALYSIS.out.version_seqkit_asm )
+    // update the results with the assembly stats
+    results = results.concat( assembly_stats )
     
-    // if (params.modules.contains("species") ){
+    if (params.modules.contains("species") ){
         
-    //     RUN_SPECIES_READS ( reads_pe )
-    //     RUN_SPECIES_ASM ( asm )
-    //     versions = versions.concat( RUN_SPECIES_READS.out.version, RUN_SPECIES_ASM.out.version )
-    //     reads_species_obs = RUN_SPECIES_READS.out.species_obs
-    //     asm_species_obs = RUN_SPECIES_ASM.out.species_obs
-    //     sp_res = reads_species_obs.map { cfg,species -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, species.trim() ) }
-    //     asm_res = asm_species_obs.map { cfg,species -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, species.trim() ) }
-    //     COMBINE_SPECIES ( 
-    //         RUN_SPECIES_READS.out.species_obs, 
-    //         RUN_SPECIES_READS.out.species,
-    //         RUN_SPECIES_ASM.out.species_obs, 
-    //         RUN_SPECIES_ASM.out.species
-    //         )
+        RUN_SPECIES_READS ( reads_pe )
+        RUN_SPECIES_ASM ( asm )
+        versions = versions.concat( RUN_SPECIES_READS.out.version, RUN_SPECIES_ASM.out.version )
+        reads_species_obs = RUN_SPECIES_READS.out.species_obs
+        asm_species_obs = RUN_SPECIES_ASM.out.species_obs
+        sp_res = reads_species_obs.map { cfg,species -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, species.trim() ) }
+        asm_res = asm_species_obs.map { cfg,species -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, species.trim() ) }
+        COMBINE_SPECIES ( 
+            RUN_SPECIES_READS.out.species_obs, 
+            RUN_SPECIES_READS.out.species,
+            RUN_SPECIES_ASM.out.species_obs, 
+            RUN_SPECIES_ASM.out.species
+            )
         
        
-    //     species_tmp = COMBINE_SPECIES.out.species_obs
-    //                                         .map { cfg, species_obs -> tuple(cfg.id, cfg, species_obs.trim() ) }
-    //     // println species_tmp.view()
-    //     reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
-    //     reads_pe = reads.join( species_tmp )
-    //                             .map { id, cfg_reads, files, cfg_spieces,  species_obs -> tuple(cfg_reads + [species:species_obs.trim()] , files) }
+        species_tmp = COMBINE_SPECIES.out.species_obs
+                                            .map { cfg, species_obs -> tuple(cfg.id, cfg, species_obs.trim() ) }
+        // println species_tmp.view()
+        reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
+        reads_pe = reads.join( species_tmp )
+                                .map { id, cfg_reads, files, cfg_spieces,  species_obs -> tuple(cfg_reads + [species:species_obs.trim()] , files) }
                          
-    //     asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
-    //     asm = asm_tmp.join( species_tmp )
-    //                             .map { id, cfg_asm, files, cfg_spieces, species_obs -> tuple(cfg_asm + [species:species_obs.trim()] , files) }
+        asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
+        asm = asm_tmp.join( species_tmp )
+                                .map { id, cfg_asm, files, cfg_spieces, species_obs -> tuple(cfg_asm + [species:species_obs.trim()] , files) }
         
-    //     // // generate summay file for species
-    //     species_report = COMBINE_SPECIES.out.species_summary
-    //     results = results.concat( species_report )
+        // // generate summay file for species
+        species_report = COMBINE_SPECIES.out.species_summary
+        results = results.concat( species_report )
         
-    // }
+    }
     
-    // if (params.modules.contains("mtb")){
-    //     RUN_TBTAMR ( reads_pe )
-    //     results = results.concat( RUN_TBTAMR.out.results )
-    //     versions = versions.concat( RUN_TBTAMR.out.version )
-    // }
+    if (params.modules.contains("mtb")){
+        RUN_TBTAMR ( reads_pe )
+        results = results.concat( RUN_TBTAMR.out.results )
+        versions = versions.concat( RUN_TBTAMR.out.version )
+    }
 
-    // if (params.modules.contains("typing") ){
-    //     // assembly is only done if the input is reads
-    //     // find any tb as plasmid and mlst and abritamr no good - use tbtamr
-    //     asm_typing = asm.filter { cfg, asm -> cfg.species != 'Mycobacterium tuberculosis' }
-    //     reads_nottb = reads_pe.filter { cfg, reads -> cfg.species != 'Mycobacterium tuberculosis' }
-    //     reads_tb = reads_pe.filter { cfg, reads -> cfg.species == 'Mycobacterium tuberculosis' }
-    //     RUN_TYPING ( asm_typing, reads_nottb )
-    //     resistome = RUN_TYPING.out.resistome
-    //     virulome = RUN_TYPING.out.virulome
-    //     plasmid = RUN_TYPING.out.plasmid
-    //     inferred = RUN_TYPING.out.inferred.ifEmpty { "no_results" }
-    //     reportable = RUN_TYPING.out.reportable
-    //     serotypes = RUN_TYPING.out.serotypes
-    //     mlst = RUN_TYPING.out.mlst
+    if (params.modules.contains("typing") ){
+        // assembly is only done if the input is reads
+        // find any tb as plasmid and mlst and abritamr no good - use tbtamr
+        asm_typing = asm.filter { cfg, asm -> cfg.species != 'Mycobacterium tuberculosis' }
+        reads_nottb = reads_pe.filter { cfg, reads -> cfg.species != 'Mycobacterium tuberculosis' }
+        reads_tb = reads_pe.filter { cfg, reads -> cfg.species == 'Mycobacterium tuberculosis' }
+        RUN_TYPING ( asm_typing, reads_nottb )
+        resistome = RUN_TYPING.out.resistome
+        virulome = RUN_TYPING.out.virulome
+        plasmid = RUN_TYPING.out.plasmid
+        inferred = RUN_TYPING.out.inferred.ifEmpty { "no_results" }
+        reportable = RUN_TYPING.out.reportable
+        serotypes = RUN_TYPING.out.serotypes
+        mlst = RUN_TYPING.out.mlst
       
-    //     results = results.concat( resistome )
-    //     results = results.concat( virulome )
-    //     results = results.concat( plasmid )
-    //     results = results.concat( inferred )
-    //     results = results.concat( reportable )
-    //     results = results.concat( serotypes )
-    //     results = results.concat( mlst )
-    //     versions = versions.concat( RUN_TYPING.out.versions )
-    //     RUN_TBTAMR ( reads_tb)
-    //     results = results.concat( RUN_TBTAMR.out.results )
-    //     versions = versions.concat( RUN_TBTAMR.out.version )
-    //     println results.view()
-    // }
+        results = results.concat( resistome )
+        results = results.concat( virulome )
+        results = results.concat( plasmid )
+        results = results.concat( inferred )
+        results = results.concat( reportable )
+        results = results.concat( serotypes )
+        results = results.concat( mlst )
+        versions = versions.concat( RUN_TYPING.out.versions )
+        RUN_TBTAMR ( reads_tb)
+        results = results.concat( RUN_TBTAMR.out.results )
+        versions = versions.concat( RUN_TBTAMR.out.version )
+        println results.view()
+    }
     
-    // if (params.modules.contains("snippy") || (params.modules.contains("ska")) || (params.modules.contains("mash"))){
+    if (params.modules.contains("snippy") || (params.modules.contains("ska")) || (params.modules.contains("mash"))){
         
-    //     if (params.modules.contains("snippy") ){
-    //         sequences = reads_pe
+        if (params.modules.contains("snippy") ){
+            sequences = reads_pe
             
-    //         // RUN_SNIPPY ( reads_pe, Channel.from(file(params.reference)) )
-    //     } else if (params.modules.contains("ska") || params.modules.contains("mash") ){
-    //         reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
-    //         asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
-    //         sequences = reads.join(asm_tmp, remainder:true).map( v -> { v.size() == 4 ? v[1] ? [v[1],v[2]] : [v[2],v[3]]  : [v[1],v[2]]} )
+            // RUN_SNIPPY ( reads_pe, Channel.from(file(params.reference)) )
+        } else if (params.modules.contains("ska") || params.modules.contains("mash") ){
+            reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
+            asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
+            sequences = reads.join(asm_tmp, remainder:true).map( v -> { v.size() == 4 ? v[1] ? [v[1],v[2]] : [v[2],v[3]]  : [v[1],v[2]]} )
            
-    //     } 
+        } 
 
-    //     RELATIONSHIPS ( sequences, Channel.fromPath(params.reference) )
+        RELATIONSHIPS ( sequences, Channel.fromPath(params.reference) )
       
-    //     results = results.concat( RELATIONSHIPS.out.dists )
-    //     results = results.concat( RELATIONSHIPS.out.core_vcf )
-    //     results = results.concat( RELATIONSHIPS.out.clusters )
-    //     results = results.concat( RELATIONSHIPS.out.stats )
-    //     results = results.concat( RELATIONSHIPS.out.tree)
-    //     versions = versions.concat( RELATIONSHIPS.out.version )
-    //     versions = versions.concat( RELATIONSHIPS.out.tree_version )
+        results = results.concat( RELATIONSHIPS.out.dists )
+        results = results.concat( RELATIONSHIPS.out.core_vcf )
+        results = results.concat( RELATIONSHIPS.out.clusters )
+        results = results.concat( RELATIONSHIPS.out.stats )
+        results = results.concat( RELATIONSHIPS.out.tree)
+        versions = versions.concat( RELATIONSHIPS.out.version )
+        versions = versions.concat( RELATIONSHIPS.out.tree_version )
 
-    // }
+    }
 
-    // if (params.modules.contains("pangenome")){
+    if (params.modules.contains("pangenome")){
 
-    //     if( params.pangenome_groups == "clusters") {
-    //         groups = RELATIONSHIPS.out.clusters
-    //     } else if (params.pangenome_groups == "mlst") {
-    //         groups = RELATIONSHIPS.out.mlst
-    //     } 
-    //     gff = ASSEMBLY_ANALYSIS.out.gff
-    //     RUN_PANAROO ( gff,groups )
+        if( params.pangenome_groups == "clusters") {
+            groups = RELATIONSHIPS.out.clusters
+        } else if (params.pangenome_groups == "mlst") {
+            groups = RELATIONSHIPS.out.mlst
+        } 
+        gff = ASSEMBLY_ANALYSIS.out.gff
+        RUN_PANAROO ( gff,groups )
 
         
-    //     results = results.concat( RUN_PANAROO.out.pangenome_rtab )
-    //     results = results.concat( RUN_PANAROO.out.classification )
-    //     results = results.concat( RUN_PANAROO.out.groups )
-    //     versions = versions.concat( RUN_PANAROO.out.version )
-    // }
+        results = results.concat( RUN_PANAROO.out.pangenome_rtab )
+        results = results.concat( RUN_PANAROO.out.classification )
+        results = results.concat( RUN_PANAROO.out.groups )
+        versions = versions.concat( RUN_PANAROO.out.version )
+    }
 
-    // // println results.view()
-    // RUN_COMPILE ( results, versions )
+    // println results.view()
+    RUN_COMPILE ( results, versions )
 }
