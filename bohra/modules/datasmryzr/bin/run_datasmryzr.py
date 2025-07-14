@@ -13,7 +13,7 @@ def check_asm(contigs:list)-> tuple:
     iqr = q3 - q1
     lower_bound = q1 - (1.5 * iqr)
     upper_bound = q3 + (1.5 * iqr)
-
+    # print(f"Lower bound: {lower_bound}, Upper bound: {upper_bound}")
     return lower_bound, upper_bound
 
 def check_species(species:list) -> str:
@@ -42,9 +42,11 @@ def check_contigs(upper, lower, contigs:list) -> str:
     """
     Check if the number of contigs is within the expected range
     """
+    # print(contigs[0])
+    # print(lower, upper)
     if contigs[1]:
         return 1
-    if contigs[0] >= lower and contigs[0] <= upper:
+    if (contigs[0] >= lower) and (contigs[0] <= upper):
         return 1
     else:
         return f"Number of contigs: {contigs[0]} is outside the expected range of {lower} and {upper}."
@@ -53,12 +55,26 @@ def check_filesize(filesize) -> str:
     """
     Check if the file size is above the minimum size
     """
-    if filesize[1]:
+    if filesize[1] == "":
         return 1
     if filesize[0] == ">20000000":
         return 1
     else:
         return "File below recommended size of 20Mbp"
+
+def make_comment(comments:list) -> str:
+    """
+    Make a comment from the list of comments
+    """
+    cmt = []
+    for i in comments:
+        if i != 1:
+            cmt.append(i)
+    if cmt:
+        return " | ".join(cmt)
+    return ""
+
+
 
 def _generate_summary_table(results_files: list, output:list, min_depth:40, minquality : 30, minaln:70) -> list:
     print("Generating summary table")
@@ -87,16 +103,19 @@ def _generate_summary_table(results_files: list, output:list, min_depth:40, minq
                 summary = df
             else:
                 summary = pd.merge(summary, df, how = 'outer', on = "Isolate")
+    summary["is_control"] = summary["is_control"].fillna(False)
     summary = summary.fillna("")
     summary = summary.rename(columns = {"Match 1 (reads)":"Species (reads)","Match 1 (asm)":"Species (assembly)"})
     # summary["Data assessment"] = "ok"
     # summary["Comment"] = ""
-
+    
     sp_cols = [i for i in summary.columns if "Species" in i]
-    # print(sp_cols)
-    summary["Species check"] = summary[sp_cols].apply(lambda x: check_species(x.tolist()), axis=1)
+    # print(summary)
+    if sp_cols:
+        summary["Species check"] = summary[sp_cols].apply(lambda x: check_species(x.tolist()), axis=1)
     if "filesize" in summary.columns:
-        summary["File size check"] = summary[["filesize","is_control"]].apply(lambda x: check_filesize(x), axis=1)
+        summary["File size check"] = summary[["filesize","Reads"]].apply(lambda x: check_filesize(x), axis=1)
+        print(summary)
     if "Est average depth" in summary.columns:
         summary["Coverage check"] = summary[["Est average depth","is_control"]].apply(lambda x: check_val(x, min_depth, "Avg depth"),axis=1)
     if "% Aligned" in summary.columns:
@@ -105,13 +124,14 @@ def _generate_summary_table(results_files: list, output:list, min_depth:40, minq
     if "# Contigs" in summary.columns:
         print("Checking number of contigs")
         bounds = check_asm(summary["# Contigs"].tolist())
-        summary["Contigs check"] = summary[["# Contigs","is_control"]].apply(lambda x: check_contigs(bounds[0], bounds[1], x), axis=1)
+        summary["Contigs check"] = summary[["# Contigs","is_control"]].apply(lambda x: check_contigs(bounds[1], bounds[0], x), axis=1)
 
     check_cols = [i for i in summary.columns if "check" in i]
-    summary["Comment"] = summary[check_cols].apply(lambda x: " | ".join([i for i in x.tolist() if i != 1]), axis=1)
+    summary = summary.fillna("")
+    summary["Comment"] = summary[check_cols].apply(lambda x: make_comment(x.tolist()), axis=1)
     summary["Data assessment"] = summary[check_cols].apply(lambda x: 1 if all(i == 1 for i in x.tolist()) else 0, axis=1)
     
-    print(summary)
+    # print(summary)
     summary.drop(columns=check_cols, inplace=True)
     print(summary)
     if not summary.empty:

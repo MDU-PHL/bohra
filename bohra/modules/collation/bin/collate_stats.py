@@ -73,7 +73,7 @@ tab['is_control'] = True if "control" in sys.argv[6] else False
 tab['filesize'] = "<20000000" if sys.argv[7] == "FAIL_READ_FILE_TOO_SMALL" else ">20000000"
 tab['Qscore'] = get_vals_seqtk(sys.argv[5])
 
-tab = tab[['Isolate','Reads','Yield','GC','Min len','Avg len','Max len','Qscore',"Est genome size", 'Est average depth',"is_control"]]
+tab = tab[['Isolate','Reads','Yield','GC','Min len','Avg len','Max len','Qscore',"Est genome size", 'Est average depth',"is_control","filesize"]]
 tab.to_csv('read_assessment.txt', sep = '\t', index = False)
 
 

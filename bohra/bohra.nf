@@ -23,6 +23,7 @@ def samples = [:]
 def asms = [:]
 def asmblr = [:]
 def sp = [:]
+def ctrl = [:]
 input_file = file(params.isolates) // need to make this an input file 
     reader =   input_file.newReader()
     reader.eachLine { line ->
@@ -34,6 +35,7 @@ input_file = file(params.isolates) // need to make this an input file
         asms[line[0]] = line[3]
         // asmblr[line[0]] = line[3]
         sp[line[0]] = line[4]
+        ctrl[line[0]] = line[5] 
      }
     }
 
@@ -53,7 +55,7 @@ workflow {
     // then depending on the workflow run the appropriate analysis
     reads_pe = Channel.fromFilePairs(["${params.outdir}/*/R{1,2}.fastq.gz"])
                     .filter { sample, files -> samples.containsKey(files[0].getParent().getName())}
-                    .map { sample, files -> tuple([id: files[0].getParent().getName(),input_type:'pe_reads', asm :asms[files[0].getParent().getName()],  species:sp[files[0].getParent().getName()] ], files)}
+                    .map { sample, files -> tuple([id: files[0].getParent().getName(),input_type:'pe_reads', asm :asms[files[0].getParent().getName()],  species:sp[files[0].getParent().getName()], control:ctrl[files[0].getParent().getName()]], files)}
     // reads_ont = Channel.fromPath( ["${params.outdir}/*/read_ont.fastq.gz","${params.outdir}/*/read_ont.fastq"])       
     //             .filter { files -> samples.containsKey(files.getParent().getName())} 
     //             .map {  files -> tuple([id: files.getParent().getName(), modules:samples[files.getParent().getName()], input_type:'ont_reads', asm :asms[files.getParent().getName()],assembler:asmblr[files.getParent().getName()],species:sp[files.getParent().getName()]], files)}
@@ -72,12 +74,12 @@ workflow {
     versions = READ_ANALYSIS.out.version_seqkit_reads
     versions = versions.concat( READ_ANALYSIS.out.version_kmc )
     versions = versions.concat( READ_ANALYSIS.out.version_bohra )
-    reads_pe = READ_ANALYSIS.out.reads_pe
+    // reads_pe = READ_ANALYSIS.out.reads_pe
     // if there is assembly in the modules list then generate an assembly and run assembly analysis
     
     if (params.modules.contains("assemble") ){
         // assembly is only done if the input is reads
-        RUN_ASSEMBLE ( reads_pe.filter { cfg, files -> cfg.species != 'control' } )
+        RUN_ASSEMBLE ( reads_pe.filter { cfg, files -> cfg.control != 'control' } )
         // RUN_ASSEMBLE ( reads_ont )
         asm = RUN_ASSEMBLE.out.contigs
         versions = versions.concat( RUN_ASSEMBLE.out.versions )
