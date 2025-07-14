@@ -1,5 +1,6 @@
 import pathlib
 import datetime
+import pandas as pd
 import logging
 from bohra.launcher.Utils import CustomFormatter, _check_path
 # Logger
@@ -41,9 +42,9 @@ CFG = {
 }
   
     
-def _get_isolate_list(_dir: pathlib.Path,
-                      isolates: list, 
-                      ext: str = f"*.f*q.gz") -> list:
+def _get_isolate_list(reads:str,
+                      contigs:str,
+                      ) -> list:
     """
     Retrieve a list of unique isolate names from files in the specified directory.
 
@@ -53,32 +54,46 @@ def _get_isolate_list(_dir: pathlib.Path,
     :return: A list of unique isolate names found in the directory.
     """
     # iso_found = _get_isolate_list(_dir=_dir, isolates=isolates, ext="*.f*q.gz")
+    all_data = []
+    if reads != '' and _check_path(reads):
+        ext = CFG['reads']['ext']
+        reads_list = sorted(pathlib.Path(reads).rglob(ext))
+        all_data.extend(reads_list)
+    elif contigs != '' and _check_path(contigs):
+        ext = CFG['asm']['ext']
+        contigs_list = sorted(pathlib.Path(contigs).rglob(ext))
+        all_data.extend(contigs_list)
+    else:
+        LOGGER.error("No valid reads or contigs path provided. Please check your input.")
+        raise SystemExit
     
-    all_data = sorted(pathlib.Path(_dir).rglob(ext))
-
     iso_found = set()
 
-    for reads in all_data:
-        nme = reads.name.split('_')[0]
-
+    for sq in all_data:
+        nme = sq.name.split('_')[0]
         iso_found.add(nme)
 
-    isolist = []
-    if isolates != []:
-
-        for i in list(iso_found):
-            for j in isolates:
-                if i in j:
-                    isolist.append(i)
-    else:
-        isolist = iso_found
-    
-    LOGGER.info(f"Found {len(list(iso_found))} distinct sample names at path {_dir}")
     return list(iso_found)
+
+def _order_pereads(reads: list) -> list:
+    """
+    Order paired-end reads by their names.
+
+    :param reads: List of read file paths.
+    :return: Ordered list of read file paths.
+    """
+    
+    
+    r1 = [r for r in reads if "_R1" in r.name or "_1" in r.name]
+    r1 = sorted(r1, key=lambda f: f.stat().st_ctime)[-1]
+    r2 = [r for r in reads if "_R2" in r.name or "_2" in r.name]
+    r2 = sorted(r2, key=lambda f: f.stat().st_ctime)[-1]
+    
+    return [r1,r2]
 
 def _glob_sequences(_dir: pathlib.Path, 
                     isolates: list, 
-                    sequence_type: str) -> bool:
+                    sequence_type: str) -> pd.DataFrame:
     """
     Process and validate sequence files for the specified sequence type.
 
@@ -87,47 +102,67 @@ def _glob_sequences(_dir: pathlib.Path,
     :param sequence_type: Type of sequence data to process (e.g., 'reads', 'asm').
     :return: True if processing is successful, otherwise raises an error.
     """
+    data = []
     if sequence_type in CFG:
-        isolist = _get_isolate_list(_dir=_dir, isolates=isolates, ext=CFG[sequence_type]["ext"])
-
-        lines = []
-
-        for iso in isolist:
-            reads = sorted(pathlib.Path(_dir).rglob(f"*{iso}*.f*q.gz"))
-            if len(reads) == CFG[sequence_type]['num_expected']:
-                LOGGER.info(f"Now add reads for {iso}")
-                lines.append(f"{iso}\t{reads[0]}\t{reads[1]}")
-            elif len(reads) < CFG[sequence_type]['num_expected']:
-                LOGGER.warning(f"There do not appear to be {CFG[sequence_type]['num_expected']} reads for {iso}. Skipping")
-            else:
-                LOGGER.warning(f"There appear to be more than {CFG[sequence_type]['num_expected']} reads available for {iso}. Skipping")
-        if lines != []:
-            LOGGER.info(f"Saving reads file as isolates.tab")
-            pathlib.Path(f"{sequence_type}.tab").write_text('\n'.join(lines))
-        else:
-            LOGGER.warning(f"It appears that no reads have been found. Please check your input and try again.")
         
-        return True
+        for iso in isolates:
+            
+            seqs = sorted(pathlib.Path(_dir).rglob(f"{iso}*{CFG[sequence_type]['ext']}"))
+            if seqs == []:
+                seqs = sorted(pathlib.Path(_dir).rglob(f"{iso}/*{CFG[sequence_type]['ext']}"))
+            if len(seqs) >= CFG[sequence_type]['num_expected']:
+                LOGGER.info(f"Now add {sequence_type} for {iso}")
+                if sequence_type == "reads":
+                    seqs = _order_pereads(seqs)
+                    heads = [f"r{i+1}" for i in range(len(seqs))]
+                    if len(seqs) > CFG[sequence_type]['num_expected']:
+                        LOGGER.warning(f"Expected 2 reads for {iso}, but found {len(seqs)}. Will use the most recent.")
+                elif sequence_type == "asm":
+                    heads = ["asm"]
+                else:
+                    LOGGER.error(f"Unexpected sequence type: {sequence_type}.")
+                    raise SystemExit
+                line = dict(zip(heads,seqs))
+                line['Isolate'] = iso
+                data.append(line)
+            elif len(seqs) < CFG[sequence_type]['num_expected']:
+                LOGGER.warning(f"There do not appear to be {CFG[sequence_type]['num_expected']} reads for {iso}. Skipping")
+            
+        if data != []:
+            return pd.DataFrame(data)
+        else:
+            LOGGER.warning(f"It appears that no {sequence_type} have been found. Please check your input and try again.")
+            raise SystemExit
+        
     else:
         LOGGER.critical(f"An error has occurred somewhere - {sequence_type} is not a valid type of input data.")
         raise SystemExit
 
         
-def _extract_isolates(isolate_ids:str):
+def _extract_isolates(isolate_ids:str)-> pd.DataFrame:
     """
     Extract isolates from isolate_ids file
     :input - path to isolate_ids file
     :output - list of isolates
     """
-    with open(isolate_ids, 'r') as f:
-        isolates = f.read().strip().split('\n')
+    try:
+        isolates_df = pd.read_csv(isolate_ids, sep=None, engine='python')
+        if 'Isolate' not in isolates_df.columns:
+            LOGGER.error("The provided isolate_ids file does not contain a column named 'Isolate'. Please check the file format.")
+            raise SystemExit
+        if 'species' not in isolates_df.columns:
+            LOGGER.warning("The provided isolate_ids file does not contain a column named 'species'. This column is optional but recommended for further annotation of trees.")
+        
+    except Exception as e:
+        LOGGER.error(f"An error occurred while reading the isolate_ids file: {e}")
+        raise SystemExit
     
-    return isolates
-
+    return isolates_df
     
-def find_data( input_type:str,
-                isolate_ids:str,
-                path:str):
+def find_data(reads:str,
+              contigs:str,
+              isolate_ids:str,
+              ) -> None:
     """
     Find data in the path provided
     :input - path to reads/contigs
@@ -135,14 +170,37 @@ def find_data( input_type:str,
                 input_type - type of input data (reads, asm)
     :output - list of data
     """
-    LOGGER.info(f"Finding data in {path}")
-    if path != '' and _check_path(path):
-        LOGGER.info(f"Path provided : {path} exists.")
-        if isolate_ids != '': 
-            isolates = _extract_isolates(isolate_ids= isolate_ids) if _check_path(isolate_ids) else []
-        else:
-            isolates = []
-        _glob_sequences(_dir = path, isolates= isolates, sequence_type = input_type)
+    isolates = []
+    bohra_table = []
+    if isolate_ids != '' and _check_path(isolate_ids):
+        LOGGER.info(f"Extracting isolates from {isolate_ids}")
+        isolates_df = _extract_isolates(isolate_ids)
+        bohra_table.append(isolates_df)
+        isolates = list(isolates_df['Isolate'].unique())
     else:
-        LOGGER.critical(f"There seems to be a problem with your read path. Please provide a valid path to the reads you wish to include")
-        raise SystemExit
+        LOGGER.warning("No isolate_ids file provided. Using all isolates found in the reads/contigs directories.")
+        isolates = _get_isolate_list(reads=reads, contigs = contigs)
+    # now get reads
+    if reads != '' and _check_path(reads):
+        reads_path = pathlib.Path(reads)
+        if not reads_path.exists():
+            LOGGER.error(f"The specified reads path {reads} does not exist.")
+            raise SystemExit
+        reads_tab = _glob_sequences(_dir=reads_path, isolates=isolates, sequence_type='reads')
+        if not reads_tab.empty:
+            bohra_table.append(reads_tab)
+    if contigs != '' and _check_path(contigs):
+        contigs_path = pathlib.Path(contigs)
+        if not contigs_path.exists():
+            LOGGER.error(f"The specified contigs path {contigs} does not exist.")
+            raise SystemExit
+        contigs_tab = _glob_sequences(_dir=contigs_path, isolates=isolates, sequence_type='asm')
+        if not contigs_tab.empty:
+            bohra_table.append(contigs_tab)
+    
+    if bohra_table:
+        bohra_df = pd.concat(bohra_table)
+        # bohra_df = bohra_df.loc[:,~bohra_df.columns.duplicated()]
+        bohra_df = bohra_df.sort_values(by='Isolate')
+        bohra_df.to_csv('bohra_input.tsv',sep = "\t", index=False)
+        LOGGER.info("Input files generated successfully and saved to 'bohra_input.tsv'.")

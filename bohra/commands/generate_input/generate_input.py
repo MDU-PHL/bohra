@@ -6,52 +6,31 @@ from bohra.launcher.SetupInput import find_data
 
 @click.command()
 @click.option('--reads',
-              is_flag=True,
-              help="Set if your input type is reads.")
+              default="",
+              help="Path to search for reads files, e.g. *.f*q.gz",)
 @click.option('--contigs',
-              is_flag=True,
-              help="Set if your input type is contigs.")
-@click.option('--path',
-              default=pathlib.Path.cwd().absolute(),
-              help='The directory where your input files are located, default is current directory',
-              type=click.Path(exists=True))
+              default="",
+              help="Path to search for assembly files, e.g. *.f*a.gz")
 @click.option('--isolate_ids',
               default='',
-              help='File containing isolate IDs one per line - OPTIONAL.')
+              help="Path to a file containing at least one column 'Isolate' with isolate names. Optionally add 'species' and other columns you wish to use for further annotation of trees.")
 
 def generate_input(reads, contigs, path, isolate_ids):
     """
     Generare input files for the Bohra pipeline.
     """
-    if reads and contigs:
-        click.echo("Please specify either --reads or --contigs, not both.")
-        return
-
+    
     if not reads and not contigs:
-        click.echo("Please specify either --reads or --contigs.")
+        click.echo("Please specify  --reads and/or --contigs.")
         return
 
-    if reads:
-        input_type = 'reads'
-    else:
-        input_type = 'contigs'
-
-    # Check if the path exists
-    if not os.path.exists(path):
-        click.echo(f"Path {path} does not exist.")
-        return
-
-    # Check if the isolate_ids file exists
-    if isolate_ids and not os.path.exists(isolate_ids):
-        click.echo(f"File {isolate_ids} does not exist.")
-        return
-
+    
     # click.echo(f"Generating input files for {input_type} in {path}.")
 
     find_data(
-        input_type=input_type,
         isolate_ids=isolate_ids,
-        path=path
+        reads=reads,
+        contigs=contigs,
     )
 
   
