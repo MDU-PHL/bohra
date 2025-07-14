@@ -15,7 +15,7 @@ from bohra.launcher.SetupInput import find_data
               default='',
               help="Path to a file containing at least one column 'Isolate' with isolate names. Optionally add 'species' and other columns you wish to use for further annotation of trees.")
 
-def generate_input(reads, contigs, path, isolate_ids):
+def generate_input(reads, contigs, isolate_ids):
     """
     Generare input files for the Bohra pipeline.
     """

@@ -107,9 +107,9 @@ def _glob_sequences(_dir: pathlib.Path,
         
         for iso in isolates:
             
-            seqs = sorted(pathlib.Path(_dir).rglob(f"{iso}*{CFG[sequence_type]['ext']}"))
+            seqs = sorted(pathlib.Path(_dir).rglob(f"{iso}{CFG[sequence_type]['ext']}"))
             if seqs == []:
-                seqs = sorted(pathlib.Path(_dir).rglob(f"{iso}/*{CFG[sequence_type]['ext']}"))
+                seqs = sorted(pathlib.Path(_dir).rglob(f"{iso}/{CFG[sequence_type]['ext']}"))
             if len(seqs) >= CFG[sequence_type]['num_expected']:
                 LOGGER.info(f"Now add {sequence_type} for {iso}")
                 if sequence_type == "reads":
@@ -146,7 +146,7 @@ def _extract_isolates(isolate_ids:str)-> pd.DataFrame:
     :output - list of isolates
     """
     try:
-        isolates_df = pd.read_csv(isolate_ids, sep=None, engine='python')
+        isolates_df = pd.read_csv(isolate_ids, sep="\t")
         if 'Isolate' not in isolates_df.columns:
             LOGGER.error("The provided isolate_ids file does not contain a column named 'Isolate'. Please check the file format.")
             raise SystemExit
@@ -199,8 +199,15 @@ def find_data(reads:str,
             bohra_table.append(contigs_tab)
     
     if bohra_table:
-        bohra_df = pd.concat(bohra_table)
+
+        bohra_df = pd.DataFrame()
+        for df in bohra_table:
+            if bohra_df.empty:
+                bohra_df = df
+            else:
+                bohra_df = pd.merge(bohra_df, df, on='Isolate', how='outer')
         # bohra_df = bohra_df.loc[:,~bohra_df.columns.duplicated()]
         bohra_df = bohra_df.sort_values(by='Isolate')
+        bohra_df = bohra_df.fillna('not_supplied')
         bohra_df.to_csv('bohra_input.tsv',sep = "\t", index=False)
         LOGGER.info("Input files generated successfully and saved to 'bohra_input.tsv'.")
