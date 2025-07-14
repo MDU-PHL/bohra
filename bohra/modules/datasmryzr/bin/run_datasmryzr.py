@@ -25,16 +25,29 @@ def check_species(species:list) -> str:
         return 1
     elif len(sp) > 1:
         return f"Species from reads: {species[0]} and assembly: {species[1]} are different."
-def check_val(val:float, min_val:float) -> str:
+def check_val(val:float, min_val:float,metric) -> str:
     """
     Check if the coverage is above the minimum coverage
     """
-    if val == "":
+    if val[1]:
         return 1
-    elif int(val) >= min_val:
+    if val[0] == "":
+        return 1
+    elif int(val[0]) >= min_val:
         return 1
     else:
-        return f"Coverage is {val}, should be at least {min_val}`"
+        return f"{metric}: {val}, should be at least {min_val}`"
+
+def check_contigs(upper, lower, contigs:list) -> str:
+    """
+    Check if the number of contigs is within the expected range
+    """
+    if contigs[1]:
+        return 1
+    if contigs[0] >= lower and contigs[0] <= upper:
+        return 1
+    else:
+        return f"Number of contigs: {contigs[0]} is outside the expected range of {lower} and {upper}."
 
 def _generate_summary_table(results_files: list, output:list, min_depth:40, minquality : 30, minaln:70) -> list:
     print("Generating summary table")
@@ -73,14 +86,14 @@ def _generate_summary_table(results_files: list, output:list, min_depth:40, minq
     summary["Species check"] = summary[sp_cols].apply(lambda x: check_species(x.tolist()), axis=1)
     
     if "Est average depth" in summary.columns:
-        summary["Coverage check"] = summary["Est average depth"].apply(lambda x: check_val(x, min_depth))
+        summary["Coverage check"] = summary[["Est average depth","is_control"]].apply(lambda x: check_val(x, min_depth, "Avg depth"),axis=1)
     if "% Aligned" in summary.columns:
-        summary["Alignment check"] = summary["% Aligned"].apply(lambda x:check_val(x, minaln))
+        summary["Alignment check"] = summary[["% Aligned", "is_control"]].apply(lambda x:check_val(x, minaln, "Alignment %"), axis=1)
 
     if "# Contigs" in summary.columns:
         print("Checking number of contigs")
         bounds = check_asm(summary["# Contigs"].tolist())
-        summary["Contigs check"] = summary["# Contigs"].apply(lambda x: 1 if bounds[0] <= x <= bounds[1] else f"Number of contigs is {x} is outside {bounds[0]} and {bounds[1]}")
+        summary["Contigs check"] = summary[["# Contigs","is_control"]].apply(lambda x: check_contigs(bounds[0], bounds[1], x), axis=1)
 
     check_cols = [i for i in summary.columns if "check" in i]
     summary["Comment"] = summary[check_cols].apply(lambda x: " | ".join([i for i in x.tolist() if i != 1]), axis=1)

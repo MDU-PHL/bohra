@@ -73,10 +73,10 @@ workflow {
     versions = versions.concat( READ_ANALYSIS.out.version_kmc )
     versions = versions.concat( READ_ANALYSIS.out.version_bohra )
     // if there is assembly in the modules list then generate an assembly and run assembly analysis
-    reads_pe = reads_pe.filter { cfg, files -> cfg.species != 'control' }
+    
     if (params.modules.contains("assemble") ){
         // assembly is only done if the input is reads
-        RUN_ASSEMBLE ( reads_pe )
+        RUN_ASSEMBLE ( reads_pe.filter { cfg, files -> cfg.species != 'control' } )
         // RUN_ASSEMBLE ( reads_ont )
         asm = RUN_ASSEMBLE.out.contigs
         versions = versions.concat( RUN_ASSEMBLE.out.versions )

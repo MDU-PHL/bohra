@@ -25,7 +25,7 @@ process COLLATE_STATS_ISOLATE {
     script:
     """
     ${module_dir}/collate_stats.py $meta.id $seqkit_stats  \
-    $seqkit_qual $genome_size $qcscore read_assessment.txt
+    $seqkit_qual $genome_size $qcscore read_assessment.txt $meta.species
     """
     
 }

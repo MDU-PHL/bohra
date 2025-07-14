@@ -69,8 +69,9 @@ dpth,size = get_dpth(genome_size = sys.argv[4], bases = tab['Yield'].values[0])
 tab['Est average depth'] = dpth
 tab["Est genome size"] = size
 tab['GC'] = gcs
+tab['is_control'] = True if "control" in sys.argv[6] else False
 tab['Qscore'] = get_vals_seqtk(sys.argv[5])
-tab = tab[['Isolate','Reads','Yield','GC','Min len','Avg len','Max len','Qscore',"Est genome size", 'Est average depth']]
+tab = tab[['Isolate','Reads','Yield','GC','Min len','Avg len','Max len','Qscore',"Est genome size", 'Est average depth',"is_control"]]
 tab.to_csv('read_assessment.txt', sep = '\t', index = False)
 
 
