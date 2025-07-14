@@ -8,7 +8,7 @@ from ast import literal_eval
 import json 
 
 def check_asm(contigs:list)-> tuple:
-
+    contigs = [i for i in contigs if not isinstance(i, str)]
     q1, q3 = np.percentile(contigs, [25, 75])
     iqr = q3 - q1
     lower_bound = q1 - (1.5 * iqr)
@@ -20,7 +20,7 @@ def check_species(species:list) -> str:
     """
     Check if the species is the same in the assembly and reads
     """
-    sp = set(species)
+    sp = set([i for i in species if i != ""])
     if len(sp) == 1:
         return 1
     elif len(sp) > 1:
@@ -45,6 +45,8 @@ def check_contigs(upper, lower, contigs:list) -> str:
     # print(contigs[0])
     # print(lower, upper)
     if contigs[1]:
+        return 1
+    if contigs[0] == "":
         return 1
     if (contigs[0] >= lower) and (contigs[0] <= upper):
         return 1
@@ -91,6 +93,8 @@ def _generate_summary_table(results_files: list, output:list, min_depth:40, minq
     for file in results_files:
         # print(file)
         if pathlib.Path(file).name in list_of_filename and pathlib.Path(file).exists():
+            if 'mlst' in pathlib.Path(file).name:
+                df = pd.read_csv(file, sep = '\t', dtype=str)
             df = pd.read_csv(file, sep = '\t')
             
             cols_to_keep = []
@@ -106,8 +110,12 @@ def _generate_summary_table(results_files: list, output:list, min_depth:40, minq
     summary["is_control"] = summary["is_control"].fillna(False)
     summary = summary.fillna("")
     summary = summary.rename(columns = {"Match 1 (reads)":"Species (reads)","Match 1 (asm)":"Species (assembly)"})
-    # summary["Data assessment"] = "ok"
-    # summary["Comment"] = ""
+    if 'ST' in summary.columns:
+        summary['ST'] = summary['ST'].apply(lambda x: str(int(x)) if not isinstance(x, str) else x)
+    int_cols = ["Reads","bp","# Contigs","N50", "Est"]
+    for i in int_cols:
+        if i in summary.columns:
+            summary[i] = summary[i].apply(lambda x: int(x) if x != "" else "")
     
     sp_cols = [i for i in summary.columns if "Species" in i]
     # print(summary)
@@ -363,15 +371,15 @@ def _run_datasmryzr(tree:str,
     Run the datasmryzr pipeline
     """
     cmd = f"datasmryzr -c bohra_config.json -bg '{bkgd_color}' -fc '{text_color}' {other_files} {pangenome_classification} {pangenome_rtab} {pangenome_groups} {tree} {distance_matrix} {core_genome} {core_genome_report} {reference} {mask} {annotation}"
-    # print(cmd)
-    # p = subprocess.run(cmd, shell=True, capture_output=True)
-    # if p.returncode != 0:
-    #     print(p.stderr.decode())
-    #     raise Exception(f"Error running datasmryzr: {p.stderr.decode()}")
-    # else:
-    #     print(p.stdout.decode())
-    #     print("datasmryzr run complete")
-    #     return p.stdout.decode()
+    print(cmd)
+    p = subprocess.run(cmd, shell=True, capture_output=True)
+    if p.returncode != 0:
+        print(p.stderr.decode())
+        raise Exception(f"Error running datasmryzr: {p.stderr.decode()}")
+    else:
+        print(p.stdout.decode())
+        print("datasmryzr run complete")
+        return p.stdout.decode()
 
 def generate_config(cluster_method:str,
                     cluster_threshold:str,

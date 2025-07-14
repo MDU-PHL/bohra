@@ -62,10 +62,13 @@ workflow {
     
     asm = Channel.fromPath( ["${params.outdir}/*/contigs.fa"])       
                 .filter { files -> samples.containsKey(files.getParent().getName())} 
-                .map {  files -> tuple([id: files.getParent().getName(), input_type:'asm', asm :files,species:sp[files.getParent().getName()]], files)}
+                .map {  files -> tuple([id: files.getParent().getName(), input_type:'asm', asm :files, species:sp[files.getParent().getName()], control: ctrl[files.getParent().getName()]], files)}
     
     
     results = Channel.empty()
+
+    // println reads_pe.view()
+    // println asm.view()
     // println reads_pe.view()
     // seq assessment is always done on every input
     READ_ANALYSIS ( reads_pe )
@@ -127,7 +130,7 @@ workflow {
     }
     
     if (params.modules.contains("mtb")){
-        RUN_TBTAMR ( reads_pe )
+        RUN_TBTAMR ( reads_pe.filter { cfg, files -> cfg.control != 'control' } )
         results = results.concat( RUN_TBTAMR.out.results )
         versions = versions.concat( RUN_TBTAMR.out.version )
     }
@@ -135,9 +138,9 @@ workflow {
     if (params.modules.contains("typing") ){
         // assembly is only done if the input is reads
         // find any tb as plasmid and mlst and abritamr no good - use tbtamr
-        asm_typing = asm.filter { cfg, asm -> cfg.species != 'Mycobacterium tuberculosis' }
-        reads_nottb = reads_pe.filter { cfg, reads -> cfg.species != 'Mycobacterium tuberculosis' }
-        reads_tb = reads_pe.filter { cfg, reads -> cfg.species == 'Mycobacterium tuberculosis' }
+        asm_typing = asm.filter { cfg, asm -> cfg.species != 'Mycobacterium tuberculosis' }.filter { cfg, files -> cfg.control != 'control' }
+        reads_nottb = reads_pe.filter { cfg, reads -> cfg.species != 'Mycobacterium tuberculosis' }.filter { cfg, files -> cfg.control != 'control' }
+        reads_tb = reads_pe.filter { cfg, reads -> cfg.species == 'Mycobacterium tuberculosis' }.filter { cfg, files -> cfg.control != 'control' }
         RUN_TYPING ( asm_typing, reads_nottb )
         resistome = RUN_TYPING.out.resistome
         virulome = RUN_TYPING.out.virulome
@@ -164,12 +167,12 @@ workflow {
     if (params.modules.contains("snippy") || (params.modules.contains("ska")) || (params.modules.contains("mash"))){
         
         if (params.modules.contains("snippy") ){
-            sequences = reads_pe
+            sequences = reads_pe.filter { cfg, files -> cfg.control != 'control' }
             
             // RUN_SNIPPY ( reads_pe, Channel.from(file(params.reference)) )
         } else if (params.modules.contains("ska") || params.modules.contains("mash") ){
-            reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
-            asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
+            reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }.filter { cfg, files -> cfg.control != 'control' }
+            asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }.filter { cfg, files -> cfg.control != 'control' }
             sequences = reads.join(asm_tmp, remainder:true).map( v -> { v.size() == 4 ? v[1] ? [v[1],v[2]] : [v[2],v[3]]  : [v[1],v[2]]} )
            
         } 

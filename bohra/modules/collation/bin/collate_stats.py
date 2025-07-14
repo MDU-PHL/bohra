@@ -64,13 +64,14 @@ tab['Isolate'] = sys.argv[1]
 print(tab)
 gcs = get_gcs(sys.argv[3])
 print(gcs)
+print(sys.argv[6])
 tab = tab.rename(columns = {'num_seqs': 'Reads', 'sum_len': 'Yield','min_len':'Min len','max_len':'Max len', 'avg_len':'Avg len', 'Q30(%)': 'Average quality (% >Q30)'})
 dpth,size = get_dpth(genome_size = sys.argv[4], bases = tab['Yield'].values[0])
 tab['Est average depth'] = dpth
 tab["Est genome size"] = size
 tab['GC'] = gcs
-tab['is_control'] = True if "control" in sys.argv[6] else False
-tab['filesize'] = "<20000000" if sys.argv[7] == "FAIL_READ_FILE_TOO_SMALL" else ">20000000"
+tab['is_control'] = True if "control" in sys.argv[7] else False
+tab['filesize'] = "<20000000" if sys.argv[8] == "FAIL_READ_FILE_TOO_SMALL" else ">20000000"
 tab['Qscore'] = get_vals_seqtk(sys.argv[5])
 
 tab = tab[['Isolate','Reads','Yield','GC','Min len','Avg len','Max len','Qscore',"Est genome size", 'Est average depth',"is_control","filesize"]]
