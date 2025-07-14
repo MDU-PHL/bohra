@@ -8,6 +8,7 @@ include { KMC } from './../modules/kmc/main'
 include { PROKKA } from './../modules/prokka/main'
 include { CSVTK_CONCAT;CSVTK_UNIQ } from './../modules/csvtk/main'
 include { BOHRA_VERSION } from './../modules/utils/main'
+include { CHECK_FASTQ } from './../modules/check_fastq/main'
 
 workflow READ_ANALYSIS {   
 
@@ -17,6 +18,7 @@ workflow READ_ANALYSIS {
         
     main:
         BOHRA_VERSION (  )
+        CHECK_FASTQ ( reads_pe )
         SEQKIT_STATS ( reads_pe )
         SEQKIT_GC ( reads_pe )
         KMC ( reads_pe )
