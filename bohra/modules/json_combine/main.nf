@@ -11,17 +11,6 @@ process JSON_COMBINE {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
     
-    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/csvtk" : 'bioconda::csvtk') : null)
-    
-    // if ( params.enable_conda ) {
-    //     if (file("${params.conda_path}").exists()) {
-    //         conda "${params.conda_path}/bohra-csvtk"
-    //     } else {
-    //         conda 'bioconda::csvtk'
-    //     }
-    // } else {
-    //     conda null
-    // }
 
     cache 'lenient'
     scratch true
