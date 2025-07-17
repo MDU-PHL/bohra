@@ -17,7 +17,7 @@ process IQTREE {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-test-iqtree"
         } else {
-            conda 'iqtree=2.1.4 snp-sites=2.5.1 gotree'
+            conda 'environment.yml'
         }
     } else {
         conda null

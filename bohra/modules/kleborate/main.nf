@@ -20,7 +20,7 @@ process KLEBORATE {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-kleborate"
         } else {
-            conda 'bioconda::kleborate bioconda::csvtk'
+            conda 'environment.yml'
         }
         
     } else {
