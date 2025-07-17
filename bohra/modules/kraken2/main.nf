@@ -14,10 +14,10 @@ process KRAKEN2 {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"${meta.id}", publish_id:meta.id) }
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
+        if (file("${params.conda_path}/bohra-kraken2").exists()) {
             conda "${params.conda_path}/bohra-kraken2"
         } else {
-            conda 'kraken2=2.1.2'
+            conda 'environment.yml'
         }
     } else {
         conda null
