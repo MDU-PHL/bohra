@@ -19,7 +19,7 @@ process NGMASTER {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-ngmaster"
         } else {
-            conda 'ngmaster csvtk'
+            conda 'environment.yml'
         }
        
     } else {

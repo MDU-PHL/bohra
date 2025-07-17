@@ -1,0 +1,7 @@
+name: bohra-ngmaster
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - ngmaster=1.0.0
+  - csvtk=0.25.0
