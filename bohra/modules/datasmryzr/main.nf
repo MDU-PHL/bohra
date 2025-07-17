@@ -17,7 +17,7 @@ process RUN_SMRYZR {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/datasmryzr"
         } else {
-            conda 'datasmryzr'
+            conda 'environment.yml'
         }
     } else {
         conda null
