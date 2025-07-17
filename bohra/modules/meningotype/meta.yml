@@ -1,12 +1,15 @@
-name: shovill
-description: Assemble bacterial isolate genomes from Illumina paired-end reads
+name: meningotype
+description: 
+  Meningotype is a tool for typing Neisseria meningitidis genomes based on the
+  presence of specific genes and alleles.
 keywords:
   - assembly
 tools:
-  - shovill:
+  - meningotype:
       description: |
-        Assemble bacterial isolate genomes from Illumina paired-end reads
-      documentation: https://github.com/tseemann/shovill
+        Meningotype is a tool for typing Neisseria meningitidis genomes based on the
+        presence of specific genes and alleles.
+      documentation: https://github.com/MDU-PHL/meningotype
       doi: 
 params:
   - outdir:
@@ -36,11 +39,10 @@ input:
       description: |
         Groovy Map containing sample information
         e.g. [ id:'test', single_end:false ]
-  - reads:
+  - contigs:
       type: file
       description: |
-        List of input FastQ files of size 1 and 2 for single-end and paired-end data,
-        respectively.
+        List of input contig files for the samples.
 
 output:
   - meta:
