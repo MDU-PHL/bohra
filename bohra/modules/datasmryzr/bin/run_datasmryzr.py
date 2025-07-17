@@ -394,19 +394,40 @@ def extract_cmd(launchdir: str) -> str:
             return cmd
         else:
             return ""
+        
+def get_ref_accession(reference: str) -> str:
+    """
+    Get the accession number from the reference file
+    """
+    if pathlib.Path(reference).exists():
+        acc = ""
+        with open(reference, "r") as f:
+            header = f.readline().strip().split("\n")[0]
+
+        if header.startswith(">"):
+            acc = header.strip(">")
+        elif header.startswith("LOCUS"):
+            acc = header.split(" ")[1]
+        return acc
+    return ""
+
 def generate_config(cluster_method:str,
                     cluster_threshold:str,
                     pangenome_groups:str,
                     kraken2_db:str,
                     speciation: str,
-                    launchdir: str) -> None:
+                    launchdir: str,
+                    reference:str) -> None:
 
     key = {
         "GRP":pangenome_groups,
         "THRESHOLDS":cluster_threshold,
         "METHOD":cluster_method,
         "KRAKEN2_DB": kraken2_db,
-        "CMD": extract_cmd(launchdir)}
+        "CMD": extract_cmd(launchdir),
+        "REF_FILE": reference if pathlib.Path(reference).exists() else "",
+        "REF_ACCESSION": get_ref_accession(reference) if pathlib.Path(reference).exists() else "",
+        }
 
     with open(f"{pathlib.Path(__file__).parent / 'base_config.json'}","r") as j:
         cfg = j.read()
@@ -453,7 +474,7 @@ def _compile(args):
     reference = _get_reference(args.reference)
     mask = _get_mask(args.mask)
     annotation = _make_annotation_file(args.input_file, results_files, f"{args.annot_cols}")
-    generate_config(args.cluster_method, args.cluster_threshold, args.pangenome_groups, args.kraken2_db, 'kraken2' if args.speciation == 'true' else "sylph", args.launchdir)
+    generate_config(args.cluster_method, args.cluster_threshold, args.pangenome_groups, args.kraken2_db, 'kraken2' if args.speciation == 'true' else "sylph", args.launchdir, args.reference)
     p = _run_datasmryzr(tree,
                         distance_matrix,
                         core_genome,

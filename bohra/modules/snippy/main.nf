@@ -28,13 +28,11 @@ process SNIPPY {
     tuple val(meta), path(reads), path(reference)
 
     output:
-    // tuple val(meta), path("${meta.id}/*"), emit: snippy_dir
     tuple val(meta), path("${meta.id}/snps.aligned.fa"), emit: aln
     tuple val(meta), path("${meta.id}/snps.raw.vcf"), emit: raw_vcf
     tuple val(meta), path("${meta.id}/snps.vcf"), emit: vcf
     tuple val(meta), path("${meta.id}/snps.log"), emit: log
     tuple val(meta), path("${meta.id}/snps.tab"), emit: tab
-    // tuple val(meta), path("${meta.id}/snps.bam"), emit
     tuple val(meta), path("version_snippy.txt"), emit: version
     
 
