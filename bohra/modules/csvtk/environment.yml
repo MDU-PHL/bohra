@@ -1,4 +1,4 @@
-name: bohra-core-snp-filter
+name: bohra-csvtk
 channels:
   - conda-forge
   - bioconda

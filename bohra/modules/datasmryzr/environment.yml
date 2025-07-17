@@ -1,0 +1,9 @@
+name: bohra-datasmryzr
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  dependencies:
+  - pip
+  - pip:
+    - datasmryzr==0.1.0
