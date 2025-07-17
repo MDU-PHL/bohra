@@ -17,7 +17,7 @@ process SYLPH {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-sylph"
         } else {
-            conda 'sylph pandas'
+            conda 'environment.yml'
         }
     } else {
         conda null
