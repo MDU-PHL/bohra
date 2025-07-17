@@ -47,18 +47,28 @@ output:
       description: |
         Groovy Map containing sample information
         e.g. [ id:'test', single_end:false ]
-  - contigs:
+  - amrfinderplus:
       type: file
-      description: The report file from kraken2
-      pattern: "*.contigs.fa"
-  - log:
+      description: |
+        AMRfinderPlus output file containing AMR gene predictions
+  - summary_matches:
       type: file
-      description: fastq log file
-      pattern: "*.shovill.log"
+      description: |
+        Summary of AMR full gene matches across gene classes sample
+  - summary_partials:
+      type: file
+      description: |
+        Summary of AMR partial gene matches across gene classes sample
+  - summary_virulence:
+      type: file
+      description: |
+        Summary of virulence gene matches across gene classes sample
+  - summary_graph:
   - version:
       type: file
       description: File containing software version
       pattern: "*.{version.txt}"
+  
 authors:
   - "@kristyhoran"
   

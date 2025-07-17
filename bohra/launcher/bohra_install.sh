@@ -26,8 +26,6 @@ else
 #   return 1 
 fi
 
-
-
 function check_installation(){
     rt=$(conda activate $1 2>&1)
     # echo "$rt"
