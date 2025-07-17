@@ -23,7 +23,7 @@ process SNP_CLUSTER {
     cache 'lenient'
     scratch true
     input:
-    val(matrix) // this needs to be a list of sample! not .aln since snippy core uses relative path and the name of the folder to name results!
+    val(matrix) 
     
     output:
     path('clusters.txt'), emit: clusters
