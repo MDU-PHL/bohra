@@ -1,4 +1,4 @@
-name: shovill
+name: pe_assesmbler
 description: Assemble bacterial isolate genomes from Illumina paired-end reads
 keywords:
   - assembly
@@ -8,6 +8,16 @@ tools:
         Assemble bacterial isolate genomes from Illumina paired-end reads
       documentation: https://github.com/tseemann/shovill
       doi: 
+  - skesa:
+      description: |
+        Skesa is a de novo assembler for large genomes, such as bacterial genomes.
+      documentation: https://github.com/sanger-pathogens/skesa
+      doi:
+  - spades:
+      description: |
+        SPAdes is a versatile genome assembler, designed for both single-cell and multi-cell sequencing.
+      documentation: https://github.com/ablab/spades
+      doi: 10.1038/nmeth.2166
 params:
   - outdir:
       type: string
@@ -24,12 +34,7 @@ params:
       description: |
         Run the module with Conda using the software specified
         via the `conda` directive
-  - singularity_pull_docker_container:
-      type: boolean
-      description: |
-        Instead of directly downloading Singularity images for use with Singularity,
-        force the workflow to pull and convert Docker containers instead.
-
+  
 input:
   - meta:
       type: map
@@ -52,10 +57,6 @@ output:
       type: file
       description: The report file from kraken2
       pattern: "*.contigs.fa"
-  - log:
-      type: file
-      description: fastq log file
-      pattern: "*.shovill.log"
   - version:
       type: file
       description: File containing software version
