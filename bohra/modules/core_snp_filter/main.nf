@@ -18,7 +18,7 @@ process CORE_SNP_FILTER {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-core-snp-filter"
         } else {
-            conda 'bioconda::core-snp-filter'
+            conda 'environment.yml'
         }
     } else {
         conda null
