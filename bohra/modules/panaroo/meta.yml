@@ -1,13 +1,13 @@
-name: kraken2
-description: Use kraken2 to indentify species from single or paired end reads
+name: panaroo
+description: 
+  Panaroo is a pangenome pipeline for prokaryotes that can be used to infer gene presence/absence, core and accessory genomes, and gene trees.
 keywords:
-  - speciation
-  - kraken2
+  - pangenome
 tools:
-  - kraken2:
+  - panaroo:
       description: |
-        The second version of the Kraken taxonomic sequence classification system
-      documentation: https://github.com/DerrickWood/kraken2
+        Panaroo is a pangenome pipeline for prokaryotes that can be used to infer gene presence/absence, core and accessory genomes, and gene trees.
+      documentation: https://github.com/gtonkinhill/panaroo
       doi: https://doi.org/10.1186/s13059-019-1891-0
 params:
   - outdir:
@@ -25,34 +25,22 @@ params:
       description: |
         Run the module with Conda using the software specified
         via the `conda` directive
-  - singularity_pull_docker_container:
-      type: boolean
-      description: |
-        Instead of directly downloading Singularity images for use with Singularity,
-        force the workflow to pull and convert Docker containers instead.
-
+  
 input:
-  - meta:
-      type: map
-      description: |
-        Groovy Map containing sample information
-        e.g. [ id:'test', single_end:false ]
-  - reads:
+  - gff:
       type: file
       description: |
-        List of input FastQ files of size 1 and 2 for single-end and paired-end data,
-        respectively.
-
+        GFF file containing gene annotations for the input genomes.
+  
 output:
-  - meta:
-      type: map
-      description: |
-        Groovy Map containing sample information
-        e.g. [ id:'test', single_end:false ]
-  - report:
+  - pangenome_summary:
       type: file
-      description: The report file from kraken2
-      pattern: "*.kraken2.tab"
+      description: The pangenome output file containing gene presence/absence information.
+      pattern: "pangenome_statistics.tsv"
+  - pangenome_csv:
+      type: file
+      description: The pangenome output file containing gene presence/absence information in roary format.
+      pattern: "gene_presence_absence_roary.csv"
   - version:
       type: file
       description: File containing software version
