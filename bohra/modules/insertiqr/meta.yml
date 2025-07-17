@@ -56,10 +56,7 @@ output:
       type: file
       description: The report file from calculatng the IQR and insert sizes
       pattern: "insertiqr_*.txt"
-  - log:
-      type: file
-      description: fastq log file
-      pattern: "*.shovill.log"
+  
   - version:
       type: file
       description: File containing software version

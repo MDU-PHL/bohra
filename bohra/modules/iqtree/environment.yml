@@ -1,8 +1,11 @@
-name: bohra-gubbins
+name: bohra-iqtree
 channels:
   - conda-forge
   - bioconda
 dependencies:
-  - gubbins=2.4.0
+  - iqtree=2.1.2
   - csvtk=0.25.0
+  - gotree
   - snp-sites=2.5.1
+
+  

@@ -1,12 +1,12 @@
-name: seqtk
+name: iqtree
 description: 
 keywords:
-  - assembly
+  - phylogentics
 tools:
   - shovill:
       description: |
-        Assemble bacterial isolate genomes from Illumina paired-end reads
-      documentation: https://github.com/tseemann/shovill
+        Generate phylogenetic trees using the IQ-TREE software.
+      documentation: https://github.com/iqtree/iqtree2
       doi: 
 params:
   - outdir:
@@ -36,11 +36,14 @@ input:
       description: |
         Groovy Map containing sample information
         e.g. [ id:'test', single_end:false ]
-  - reads:
+  - aln:
       type: file
       description: |
-        List of input FastQ files of size 1 and 2 for single-end and paired-end data,
-        respectively.
+        cleaned alignment file.
+  - full_aln:
+      type: file
+      description: |
+        List of input contig files for the alignment process.
 
 output:
   - meta:
@@ -48,10 +51,10 @@ output:
       description: |
         Groovy Map containing sample information
         e.g. [ id:'test', single_end:false ]
-  - qscore:
+  - newick:
       type: file
-      description: The report file from kraken2
-      pattern: "qscore.txt"
+      description: The newick file from IQ-TREE
+      pattern: "*.newick"
 authors:
   - "@kristyhoran"
   
