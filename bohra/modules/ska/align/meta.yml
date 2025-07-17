@@ -1,12 +1,12 @@
-name: seqtk
+name: ska2
 description: 
 keywords:
-  - assembly
+  - ska2
 tools:
-  - shovill:
+  - ska2:
       description: |
-        Assemble bacterial isolate genomes from Illumina paired-end reads
-      documentation: https://github.com/tseemann/shovill
+        Split k-mer analysis (version 2) uses exact matching of split k-mer sequences to align closely related sequences, typically small haploid genomes such as bacteria and viruses.
+      documentation: https://github.com/bacpop/ska.rust
       doi: 
 params:
   - outdir:
@@ -31,27 +31,18 @@ params:
         force the workflow to pull and convert Docker containers instead.
 
 input:
-  - meta:
-      type: map
-      description: |
-        Groovy Map containing sample information
-        e.g. [ id:'test', single_end:false ]
-  - reads:
+  
+  - skf:
       type: file
       description: |
-        List of input FastQ files of size 1 and 2 for single-end and paired-end data,
-        respectively.
+        ska sketch
 
 output:
-  - meta:
-      type: map
-      description: |
-        Groovy Map containing sample information
-        e.g. [ id:'test', single_end:false ]
-  - qscore:
+  
+  - aligned:
       type: file
-      description: The report file from kraken2
-      pattern: "qscore.txt"
+      description: The report file from ska2
+      pattern: "ska.aln"
 authors:
   - "@kristyhoran"
   

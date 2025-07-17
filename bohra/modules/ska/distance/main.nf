@@ -20,7 +20,7 @@ process SKA_DISTANCE {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-ska2"
         } else {
-            conda 'ska pandas'
+            conda 'environment.yml'
         }
     } else {
         conda null
