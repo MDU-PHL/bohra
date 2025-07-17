@@ -17,7 +17,7 @@ process SNIPPY_CLEAN {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-snippy"
         } else {
-            conda 'bioconda::snippy=4.4.5'
+            conda 'environment.yml'
         }
     } else {
         conda null
