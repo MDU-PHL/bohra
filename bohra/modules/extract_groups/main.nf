@@ -7,15 +7,11 @@ def options    = initOptions(params.options)
 process EXTRACT_GROUPS {
     // tag "$meta.id"
     label 'process_upper_medium'
-    //  publishDir "${params.outdir}",
-    //     mode: params.publish_dir_mode,
-    //     saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"${meta.id}", publish_id:meta.id) }  
     cache 'lenient'
     
     
     scratch true
-    // errorStrategy 'ignore'
-
+    
     input:
     val(groups)
     
