@@ -5,11 +5,8 @@ params.options = [:]
 def options    = initOptions(params.options)
 
 process CLASSIFY_PANGENOME {
-    // tag "$meta.id"
+    
     label 'process_upper_medium'
-    //  publishDir "${params.outdir}",
-    //     mode: params.publish_dir_mode,
-    //     saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"${meta.id}", publish_id:meta.id) }  
     cache 'lenient'
     
     if ( params.enable_conda ) {
@@ -22,8 +19,7 @@ process CLASSIFY_PANGENOME {
         conda null
     }
     scratch true
-    // errorStrategy 'ignore'
-
+    
     input:
     path(rtab)
     path(groups)

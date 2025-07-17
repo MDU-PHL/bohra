@@ -1,19 +1,15 @@
-name: shovill
-description: Assemble bacterial isolate genomes from Illumina paired-end reads
+name: rclassify_pangenome
+description: classify pangenome of bacterial isolates based on a user define lineage or grouping strategies
 keywords:
-  - assembly
+  - pangenome
 tools:
-  - shovill:
+  - rclassify_genes:
       description: |
-        Assemble bacterial isolate genomes from Illumina paired-end reads
-      documentation: https://github.com/tseemann/shovill
-      doi: 
+        Calssify pangenome of bacterial isolates based on a user define lineage or grouping strategies
+      documentation: https://github.com/ghoresh11/twilight/tree/master
+      doi: https://doi.org/10.1099/mgen.0.000670
 params:
-  - outdir:
-      type: string
-      description: |
-        The pipeline's output directory. By default, the module will
-        output files into `$params.outdir/<SOFTWARE>`
+  
   - publish_dir_mode:
       type: string
       description: |
@@ -24,42 +20,21 @@ params:
       description: |
         Run the module with Conda using the software specified
         via the `conda` directive
-  - singularity_pull_docker_container:
-      type: boolean
-      description: |
-        Instead of directly downloading Singularity images for use with Singularity,
-        force the workflow to pull and convert Docker containers instead.
+  
 
 input:
-  - meta:
-      type: map
-      description: |
-        Groovy Map containing sample information
-        e.g. [ id:'test', single_end:false ]
-  - reads:
+  
+  - rtab:
       type: file
       description: |
-        List of input FastQ files of size 1 and 2 for single-end and paired-end data,
-        respectively.
+        The gene presence/absence table from panaroo in rtab format
 
 output:
-  - meta:
-      type: map
-      description: |
-        Groovy Map containing sample information
-        e.g. [ id:'test', single_end:false ]
-  - contigs:
+  - classification_tab:
       type: file
-      description: The report file from kraken2
-      pattern: "*.contigs.fa"
-  - log:
-      type: file
-      description: fastq log file
-      pattern: "*.shovill.log"
-  - version:
-      type: file
-      description: File containing software version
-      pattern: "*.{version.txt}"
+      description: Tab-delimted output of the classification
+      pattern: "classification.tab"
+  
 authors:
   - "@kristyhoran"
   
