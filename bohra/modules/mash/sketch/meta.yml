@@ -1,13 +1,13 @@
-name: seqtk
-description: 
+name: mash
+description: Sketch-based metagenomic binning tool
 keywords:
-  - assembly
+  - sketch
 tools:
-  - shovill:
+  - mash:
       description: |
-        Assemble bacterial isolate genomes from Illumina paired-end reads
-      documentation: https://github.com/tseemann/shovill
-      doi: 
+        Sketch-based metagenomic binning tool
+      documentation: https://github.com/marbl/Mash
+      doi: doi: 10.1186/s13059-016-0997-x
 params:
   - outdir:
       type: string
@@ -48,10 +48,10 @@ output:
       description: |
         Groovy Map containing sample information
         e.g. [ id:'test', single_end:false ]
-  - qscore:
+  - sketch:
       type: file
-      description: The report file from kraken2
-      pattern: "qscore.txt"
+      description: The sketch file from mash
+      pattern: "*.msh"
 authors:
   - "@kristyhoran"
   

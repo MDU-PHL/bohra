@@ -14,13 +14,11 @@ process LISSERO {
     cpus options.args2// args2 needs to be cpus for shovill
     cache 'lenient'
     scratch true
-    // errorStrategy 'ignore'
-    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/spades" : 'bioconda::spades=3.15.2') : null) 
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-lissero"
         } else {
-            conda 'lissero csvtk'
+            conda 'environment.yml'
         }
         
     } else {

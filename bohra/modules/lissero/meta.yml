@@ -1,11 +1,11 @@
-name: shovill
-description: Assemble bacterial isolate genomes from Illumina paired-end reads
+name: lissero
+description: Serotype prediction tool for Listeria monocytogenes
 keywords:
-  - assembly
+  - serotype
 tools:
   - lissero:
       description: |
-        none
+        Serotype prediction tool for Listeria monocytogenes
       documentation: https://github.com/MDU-PHL/lissero
       doi: 
 params:

@@ -3,6 +3,6 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - kmc=3.2.1
+  - kraken2=2.1.2
   - csvtk=0.25.0
   
