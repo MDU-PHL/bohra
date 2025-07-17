@@ -15,10 +15,10 @@ process SKA_BUILD {
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/mash" : 'mash') : null) 
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
+        if (file("${params.conda_path}/bohra-ska2").exists()) {
             conda "${params.conda_path}/bohra-ska2"
         } else {
-            conda 'ska2 csvtk'
+            conda 'environment.yml'
         }
     } else {
         conda null

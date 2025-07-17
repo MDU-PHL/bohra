@@ -13,7 +13,7 @@ process INSERTIQR {
     cache 'lenient'
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
+        if (file("${params.conda_path}/bohra-snippy").exists()) {
             conda "${params.conda_path}/bohra-snippy"
         } else {
             conda 'environment.yml'

@@ -14,7 +14,7 @@ process CSVTK_CONCAT {
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/csvtk" : 'bioconda::csvtk') : null)
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
+        if (file("${params.conda_path}/bohra-csvtk").exists()) {
             conda "${params.conda_path}/bohra-csvtk"
         } else {
             conda 'environment.yml'
@@ -51,7 +51,7 @@ process CSVTK_UNIQ {
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/csvtk" : 'bioconda::csvtk') : null)
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
+        if (file("${params.conda_path}/bohra-csvtk").exists()) {
             conda "${params.conda_path}/bohra-csvtk"
         } else {
             conda 'bioconda::csvtk'

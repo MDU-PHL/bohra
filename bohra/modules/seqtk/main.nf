@@ -15,7 +15,7 @@ process SEQTK {
     scratch true
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/seqtk" : 'seqtk') : null) 
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
+        if (file("${params.conda_path}/bohra-seqtk").exists()) {
             conda "${params.conda_path}/bohra-seqtk"
         } else {
             conda 'environment.yml'

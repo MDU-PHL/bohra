@@ -13,7 +13,7 @@ process GUBBINS {
     cache 'lenient'
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/gubbins" : 'gubbins=2.4.1 snp-sites=2.5.1') : null)
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
+        if (file("${params.conda_path}/bohra-gubbins").exists()) {
             conda "${params.conda_path}/bohra-gubbins"
         } else {
             conda 'environment.yml'

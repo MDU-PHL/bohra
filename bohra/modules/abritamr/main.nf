@@ -19,7 +19,7 @@ process ABRITAMR {
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/abritamr" : 'bioconda::abritamr') : null) 
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
+        if (file("${params.conda_path}/bohra-abritamr").exists()) {
             conda "${params.conda_path}/bohra-abritamr"
         } else {
             conda 'environment.yml'

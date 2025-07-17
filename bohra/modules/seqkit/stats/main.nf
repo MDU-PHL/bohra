@@ -16,7 +16,7 @@ process SEQKIT_STATS {
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/seqkit" : 'csvtk seqkit=2.1.0') : null) 
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
+        if (file("${params.conda_path}/bohra-seqkit").exists()) {
             conda "${params.conda_path}/bohra-seqkit"
         } else {
             conda 'environment.yml'
@@ -25,11 +25,6 @@ process SEQKIT_STATS {
         conda null
     }
 
-    // if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-    //     container 'https://depot.galaxyproject.org/singularity/fastp:0.20.1--h8b12597_0'
-    // } else {
-    //     container 'quay.io/biocontainers/fastp:0.20.1--h8b12597_0'
-    // }
 
     input:
     tuple val(meta), path(input_files)

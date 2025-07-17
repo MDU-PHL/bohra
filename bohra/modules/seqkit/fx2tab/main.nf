@@ -15,7 +15,7 @@ process SEQKIT_GC {
     scratch true
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/seqkit" : 'csvtk seqkit=2.1.0') : null) 
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
+        if (file("${params.conda_path}/bohra-seqkit").exists()) {
             conda "${params.conda_path}/bohra-seqkit"
         } else {
             conda 'environment.yml'

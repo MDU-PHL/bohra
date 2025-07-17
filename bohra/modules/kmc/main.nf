@@ -10,7 +10,7 @@ process KMC {
     // afterScript "rm -fr /tmp/\$USER/*"
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
+        if (file("${params.conda_path}/bohra-kmc").exists()) {
             conda "${params.conda_path}/bohra-kmc"
         } else {
             conda 'environment.yml'

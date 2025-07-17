@@ -1,7 +1,7 @@
-name: bohra-panaroo
+name: bohra-prokka
 channels:
   - conda-forge
   - bioconda
 dependencies:
-  - panaroo=1.2.9
+  - prokka=1.14.6
   - csvtk=0.25.0

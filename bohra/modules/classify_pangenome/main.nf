@@ -10,7 +10,7 @@ process CLASSIFY_PANGENOME {
     cache 'lenient'
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
+        if (file("${params.conda_path}/bohra-classify-pangenome").exists()) {
             conda "${params.conda_path}/bohra-classify-pangenome"
         } else {
             conda 'conda-forge::r-data-table r-ggplot2 r-optparse'

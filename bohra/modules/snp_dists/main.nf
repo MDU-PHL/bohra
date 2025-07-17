@@ -15,7 +15,7 @@ process SNP_DISTS {
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/snpdists" : 'bioconda::snp-dists=0.8.2 bioconda::csvtk') : null) 
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
+        if (file("${params.conda_path}/bohra-snpdists").exists()) {
             conda "${params.conda_path}/bohra-snpdists"
         } else {
             conda 'environment.yml'

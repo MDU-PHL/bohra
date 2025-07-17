@@ -12,7 +12,7 @@ process ASSEMBLER_PE {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"${meta.id}", publish_id:meta.id) }
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
+        if (file("${params.conda_path}/bohra-shovill").exists()) {
             conda "${params.conda_path}/bohra-shovill"
         } else {
             conda 'environment.yml'

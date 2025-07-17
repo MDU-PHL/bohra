@@ -11,7 +11,7 @@ process SNP_CLUSTER {
         mode: params.publish_dir_mode
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
+        if (file("${params.conda_path}/bohra-cluster").exists()) {
             conda "${params.conda_path}/bohra-cluster"
         } else {
             conda 'environment.yml'

@@ -11,7 +11,7 @@ process PANAROO {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"report", publish_id:'report') }
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
+        if (file("${params.conda_path}/bohra-panaroo").exists()) {
             conda "${params.conda_path}/bohra-panaroo"
         } else {
             conda 'bioconda::panaroo=1.2.9 csvtk'
