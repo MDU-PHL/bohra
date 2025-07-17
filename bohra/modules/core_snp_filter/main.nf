@@ -13,8 +13,7 @@ process CORE_SNP_FILTER {
     
     scratch true
     cache 'lenient'
-    // errorStrategy 'ignore'
-    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/snippy" : 'bioconda::snippy=4.4.5') : null) 
+    
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-core-snp-filter"
