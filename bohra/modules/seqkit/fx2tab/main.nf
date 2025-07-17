@@ -18,16 +18,12 @@ process SEQKIT_GC {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-seqkit"
         } else {
-            conda 'csvtk seqkit=2.1.0'
+            conda 'environment.yml'
         }
     } else {
         conda null
     }
-    // if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-    //     container 'https://depot.galaxyproject.org/singularity/fastp:0.20.1--h8b12597_0'
-    // } else {
-    //     container 'quay.io/biocontainers/fastp:0.20.1--h8b12597_0'
-    // }
+    
 
     input:
     tuple val(meta), path(input_files)

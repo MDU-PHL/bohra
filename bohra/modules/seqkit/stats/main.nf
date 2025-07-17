@@ -19,7 +19,7 @@ process SEQKIT_STATS {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-seqkit"
         } else {
-            conda 'csvtk seqkit=2.1.0'
+            conda 'environment.yml'
         }
     } else {
         conda null

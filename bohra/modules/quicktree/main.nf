@@ -18,7 +18,7 @@ process QUICKTREE {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-test-quicktree"
         } else {
-            conda 'bioconda::bioconda::quicktree=2.5 gotree'
+            conda 'environment.yml'
         }
     } else {
         conda null
