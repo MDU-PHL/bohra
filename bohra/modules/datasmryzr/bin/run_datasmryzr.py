@@ -82,7 +82,7 @@ def _generate_summary_table(results_files: list, output:list, min_depth:40, minq
     print("Generating summary table")
     list_of_filename = {
         "read_assessment.txt" : ["Isolate","Reads","GC content", "Est average depth", "is_control", "filesize", "Qscore"],
-        "assembly_assesment.txt":["Isolate","bp","# Contigs","N50"],
+        "assembly_assessment.txt":["Isolate","bp","# Contigs","N50"],
         "core_genome_stats.txt":["Isolate","% Aligned"],
         "speciation.txt":["Isolate","Species (reads)","Match 1 (reads)", "Match 1 (asm)"],
         "mlst.txt":["Isolate","Scheme","ST"],
@@ -370,7 +370,7 @@ def _run_datasmryzr(tree:str,
     """
     Run the datasmryzr pipeline
     """
-    cmd = f"datasmryzr -c bohra_config.json -bg '{bkgd_color}' -fc '{text_color}' {other_files} {pangenome_classification} {pangenome_rtab} {pangenome_groups} {tree} {distance_matrix} {core_genome} {core_genome_report} {reference} {mask} {annotation}"
+    cmd = f"datasmryzr --title '{job_id}' -c bohra_config.json -bg '{bkgd_color}' -fc '{text_color}' {other_files} {pangenome_classification} {pangenome_rtab} {pangenome_groups} {tree} {distance_matrix} {core_genome} {core_genome_report} {reference} {mask} {annotation}"
     print(cmd)
     p = subprocess.run(cmd, shell=True, capture_output=True)
     if p.returncode != 0:
@@ -422,7 +422,7 @@ def _compile(args):
     results_files = args.results_files
     results_files = [i for i in results_files if pathlib.Path(i).exists()]
     read_assessment,output,results_files = _combine_reads_iqr(results_files, output)
-    tree,output = _extract_tree(results_files, args.job_id)
+    tree,output = _extract_tree(results_files, output)
     distance_matrix,output = _extract_distance_matrix(results_files, output)
     core_genome,output = _extract_core_genome(results_files, output)
     core_genome_report,output = _extract_core_genome_report(results_files, output)
@@ -465,8 +465,7 @@ def set_parsers():
         default = '')
     parser.add_argument('--job_id',
         help='',
-        default = '',
-        nargs='+')
+        default = '')
     parser.add_argument('--results_files',
         help = '',
         default = '',

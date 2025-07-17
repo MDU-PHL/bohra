@@ -40,7 +40,6 @@ workflow READ_ANALYSIS {
         CSVTK_CONCAT ( seq_stats )
         reads_pe_checked = reads_pe_checked.filter { cfg, files -> cfg.check != 'FAIL_READ_FILE_TOO_SMALL' }
                                             .map { cfg,files -> tuple(cfg.findAll {it.key != 'check'}, files ) }
-        println reads_pe_checked.view()
     emit:
         read_stats  = CSVTK_CONCAT.out.collated
         reads_pe = reads_pe_checked
@@ -69,7 +68,7 @@ workflow ASSEMBLY_ANALYSIS {
         APS = PROKKA.out.prokka_txt.join( SEQKIT_STATS.out.stats )
         COLLATE_ASM ( APS )
         asm_stats = COLLATE_ASM.out.assembly.map { cfg, asm -> asm }.collect()
-        asm_stats = asm_stats.map { files -> tuple("assembly_assesment", files) }
+        asm_stats = asm_stats.map { files -> tuple("assembly_assessment", files) }
         versions_prokka = PROKKA.out.version.map { cfg, file -> file }.collect()
                                          .map { files -> tuple("version_prokka", files) }
         versions_seqkit = SEQKIT_STATS.out.version.map { cfg, file -> file }.collect()
