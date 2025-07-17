@@ -36,7 +36,7 @@ process RUN_SMRYZR {
     script:
     def input_files = inputs.join(' ')
     """
-    $module_dir/run_datasmryzr.py --job_id ${params.job_id} \
+    $module_dir/run_datasmryzr.py --job_id '${params.job_id}' \
     --mask ${params.mask} --reference ${params.reference} \
     --input_file ${launchDir}/${params.isolates} \
     --annot_cols '${params.annot_cols}' \
