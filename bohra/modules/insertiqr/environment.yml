@@ -1,10 +1,10 @@
-name: bohra-gubbins
+name: bohra-snippy
 channels:
   - conda-forge
   - bioconda
 dependencies:
-  - gubbins=2.4.0
+  - snippy=4.4.5
   - csvtk=0.25.0
-  - snp-sites=2.5.1
+  - samtools=1.9
 
   

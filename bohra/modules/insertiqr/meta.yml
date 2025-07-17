@@ -1,12 +1,12 @@
-name: shovill
-description: Assemble bacterial isolate genomes from Illumina paired-end reads
+name: insertiqr
+description: Calculate the IQR and insert sizes from a set of paired-end reads
 keywords:
-  - assembly
+  - quality control
 tools:
   - shovill:
       description: |
-        Assemble bacterial isolate genomes from Illumina paired-end reads
-      documentation: https://github.com/tseemann/shovill
+        
+      documentation:
       doi: 
 params:
   - outdir:
@@ -41,6 +41,10 @@ input:
       description: |
         List of input FastQ files of size 1 and 2 for single-end and paired-end data,
         respectively.
+  - contigs:
+      type: file
+      description: |
+        List of input contig files for the alignment process.
 
 output:
   - meta:
@@ -48,10 +52,10 @@ output:
       description: |
         Groovy Map containing sample information
         e.g. [ id:'test', single_end:false ]
-  - contigs:
+  - insertiqr:
       type: file
-      description: The report file from kraken2
-      pattern: "*.contigs.fa"
+      description: The report file from calculatng the IQR and insert sizes
+      pattern: "insertiqr_*.txt"
   - log:
       type: file
       description: fastq log file

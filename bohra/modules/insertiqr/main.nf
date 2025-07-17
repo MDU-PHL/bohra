@@ -16,7 +16,7 @@ process INSERTIQR {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-snippy"
         } else {
-            conda 'bioconda::snippy'
+            conda 'environment.yml'
         }
     } else {
         conda null
