@@ -123,7 +123,7 @@ def run_bohra(
             command = _func(kwargs=kwargs, command=command, mtb = mtb)
         # command = _funcs()[pipeline](kwargs=kwargs, command=command)
         cmd = _make_command(command=command)
-        print(f"Please paste the following command to run the pipeline:\n\033[1m{cmd}\033[0m")
+        LOGGER.info(f"Please paste the following command to run the pipeline:\n\033[1m{cmd}\033[0m")
     else:
         LOGGER.error(f"Failed to create the working directory {kwargs['workdir']}.")
         raise SystemError

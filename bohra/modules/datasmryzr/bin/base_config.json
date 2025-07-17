@@ -12,6 +12,7 @@
     "reportable-amr-genes":["Reportable AMR gene are based on the species that was detected or provided by user and reflect clinically relevant genes for that species.", "Results generated using abritAMR."],
     "mlst":["MLST results are based on the scheme provided by the user.", "Special characters","~X indicates that the sequence detected does not have an exact match to an allele in the daatabase used, but is most similar to the allele ID X.", "?X indicates that only a partial gene match was recovered which was most similar to X.", "- indicates that there is no allele detected in the sequence.", "For more information please refer to https://github.com/tseemann/mlst"],
     "virulence":["Virulence genes were identified using abritamr"],
+    "versions":["The results presented here were generated using tool versions detailed in the table below using the following command:","<b> CMD </b>"],
     "speciation":{
         "sylph":["Sylph was used to determin the species of sequences in this analysis. Please find details here : https://github.com/bluenote-1577/sylph"],
         "kraken2":["Kraken2 and KRAKEN2_DB were used to determine the species of sequences in this analysis."]}

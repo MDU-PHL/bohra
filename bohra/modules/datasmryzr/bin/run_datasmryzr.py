@@ -381,18 +381,33 @@ def _run_datasmryzr(tree:str,
         print("datasmryzr run complete")
         return p.stdout.decode()
 
+def extract_cmd(launchdir: str) -> str:
+    """
+    Extract the command from the launch directory
+    """
+    cmd = ""
+    if pathlib.Path(launchdir).exists():
+        with open(pathlib.Path(launchdir) / "bohra_run.log", "r") as f:
+            cmd = f.read().strip().split("\n")[-1].strip('\x1b[1m[0m')
+        if cmd.startswith("nextflow"):
+            # cmd = cmd.replace("nextflow", "bohra")
+            return cmd
+        else:
+            return ""
 def generate_config(cluster_method:str,
                     cluster_threshold:str,
                     pangenome_groups:str,
                     kraken2_db:str,
-                    speciation: str) -> None:
-    
+                    speciation: str,
+                    launchdir: str) -> None:
+
     key = {
         "GRP":pangenome_groups,
         "THRESHOLDS":cluster_threshold,
         "METHOD":cluster_method,
-        "KRAKEN2_DB": kraken2_db,}
-    
+        "KRAKEN2_DB": kraken2_db,
+        "CMD": extract_cmd(launchdir)}
+
     with open(f"{pathlib.Path(__file__).parent / 'base_config.json'}","r") as j:
         cfg = j.read()
         
@@ -438,7 +453,7 @@ def _compile(args):
     reference = _get_reference(args.reference)
     mask = _get_mask(args.mask)
     annotation = _make_annotation_file(args.input_file, results_files, f"{args.annot_cols}")
-    generate_config(args.cluster_method, args.cluster_threshold, args.pangenome_groups, args.kraken2_db, 'kraken2' if args.speciation == 'true' else "sylph")
+    generate_config(args.cluster_method, args.cluster_threshold, args.pangenome_groups, args.kraken2_db, 'kraken2' if args.speciation == 'true' else "sylph", args.launchdir)
     p = _run_datasmryzr(tree,
                         distance_matrix,
                         core_genome,
@@ -503,6 +518,10 @@ def set_parsers():
     default = ''
     )
     parser.add_argument('--kraken2_db',
+    help = '',
+    default = ''
+    )
+    parser.add_argument('--launchdir',
     help = '',
     default = ''
     )

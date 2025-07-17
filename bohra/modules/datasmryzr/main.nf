@@ -47,5 +47,6 @@ process RUN_SMRYZR {
     --bkgd '${params.background_color}' \
     --text_color '${params.text_color}' \
     --results_files ${input_files} \
+    --launchdir ${launchDir} \
     """
 }
