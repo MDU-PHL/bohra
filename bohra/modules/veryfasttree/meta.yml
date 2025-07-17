@@ -1,12 +1,13 @@
-name: seqtk
-description: 
+name: veryfasttree
+description: |
+  A tool for constructing phylogenetic trees from genomic data
 keywords:
   - assembly
 tools:
-  - shovill:
+  - veryfasttree:
       description: |
-        Assemble bacterial isolate genomes from Illumina paired-end reads
-      documentation: https://github.com/tseemann/shovill
+        VeryFastTree is a tool for constructing phylogenetic trees from genomic data.
+      documentation: https://github.com/bluenote-1577/sylph
       doi: 
 params:
   - outdir:
@@ -36,11 +37,11 @@ input:
       description: |
         Groovy Map containing sample information
         e.g. [ id:'test', single_end:false ]
-  - reads:
+  - aln:
       type: file
       description: |
-        List of input FastQ files of size 1 and 2 for single-end and paired-end data,
-        respectively.
+        cleaned alignment file.
+  
 
 output:
   - meta:
@@ -48,10 +49,10 @@ output:
       description: |
         Groovy Map containing sample information
         e.g. [ id:'test', single_end:false ]
-  - qscore:
+  - newick:
       type: file
-      description: The report file from kraken2
-      pattern: "qscore.txt"
+      description: The newick file from IQ-TREE
+      pattern: "*.newick"
 authors:
   - "@kristyhoran"
   

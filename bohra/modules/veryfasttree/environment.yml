@@ -1,0 +1,8 @@
+name: bohra-veryfasttree
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - veryfasttree=4.0.5
+  - csvtk=0.25.0
+  - gotree

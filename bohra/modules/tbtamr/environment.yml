@@ -1,0 +1,15 @@
+name: bohra-tbtamr
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - tbtamr=1.0.3
+  - csvtk=0.25.0
+  - pip
+  - pip:
+    - pysam
+    - joblib
+    - tqdm
+    - pydantic
+    - requests
+    - 'git+https://github.com/jodyphelan/pathogen-profiler@v4.3.0'
