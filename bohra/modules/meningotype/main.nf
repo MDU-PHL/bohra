@@ -20,7 +20,7 @@ process MENINGOTYPE {
         if (file("${params.conda_path}").exists()) {
             conda "${params.conda_path}/bohra-meningotype"
         } else {
-            conda 'meningotype csvtk'
+            conda 'environment.yml'
         }
     } else {
         conda null
