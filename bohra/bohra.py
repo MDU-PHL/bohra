@@ -69,15 +69,26 @@ def create_subcommand_with_options(name, options_dict):
         #     raise UsageError(f"An error occurred while running the {name} pipeline: {e}")
 
     for opt in options_dict:
-        click.option(
-            f"--{opt['name']}",
-            type=opt.get('type', None),
-            default=opt.get('default', None),
-            help=opt.get('help', ''),
-            show_default= True,
-            is_flag= opt.get('is_flag', False),
-        )(run_subcommand) # Apply the decorator to the function
-
+        
+        if 'short_name' in opt:
+            click.option(
+                f"--{opt['name']}",
+                f"-{opt['short_name']}",
+                type=opt.get('type', None),
+                default=opt.get('default', None),
+                help=opt.get('help', ''),
+                show_default= True,
+                is_flag= opt.get('is_flag', False),
+            )(run_subcommand) # Apply the decorator to the function
+        else:
+            click.option(
+                f"--{opt['name']}",
+                type=opt.get('type', None),
+                default=opt.get('default', None),
+                help=opt.get('help', ''),
+                show_default= True,
+                is_flag= opt.get('is_flag', False),
+            )(run_subcommand)
     return run_subcommand
 
 cmd_opts = _get_cmd_options()
