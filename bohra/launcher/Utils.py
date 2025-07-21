@@ -1,3 +1,4 @@
+from builtins import bool, dict, float, str
 import logging
 import pathlib
 import subprocess
@@ -184,14 +185,14 @@ def _get_common_options() -> list:
         {
             "name":"sylph_db",
             "help":"Path to DB for use with sylph",
-            "default":os.getenv("SYLPH_DEFAULT_DB", ''),
+            "default":os.getenv("BOHRA_SYLPH_DB", ''),
             "show_default":True
         },
         {
             "name":"kraken2_db",
             "help":"Path to DB for use with kraken2",
-            "default":os.getenv("KRAKEN2_DEFAULT_DB", ''),
-            "metavar":'KRAKEN2_DEFAULT_DB',
+            "default":os.getenv("BOHRA_KRAKEN2_DB", ''),
+            "metavar":'BOHRA_KRAKEN2_DB',
             "show_default":True
         },
         {
@@ -248,12 +249,12 @@ def _get_cmd_options() -> dict:
             {
                 "name":"blast_db",
                 "help":"Path to the mlst blast_db, defaults to what is installed in the environment.",
-                "default":f"{os.getenv('BLAST_DB', '')}"
+                "default":f"{os.getenv('BOHRA_BLAST_DB', '')}"
             },
             {
                 "name":"data_dir",
                 "help":"Path to the mlst datadir, defaults to what is installed in the environment.",
-                "default":f"{os.getenv('PUBMLST_DB','')}"
+                "default":f"{os.getenv('BOHRA_PUBMLST_DB','')}"
             },
             {
                 "name":"mlst_exclude",
@@ -265,7 +266,7 @@ def _get_cmd_options() -> dict:
             {
                 "name":"mobsuite_db",
                 "help":"Path to the mobsuite_db, defaults to what is installed in the bohra-mob_suite environment.",
-                "default":f"{os.getenv('MOBSUITE_DB','')}"
+                "default":f"{os.getenv('BOHRA_MOBSUITE_DB','')}"
             }
         ],
         "tb":[
@@ -367,7 +368,7 @@ def _get_cmd_options() -> dict:
             },
             {
                 "name":"tree_input",
-                type:click.Choice(["distance", "alignment"]),
+                "type":click.Choice(["distance", "alignment"]),
                 "help":"Input type for tree building, either 'distance' or 'alignment'.",
                 "default":"alignment"
 
