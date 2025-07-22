@@ -15,8 +15,8 @@ process LISSERO {
     cache 'lenient'
     scratch true
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}/bohra-lissero").exists()) {
-            conda "${params.conda_path}/bohra-lissero"
+        if (file("${params.conda_path}/${params.conda_prefix}-lissero").exists()) {
+            conda "${params.conda_path}/${params.conda_prefix}-lissero"
         } else {
             conda "${moduleDir}/environment.yml"
         }

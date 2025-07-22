@@ -18,8 +18,8 @@ process ECTYPER {
     scratch true
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/spades" : 'bioconda::spades=3.15.2') : null) 
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}/bohra-ectyper").exists()) {
-            conda "${params.conda_path}/bohra-ectyper"
+        if (file("${params.conda_path}/${params.conda_prefix}-ectyper").exists()) {
+            conda "${params.conda_path}/${params.conda_prefix}-ectyper"
         } else {
             conda "${moduleDir}/environment.yml"
         }

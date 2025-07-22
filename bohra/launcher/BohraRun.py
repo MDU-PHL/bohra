@@ -57,13 +57,14 @@ def _setup_working_directory(input_file:str,
     
     return True
 
-def _init_command_dict(profile:str, cpus:int, job_name:str) -> dict:
+def _init_command_dict(profile:str, cpus:int, job_name:str, prefix:str) -> dict:
 
     return {"params":[
         f"--profile {profile}",
         f"-executor.cpus {cpus}",
         "-with-trace",
         f"--job_id {job_name}",
+        f"--conda_prefix {prefix}",
                 ], "modules":[]}
 
 
@@ -104,8 +105,8 @@ def run_bohra(
                  profile=kwargs.get('profile', 'lcl'))
     max_cpus = int(_set_cpu_limit_local(cpus=kwargs.get('cpus', 0)))
     LOGGER.info(f"Using {int(max_cpus)} CPUs for the {pipeline} pipeline.")
-    
-    command = _init_command_dict(profile=profile, cpus=max_cpus, job_name = kwargs.get('job_name', 'bohra'))
+
+    command = _init_command_dict(profile=profile, cpus=max_cpus, job_name = kwargs.get('job_name', 'bohra'), prefix=kwargs.get('prefix', 'bohra'))
     LOGGER.info(f"Checking if report directory needs to archived.")
     _check_keep(keep = kwargs["keep"])
     if _make_workdir(workdir=kwargs["workdir"],   

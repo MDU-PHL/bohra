@@ -15,8 +15,8 @@ process TBTAMR {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"${meta.id}", publish_id:meta.id) }
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}/bohra-tbtamr").exists()) {
-            conda "${params.conda_path}/bohra-tbtamr"
+        if (file("${params.conda_path}/${params.conda_prefix}-tbtamr").exists()) {
+            conda "${params.conda_path}/${params.conda_prefix}-tbtamr"
         } else {
             conda "${moduleDir}/environment.yml"
         }

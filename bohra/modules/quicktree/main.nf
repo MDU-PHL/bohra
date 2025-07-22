@@ -15,8 +15,8 @@ process QUICKTREE {
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/quicktree" : 'bioconda::quicktree=2.5') : null) 
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}/bohra-quicktree").exists()) {
-            conda "${params.conda_path}/bohra-test-quicktree"
+        if (file("${params.conda_path}/${params.conda_prefix}-quicktree").exists()) {
+            conda "${params.conda_path}/${params.conda_prefix}-quicktree"
         } else {
             conda "${moduleDir}/environment.yml"
         }

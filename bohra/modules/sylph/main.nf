@@ -14,8 +14,8 @@ process SYLPH {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"${meta.id}", publish_id:meta.id) }
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}/bohra-sylph").exists()) {
-            conda "${params.conda_path}/bohra-sylph"
+        if (file("${params.conda_path}/${params.conda_prefix}-sylph").exists()) {
+            conda "${params.conda_path}/${params.conda_prefix}-sylph"
         } else {
             conda "${moduleDir}/environment.yml"
         }

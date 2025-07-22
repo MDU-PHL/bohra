@@ -16,8 +16,8 @@ process NGMASTER {
     errorStrategy 'ignore'
     scratch true
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}/bohra-ngmaster").exists()) {
-            conda "${params.conda_path}/bohra-ngmaster"
+        if (file("${params.conda_path}/${params.conda_prefix}-ngmaster").exists()) {
+            conda "${params.conda_path}/${params.conda_prefix}-ngmaster"
         } else {
             conda "${moduleDir}/environment.yml"
         }

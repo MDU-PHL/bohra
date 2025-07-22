@@ -15,8 +15,8 @@ process CORE_SNP_FILTER {
     cache 'lenient'
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}/bohra-core-snp-filter").exists()) {
-            conda "${params.conda_path}/bohra-core-snp-filter"
+        if (file("${params.conda_path}/${params.conda_prefix}-core-snp-filter").exists()) {
+            conda "${params.conda_path}/${params.conda_prefix}-core-snp-filter"
         } else {
             conda "${moduleDir}/environment.yml"
         }

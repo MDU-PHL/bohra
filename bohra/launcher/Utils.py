@@ -210,6 +210,12 @@ def _get_common_options() -> list:
             "name":"background_color",
             "help":"Color to use for the background in the report html. Default is '#343a40'.",
             "default":"#343a40",
+        },
+        {
+            "name":"conda_prefix",
+            "help":"The prefix for the conda environments to be used for each process. Default is 'bohra'.",
+            "default":"bohra",
+            "show_default":True
         }
     ]
 

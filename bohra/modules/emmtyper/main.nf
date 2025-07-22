@@ -17,8 +17,8 @@ process EMMTYPER {
     // errorStrategy 'ignore'
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/spades" : 'bioconda::spades=3.15.2') : null) 
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}/bohra-emmtyper").exists()) {
-            conda "${params.conda_path}/bohra-emmtyper"
+        if (file("${params.conda_path}/${params.conda_prefix}-emmtyper").exists()) {
+            conda "${params.conda_path}/${params.conda_prefix}-emmtyper"
         } else {
             conda "${moduleDir}/environment.yml"
         }

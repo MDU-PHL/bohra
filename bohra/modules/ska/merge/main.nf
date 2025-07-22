@@ -11,8 +11,8 @@ process SKA_MERGE {
         mode: params.publish_dir_mode
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}/bohra-ska2").exists()) {
-            conda "${params.conda_path}/bohra-ska2"
+        if (file("${params.conda_path}/${params.conda_prefix}-ska2").exists()) {
+            conda "${params.conda_path}/${params.conda_prefix}-ska2"
         } else {
             conda "${moduleDir}/environment.yml"
         }

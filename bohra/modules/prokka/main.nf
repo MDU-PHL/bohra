@@ -15,8 +15,8 @@ process PROKKA {
     
    
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}/bohra-prokka").exists()) {
-            conda "${params.conda_path}/bohra-prokka"
+        if (file("${params.conda_path}/${params.conda_prefix}-prokka").exists()) {
+            conda "${params.conda_path}/${params.conda_prefix}-prokka"
         } else {
             conda "${moduleDir}/environment.yml"
         }
