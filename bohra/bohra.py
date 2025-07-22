@@ -73,7 +73,7 @@ def create_subcommand_with_options(name, options_dict):
         if 'short_name' in opt:
             click.option(
                 f"--{opt['name']}",
-                f"-{opt['short_name']}",
+                f"{opt['short_name']}",
                 type=opt.get('type', None),
                 default=opt.get('default', None),
                 help=opt.get('help', ''),

@@ -19,7 +19,7 @@ process NGMASTER {
         if (file("${params.conda_path}/bohra-ngmaster").exists()) {
             conda "${params.conda_path}/bohra-ngmaster"
         } else {
-            conda 'environment.yml'
+            conda "${moduleDir}/environment.yml"
         }
        
     } else {

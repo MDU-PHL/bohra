@@ -22,8 +22,7 @@ process ABRITAMR {
         if (file("${params.conda_path}/bohra-abritamr").exists()) {
             conda "${params.conda_path}/bohra-abritamr"
         } else {
-            conda 'environment.yml'
-        }
+            conda "${moduleDir}/environment.yml"
     } else {
         conda null
     }

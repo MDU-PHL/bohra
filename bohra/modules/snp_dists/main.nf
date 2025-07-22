@@ -18,7 +18,7 @@ process SNP_DISTS {
         if (file("${params.conda_path}/bohra-snpdists").exists()) {
             conda "${params.conda_path}/bohra-snpdists"
         } else {
-            conda 'environment.yml'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null

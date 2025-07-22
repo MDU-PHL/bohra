@@ -18,7 +18,7 @@ process LISSERO {
         if (file("${params.conda_path}/bohra-lissero").exists()) {
             conda "${params.conda_path}/bohra-lissero"
         } else {
-            conda 'environment.yml'
+            conda "${moduleDir}/environment.yml"
         }
         
     } else {

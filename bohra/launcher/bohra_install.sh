@@ -5,6 +5,7 @@
 
 ENV_PREFIX=$1
 UPDATE=$2
+
 # abort if any step fails
 set -e
 # resets to base env
@@ -105,6 +106,13 @@ for key in "${!TOOLS[@]}";do
                 echo "Will now finish installing tbtamr"
                 conda activate $key && \
                 pip3 install pysam joblib tqdm pydantic requests git+https://github.com/jodyphelan/pathogen-profiler@v4.3.0
+                # continue
+            fi
+            if [[ "$key" == "$ENV_PREFIX-datasmryzr" ]]; then
+                $INSTALLER create --force -y -n $key ${TOOLS[$key]}
+                echo "Will now finish installing datasmryzr"
+                conda activate $key && \
+                pip3 install git+https://github.com/kristyhoran/datasmryzr
                 # continue
             fi
         else

@@ -21,7 +21,7 @@ process MLST {
         if (file("${params.conda_path}/bohra-mlst").exists()) {
             conda "${params.conda_path}/bohra-mlst"
         } else {
-            conda 'environment.yml'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null

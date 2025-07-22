@@ -14,7 +14,7 @@ process PANAROO {
         if (file("${params.conda_path}/bohra-panaroo").exists()) {
             conda "${params.conda_path}/bohra-panaroo"
         } else {
-            conda 'bioconda::panaroo=1.2.9 csvtk'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null

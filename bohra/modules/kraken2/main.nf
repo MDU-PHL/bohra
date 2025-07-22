@@ -17,7 +17,7 @@ process KRAKEN2 {
         if (file("${params.conda_path}/bohra-kraken2").exists()) {
             conda "${params.conda_path}/bohra-kraken2"
         } else {
-            conda 'environment.yml'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null

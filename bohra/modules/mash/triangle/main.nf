@@ -18,7 +18,7 @@ process MASH_TRIANGLE {
         if (file("${params.conda_path}/bohra-mash").exists()) {
             conda "${params.conda_path}/bohra-mash"
         } else {
-            conda 'environment.yml'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null

@@ -27,6 +27,12 @@ classifiers = [
 ]
 dependencies = [
     "pytest",
+    "altair",
+    "click",
+    "pandas",
+    "numpy",
+    "psutil",
+    "biopython==1.85"
 ]
 
 [project.optional-dependencies]
@@ -47,5 +53,5 @@ path = "bohra/version.py"
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "/bohra/*","/bohra/modules/*","bohra/templates/*", "bohra/workflows/*", 
+    "/bohra/*","/bohra/modules/*","bohra/templates/*", "bohra/workflows/*", "bohra/subworkflows/*","bohra/references/*"
 ]

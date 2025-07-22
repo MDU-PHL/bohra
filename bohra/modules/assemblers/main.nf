@@ -15,7 +15,7 @@ process ASSEMBLER_PE {
         if (file("${params.conda_path}/bohra-shovill").exists()) {
             conda "${params.conda_path}/bohra-shovill"
         } else {
-            conda 'environment.yml'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null

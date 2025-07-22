@@ -20,7 +20,7 @@ process EMMTYPER {
         if (file("${params.conda_path}/bohra-emmtyper").exists()) {
             conda "${params.conda_path}/bohra-emmtyper"
         } else {
-            conda 'environment.yml'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null

@@ -18,7 +18,7 @@ process MOBSUITE {
         if (file("${params.conda_path}/bohra-mob_suite").exists()) {
             conda "${params.conda_path}/bohra-mob_suite"
         } else {
-            conda 'environment.yml'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null

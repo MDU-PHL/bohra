@@ -13,7 +13,7 @@ process CLASSIFY_PANGENOME {
         if (file("${params.conda_path}/bohra-classify-pangenome").exists()) {
             conda "${params.conda_path}/bohra-classify-pangenome"
         } else {
-            conda 'conda-forge::r-data-table r-ggplot2 r-optparse'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null

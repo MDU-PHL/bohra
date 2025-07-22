@@ -30,16 +30,19 @@ def _get_profile(profile_config: str = '',
 
     LOGGER.info(f"Tyring to find your profile.")
     # profile = 'lcl'
-    if profile_config != '' and _check_path(profile_config):
-        with open(profile_config, 'r') as f:
-            _cfg = f.read().strip().split()
+    if _check_path(profile_config):
+        try:
+            with open(profile_config, 'r') as f:
+                _cfg = f.read().strip().split()
 
-        for line in _cfg:
-            if profile == line:
-                LOGGER.info(f"Found the profile {profile} in the config file {profile_config}.")
-                return profile
-        
-        LOGGER.warning(f"The profile {profile} is not found in the config file {profile_config}. Using the default profile 'lcl'.")
+            for line in _cfg:
+                if profile == line:
+                    LOGGER.info(f"Found the profile {profile} in the config file {profile_config}.")
+                    return profile
+        except Exception as e:
+            LOGGER.warning(f"The profile {profile} is not found. Using the default profile 'lcl'.")
+    else:
+        LOGGER.warning(f"The profile config file {profile_config} does not exist. Using the default profile 'lcl'.")
     profile = 'lcl'
     LOGGER.info(f"You are running bohra with the {profile} profile.")
     return profile

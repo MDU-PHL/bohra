@@ -16,7 +16,7 @@ process GUBBINS {
         if (file("${params.conda_path}/bohra-gubbins").exists()) {
             conda "${params.conda_path}/bohra-gubbins"
         } else {
-            conda 'environment.yml'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null

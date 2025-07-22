@@ -15,7 +15,7 @@ process SNIPPY_CORE {
         if (file("${params.conda_path}/bohra-snippy").exists()) {
             conda "${params.conda_path}/bohra-snippy"
         } else {
-            conda 'bioconda::snippy=4.4.5'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null

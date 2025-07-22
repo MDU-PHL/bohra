@@ -14,7 +14,7 @@ process SKA_MERGE {
         if (file("${params.conda_path}/bohra-ska2").exists()) {
             conda "${params.conda_path}/bohra-ska2"
         } else {
-            conda 'environment.yml'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null

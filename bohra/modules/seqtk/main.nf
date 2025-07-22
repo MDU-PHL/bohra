@@ -18,7 +18,7 @@ process SEQTK {
         if (file("${params.conda_path}/bohra-seqtk").exists()) {
             conda "${params.conda_path}/bohra-seqtk"
         } else {
-            conda 'environment.yml'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null

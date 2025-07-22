@@ -17,7 +17,7 @@ process RUN_SMRYZR {
         if (file("${params.conda_path}/bohra-datasmryzr").exists()) {
             conda "${params.conda_path}/bohra-datasmryzr"
         } else {
-            conda 'environment.yml'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null

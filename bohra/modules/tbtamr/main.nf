@@ -18,7 +18,7 @@ process TBTAMR {
         if (file("${params.conda_path}/bohra-tbtamr").exists()) {
             conda "${params.conda_path}/bohra-tbtamr"
         } else {
-            conda 'environment.yml'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null

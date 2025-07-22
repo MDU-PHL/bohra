@@ -17,7 +17,7 @@ process VERYFASTTREE {
         if (file("${params.conda_path}/bohra-veryfasttree").exists()) {
             conda "${params.conda_path}/bohra-veryfasttree"
         } else {
-            conda 'veryfasttree'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null

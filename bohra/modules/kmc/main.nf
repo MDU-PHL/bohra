@@ -13,7 +13,7 @@ process KMC {
         if (file("${params.conda_path}/bohra-kmc").exists()) {
             conda "${params.conda_path}/bohra-kmc"
         } else {
-            conda 'environment.yml'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null

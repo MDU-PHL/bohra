@@ -17,8 +17,7 @@ process IQTREE {
         if (file("${params.conda_path}/bohra-iqtree").exists()) {
             conda "${params.conda_path}/bohra-iqtree"
         } else {
-            conda 'environment.yml'
-        }
+            conda "${moduleDir}/environment.yml"
     } else {
         conda null
     }

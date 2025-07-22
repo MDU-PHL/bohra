@@ -14,8 +14,7 @@ process SNP_CLUSTER {
         if (file("${params.conda_path}/bohra-cluster").exists()) {
             conda "${params.conda_path}/bohra-cluster"
         } else {
-            conda 'environment.yml'
-        }
+            conda "${moduleDir}/environment.yml"
     } else {
         conda null
     }

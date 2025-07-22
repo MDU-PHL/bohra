@@ -21,7 +21,7 @@ process ECTYPER {
         if (file("${params.conda_path}/bohra-ectyper").exists()) {
             conda "${params.conda_path}/bohra-ectyper"
         } else {
-            conda 'environment.yml'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null
