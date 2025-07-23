@@ -59,7 +59,7 @@ workflow SEROTYPES {
         emm_typing = CONCAT_EMMTYPER ( emm_typers.map {files -> tuple("emmtyper", files)} )
         collated_typers =  lissero_typing.concat(kleb_typing,salmo_typing,nmen_typing,ngono_typing,ecoli_typing,emm_typing).view()
         versions = lissero_version.concat ( salmo_version, nmen_version, ngono_version, klebs_version, ecoli_version, emm_version ).map { files -> tuple("version_serotypes", files)}
-        println collated_typers.toList().view()
+        
         // CONCAT_FILES ( typers )
         CSVTK_UNIQ ( versions )
         collated_versions = CSVTK_UNIQ.out.collated

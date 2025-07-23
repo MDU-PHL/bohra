@@ -98,8 +98,7 @@ def run_bohra(
         pipeline: str,
         kwargs: dict) -> bool:
     
-    print(f"Running the {pipeline} pipeline with the following parameters:"
-          f"\n{kwargs}")
+    
     LOGGER.info(f"Checking on the setup for the {pipeline} pipeline.")
     profile = _get_profile(profile_config=kwargs.get('profile_config', ''),
                  profile=kwargs.get('profile', 'lcl'))

@@ -37,10 +37,6 @@ def _get_annotation(input_file:str, mtb:bool) -> str:
     return ','.join(annot_cols) if annot_cols else ""
 
 def _setup_comparative_args(kwargs:dict, command:dict, mtb:bool) -> dict:
-    print(kwargs)
-    # if kwargs["cluster"]:
-    #     LOGGER.info("Cluster is set to True")
-    #     command["params"].append(f"--cluster true --cluster_method {kwargs['cluster_method']} --cluster_threshold {kwargs['cluster_threshold']}")
     if mtb:
         command['modules'].append('mtb')
     command['modules'].append(kwargs['comparative_tool'])
