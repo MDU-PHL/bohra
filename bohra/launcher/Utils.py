@@ -61,10 +61,10 @@ def _check_size_file( path:str):
 
 
 
-def _run_subprocess(self, cmd):
+def _run_subprocess(cmd):
 
     
-    p = subprocess.run(cmd, shell = True)
+    p = subprocess.run(cmd, shell = True, capture_output=True, encoding= 'utf-8')
     return p
 
 
@@ -202,6 +202,12 @@ def _get_common_options() -> list:
             "default":"sylph"
         },
         {
+            "name":"proceed",
+            "type":click.Choice(['Y', 'N']),
+            "default":"N",
+            "help":"Set to 'Y' if you want the pipeline to automatically proceed, otherwise a command will be printed to the screen and user can manually launch."
+        },
+        {
             "name":"text_color",
             "help":"Color to use for the text in the report html. Default is 'white'.",
             "default":"#ffffff",
@@ -217,7 +223,8 @@ def _get_common_options() -> list:
             "default":"bohra",
             "show_default":True
         }
-    ]
+        ]
+    
 
     return common_options
 

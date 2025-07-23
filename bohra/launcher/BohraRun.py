@@ -125,7 +125,17 @@ def run_bohra(
         # command = _funcs()[pipeline](kwargs=kwargs, command=command)
         
         cmd = _make_command(command=command)
-        LOGGER.info(f"Please paste the following command to run the pipeline:\n\033[1m{cmd}\033[0m")
+        if kwargs["proceed"] == "N":
+            LOGGER.info(f"Please paste the following command to run the pipeline:\n\033[1m{cmd}\033[0m")
+        else:
+            LOGGER.info(f"Running the command: {cmd}")
+            proc = _run_subprocess(cmd=cmd)
+            if proc.returncode == 0:
+                LOGGER.info(f"The {pipeline} pipeline has completed successfully.")
+                return True
+            else:
+                LOGGER.error(f"The {pipeline} pipeline failed with return code {proc.returncode}.")
+                return False
     else:
         LOGGER.error(f"Failed to create the working directory {kwargs['workdir']}.")
         raise SystemError
