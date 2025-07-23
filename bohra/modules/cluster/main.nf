@@ -15,6 +15,7 @@ process SNP_CLUSTER {
             conda "${params.conda_path}/${params.conda_prefix}-cluster"
         } else {
             conda "${moduleDir}/environment.yml"
+        }
     } else {
         conda null
     }

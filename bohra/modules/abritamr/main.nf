@@ -22,10 +22,11 @@ process ABRITAMR {
         if (file("${params.conda_path}/${params.conda_prefix}-abritamr").exists()) {
             conda "${params.conda_path}/${params.conda_prefix}-abritamr"
         } else {
-            conda "${moduleDir}/environment.yml"
+            conda "${moduleDir}/environment.yml" }
     } else {
         conda null
-    }
+        }
+    
 
     cache 'lenient' 
     scratch true

@@ -21,6 +21,7 @@ process SKA_DISTANCE {
             conda "${params.conda_path}/${params.conda_prefix}-ska2"
         } else {
             conda "${moduleDir}/environment.yml"
+        }
     } else {
         conda null
     }

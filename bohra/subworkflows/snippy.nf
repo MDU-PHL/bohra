@@ -37,7 +37,12 @@ workflow RUN_SNPS {
         }
         
         SNP_DISTS ( core_aln )
-        SNP_CLUSTER ( SNP_DISTS.out.matrix )
+        if ( params.cluster ) {
+            SNP_CLUSTER ( SNP_DISTS.out.matrix )
+        } else {
+            SNP_CLUSTER.out.clusters = Chanel.empty().ifEmpty("not_available")
+        }
+        // SNP_CLUSTER ( SNP_DISTS.out.matrix )
         stats = SNIPPY_QC.out.snippy_qc.map { cfg, core_stats -> core_stats }.collect().map { files -> tuple("core_genome_stats", files)}
         all_core_stats = CSVTK_CONCAT ( stats )
     emit:

@@ -18,6 +18,7 @@ process IQTREE {
             conda "${params.conda_path}/${params.conda_prefix}-iqtree"
         } else {
             conda "${moduleDir}/environment.yml"
+        }
     } else {
         conda null
     }

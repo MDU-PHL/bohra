@@ -346,7 +346,7 @@ def _get_cmd_options() -> dict:
                 "default":31
             },
             {
-                "name":"cluster",
+                "name":"cluster/--no-cluster",
                 "help":"Set if you want to do hierarchical clustering.",
                 "is_flag":True,
                 "default":True
@@ -470,7 +470,7 @@ def _get_cmd_options() -> dict:
                 "default":31
             },
             {
-                "name":"cluster",
+                "name":"cluster/--no-cluster",
                 "help":"Set if you want to do hierarchical clustering.",
                 "is_flag":True,
                 "default":True
@@ -566,6 +566,7 @@ def _compartive_args(tool:str,kwargs:dict, command:dict) -> dict:
         if kwargs[arg] != "":
             command['params'].append(f"--{arg} {kwargs[arg]}")
     if kwargs['cluster']:
+        command['params'].append(f"--cluster true")
         for arg in ["cluster_method", "cluster_threshold"]:
             if kwargs[arg] != "":
                 command['params'].append(f"--{arg} {kwargs[arg]}")

@@ -25,7 +25,12 @@ workflow RUN_SKA {
         
         SKA_ALIGN ( merged_skf )
         SKA_DISTANCE ( merged_skf )
-        SNP_CLUSTER ( SKA_DISTANCE.out.matrix )
+        if( params.cluster ) {
+            SNP_CLUSTER ( SKA_DISTANCE.out.matrix )
+        } else {
+            SNP_CLUSTER.out.clusters = Chanel.empty().ifEmpty("not_available")
+        }
+        // SNP_CLUSTER ( SKA_DISTANCE.out.matrix )
     emit:
         stats = SKA_DISTANCE.out.distance_long
         dists = SKA_DISTANCE.out.matrix

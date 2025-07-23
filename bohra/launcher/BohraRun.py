@@ -120,9 +120,11 @@ def run_bohra(
         LOGGER.info(f"Input file {kwargs['input_file']} added to command successfully.")
         command = _setup_basic_args(kwargs=kwargs, command=command)
         mtb = True if pipeline == "tb" else False
+        LOGGER.info(f"Setting up arguments for the {pipeline} pipeline.")
         for _func in _funcs()[pipeline]:
             command = _func(kwargs=kwargs, command=command, mtb = mtb)
         # command = _funcs()[pipeline](kwargs=kwargs, command=command)
+        
         cmd = _make_command(command=command)
         LOGGER.info(f"Please paste the following command to run the pipeline:\n\033[1m{cmd}\033[0m")
     else:
