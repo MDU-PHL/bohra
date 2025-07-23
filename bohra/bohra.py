@@ -16,7 +16,6 @@ Bohra is modular allowing the user to choose between calling SNPs and generating
 import click
 import sys
 
-from bohra.SnpDetection import RunSnpDetection, SetupInputFiles, InitBohra, TestBohra
 from bohra.version import version
 from click.exceptions import UsageError
 from click._compat import get_text_stderr
