@@ -1,0 +1,31 @@
+site_name: bohra
+site_url: https://mduphl.github.io/bohra/
+
+theme:
+  name: material
+  palette:
+      primary: blue grey
+  icon:
+      repo: fontawesome/brands/github-alt
+  
+features:
+    - content.code.copy
+    - content.code.select
+
+repo_url: https://github.com/MDU-PHL/bohra
+repo_name: MDU-PHL/bohra
+extra:
+  social:
+    - icon: fontawesome/brands/github 
+      link: https://github.com/MDU-PHL/bohra
+
+markdown_extensions:
+  - attr_list
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
