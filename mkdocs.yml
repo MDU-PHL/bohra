@@ -1,6 +1,19 @@
 site_name: bohra
 site_url: https://mduphl.github.io/bohra/
 
+nav:
+  - Home: index.md
+  - Installation: installation.md
+  - Usage:
+      - Overview: usage/overview.md
+      - Running Bohra: usage/running_bohra.md
+      - Modules: usage/modules.md
+  - Documentation:
+      - Overview: documentation/overview.md
+      - Comparative Genomics: documentation/comparative_genomics.md
+      - TB Analysis: documentation/tb_analysis.md
+  - Contributing: contributing.md
+  - License: license.md
 theme:
   name: material
   palette:
