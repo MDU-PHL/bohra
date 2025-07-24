@@ -2,7 +2,7 @@ site_name: bohra
 site_url: https://mduphl.github.io/bohra/
 
 nav:
-  - Home: index.md
+  - About: index.md
   - Installation: installation.md
   - Usage:
       - Overview: usage/overview.md
@@ -16,6 +16,7 @@ nav:
   - License: license.md
 theme:
   name: material
+  logo: images/logo.svg
   palette:
       primary: blue grey
   icon:
