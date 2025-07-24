@@ -26,7 +26,7 @@ def _download_reads_from_github(isolate_list:list, download_stub:str):
     for isolate in isolate_list:
         LOGGER.info(f"Downloading reads for {isolate}.")
         for r in [1,2]:
-            cmd = f"mkdir -p test_data/{isolate} && wget -O test_data/{isolate}/{isolate}_{r}.fastq.gz {self.download_stub}/{isolate}/{isolate}_{r}.fastq.gz"
+            cmd = f"mkdir -p test_data/{isolate} && wget -O test_data/{isolate}/{isolate}_{r}.fastq.gz {download_stub}/{isolate}/{isolate}_{r}.fastq.gz"
             LOGGER.info(f"Running : {cmd}")
             _run_subprocess(cmd = cmd)
         
