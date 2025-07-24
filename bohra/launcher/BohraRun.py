@@ -43,7 +43,8 @@ def _check_deps_installed(prefix: str) -> bool:
         LOGGER.info("Dependencies installed successfully.")
         LOGGER.info("Bohra is ready to go!")
         return True
-    
+
+
 
 def _check_keep(keep:str)->bool:
 
