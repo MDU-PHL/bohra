@@ -21,11 +21,14 @@ The pipeline is designed to be flexible and modular, allowing for inputs from pa
 
 Stand alone html reports are generated for easy sharing and visualisation of the results.
 
-### Pipelines
+### Workflow
 
+**basic**
+
+This workflow is the first step in all other workflows implmented by `bohra`. It can also be used alone as a simply quality control workflow.
 ```mermaid
 flowchart LR
-sequence --> sequence_assessment
+sequence --> [sequence_assessment](installation.md)
 sequence --> speciation
 ```
 
