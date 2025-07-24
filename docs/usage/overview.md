@@ -20,10 +20,40 @@ If you do not require speciation as part of the pipeline and already know the sp
 
 Where you are undertaking a comparative analysis (`snippy`, `ska2`, `mash`) you may also provide additional columns of relevant metadata in your input file. `bohra` will do data validation on these columns - that is up to the user. But any additional metadata provided will be visible on the tree provided in the report file.
 
- 
-## Pipelines
+### `generate_input`
 
-`bohra`
+If you have 
+* A table with a list of isolates and othe data (species or other metadata) (column 'Isolate' must be included) 
+
+AND/OR
+
+* Paths to your reads and/or contigs
+
+`bohra` can generate the input file for you. 
+
+```
+bohra generate-input --isolate_ids <table_name>.tsv --reads /path/to/reads --contigs /path/to/contigs
+```
+This will generate a file called `bohra_input.tsv` which you can use as input into `bohra`.
+
+**Note that on large file systems this may take a while**
+
+## Speciation
+
+By default `bohra` will use [`sylph`](https://sylph-docs.github.io) for speciation as it is quite quick and the database is relatively small, making it easier to install. However, this is ONLY available where your input are fastq files (as per `sylph` guidance). If you require speciation from assemblies to be undertaken, you will need to use `kraken2` as your speciation tool.
+
+## A note on databases
+
+Many bioinformatics tools require the use of a database or data collection. Where possible and appropriate, `bohra` utilises the databases that come packaged with the tools being used in order to ensure expected behaviour and consistency. However, there are cases were the user will need to supply a database path. 
+
+* `kraken2` - these databases are very large and not easily packaged for distribution with software. So the user will either need to have existing databases available or download them as part of the setup of `bohra`. This information is [here](../installation.md)
+
+* `sylph` - like the kraken2 databases this is a fairly large collection and needs to either already be available on the system or downloaded as part of the setup for `bohra`, as detailed [here](../installation.md)
+
+* `mlst` comes packaged with a collection of profiles and is ready to use. However, due to changes in licensing, the most up to data collections cannot be included. As such if you have available to you a current mlst database that is configured for use with `mlst` you can set the `BOHRA_PUBMLST_DB` and `BOHRA_BLAST_DB` environment variables as part of the setup of `bohra`, as described [here](../installation.md)
+
+
+## Pipelines
 
 ### Basic
 
@@ -39,6 +69,4 @@ Where you are undertaking a comparative analysis (`snippy`, `ska2`, `mash`) you 
 
 ### Full
 
-### C. auris
-
-COMING SOON
+### _C. auris_ (COMING SOON)
