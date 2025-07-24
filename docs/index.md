@@ -2,6 +2,7 @@
 
 ![pretty](images/bohra_doc.png)
 
+**Comprehensive sequence characterisation for microbial genomics**
 
 ## Introduction
 
@@ -11,7 +12,11 @@ It is designed to provide users with an easily accessible report of comprehensiv
 
 The pipeline is designed to be flexible and modular, allowing for inputs from paired end fastq or assemblies, with direct support for ONT coming soon.
 
+Stand alone html reports are generated for easy sharing of results and visualisation of the results
+
 ### Pipelines
+
+Need to put list here with flowdiagrams
 
 ### Etymology
 
