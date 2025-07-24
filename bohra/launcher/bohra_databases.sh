@@ -81,12 +81,12 @@ for db in "${DB_VARS[@]}"; do
         else
 
             if [[ " ${NONESSENTIAL_VARS[@]} " =~ " $db " ]]; then
-                warning_message="It seems that the environment variable $db is not set. If you do not set this variable the pipeline will default to the databases installed in the relevaant conda environments."
+                warning_message="It seems that the environment variable $db is not set. If you do not set this variable the pipeline will default to the databases installed in the relevaant conda environments or you will need to supply one at the time of running."
             else
-                warning_message="It seems that the environment variable $db is not set. You must have at least one species database for the pipeline to be able to detect species from your sequences."
+                warning_message="It seems that the environment variable $db is not set. You must have at least one species database for the pipeline to be able to detect species from your sequences - if you do not have an environment variable set you will need to provide a database path at the time of running."
             fi
             
-            echo "$db is unset or empty. It is recommended that you set these variables for optimal performance of the bohra pipeline"
+            echo "$db is unset or empty. $warning_message"
             echo "Would you like to set it now? (y/n)"
             read -r response
             if [[ "$response" == "y" ]]; then
