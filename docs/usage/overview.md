@@ -23,6 +23,7 @@ Where you are undertaking a comparative analysis (`snippy`, `ska2`, `mash`) you 
 ### `generate_input`
 
 If you have 
+
 * A table with a list of isolates and othe data (species or other metadata) (column 'Isolate' must be included) 
 
 AND/OR
