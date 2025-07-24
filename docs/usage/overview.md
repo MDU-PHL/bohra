@@ -20,7 +20,7 @@ If you do not require speciation as part of the pipeline and already know the sp
 
 Where you are undertaking a comparative analysis (`snippy`, `ska2`, `mash`) you may also provide additional columns of relevant metadata in your input file. `bohra` will do data validation on these columns - that is up to the user. But any additional metadata provided will be visible on the tree provided in the report file.
 
-### `generate_input`
+### `bohra` can generate the input file for you
 
 If you have 
 
