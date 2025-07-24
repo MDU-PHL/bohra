@@ -2,6 +2,6 @@ name: bohra-classify_pangenome
 channels:
   - conda-forge
 dependencies:
-  - r-data-table 
-  - r-ggplot2 
-  - r-optparse
+  - r-data.table=1.17.6
+  - r-ggplot2=3.5.2
+  - r-optparse=1.7.5
