@@ -75,4 +75,32 @@ Commands:
 
 It is highly recommended that you allow `bohra` to setup the required dependencies for the pipeline. 
 
-This step will setup conda environments in your `~/.conda` or `~/.miniconda3` (depending on how you have configured your `conda` installation). These environments will be prefixed 
+This step will setup conda environments in your `~/.conda` or `~/.miniconda3` (depending on how you have configured your `conda` installation). These environments will be prefixed with the name of the environment that you have installed `bohra` into. For example if you used the `environment.yml` file in step 2 your prefix will be `bohra-3pr`. This will ensure consistency and prevent duplication of environments across a file system. 
+
+This is also useful for public health users, were the versions of software and databases needs to be strictly controlled.
+
+Additionally, `bohra` depends upon either a correctly configure `kraken2` compatible database OR a `sylph` compatible database. The `bohra install-deps` command will optionally download the databases for your and also set the appropriate environment variables for you.
+
+1. Activate your environment from step 2 above
+```
+conda activate bohra-3pr
+```
+
+2. Run the bohra dependency installation
+
+```
+bohra install-deps
+```
+
+The initial creation of the conda environments may take some time. Once the environments are set up, `bohra` will try to set up your database environment variables. Although this is not essential it is HIGHLY recommended for ease of running and reproducibility. 
+
+Please be aware of the following:
+
+* If you elect to say no to setting up a `BOHRA_KRAKEN2_DB` or `BOHRA_SYLPH_DB`, you will need to provide EITHER the `--kraken2_db` OR a `--sylph_db` flag each time you run `bohra` if you wish to do speciation or use any features which depend on species (typing and AMR).
+
+* If you are happy to use the `mlst` database that comes bundled with the `mlst` [tool](https://github.com/tseemann/mlst), then you can decline setting the `BOHRA_PUBMLST_DB` and `BOHRA_BLAST_DB`.
+
+* If you are working in your own environments (`~/.conda` or `~/.miniconda`) you may be able to not set the `BOHRA_MOBSUITE_DB` environment variable. However, please note if you are setting up `bohra` in a share environment, please ensure that you have a properly set up `mob_suite` database and provide this path when requested during set up. See section on `mobsuite` installation below.
+
+* If you already have a kraken2 database and/or a sylph database you can press 'n' when asked if you want to download. If you select 'y' please make sure that you have enough storage space for the databases. Some are quite large, up to 600 GB (half-terabyte).
+
