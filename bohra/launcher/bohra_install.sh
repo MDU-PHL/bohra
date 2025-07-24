@@ -121,7 +121,8 @@ for key in "${!TOOLS[@]}";do
 #     # continue
     
     done
-
+echo "All conda environments have been set up."
+echo "Now checking if the database environment variables are set up correctly"
 # if [[ -z $KRAKEN2_DEFAULT_DB ]]; then
   
 #   echo KRAKEN2_DEFAUT_DB is undefined. Would you like to download babykraken database?
