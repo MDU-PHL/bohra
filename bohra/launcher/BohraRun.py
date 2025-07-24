@@ -12,6 +12,7 @@ import pathlib
 import os
 import logging
 import datetime
+import subprocess
 
 # Logger
 LOGGER =logging.getLogger(__name__) 
@@ -26,6 +27,23 @@ fh.setFormatter(formatter)
 LOGGER.addHandler(ch) 
 LOGGER.addHandler(fh)
 
+
+def _check_deps_installed(prefix: str) -> bool:
+    script_path = f"{pathlib.Path(__file__).parent}"
+    LOGGER.info(f"Will now check if dependencies are installed.")
+    process = subprocess.Popen(['bash', f"{script_path}/bohra_install.sh", f"{prefix}", "no"], stdout=subprocess.PIPE, encoding='utf-8')
+    while process.poll() is None:
+        l = process.stdout.readline().strip() # This blocks until it receives a newline.
+        LOGGER.info(f"{l}")
+
+    if process.returncode != 0:
+        LOGGER.warning(f"It seems that not all dependencies are installed. It is highly recommended to run `bohra install-deps` to install all dependencies. Otherwise nextflow will create conda environments for each analysis. This may result in unexpected behaviour.")
+        # raise SystemError
+    else:
+        LOGGER.info("Dependencies installed successfully.")
+        LOGGER.info("Bohra is ready to go!")
+        return True
+    
 
 def _check_keep(keep:str)->bool:
 

@@ -27,7 +27,7 @@ def install_dependencies(prefix):
     """
     script_path = f"{pathlib.Path(__file__).parent}"
     LOGGER.info(f"Will now try to install dependencies. Please be patient this may take some time!!... Maybe get coffee.")
-    process = subprocess.Popen(['bash', f"{script_path}/bohra_install.sh", f"{prefix}"], stdout=subprocess.PIPE, encoding='utf-8')
+    process = subprocess.Popen(['bash', f"{script_path}/bohra_install.sh", f"{prefix}", "yes"], stdout=subprocess.PIPE, encoding='utf-8')
     while process.poll() is None:
         l = process.stdout.readline().strip() # This blocks until it receives a newline.
         print(f"{l}")

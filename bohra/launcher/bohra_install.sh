@@ -4,8 +4,7 @@
 # possible installations that the user has.
 
 ENV_PREFIX=$1
-UPDATE=$2
-
+INSTALL=$2
 # abort if any step fails
 set -e
 # resets to base env
@@ -78,12 +77,16 @@ declare -A TOOLS=([$ENV_PREFIX-csvtk]="csvtk=0.33"
 
 )
 
+DEPS_INSTALLED=0
+
 for key in "${!TOOLS[@]}";do
     # do echo "$key - ${TOOLS[$key]}"
     echo Checking set up for $key
     su=$(check_installation $key)
     if [[ $su -eq 1 ]]
         then
+            if [[ "$INSTALL" == "yes"]] 
+            then
             echo $key can not be found. Now setting up $key
             echo Will now run $INSTALLER create --force -y -n $key ${TOOLS[$key]}
             $INSTALLER create --force -y -n $key ${TOOLS[$key]}
@@ -115,6 +118,10 @@ for key in "${!TOOLS[@]}";do
                 pip3 install git+https://github.com/kristyhoran/datasmryzr
                 # continue
             fi
+            else
+                echo "$key is not installed. If you want to install it please run bohra install-deps. Please note if you do not wish to install, then nextflow will create conda environments for each analsysis. This is not the preferred behaviour."
+                DEPS_INSTALLED=1
+            fi
         else
             echo $key is already setup. Nothing left to do
         fi
@@ -123,6 +130,8 @@ for key in "${!TOOLS[@]}";do
     done
 echo "All conda environments have been set up."
 echo "Now checking if the database environment variables are set up correctly"
+
+
 # if [[ -z $KRAKEN2_DEFAULT_DB ]]; then
   
 #   echo KRAKEN2_DEFAUT_DB is undefined. Would you like to download babykraken database?
