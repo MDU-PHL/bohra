@@ -37,7 +37,7 @@ def _check_deps_installed(prefix: str) -> bool:
         LOGGER.info(f"{l}")
 
     if process.returncode != 0:
-        LOGGER.warning(f"It seems that not all dependencies are installed. It is highly recommended to run `bohra install-deps` to install all dependencies. Otherwise nextflow will create conda environments for each analysis. This may result in unexpected behaviour.")
+        LOGGER.warning(f"It seems that not all dependencies are installed. It is highly recommended to run `bohra install-deps` to install all dependencies prior to running this pipeline. Otherwise nextflow will create conda environments for each analysis. This may result in unexpected behaviour and lots of environments.")
         # raise SystemError
     else:
         LOGGER.info("Dependencies installed successfully.")
