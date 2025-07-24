@@ -68,12 +68,12 @@ def run_tests():
         _download_reads_from_github(download_stub=download_stub, isolate_list=isolate_list)
         LOGGER.info(f"Reads have been downloaded to {read_path}.")
         LOGGER.info(f"Now generating the input file from the reads.")
-        find_data(reads = True,contigs=False,isolate_ids =isolate_list ,path = read_path)
+        find_data(reads = f"{read_path}",contigs="",isolate_ids =isolate_list )
         
     elif _check_test_data(path = read_path, isolate_list = isolate_list):
-        find_data(reads = True,contigs=False,isolate_ids =isolate_list ,path = read_path)
+        find_data(reads = f"{read_path}",contigs="",isolate_ids =isolate_list )
         
-    cmd = f"bohra run full -i isolates.tab -r {reference} --proceed Y"
+    cmd = f"bohra run full -i bohra_input.tsv -r {reference} --proceed Y"
     LOGGER.info(f"Now testing that the bohra installation has worked.")
     proc = _run_subprocess(cmd=cmd)
 
