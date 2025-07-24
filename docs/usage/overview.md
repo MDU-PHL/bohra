@@ -55,19 +55,3 @@ Many bioinformatics tools require the use of a database or data collection. Wher
 
 
 ## Pipelines
-
-### Basic
-
-### Assemble
-
-### Comparative
-
-### AMR and typing
-
-### TB
-
-### Default
-
-### Full
-
-### _C. auris_ (COMING SOON)
