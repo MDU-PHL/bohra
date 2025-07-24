@@ -85,7 +85,7 @@ for key in "${!TOOLS[@]}";do
     su=$(check_installation $key)
     if [[ $su -eq 1 ]]
         then
-            if [[ "$INSTALL" == "yes"]] 
+            if [ "$INSTALL" == "yes" ]
             then
             echo $key can not be found. Now setting up $key
             echo Will now run $INSTALLER create --force -y -n $key ${TOOLS[$key]}
