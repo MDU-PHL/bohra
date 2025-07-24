@@ -51,7 +51,7 @@ Many bioinformatics tools require the use of a database or data collection. Wher
 
 * `sylph` - like the kraken2 databases this is a fairly large collection and needs to either already be available on the system or downloaded as part of the setup for `bohra`, as detailed [here](../installation.md)
 
-* `mlst` comes packaged with a collection of profiles and is ready to use. However, due to changes in licensing, the most up to data collections cannot be included. As such if you have available to you a current mlst database that is configured for use with `mlst` you can set the `BOHRA_PUBMLST_DB` and `BOHRA_BLAST_DB` environment variables as part of the setup of `bohra`, as described [here](../installation.md)
+* `mlst` comes packaged with a collection of profiles and is ready to use. However, due to changes in licensing, the most up to date profiles cannot be included. As such if you have available to you a current mlst database that is configured for use with `mlst` you can set the `BOHRA_PUBMLST_DB` and `BOHRA_BLAST_DB` environment variables as part of the setup of `bohra`, as described [here](../installation.md)
 
 
 ## Pipelines
