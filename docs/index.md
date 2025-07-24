@@ -1,12 +1,12 @@
 # Welcome to bohra documentation
 
-NEED A FIGURE HERE
+![pretty](images/bohra_doc.png)
 
 ## Introduction
 
 Bohra is microbial genomics pipeline, designed predominantly for use in public health, but may also be useful in research settings. 
 
-
+It is designed to provide users with comprehensive analysis of bacterial sequence data to for characterisation of single samples or for outbreaks or population investigations. 
 
 ### Etymology
 
