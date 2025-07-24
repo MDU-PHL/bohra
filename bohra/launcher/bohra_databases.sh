@@ -10,7 +10,7 @@ eval "$(conda shell.bash hook)"
 
 
 DB_VARS=("BOHRA_KRAKEN2_DB" "BOHRA_SYLPH_DB" "BOHRA_PUBMLST_DB" "BOHRA_BLAST_DB" "BOHRA_MOBSUITE_DB")
-
+NONESSENTIAL_VARS=("BOHRA_PUBMLST_DB" "BOHRA_BLAST_DB" "BOHRA_MOBSUITE_DB") 
 declare -A DB_URL=(
     [1]="https://genome-idx.s3.amazonaws.com/kraken/k2_standard_20250402.tar.gz",
     [2]="https://genome-idx.s3.amazonaws.com/kraken/k2_standard_08gb_20250402.tar.gz",
@@ -21,7 +21,7 @@ declare -A DB_URL=(
     [7]="https://genome-idx.s3.amazonaws.com/kraken/k2_gtdb_genome_reps_20250609.tar.gz"
 
 )
-echo "Do you want to download database for kraken2? (y/n)"
+echo "Do you need to download database for kraken2? (y/n)"
 read -r response
 if [[ "$response" == "y" ]]; then
     echo "Please select a database to download:"
@@ -55,7 +55,7 @@ else
     echo "Skipping database download."
 fi
 
-echo "Do you want to download a database for SYLPH? (y/n)"
+echo "Do you need to download a database for SYLPH? (y/n)"
 read -r response
 if [[ "$response" == "y" ]]; then
     echo "Downloading SYLPH database"
@@ -79,7 +79,15 @@ for db in "${DB_VARS[@]}"; do
         if [ -v "${db}" ]; then
             echo "$db is set and not empty."
         else
-            echo "$db is unset or empty. It is recommended that you set these variables for optimal performance of the bohra pipeline. Would you like to set it now? (y/n)"
+
+            if [[ " ${NONESSENTIAL_VARS[@]} " =~ " $db " ]]; then
+                warning_message="It seems that the environment variable $db is not set. If you do not set this variable the pipeline will default to the databases installed in the relevaant conda environments."
+            else
+                warning_message="It seems that the environment variable $db is not set. You must have at least one species database for the pipeline to be able to detect species from your sequences."
+            fi
+            
+            echo "$db is unset or empty. It is recommended that you set these variables for optimal performance of the bohra pipeline"
+            echo "Would you like to set it now? (y/n)"
             read -r response
             if [[ "$response" == "y" ]]; then
                 echo "Please enter a value for $db:"
