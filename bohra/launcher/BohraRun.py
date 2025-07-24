@@ -124,7 +124,7 @@ def run_bohra(
     max_cpus = int(_set_cpu_limit_local(cpus=kwargs.get('cpus', 0)))
     LOGGER.info(f"Using {int(max_cpus)} CPUs for the {pipeline} pipeline.")
 
-    command = _init_command_dict(profile=profile, cpus=max_cpus, job_name = kwargs.get('job_name', 'bohra'), prefix=kwargs.get('prefix', 'bohra'))
+    command = _init_command_dict(profile=profile, cpus=max_cpus, job_name = kwargs.get('job_name', 'bohra'), prefix=kwargs.get('conda_prefix', 'bohra'))
     LOGGER.info(f"Checking if report directory needs to archived.")
     _check_keep(keep = kwargs["keep"])
     if _make_workdir(workdir=kwargs["workdir"],   
