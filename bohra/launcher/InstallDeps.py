@@ -39,5 +39,23 @@ def install_dependencies(prefix):
         LOGGER.info("Dependencies installed successfully.")
         LOGGER.info("Bohra is ready to go!")
         return True
-        
+
+def check_databases(prefix: str) -> bool:
+    """
+    Check if databases are installed.
+    """
+    script_path = f"{pathlib.Path(__file__).parent}"
+    LOGGER.info(f"Checking if databases are installed.")
+    process = subprocess.Popen(['bash', f"{script_path}/bohra_databases.sh",prefix], stdout=subprocess.PIPE, encoding='utf-8')
+    while process.poll() is None:
+        l = process.stdout.readline().strip() # This blocks until it receives a newline.
+        LOGGER.info(f"{l}")
+
+    if process.returncode != 0:
+        LOGGER.error(f"Error checking databases: {process.returncode}")
+        raise SystemError
+    else:
+        LOGGER.info("Databases checked successfully.")
+        return True
+
         

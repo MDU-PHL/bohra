@@ -1,7 +1,7 @@
 import click
 
 
-from bohra.launcher.InstallDeps import install_dependencies
+from bohra.launcher.InstallDeps import install_dependencies, check_databases
 
 @click.command()
 @click.option('--prefix','-p',
@@ -29,8 +29,7 @@ def install_deps(prefix, install_deps, databases):
         print("Skipping installation of dependencies.")
     if databases:
         print("Checking for databases...")
+        check_databases(prefix=prefix)
     else:
         print("Skipping database checks.")  
-    # Add the code to check dependencies here
-    # This is a placeholder for the actual implementation
     
