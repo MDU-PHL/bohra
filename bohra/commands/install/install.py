@@ -1,12 +1,15 @@
 import click
-
+import pathlib
+import os
 
 from bohra.launcher.InstallDeps import install_dependencies, check_databases
 
+
 @click.command()
 @click.option('--prefix','-p',
-              default='bohra',
-              help='The prefix for your environments, this will be used to create the conda environments for each process. The default is \'bohra\'')
+              default=f"{pathlib.Path(os.environ['CONDA_PREFIX']).name}" if os.environ['CONDA_PREFIX'] != "" else 'bohra',
+              help='The prefix for your environments, this will be used to create the conda environments for each process.',
+              show_default=True)
 @click.option('--install-deps/--no-install-deps', 
               is_flag=True, 
               default=True,
