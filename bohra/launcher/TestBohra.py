@@ -73,7 +73,7 @@ def run_tests():
     elif _check_test_data(path = read_path, isolate_list = isolate_list):
         find_data(reads = f"{read_path}",contigs="",isolate_ids ="" )
         
-    cmd = f"bohra run full -i bohra_input.tsv -r {reference} --proceed Y"
+    cmd = f"bohra run full -i bohra_input.tsv -ref {reference} --proceed Y"
     LOGGER.info(f"Now testing that the bohra installation has worked.")
     proc = _run_subprocess(cmd=cmd)
 
