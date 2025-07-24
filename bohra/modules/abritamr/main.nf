@@ -101,9 +101,9 @@ process ABRITAMR_INFER {
     
     if ( params.enable_conda ) {
         if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/bohra-abritamr"
+            conda "${params.conda_path}/${params.conda_prefix}-abritamr"
         } else {
-            conda 'bioconda::bioconda::abritamr'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null
