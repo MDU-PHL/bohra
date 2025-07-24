@@ -10,7 +10,11 @@
 | r1 | The path to read 1 | If an assembly file is not supplied you must supply reads | 
 | r2 | The path to read 2 | If an assembly file is not supplied you must supply reads |
 | assembly | The path to the assembly for the isolate | If reads are not supplied you must supply an assembly file |
-| species | The expected species of the sample. If you do not require speciation as part of the pipeline and already know the species, you can provide it here. Please note if no speciation is undertaken, `bohra` will use this value to undertake typing and AMR mechanisms/inferrence. If the species in this column is NOT accurate - unexpected results may occur. Furthermore if your analysis includes control sequences you can provide that information here (`control`) and the sequence will not be included in any comparative analysis. | No |
+| species | The expected species of the sample or 'control'.  | No |
+
+### Species column
+
+If you do not require speciation as part of the pipeline and already know the species, you can provide it here. Please note if no speciation is undertaken, `bohra` will use this value to undertake typing and AMR mechanisms/inferrence. If the species in this column is NOT accurate - unexpected results may occur. Furthermore if your analysis includes control sequences you can provide that information here (`control`) and the sequence will not be included in any comparative analysis.
 
 ### Annotation
 
