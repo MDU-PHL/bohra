@@ -168,6 +168,9 @@ def _get_common_options() -> list:
     :return: list of options
     """
 
+    prefix = f"{pathlib.Path(os.getenv('CONDA_PREFIX', ''))}"
+    prefix = f"{pathlib.Path(prefix).name}" if prefix else 'bohra'
+
     common_options = [
         {
             "name":"input_file",
@@ -220,7 +223,7 @@ def _get_common_options() -> list:
         {
             "name":"conda_prefix",
             "help":"The prefix for the conda environments to be used for each process. Default is 'bohra'.",
-            "default":"bohra",
+            "default":prefix,
             "show_default":True
         }
         ]
