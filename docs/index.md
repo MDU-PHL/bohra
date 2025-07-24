@@ -23,7 +23,11 @@ Stand alone html reports are generated for easy sharing and visualisation of the
 
 ### Pipelines
 
-Need to put list here with flowdiagrams
+```mermaid
+flowchart LR
+sequence --> sequence_assessment
+sequence --> speciation
+```
 
 ### Etymology
 
