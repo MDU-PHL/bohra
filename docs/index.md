@@ -28,7 +28,7 @@ Stand alone html reports are generated for easy sharing and visualisation of the
 This workflow is the first step in all other workflows implmented by `bohra`. It can also be used alone as a simply quality control workflow.
 ```mermaid
 flowchart LR
-sequence --> [sequence_assessment](installation.md)
+sequence --> sequence_assessment
 sequence --> speciation
 ```
 
