@@ -74,11 +74,11 @@ def run_tests():
         find_data(reads = f"{read_path}",contigs="",isolate_ids ="" )
         
     cmd = f"bohra run full -i bohra_input.tsv -ref {reference} --proceed Y"
-    LOGGER.info(f"Now testing that the bohra installation has worked.")
+    LOGGER.info(f"Now testing that the bohra installation has worked. Running command: {cmd}")
     proc = _run_subprocess(cmd=cmd)
 
     if proc.returncode == 0:
         LOGGER.info(f"bohra test has completed successfully!!")
     else:
-        LOGGER.critical(f"bohra run was not successful... please raise an issue on github.")
+        LOGGER.critical(f"bohra run was not successful... The following error was reported : {proc.stderr}. Please raise an issue on github.")
 
