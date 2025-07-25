@@ -21,7 +21,7 @@ The pipeline is designed to be flexible and modular, allowing for inputs from pa
 
 Stand alone html reports are generated for easy sharing and visualisation of the results.
 
-### Workflows
+## Workflows
 
 `bohra` is a flexible pipeline and allows users to customise the workflows used. Below is an overview of each workflow. More detail on tools and options for each workflow can be found [here](usage/modules.md). Further explanations and detailed guides can be found [here](guides/overview.md)
 
@@ -100,6 +100,6 @@ variant_detection --> alignment --> tree_generation --> report
 ```
 
 
-### Etymology
+## Etymology
 
 The name 'bohra', is the name of an exinct species of tree kangaroo that lived on the Nullarbor plain in Australia was chosen to reflect the fact that it was originally developed to used to build trees, relies on [snippy](https://github.com/tseemann/snippy) (named for a very famous kangaroo) and was inspired by [nullarbor](https://github.com/tseemann/nullarbor).
