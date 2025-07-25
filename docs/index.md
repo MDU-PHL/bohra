@@ -73,7 +73,30 @@ This workflow undertakes a comparative anaysis of all the sequences included in 
 
 ```mermaid
 flowchart LR
-sequence --> sequence_assessment -- reference_based -> alignment
+sequence --> sequence_assessment --> report
+sequence --> speciation --> report
+sequence --> variant_detection --> distances --> cluster --> report
+variant_detection --> alignment --> tree_generation --> report
+```
+
+**full**
+
+The full workflow includes all the workflows outlined above with the addition of pangenome analysis using `panaroo`.
+
+```mermaid
+flowchart LR
+fastq --> assembly --> annotation --> sequence_assessment
+assembly --> speciation
+fastq --> sequence_assessment --> report
+fastq --> speciation --> report
+speciation --> typing --> report
+assembly --> typing
+speciation --> AMR --> report
+assembly --> AMR
+assembly --> pangenome --> report
+assembly -- "only possible with reference free" --> variant_detection
+fastq --> variant_detection --> distances --> cluster --> report
+variant_detection --> alignment --> tree_generation --> report
 ```
 
 
