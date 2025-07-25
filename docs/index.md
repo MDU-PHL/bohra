@@ -23,7 +23,7 @@ Stand alone html reports are generated for easy sharing and visualisation of the
 
 ## Workflows
 
-`bohra` is a flexible pipeline and allows users to customise the workflows used. Below is an overview of each workflow. More detail on tools and options for each workflow can be found [here](usage/modules.md). Further explanations and detailed guides can be found [here](guides/overview.md)
+`bohra` is a flexible pipeline and allows users to customise the workflows used. Below is an overview of each workflow. More detail on tools and options for each workflow can be found [here](usage/running_bohra.md) and [here](usage/modules.md). Further explanations and detailed guides can be found [here](guides/overview.md)
 
 **basic**
 
@@ -99,6 +99,18 @@ fastq --> variant_detection --> distances --> cluster --> report
 variant_detection --> alignment --> tree_generation --> report
 ```
 
+**tb**
+
+`bohra` now has a _M. tuberulosis_ specific workflow, which does not run MLST or other assembly based tools. And undertakes _M. tuberculosis_ relevant gDST. It uses the H37rV reference genome, masking repetitive sites and `tbtAMR` for generation of an inferred antibiogram.
+```mermaid
+flowchart LR
+fastq --> sequence_assessment --> report
+fastq --> speciation --> report
+speciation --> lineage --> report
+fastq --> AMR --> report
+fastq --> variant_detection --> distances --> cluster --> report
+variant_detection --> alignment --> tree_generation --> report
+```
 
 ## Etymology
 
