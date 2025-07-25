@@ -21,7 +21,9 @@ The pipeline is designed to be flexible and modular, allowing for inputs from pa
 
 Stand alone html reports are generated for easy sharing and visualisation of the results.
 
-### Workflow
+### Workflows
+
+`bohra` is a flexible pipeline and allows users to customise the workflows used. Below is an overview of each workflow. More detail on tools and options for each workflow can be found [here](usage/modules.md). Further explanations and detailed guides can be found [here](guides/overview.md)
 
 **basic**
 
@@ -64,6 +66,16 @@ assembly --> typing
 speciation --> AMR --> report
 assembly --> AMR
 ```
+
+**comparative analysis**
+
+This workflow undertakes a comparative anaysis of all the sequences included in the analysis. You can use reference based alignments with `snippy` or you can use reference free approaches with `mash` and `ska2`. 
+
+```mermaid
+flowchart LR
+sequence --> sequence_assessment -- reference_based -> alignment
+```
+
 
 ### Etymology
 
