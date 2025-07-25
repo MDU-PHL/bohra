@@ -25,11 +25,44 @@ Stand alone html reports are generated for easy sharing and visualisation of the
 
 **basic**
 
-This workflow is the first step in all other workflows implmented by `bohra`. It can also be used alone as a simply quality control workflow.
+This workflow will run on fastq and/or fasta (depending user supplied input) and is the first step in all other workflows implmented by `bohra`. It can also be used alone as a simply quality control workflow.
 ```mermaid
 flowchart LR
-sequence --> sequence_assessment
-sequence --> speciation
+sequence --> sequence_assessment --> report
+sequence --> speciation --> report
+```
+
+**assembly**
+
+This workflow will simple generate assemblies from paired-end fastq, run basic genome annotation with `prokka` and assess the quality of both the input reads and the resulting assemblies. This workflow forms the basis for amr, typing and pangenome analysis.
+
+```mermaid
+flowchart LR
+fastq --> assembly --> annotation --> sequence_assessment
+assembly --> speciation
+fastq --> sequence_assessment --> report
+fastq --> speciation --> report
+
+```
+
+**amr and typing**
+
+This workflow will use user supplied species or the species detected in the sequence to determine the appropriate typing and AMR pipeline to use. Additional inferrence of genomic DST/AST will be undertaken for _S. enterica_ and _M. tuberculosis_.
+
+If assembly is required and fastq are used as input - the assembly workflow will be triggered. 
+
+Note that for AMR and gDST in _M. tuberculosis_ paired-end fastq are required. We recommend to use the `bohra run tb` workflow for _M. tuberculosis_.
+
+```mermaid
+flowchart LR
+fastq --> assembly --> annotation --> sequence_assessment
+assembly --> speciation
+fastq --> sequence_assessment --> report
+fastq --> speciation --> report
+speciation --> typing --> report
+assembly --> typing
+speciation --> AMR --> report
+assembly --> AMR
 ```
 
 ### Etymology
