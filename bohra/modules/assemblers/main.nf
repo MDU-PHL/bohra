@@ -43,9 +43,16 @@ process ASSEMBLER_PE {
             echo "No assembly file found" >> assembly.log
         fi
         """
-    else if ( meta.asm == "not_supplied" && params.assembler == "shovill" ) {
+    else if ( meta.asm == "not_supplied" && params.assembler == "shovill_spades" ) {
         """
         shovill --R1 ${reads[0]} --R2 ${reads[1]} --outdir current --cpus $task.cpus --ram 16 
+        cp current/contigs.fa contigs.fa
+        version=\$(shovill --version)
+        echo -e shovill'\t'\$CONDA_PREFIX'\t'\$(shovill -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
+        """
+    } else if ( meta.asm == "not_supplied" && params.assembler == "shovill_skesa" ) {
+        """
+        shovill --R1 ${reads[0]} --R2 ${reads[1]} --outdir current --cpus $task.cpus --ram 16 --assembler skesa
         cp current/contigs.fa contigs.fa
         version=\$(shovill --version)
         echo -e shovill'\t'\$CONDA_PREFIX'\t'\$(shovill -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt

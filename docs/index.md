@@ -58,13 +58,13 @@ Note that for AMR and gDST in _M. tuberculosis_ paired-end fastq are required. W
 ```mermaid
 flowchart LR
 fastq --> assembly --> annotation --> sequence_assessment
+assembly --> typing
+assembly --> AMR
 assembly --> speciation
+speciation --> typing --> report
+speciation --> AMR --> report
 fastq --> sequence_assessment --> report
 fastq --> speciation --> report
-speciation --> typing --> report
-assembly --> typing
-speciation --> AMR --> report
-assembly --> AMR
 ```
 
 **comparative analysis**

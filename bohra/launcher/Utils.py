@@ -251,9 +251,9 @@ def _get_cmd_options() -> dict:
             {
                 "name":"assembler",
                 "short_name":"-a",
-                "help":"Assembler to use (shovill uses spades > 3.14 < 4 with --isolate mode).",
-                "default":"shovill",
-                "type":click.Choice(['shovill', 'skesa', 'spades'])
+                "help":"Assembler to use (shovill_spades uses spades > 3.14 < 4 with --isolate mode).",
+                "default":"shovill_spades",
+                "type":click.Choice(['shovill_spades','shovill_skesa', 'skesa', 'spades'])
             },
             {
                 "name":"spades_args",
