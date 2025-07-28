@@ -96,3 +96,13 @@ bohra run comparative -i input_file.tsv -j my_snippy_pipeline -ref <path_to_refe
 ```
 bohra run comparative -i input_file.tsv -j my_snippy_pipeline --comparative_tool ska2 --cluster_method complete --cluster_threshold 6,26
 ```
+
+### full
+
+Like the `comparative` pipeline, you can select the comparative tool, tree builder, cluster methods, and thresholds. In addition, this pipeline will undertake the assembly, amr and typing described above and additional pangenome analysis.
+
+For example
+
+```
+bohra run full -i input_file.tsv -j my_snippy_pipeline -ref <path_to_reference.fa(gbk)> --tree_builder iqtree --cluster_threshold 6,26
+```
