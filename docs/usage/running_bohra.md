@@ -94,7 +94,7 @@ bohra run comparative -i input_file.tsv -j my_snippy_pipeline -ref <path_to_refe
 ```
 **ska2 (distance and veryfastree) and cluster at a threshold of <= 5 and <= 25, using complete linkage**
 ```
-bohra run comparative -i input_file.tsv -j my_snippy_pipeline --comparative_tool ska2 --cluster_method complete --cluster_threshold 6,26
+bohra run comparative -i input_file.tsv -j my_ska2_pipeline --comparative_tool ska2 --cluster_method complete --cluster_threshold 6,26
 ```
 
 ### full
@@ -104,5 +104,13 @@ Like the `comparative` pipeline, you can select the comparative tool, tree build
 For example
 
 ```
-bohra run full -i input_file.tsv -j my_snippy_pipeline -ref <path_to_reference.fa(gbk)> --tree_builder iqtree --cluster_threshold 6,26
+bohra run full -i input_file.tsv -j my_full_pipeline -ref <path_to_reference.fa(gbk)> --tree_builder iqtree --cluster_threshold 6,26
+```
+
+### tb
+
+The `tb` pipeline will run tools specific for _M. tuberculosis_, using `tbtAMR` (WHO v2 catalogue) for inferrence of resistance and the H37rV reference genome and mask
+
+```
+bohra tb -i input_file.tsv -j my_tb_pipeline
 ```
