@@ -82,7 +82,13 @@ process ABRITAMR_GENERAL {
     """
     echo "ISOLATE,SPECIES_EXP,SPECIES_OBS,TEST_QC\n${meta.id},${meta.species},${meta.species},PASS" > qc.tmp.csv
     abritamr report -q qc.tmp.csv -r bohra -m $summary_matches -p $summary_partials --sop general --sop_name reportable
-    csvtk xlsx2csv -n reportable bohra_reportable.xlsx | csvtk rename -f 'MDU sample ID,Resistance genes (alleles) detected,Resistance genes (alleles) det (non-rpt)' -n 'Isolate,Reportable AMR mechanisms,Other AMR mechanisms' | csvtk cut -f 'Isolate,Reportable AMR mechanisms,Other AMR mechanisms' |  csvtk csv2tab > reportable_amr_matches.txt
+    csvtk xlsx2csv -n reportable bohra_reportable.xlsx | csvtk rename -f 'MDU sample ID,Resistance genes (alleles) detected,Resistance genes (alleles) det (non-rpt)' -n 'Isolate,Reportable AMR mechanisms,Other AMR mechanisms' | csvtk cut -f 'Isolate,Reportable AMR mechanisms,Other AMR mechanisms' |  csvtk csv2tab > reportable_amr_matches_tmp.txt
+    sed -i 's/CPase_ESBL_AmpC_16S_NEG//g' reportable_amr_matches_tmp.txt
+    sed -i 's/CPase_ESBL_AmpC_16S_NEG//g' reportable_amr_matches_tmp.txt
+    sed -i 's/Mec_VanAB_Linez_NEG//g' reportable_amr_matches_tmp.txt
+    sed -i 's/Van_Linez_NEG//g' reportable_amr_matches_tmp.txt
+    sed -i 's/CPase_16S_mcr_NEG//g' reportable_amr_matches_tmp.txt
+    mv reportable_amr_matches_tmp.txt reportable_amr_matches.txt
     """
     
 }

@@ -81,8 +81,8 @@ def make_comment(comments:list) -> str:
 def _generate_summary_table(results_files: list, output:list, min_depth:40, minquality : 30, minaln:70) -> list:
     print("Generating summary table")
     list_of_filename = {
-        "read_assessment.txt" : ["Isolate","Reads","GC content", "Est average depth", "is_control", "filesize", "Qscore"],
-        "assembly_assessment.txt":["Isolate","bp","# Contigs","N50"],
+        "read_assessment.txt" : ["Isolate","Reads","GC", "Depth", "is_control", "filesize", "Qscore"],
+        "assembly_assessment.txt":["Isolate","Length","# Contigs","Assembly N50"],
         "core_genome_stats.txt":["Isolate","% Aligned"],
         "speciation.txt":["Isolate","Species (reads)","Match 1 (reads)", "Match 1 (asm)"],
         "mlst.txt":["Isolate","Scheme","ST"],
@@ -107,12 +107,14 @@ def _generate_summary_table(results_files: list, output:list, min_depth:40, minq
                 summary = df
             else:
                 summary = pd.merge(summary, df, how = 'outer', on = "Isolate")
+    summary["Comment"] = ""
+    summary["Data assessment"] = 1
     summary["is_control"] = summary["is_control"].fillna(False)
     summary = summary.fillna("")
     summary = summary.rename(columns = {"Match 1 (reads)":"Species (reads)","Match 1 (asm)":"Species (assembly)"})
     if 'ST' in summary.columns:
         summary['ST'] = summary['ST'].apply(lambda x: str(int(x)) if not isinstance(x, str) else x)
-    int_cols = ["Reads","bp","# Contigs","N50", "Est"]
+    int_cols = ["Reads","Length","# Contigs","Assembly N50", "Est"]
     for i in int_cols:
         if i in summary.columns:
             summary[i] = summary[i].apply(lambda x: int(x) if x != "" else "")
@@ -124,8 +126,8 @@ def _generate_summary_table(results_files: list, output:list, min_depth:40, minq
     if "filesize" in summary.columns:
         summary["File size check"] = summary[["filesize","Reads"]].apply(lambda x: check_filesize(x), axis=1)
         print(summary)
-    if "Est average depth" in summary.columns:
-        summary["Coverage check"] = summary[["Est average depth","is_control"]].apply(lambda x: check_val(x, min_depth, "Avg depth"),axis=1)
+    if "Depth" in summary.columns:
+        summary["Coverage check"] = summary[["Depth","is_control"]].apply(lambda x: check_val(x, min_depth, "Avg depth"),axis=1)
     if "% Aligned" in summary.columns:
         summary["Alignment check"] = summary[["% Aligned", "is_control"]].apply(lambda x:check_val(x, minaln, "Alignment %"), axis=1)
 
@@ -366,11 +368,13 @@ def _run_datasmryzr(tree:str,
                     pangenome_classification:str,
                     pangenome_rtab:str,
                     pangenome_groups:str,
-                    read_assessment) -> str:    
+                    read_assessment,
+                    pipeline:str,
+                    pipeline_version:str) -> str:    
     """
     Run the datasmryzr pipeline
     """
-    cmd = f"datasmryzr --title '{job_id}' -c bohra_config.json -bg '{bkgd_color}' -fc '{text_color}' {other_files} {pangenome_classification} {pangenome_rtab} {pangenome_groups} {tree} {distance_matrix} {core_genome} {core_genome_report} {reference} {mask} {annotation}"
+    cmd = f"datasmryzr --title '{job_id}' -c bohra_config.json -bg '{bkgd_color}' -fc '{text_color}' --pipeline {pipeline} --pipeline_version '{pipeline_version}' {other_files} {pangenome_classification} {pangenome_rtab} {pangenome_groups} {tree} {distance_matrix} {core_genome} {core_genome_report} {reference} {mask} {annotation}"
     print(cmd)
     p = subprocess.run(cmd, shell=True, capture_output=True)
     if p.returncode != 0:
@@ -448,7 +452,19 @@ def generate_config(cluster_method:str,
         
 
     
-
+def get_pipeline_version(results_files: list) -> str:
+    """
+    Get the pipeline version from the results files
+    """
+    for file in results_files:
+        try:
+            if pathlib.Path(file).exists() and "version" in file:
+                versions = pd.read_csv(file, sep = '\t')
+                version = versions[versions['tool'] == 'bohra']['version'].values
+                return version[0] if len(version) > 0 else "not provided"
+        except Exception as e:
+            print(f"Error reading file {file}: {e}")
+            return "not provided"
 
 def _compile(args):
     # print(f"{args.annot_cols}")
@@ -475,6 +491,7 @@ def _compile(args):
     mask = _get_mask(args.mask)
     annotation = _make_annotation_file(args.input_file, results_files, f"{args.annot_cols}")
     generate_config(args.cluster_method, args.cluster_threshold, args.pangenome_groups, args.kraken2_db, 'kraken2' if args.speciation == 'true' else "sylph", args.launchdir, args.reference)
+    pipeline_version = get_pipeline_version(args.results_files)
     p = _run_datasmryzr(tree,
                         distance_matrix,
                         core_genome,
@@ -489,7 +506,9 @@ def _compile(args):
                         panclass,
                         panrtab,
                         pangroups,
-                        read_assessment)
+                        read_assessment,
+                        args.pipeline,
+                        pipeline_version)
     
 
 
@@ -546,7 +565,10 @@ def set_parsers():
     help = '',
     default = ''
     )
- 
+    parser.add_argument('--pipeline',
+    help = '',
+    default = ''
+    )
     
     parser.set_defaults(func=_compile)
     args = parser.parse_args()

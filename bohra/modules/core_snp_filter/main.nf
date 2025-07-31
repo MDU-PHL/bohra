@@ -29,10 +29,11 @@ process CORE_SNP_FILTER {
     output:
     // tuple val(meta), path("${meta.id}/*"), emit: snippy_dir
     path("core.filtered.aln"), emit: aln
+    path("core_snp_table.tsv"), emit: table
     path("version_coresnp.txt"), emit: version
     script:
     """
-    coresnpfilter -c ${params.fuzzy_core_prop} -e $core_full_aln > core.filtered.aln 
+    coresnpfilter -c ${params.fuzzy_core_prop} --table core_snp_table.tsv -e $core_full_aln > core.filtered.aln 
     echo -e core-snp-filter'\t'\$CONDA_PREFIX'\t'\$(coresnpfilter --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_coresnp.txt
     """
     

@@ -3,7 +3,7 @@ import pathlib, subprocess, sys, pandas, numpy
 
 import pandas, pathlib
 
-HEADER = [f"Isolate\tbp\t# Contigs\t# Gaps\tMin Contig size\tMax Contig size\tAvg Contig size\tN50\tCDS\trRNA"]
+HEADER = [f"Isolate\tLength\t# Contigs\t# Gaps\tMin Contig size\tMax Contig size\tAvg Contig size\tAssembly N50\tCDS\trRNA"]
 
 def combine(prokka, asm, isolate, output):
 

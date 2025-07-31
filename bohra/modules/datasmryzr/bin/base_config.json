@@ -38,10 +38,16 @@
         ],
         "vals":["# Contigs",
                 "bp",
-                "Reads", 
+                "N50", 
                 "Yield",
                 "Est average depth"
             ]
-    }
+    },
+    "has_graph":[
+        "summary",
+        "distances",
+        "core-genome-stats",
+        "pangenome"
+    ]
 
 }
