@@ -6,6 +6,8 @@ include { NGMASTER } from './../modules/ngmaster/main'
 include { KLEBORATE } from './../modules/kleborate/main'
 include { ECTYPER } from './../modules/ectyper/main'
 include { EMMTYPER } from './../modules/emmtyper/main'
+include { SHIGAPASS } from './../modules/shigapass/main'
+include { SONNEITYPE } from './../modules/sonneitype/main'
 include {CSVTK_CONCAT;CSVTK_UNIQ } from './../modules/csvtk/main'
 include { CONCAT_FILES } from './../modules/utils/main'
 workflow SEROTYPES {
@@ -21,7 +23,8 @@ workflow SEROTYPES {
         ngono = asm.filter { cfg, contigs -> cfg.species == 'Neisseria gonorrhoeae'}
         salmonella = asm.filter { cfg, contigs -> cfg.species =~ 'Salmonella'}
         klebs = asm.filter { cfg, contigs -> cfg.species =~ 'Klebsiella'}
-
+        shigella = asm.filter { cfg, contigs -> cfg.species =~ 'Shigella'}
+        sonnei = reads.filter { cfg, reads -> cfg.species == 'Shigella sonnei'}
         ecoli = asm.filter { cfg, contigs -> cfg.species == 'Escherichia coli'}
         igas = asm.filter { cfg, contigs -> cfg.species == 'Streptococcus pyogenes'}
         // add in shigella
@@ -47,6 +50,13 @@ workflow SEROTYPES {
         EMMTYPER ( igas )
         emm_typers = EMMTYPER.out.typer.map {cfg, typer -> typer }.collect()
         emm_version = EMMTYPER.out.version.map {cfg, version -> version }.collect()
+        SHIGAPASS ( shigella )
+        shigella_typers = SHIGAPASS.out.typer.map {cfg, typer -> typer }.collect()
+        shigella_version = SHIGAPASS.out.version.map {cfg, version -> version }.collect()
+        SONNEITYPE ( sonnei )
+        sonnei_typers = SONNEITYPE.out.typer.map {cfg, typer -> typer }.collect()
+        sonnei_version = SONNEITYPE.out.version.map {cfg, version -> version }.collect()
+
         // typers = lissero_typers.concat ( salmo_typers, nmen_typers, ngono_typers, klebs_typers, ecoli_typers,emm_typers ).flatten().toList().map { files -> tuple("typer", files)}
         // println typers.view()
         // println klebs_typers.view()
@@ -57,7 +67,9 @@ workflow SEROTYPES {
         ngono_typing = CONCAT_NGMASTER ( ngono_typers.map {files -> tuple("ngmaster", files)} )
         ecoli_typing = CONCAT_ECTYPER ( ecoli_typers.map {files -> tuple("ectyper", files)} )
         emm_typing = CONCAT_EMMTYPER ( emm_typers.map {files -> tuple("emmtyper", files)} )
-        collated_typers =  lissero_typing.concat(kleb_typing,salmo_typing,nmen_typing,ngono_typing,ecoli_typing,emm_typing).view()
+        shigapass = CONCAT_SHIGAPASS ( shigella_typers.map {files -> tuple("shigapass", files)} )
+        sonnei_typing = CONCAT_SONNEITYPE ( sonnei_typers.map {files -> tuple("sonneitype", files)} )
+        collated_typers =  lissero_typing.concat(kleb_typing,salmo_typing,nmen_typing,ngono_typing,ecoli_typing,emm_typing, shigapass, sonnei_typing)
         versions = lissero_version.concat ( salmo_version, nmen_version, ngono_version, klebs_version, ecoli_version, emm_version ).map { files -> tuple("version_serotypes", files)}
         
         // CONCAT_FILES ( typers )
@@ -79,6 +91,26 @@ workflow CONCAT_KLEBORATE {
         collated_klebs = CONCAT_FILES.out.collated
 }
 
+workflow CONCAT_SHIGAPASS {
+    take:
+
+        shigella
+    main:
+        CONCAT_FILES ( shigella )
+    emit:
+        collated_shigella = CONCAT_FILES.out.collated
+}
+
+
+workflow CONCAT_SONNEITYPE {
+    take:
+
+        sonnei
+    main:
+        CONCAT_FILES ( sonnei )
+    emit:
+        collated_sonnei = CONCAT_FILES.out.collated
+}
 
 workflow CONCAT_EMMTYPER {
     take:

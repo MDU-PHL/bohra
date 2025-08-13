@@ -4,7 +4,7 @@ module_dir = moduleDir + "/bin"
 params.options = [:]
 def options    = initOptions(params.options)
 
-process SHIGAPASS {
+process SONNEITYPE {
     tag "$meta.id"
     label 'process_high'
     publishDir "${params.outdir}",
@@ -27,22 +27,22 @@ process SHIGAPASS {
         conda null
     }
     input:
-    tuple val(meta), path(contigs)
+    tuple val(meta), path(reads)
 
     output:
     tuple val(meta), path("typer_${getSoftwareName(task.process)}.txt"), emit: typer
-    tuple val(meta), path("version_shigapass.txt"), emit: version
+    tuple val(meta), path("sonneitype.txt"), emit: raw
+    tuple val(meta), path("version_sonneitype_mykrobe.txt"), emit: version
     
 
     script:
     """
-    echo -e Isolate'\t'Typing_tool'\n'${meta.id}'\t'shigapass >> tmp.tab
-    echo $contigs > input.tab
-    bash ${module_dir}/Shigapass.sh -l input.tab -o shigapass -t $task.cpus -p ${module_dir}/ShigaPass_DataBases 
-    sed 's/;/\t/g' shigapass/ShigaPass_summary.csv > shigapass.tsv
-    paste tmp.tab shigapass.tsv > final_output.tsv
-    csvtk -t cut -f 'Isolate,Predicted_Serotype,Predicted_FlexSerotype' > typer_shigapass.txt
-    echo -e shigapass'\t'\$CONDA_PREFIX'\t'\$(stype -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_shigapass.txt
+    mkdir ${meta.id}
+    mykrobe predict --sample ${meta.id} --species sonnei --format json --out ${meta.id}/${meta.id}.json --seq ${reads[0]} ${reads[1]}
+    ${module_dir}/parse_mykrobe_predict.py --jsons ${meta.id}/${meta.id}.json --alleles ${module_dir}/alleles.txt --prefix ${meta.id}/sonneitype
+    csvtk -t rename -f 'genome,final genotype,name' ${meta.id}/sonneitype_predictResults.tsv > typer_sonneitype.txt
+    cp ${meta.id}/sonneitype_predictResults.tsv sonneitype.txt
+    echo -e mykrobe (sonnietype)'\t'\$CONDA_PREFIX'\t'\$(mykrobe --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_mykrobe.txt
     """
     
 }
