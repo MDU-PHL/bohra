@@ -186,23 +186,17 @@ def _get_common_options() -> list:
             "default":"bohra",
         },
         {
-            "name":"sylph_db",
-            "help":"Path to DB for use with sylph",
-            "default":os.getenv("BOHRA_SYLPH_DB", ''),
-            "show_default":True
-        },
-        {
             "name":"kraken2_db",
             "help":"Path to DB for use with kraken2",
-            "default":os.getenv("BOHRA_KRAKEN2_DB", ''),
+            "default":f"{pathlib.Path(os.getenv('BOHRA_KRAKEN2_DB'))}" if os.getenv("BOHRA_KRAKEN2_DB") else f"{pathlib.Path(os.getenv('KRAKEN2_DEFAULT_DB'))}" ,
             "metavar":'BOHRA_KRAKEN2_DB',
             "show_default":True
         },
         {
             "name":"speciation",
             "help":"Speciation will be performed by deafult. Use none if you do not need species detected.",
-            "type":click.Choice(['kraken2', 'sylph', 'none']),
-            "default":"sylph"
+            "type":click.Choice(['kraken2', 'none']),
+            "default":"kraken2"
         },
         {
             "name":"proceed",
