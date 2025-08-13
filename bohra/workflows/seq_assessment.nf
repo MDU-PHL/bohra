@@ -19,8 +19,10 @@ workflow READ_ANALYSIS {
     main:
         BOHRA_VERSION (  )
         CHECK_FASTQ ( reads_pe )
+        println reads_pe.view()
         reads_pe_checked = CHECK_FASTQ.out.pe_check.join( reads_pe )
         reads_pe_checked = reads_pe_checked.map { cfg, check, files -> tuple(cfg + [check:check], files) }
+        println reads_pe_checked.view()
         SEQKIT_STATS ( reads_pe_checked )
         SEQKIT_GC ( reads_pe_checked )
         KMC ( reads_pe_checked )

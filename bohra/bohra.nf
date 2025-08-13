@@ -40,7 +40,7 @@ input_file = file(params.isolates) // need to make this an input file
     }
 
 println "Will run : $params.modules"
-// println samples
+println samples
 include { READ_ANALYSIS;ASSEMBLY_ANALYSIS } from './workflows/seq_assessment'
 include { RUN_ASSEMBLE } from './workflows/assemble'
 include { RUN_SPECIES_READS; RUN_SPECIES_ASM; COMBINE_SPECIES } from './workflows/species'

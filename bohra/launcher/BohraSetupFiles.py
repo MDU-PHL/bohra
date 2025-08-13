@@ -108,9 +108,19 @@ def _get_input_types(cols_provided: list, cols_required:list) -> dict:
             input_types[c] = "R2.fastq.gz"
     return input_types
 
+def _infer_correct_read(file_path:str) -> str:
+
+    if '_R1' in file_path or '_1' in file_path:
+        return "R1.fastq.gz"
+    elif '_R2_' in file_path or '_2' in file_path:
+        return "R2.fastq.gz"
+    else:
+        return "unknown"
+
 def _make_workdir(_input:pd.DataFrame, workdir:str) -> bool:
 
     columns = _get_columns_list()
+    pereads = ["r1","r2"]
     if _check_path(workdir):
         
         wd = pathlib.Path(workdir)
@@ -122,18 +132,22 @@ def _make_workdir(_input:pd.DataFrame, workdir:str) -> bool:
             
             for input_type in input_types:
                 user_supplied = row[1][input_type]
-
+                
                 if _check_sequence_file(pathlib.Path(user_supplied)):
-                    LOGGER.info(f"Linking {user_supplied} to {wd / row[1][columns[0]]}/{input_types[input_type]}")
+                    # check that col is actually the r1 or r2
+                    target_file = input_types[input_type]
+                    if input_type in pereads:
+                        target_file = _infer_correct_read(user_supplied)
+                    LOGGER.info(f"Linking {user_supplied} to {wd / row[1][columns[0]]}/{target_file}.")
                     try:
                         LOGGER.info(f"Creating directory {row[1][columns[0]]} in {workdir}")
-                        target = pathlib.Path(wd / row[1][columns[0]] / input_types[input_type])
+                        target = pathlib.Path(wd / row[1][columns[0]] / target_file)
                         if not target.exists():
                             pathlib.Path(f"{wd / row[1][columns[0]]}").mkdir(parents=True, exist_ok=True)
                             target.symlink_to(user_supplied)
                         else:
                             LOGGER.warning(f"File {target} already exists. Skipping link creation.")
                     except Exception as e:
-                        LOGGER.critical(f"Could not link {user_supplied} to {wd / row[1][columns[0]]}/{input_types[input_type]}. Error: {e}")
+                        LOGGER.critical(f"Could not link {user_supplied} to {wd / row[1][columns[0]]}/{target_file}. Error: {e}")
                         raise SystemExit
     return "input_checked.tsv"
