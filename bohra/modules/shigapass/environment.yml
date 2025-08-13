@@ -1,8 +1,8 @@
-name: bohra-stype
+name: bohra-shigapass
 channels:
   - conda-forge
   - bioconda
 dependencies:
-  - blastn
+  - blast=2.16.0
 
   
