@@ -1,0 +1,8 @@
+name: bohra-stype
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - blastn
+
+  
