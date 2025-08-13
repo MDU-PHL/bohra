@@ -136,12 +136,12 @@ def _resource_opt() -> list:
         {
             "name":"profile",
             "help":"The profile to use for running the pipeline. If not using defaults, you will need to have nextflow config set up - ist should be set as an environment variable - see docs for help. If not set, it will default to 'lcl'.",
-            "default":os.getenv('NF_PROFILE', 'lcl'),
+            "default":f"{pathlib.Path(os.getenv('NF_PROFILE'))}" if os.getenv('NF_PROFILE') else 'lcl',
         },
         {
             "name":"profile_config",
             "help":"Path to the profile config file.",
-            "default":f"{pathlib.Path( os.getenv('NF_PROFILE_CONFIG', ''))}", # need to change this to reflect the ENV variable or the default supplied with bohra
+            "default":f"{pathlib.Path( os.getenv('NF_PROFILE_CONFIG'))}" if os.getenv('NF_PROFILE_CONFIG') else f"",
         },
         {
             "name":"keep",
