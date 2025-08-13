@@ -1,6 +1,5 @@
 #!/usr/bin/env nextflow
 include { RUN_KRAKEN } from './../subworkflows/kraken'
-include { RUN_SYLPH } from './../subworkflows/sylph'
 include { EXTRACT_SPECIES } from './../modules/extract_species/main'
 include { COMBINE_SPECIES_VALS } from './../modules/combine_species_vals/main'
 include { COMBINE_SPECIES_REPORT } from './../modules/combine_species/main'
@@ -19,14 +18,7 @@ workflow RUN_SPECIES_READS {
             species = RUN_KRAKEN.out.species
             species_obs = RUN_KRAKEN.out.species_obs
             version = RUN_KRAKEN.out.version
-        } else {
-            
-            RUN_SYLPH ( sequences )
-            species_raw = RUN_SYLPH.out.species_raw
-            species = RUN_SYLPH.out.species
-            species_obs = RUN_SYLPH.out.species_obs
-            version = RUN_SYLPH.out.version
-        }
+        } 
         
     emit:
         species_raw  = species_raw

@@ -9,7 +9,7 @@ set -e
 eval "$(conda shell.bash hook)"
 
 
-DB_VARS=("BOHRA_KRAKEN2_DB" "BOHRA_SYLPH_DB" "BOHRA_PUBMLST_DB" "BOHRA_BLAST_DB" "BOHRA_MOBSUITE_DB")
+DB_VARS=("BOHRA_KRAKEN2_DB" "BOHRA_PUBMLST_DB" "BOHRA_BLAST_DB" "BOHRA_MOBSUITE_DB")
 NONESSENTIAL_VARS=("BOHRA_PUBMLST_DB" "BOHRA_BLAST_DB" "BOHRA_MOBSUITE_DB") 
 declare -A DB_URL=(
     [1]="https://genome-idx.s3.amazonaws.com/kraken/k2_standard_20250402.tar.gz",
@@ -55,24 +55,6 @@ else
     echo "Skipping database download."
 fi
 
-echo "Do you need to download a database for SYLPH? (y/n)"
-read -r response
-if [[ "$response" == "y" ]]; then
-    echo "Downloading SYLPH database"
-    wget http://faust.compbio.cs.cmu.edu/sylph-stuff/gtdb-r226-c200-dbv1.syldb
-
-    echo "Please provide the path where you want to extract the SYLPH database:"
-    read -r db_path
-    mkdir -p "$db_path"
-    mv gtdb-r226-c200-dbv1.syldb "$db_path"
-    echo "SYLPH database extracted to $db_path"
-    conda activate $ENV_PREFIX && conda env config vars set BOHRA_SYLPH_DB="$db_path/gtdb-r226-c200-dbv1.syldb"
-    echo "BOHRA_SYLPH_DB is set to $db_path/gtdb-r226-c200-dbv1.syldb"
-    echo "Reactivating environment to apply changes"
-    conda activate $ENV_PREFIX
-else
-    echo "Skipping SYLPH database download."
-fi
 
 for db in "${DB_VARS[@]}"; do
     echo "Checking if $db is set"

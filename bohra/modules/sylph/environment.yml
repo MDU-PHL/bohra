@@ -1,8 +1,0 @@
-name: bohra-sylph
-channels:
-  - conda-forge
-  - bioconda
-dependencies:
-  - sylph=0.8.1
-  - csvtk=0.25.0
-  - pandas=2.2.3
