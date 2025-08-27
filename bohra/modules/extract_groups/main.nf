@@ -6,7 +6,7 @@ def options    = initOptions(params.options)
 
 process EXTRACT_GROUPS {
     // tag "$meta.id"
-    label 'process_upper_medium'
+    label 'process_medium'
     cache 'lenient'
     
     

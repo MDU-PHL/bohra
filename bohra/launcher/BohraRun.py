@@ -79,7 +79,7 @@ def _setup_working_directory(input_file:str,
 def _init_command_dict(profile:str, cpus:int, job_name:str, prefix:str, pipeline:str, profile_config:str) -> dict:
 
     command_dict = {"params":[
-        f"--profile {profile}",
+        f"-profile {profile}",
         f"--pipeline {pipeline}",
         f"-executor.cpus {cpus}",
         "-with-trace",
@@ -88,7 +88,7 @@ def _init_command_dict(profile:str, cpus:int, job_name:str, prefix:str, pipeline
                 ], "modules":[]}
 
     if profile_config != "":
-        command_dict["params"].append(f"--profile_config {profile_config}")
+        command_dict["params"].append(f"-c {profile_config}")
 
     return command_dict
 

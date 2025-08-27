@@ -8,7 +8,7 @@ def options    = initOptions(params.options)
 
 process COMBINE_SPECIES_REPORT {
     tag "$meta.id"
-    label 'process_high'
+    label 'process_low'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"${meta.id}", publish_id:meta.id) }

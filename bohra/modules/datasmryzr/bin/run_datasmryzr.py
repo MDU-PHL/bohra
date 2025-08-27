@@ -163,6 +163,18 @@ def _extract_tree(results_files: list, output : list) -> str:
             return f"-tr {file}",output
     return "",output
 
+def _extract_cluster_table(results_files: list, output:list) -> str:
+    """
+    Extract the distance matrix from the results files
+    """
+    # print(output)
+    for file in results_files:
+        if pathlib.Path(file).exists() and "clusters" in file:       
+            output.append(file)
+            return f"-ct {file}", output
+    # print(output)
+    return "",output
+
 def _extract_distance_matrix(results_files: list, output:list) -> str:
     """
     Extract the distance matrix from the results files
@@ -357,6 +369,7 @@ def _combine_reads_iqr(results_files: list, output:list) -> str:
 
 def _run_datasmryzr(tree:str,
                     distance_matrix:str,
+                    cluster_table:str,
                     core_genome:str,
                     core_genome_report:str,
                     other_files:str,
@@ -374,7 +387,7 @@ def _run_datasmryzr(tree:str,
     """
     Run the datasmryzr pipeline
     """
-    cmd = f"datasmryzr --title '{job_id}' -c bohra_config.json -bg '{bkgd_color}' -fc '{text_color}' --pipeline {pipeline} --pipeline_version '{pipeline_version}' {other_files} {pangenome_classification} {pangenome_rtab} {pangenome_groups} {tree} {distance_matrix} {core_genome} {core_genome_report} {reference} {mask} {annotation}"
+    cmd = f"datasmryzr --title '{job_id}' -c bohra_config.json -bg '{bkgd_color}' -fc '{text_color}' --pipeline {pipeline} --pipeline_version '{pipeline_version}' {other_files} {pangenome_classification} {pangenome_rtab} {pangenome_groups} {tree} {distance_matrix} {cluster_table} {core_genome} {core_genome_report} {reference} {mask} {annotation} {read_assessment}"
     print(cmd)
     p = subprocess.run(cmd, shell=True, capture_output=True)
     if p.returncode != 0:
@@ -476,10 +489,11 @@ def _compile(args):
     read_assessment,output,results_files = _combine_reads_iqr(results_files, output)
     tree,output = _extract_tree(results_files, output)
     distance_matrix,output = _extract_distance_matrix(results_files, output)
+    cluster_table,output = _extract_cluster_table(results_files, output)
     core_genome,output = _extract_core_genome(results_files, output)
     core_genome_report,output = _extract_core_genome_report(results_files, output)
     summary,output = _generate_summary_table(results_files, output, 40, 30, 70)
-    print(output)
+    print(read_assessment)
     
     panclass,output = _extract_pangenome_classification(results_files, output)
     panrtab,output= _extract_pangenome_rtab(results_files, output)
@@ -494,6 +508,7 @@ def _compile(args):
     pipeline_version = get_pipeline_version(args.results_files)
     p = _run_datasmryzr(tree,
                         distance_matrix,
+                        cluster_table,
                         core_genome,
                         core_genome_report,
                         other_files,

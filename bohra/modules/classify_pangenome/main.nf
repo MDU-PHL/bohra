@@ -6,7 +6,7 @@ def options    = initOptions(params.options)
 
 process CLASSIFY_PANGENOME {
     
-    label 'process_upper_medium'
+    label 'process_medium'
     cache 'lenient'
     
     if ( params.enable_conda ) {

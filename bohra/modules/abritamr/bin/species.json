@@ -26,6 +26,20 @@
         "Streptococcus_pyogenes",
         "Vibrio_cholerae", 
         "Vibrio_parahaemolyticus",
-        "Vibrio_vulnificus"]
-    
+        "Vibrio_vulnificus"],
+    "abritamr_synonyms":{
+        "Peptoclostridium difficile":"Clostridioides_difficile",
+        "Clostridium difficile":"Clostridioides_difficile",
+        "Burkholderia cenocepacia":"Burkholderia_cepacia",
+        "Burkholderia cepacia":"Burkholderia_cepacia",
+        "Burkholderia multivorans":"Burkholderia_cepacia",
+        "Burkholderia vietnamiensis":"Burkholderia_cepacia",
+        "Burkholderia stabilis":"Burkholderia_cepacia",
+        "Burkholderia ambifaria":"Burkholderia_cepacia",
+        "Burkholderia dolosa":"Burkholderia_cepacia",
+        "Burkholderia anthina":"Burkholderia_cepacia",
+        "Burkholderia pyrrocinia":"Burkholderia_cepacia",
+        "Burkholderia ubonensis":"Burkholderia_cepacia",
+        "Burkholderia lata":"Burkholderia_cepacia"
+    }
     }

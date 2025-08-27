@@ -26,7 +26,31 @@
         "ST"
     ],
    "menu": [
-    "summary"
+    "tree",
+    "summary",
+    "read-assessment",
+    "assembly-assessment",
+    "speciation",
+    "mlst",
+    "tbtamr",
+    "reportable-amr-genes",
+    "resistome",
+    "plasmid",
+    "virulence",
+    "ectyper",
+    "emmtyper",
+    "kleborate",
+    "lissero",
+    "meningotype",
+    "ngmaster",
+    "shigapass",
+    "sonneitype",
+    "core-genome-stats",
+    "distances",
+    "clusters",
+    "pangenome",
+    "versions",
+    "glossary"
    ],
     "id_column": "Isolate",
 
@@ -37,17 +61,18 @@
             "Species (assembly)"
         ],
         "vals":["# Contigs",
-                "bp",
-                "N50", 
+                "Length",
+                "Assembly N50", 
                 "Yield",
-                "Est average depth"
+                "Depth"
             ]
     },
     "has_graph":[
         "summary",
         "distances",
         "core-genome-stats",
-        "pangenome"
+        "pangenome",
+        "clusters"
     ]
 
 }
