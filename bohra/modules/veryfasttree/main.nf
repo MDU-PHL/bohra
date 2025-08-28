@@ -38,8 +38,8 @@ process VERYFASTTREE {
     """
     VeryFastTree -nt -gamma -gtr -threads $task.cpus $aln > tmp.newick
     gotree reroot midpoint -i tmp.newick -o snps.newick
-    echo -e VeryFastTree'\t'\$CONDA_PREFIX'\t'\$(VeryFastTree --help | head -n 1 2>&1) | csvtk add-header -t -n 'tool,conda_env,version' > version_veryfasttree.txt
-    echo -e gotree'\t'\$CONDA_PREFIX'\t'\$(gotree version)  >> version_veryfasttree.txt
+    echo -e VeryFastTree'\t'\$CONDA_PREFIX'\t'\$(VeryFastTree --help | head -n 1 2>&1)'\t'${params.veryfasttree_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_veryfasttree.txt
+    echo -e gotree'\t'\$CONDA_PREFIX'\t'\$(gotree version)'\t'${params.gotree_ref}  >> version_veryfasttree.txt
     """
         
 }
