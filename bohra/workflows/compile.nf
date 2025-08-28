@@ -14,7 +14,7 @@ workflow RUN_COMPILE {
                                 .map { files -> tuple("versions", files) }
         CONCAT_FILES ( versions )
 
-        results = CSVTK_UNIQ.out.collated.concat ( results ).collect()
+        results = CONCAT_FILES.out.collated.concat ( results ).collect()
         // println results.view()
         RUN_SMRYZR ( results )
 

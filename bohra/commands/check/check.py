@@ -5,7 +5,6 @@ import os
 from bohra.launcher.CheckDeps import install_dependencies, check_databases
 
 
-@click.command()
 @click.option('--prefix','-p',
               default=f"{pathlib.Path(os.environ['CONDA_PREFIX']).name}" if os.environ['CONDA_PREFIX'] != "" else 'bohra',
               help='The prefix for your environments, this will be used to create the conda environments for each process.',

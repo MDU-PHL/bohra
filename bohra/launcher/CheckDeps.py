@@ -13,7 +13,7 @@ LOGGER.setLevel(logging.DEBUG)
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 ch.setFormatter(CustomFormatter())
-fh = logging.FileHandler('bohra_installation.log')
+fh = logging.FileHandler('bohra.log')
 fh.setLevel(logging.DEBUG)
 formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p') 
 fh.setFormatter(formatter)
@@ -31,7 +31,7 @@ def install_dependencies(prefix, check_only = False):
     process = subprocess.Popen(['bash', f"{script_path}/bohra_install.sh", f"{prefix}", install], stdout=subprocess.PIPE, encoding='utf-8')
     while process.poll() is None:
         l = process.stdout.readline().strip() # This blocks until it receives a newline.
-        print(f"{l}")
+        LOGGER.info(f"{l}")
 
     if process.returncode != 0:
         LOGGER.error(f"Error installing dependencies: {process.stderr}")

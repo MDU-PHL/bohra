@@ -112,7 +112,7 @@ def _infer_correct_read(file_path:str) -> str:
 
     if '_R1' in file_path or '_1' in file_path:
         return "R1.fastq.gz"
-    elif '_R2_' in file_path or '_2' in file_path:
+    elif '_R2' in file_path or '_2' in file_path:
         return "R2.fastq.gz"
     else:
         return "unknown"
@@ -138,6 +138,9 @@ def _make_workdir(_input:pd.DataFrame, workdir:str) -> bool:
                     target_file = input_types[input_type]
                     if input_type in pereads:
                         target_file = _infer_correct_read(user_supplied)
+                    if target_file == "unknown":
+                        LOGGER.warning(f"Could not infer read type from {user_supplied}. Skipping link creation.")
+                        continue
                     LOGGER.info(f"Linking {user_supplied} to {wd / row[1][columns[0]]}/{target_file}.")
                     try:
                         LOGGER.info(f"Creating directory {row[1][columns[0]]} in {workdir}")

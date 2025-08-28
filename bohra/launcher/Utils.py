@@ -160,7 +160,8 @@ def _resource_opt() -> list:
             "help": "If you would like to install dependencies that are not already available using conda for each process, set this to 'Y'. Highly recommended.",
             "default":'Y',
             "type":click.Choice(['Y', 'N'])
-        }
+        },
+        
         
     
     ]
