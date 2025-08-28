@@ -2,7 +2,7 @@ import click
 import pathlib
 import os
 
-from bohra.launcher.InstallDeps import install_dependencies, check_databases
+from bohra.launcher.CheckDeps import install_dependencies, check_databases
 
 
 @click.command()
@@ -26,10 +26,11 @@ def install_deps(prefix, install_deps, databases):
     print("This will take some time.")
     print("Please be patient.")
     if install_deps:
-        print("Installing dependencies...")
-        install_dependencies(prefix=prefix)
+        print("Will now check you installation and install anything that may be required. ")
+        install_dependencies(prefix=prefix, check_only = False)
     else:
-        print("Skipping installation of dependencies.")
+        print("Will just check your installation - no dependencies will be installed.")
+        install_dependencies(prefix=prefix, check_only = True)
     if databases:
         print("Checking for databases...")
         check_databases(prefix=prefix)

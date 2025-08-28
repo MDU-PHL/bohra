@@ -81,7 +81,7 @@ def make_comment(comments:list) -> str:
 def _generate_summary_table(results_files: list, output:list, min_depth:40, minquality : 30, minaln:70) -> list:
     print("Generating summary table")
     list_of_filename = {
-        "read_assessment.txt" : ["Isolate","Reads","GC", "Depth", "is_control", "filesize", "Qscore"],
+        "read_assessment.txt" : ["Isolate","Reads","GC", "Depth","Genome size", "is_control", "filesize", "Qscore"],
         "assembly_assessment.txt":["Isolate","Length","# Contigs","Assembly N50"],
         "core_genome_stats.txt":["Isolate","% Aligned"],
         "speciation.txt":["Isolate","Species (reads)","Match 1 (reads)", "Match 1 (asm)"],
@@ -114,7 +114,7 @@ def _generate_summary_table(results_files: list, output:list, min_depth:40, minq
     summary = summary.rename(columns = {"Match 1 (reads)":"Species (reads)","Match 1 (asm)":"Species (assembly)"})
     if 'ST' in summary.columns:
         summary['ST'] = summary['ST'].apply(lambda x: str(int(x)) if not isinstance(x, str) else x)
-    int_cols = ["Reads","Length","# Contigs","Assembly N50", "Est"]
+    int_cols = ["Reads","Assembly length","# Contigs","Assembly N50", "Depth", "Genome size"]
     for i in int_cols:
         if i in summary.columns:
             summary[i] = summary[i].apply(lambda x: int(x) if x != "" else "")
@@ -123,6 +123,8 @@ def _generate_summary_table(results_files: list, output:list, min_depth:40, minq
     # print(summary)
     if sp_cols:
         summary["Species check"] = summary[sp_cols].apply(lambda x: check_species(x.tolist()), axis=1)
+        summary["Species"] = summary[sp_cols].apply(lambda x: ':'.join(list(set(x))), axis=1)
+        cols = [i for i in summary.columns if i not in sp_cols]
     if "filesize" in summary.columns:
         summary["File size check"] = summary[["filesize","Reads"]].apply(lambda x: check_filesize(x), axis=1)
         print(summary)
@@ -137,6 +139,7 @@ def _generate_summary_table(results_files: list, output:list, min_depth:40, minq
         summary["Contigs check"] = summary[["# Contigs","is_control"]].apply(lambda x: check_contigs(bounds[1], bounds[0], x), axis=1)
 
     check_cols = [i for i in summary.columns if "check" in i]
+    check_cols = "filesize"
     summary = summary.fillna("")
     summary["Comment"] = summary[check_cols].apply(lambda x: make_comment(x.tolist()), axis=1)
     summary["Data assessment"] = summary[check_cols].apply(lambda x: 1 if all(i == 1 for i in x.tolist()) else 0, axis=1)

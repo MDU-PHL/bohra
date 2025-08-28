@@ -54,7 +54,7 @@ declare -A TOOLS=([$ENV_PREFIX-csvtk]="csvtk=0.33"
 [$ENV_PREFIX-mlst]="mlst=2.19.0 csvtk pandas numpy"
 [$ENV_PREFIX-kraken2]="kraken2=2.1.2 csvtk"
 [$ENV_PREFIX-mob_suite]="mob_suite=3.1.9 csvtk"
-[$ENV_PREFIX-panaroo]="panaroo=1.2.9 csvtk"
+[$ENV_PREFIX-panaroo]="panaroo csvtk"
 [$ENV_PREFIX-abritamr]="abritamr=1.0.19 csvtk"
 [$ENV_PREFIX-gubbins]="csvtk=0.25 gubbins=2.4.1 snp-sites=2.5.1"
 [$ENV_PREFIX-snpdists]="snp-dists=0.8.2 csvtk=0.25"
@@ -121,7 +121,7 @@ for key in "${!TOOLS[@]}";do
                     # continue
                 fi
             else
-                echo "$key is not installed. If you want to install it please run bohra install-deps. Please note if you do not wish to install, then nextflow will create conda environments for each analsysis. This is not the preferred behaviour."
+                echo "$key is not installed. If you want to install it please run bohra check --install-deps. Please note if you do not wish to install, then nextflow will create conda environments for each analsysis. This is not the preferred behaviour."
                 DEPS_INSTALLED=1
             fi
         else
@@ -130,4 +130,12 @@ for key in "${!TOOLS[@]}";do
 #     # continue
     
     done
-echo "All conda environments have been set up."
+
+if [[ $DEPS_INSTALLED -eq 1 ]]
+    then
+        echo "One or more dependencies are not installed. Please run bohra check --install-deps to install them"
+        exit 1
+    else
+        echo "All dependencies are installed. Bohra is ready to go!"
+        exit 0
+fi

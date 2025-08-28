@@ -65,7 +65,7 @@ print(tab)
 gcs = get_gcs(sys.argv[3])
 print(gcs)
 print(sys.argv[6])
-tab = tab.rename(columns = {'num_seqs': 'Reads', 'sum_len': 'Yield','min_len':'Min len','max_len':'Max len', 'avg_len':'Avg len', 'Q30(%)': 'Average quality (% >Q30)'})
+tab = tab.rename(columns = {'num_seqs': 'Reads', 'sum_len': 'Yield','min_len':'Min len','max_len':'Max len', 'avg_len':'Avg len', 'Q30(%)': 'Qscore'})
 dpth,size = get_dpth(genome_size = sys.argv[4], bases = tab['Yield'].values[0])
 tab['Depth'] = dpth
 tab["Genome size"] = size

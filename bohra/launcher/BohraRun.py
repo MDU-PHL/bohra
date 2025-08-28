@@ -6,6 +6,7 @@ from bohra.launcher.BohraAssembly import _setup_assembly_args
 from bohra.launcher.BohraTyping import _setup_typing_args
 from bohra.launcher.BohraComparative import _setup_comparative_args
 from bohra.launcher.BohraPangenome import _setup_pangenome_args
+from bohra.launcher.CheckDeps import install_dependencies, check_databases
 
 import pandas as pd
 import pathlib
@@ -28,21 +29,16 @@ LOGGER.addHandler(ch)
 LOGGER.addHandler(fh)
 
 
-def _check_deps_installed(prefix: str) -> bool:
+def _check_deps_installed(prefix: str, check_only = False) -> bool:
     script_path = f"{pathlib.Path(__file__).parent}"
-    LOGGER.info(f"Will now check if dependencies are installed.")
-    process = subprocess.Popen(['bash', f"{script_path}/bohra_install.sh", f"{prefix}", "no"], stdout=subprocess.PIPE, encoding='utf-8')
-    while process.poll() is None:
-        l = process.stdout.readline().strip() # This blocks until it receives a newline.
-        LOGGER.info(f"{l}")
-
-    if process.returncode != 0:
-        LOGGER.warning(f"It seems that not all dependencies are installed. It is highly recommended to run `bohra install-deps` to install all dependencies prior to running this pipeline. Otherwise nextflow will create conda environments for each analysis. This may result in unexpected behaviour and lots of environments.")
-        # raise SystemError
-    else:
-        LOGGER.info("Dependencies installed successfully.")
-        LOGGER.info("Bohra is ready to go!")
+    
+    deps = install_dependencies(prefix=prefix, check_only = check_only)
+    if deps == 0:
+        # LOGGER.info("All dependencies are installed.")
         return True
+    else:
+        LOGGER.error("One or more dependencies are not installed. Please run bohra check --install-deps to install them")
+        raise SystemExit
 
 
 
@@ -123,8 +119,11 @@ def run_bohra(
     
     
     LOGGER.info(f"Checking on the setup for the {pipeline} pipeline.")
+    check_only = True if kwargs['install_deps'] == 'N' else False
+    deps_ok = _check_deps_installed(prefix=kwargs.get('conda_prefix', 'bohra'), check_only = check_only)
     profile = _get_profile(profile_config=kwargs.get('profile_config', ''),
                  profile=kwargs.get('profile', 'lcl'))
+    
     max_cpus = int(_set_cpu_limit_local(cpus=kwargs.get('cpus', 0)))
     LOGGER.info(f"Using {int(max_cpus)} CPUs for the {pipeline} pipeline.")
 
