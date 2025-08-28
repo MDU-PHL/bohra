@@ -42,7 +42,7 @@ process SHIGAPASS {
     sed 's/;/\t/g' shigapass/ShigaPass_summary.csv > shigapass.tsv
     paste tmp.tab shigapass.tsv > final_output.tsv
     csvtk -t cut -f 'Isolate,Predicted_Serotype,Predicted_FlexSerotype' final_output.tsv > typer_shigapass.txt
-    echo -e shigapass'\\t'\$CONDA_PREFIX'\\t'\$(${module_dir}/ShigaPass.sh -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_shigapass.txt
+    echo -e shigapass'\\t'\$CONDA_PREFIX'\\t'\$(${module_dir}/ShigaPass.sh -v)'\t'${params.shigapass_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_shigapass.txt
     """
     
 }

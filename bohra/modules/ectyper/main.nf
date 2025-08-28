@@ -40,7 +40,7 @@ process ECTYPER {
     ectyper -i $contigs -o ectyper 
     paste tmp.tab ectyper/output.tsv | csvtk -t cut -f -Name,-Species,-QC > typer_${getSoftwareName(task.process)}.txt
     rm -f tmp.tab
-    echo -e ectyper'\t'\$CONDA_PREFIX'\t'\$(ectyper --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_ectyper.txt
+    echo -e ectyper'\t'\$CONDA_PREFIX'\t'\$(ectyper --version)'\t'${params.ectyper_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_ectyper.txt
     """
     
 }

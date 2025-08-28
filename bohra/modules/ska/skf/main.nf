@@ -42,7 +42,7 @@ process SKA_BUILD {
     """
     echo -e "$meta.id\t$input_files" > tmp.tsv
     ska build -f tmp.tsv -k $params.ska2_kszise -o $meta.id
-    echo -e ska2'\t'\$CONDA_PREFIX'\t'\$(ska --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_ska.txt
+    echo -e ska2'\t'\$CONDA_PREFIX'\t'\$(ska --version)'\t'${params.ska_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_ska.txt
     """
     
     

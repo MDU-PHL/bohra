@@ -36,7 +36,7 @@ process SEQKIT_GC {
     cat ${input_files[0]} ${input_files[1]} \
     | seqkit fx2tab -H --name --only-id --avg-qual --gc \
     | csvtk summary -t -i -f 2:mean,3:mean > read_qual.txt
-    echo -e seqkit'\t'\$CONDA_PREFIX'\t'\$(seqkit version) | csvtk add-header -t -n 'tool,conda_env,version' > version_seqkit.txt
+    echo -e seqkit'\t'\$CONDA_PREFIX'\t'\$(seqkit version)'\t'${params.seqkit_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_seqkit.txt
     """
 
     

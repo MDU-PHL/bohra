@@ -36,7 +36,7 @@ process LISSERO {
     lissero $contigs | sed 's/contigs\\.fa/$meta.id/g'  > lissero.tab
     paste tmp.tab lissero.tab | csvtk -t rename -f SEROTYPE -n Serotype | csvtk -t cut -f -ID,-COMMENT > typer_${getSoftwareName(task.process)}.txt
     rm -f tmp.tab
-    echo -e lissero'\t'\$CONDA_PREFIX'\t'\$(lissero --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_lissero.txt
+    echo -e lissero'\t'\$CONDA_PREFIX'\t'\$(lissero --version)'\t'${params.lissero_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_lissero.txt
     """
     
 }

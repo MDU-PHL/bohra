@@ -42,7 +42,7 @@ process STYPE {
     paste tmp.tab tmp.typer.tab > raw_typer.tab
     csvtk -t cut -f 'genome,h1,h2,o_antigen,serogroup,serovar,Typing_tool' raw_typer.tab \
     | csvtk -t rename -f 'genome,serogroup,serovar' -n 'Isolate,Serogroup,Serovar' > typer_${getSoftwareName(task.process)}.txt
-    echo -e stype'\t'\$CONDA_PREFIX'\t'\$(stype -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_stype.txt
+    echo -e stype'\t'\$CONDA_PREFIX'\t'\$(stype -v)'\t'${params.stype_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_stype.txt
     """
     
 }

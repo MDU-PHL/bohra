@@ -33,7 +33,7 @@ process KMC {
     tmp_dir=\$(mktemp -d)
     kmc  -t$task.cpus $options.args ${reads[0]} \$tmp_dir/kmc \$tmp_dir | grep 'No. of unique counted k-mers' | cut -f2 -d: > est_genome_size_kmer.txt
     rm -rf \$tmp_dir
-    echo -e kmc'\t'\$CONDA_PREFIX'\t'\$(kmc -V | grep 'K-Mer Counter') | csvtk add-header -t -n 'tool,conda_env,version' > version_kmc.txt
+    echo -e kmc'\t'\$CONDA_PREFIX'\t'\$(kmc -V | grep 'K-Mer Counter')'\t'${params.kmc_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_kmc.txt
     """
     
 }

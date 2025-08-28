@@ -37,8 +37,8 @@ process QUICKTREE {
     """
     quicktree -in m -out t $distances  > tmp.newick
     gotree reroot midpoint -i tmp.newick -o distance.newick
-    echo -e quicktree'\t'\$CONDA_PREFIX'\t'\$(quicktree -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_quicktree.txt
-    echo -e gotree'\t'\$CONDA_PREFIX'\t'\$(gotree version)  >> version_quicktree.txt
+    echo -e quicktree'\t'\$CONDA_PREFIX'\t'\$(quicktree -v)'\t'${params.quicktree_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_quicktree.txt
+    echo -e gotree'\t'\$CONDA_PREFIX'\t'\$(gotree version)'\t'${params.gotree_ref}  >> version_quicktree.txt
     """
         
 }

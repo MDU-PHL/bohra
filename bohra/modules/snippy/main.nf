@@ -45,7 +45,7 @@ process SNIPPY {
     --mincov ${params.mincov} --minfrac ${params.minfrac} \\
     --minqual ${params.minqual} \\
     --force --cpus $task.cpus
-    echo -e snippy'\t'\$CONDA_PREFIX'\t'\$(snippy -v 2>&1) | csvtk add-header -t -n 'tool,conda_env,version' > version_snippy.txt
+    echo -e snippy'\t'\$CONDA_PREFIX'\t'\$(snippy -v 2>&1)'\t'${params.snippy_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_snippy.txt
     """
     
 }

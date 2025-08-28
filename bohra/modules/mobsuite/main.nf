@@ -42,7 +42,7 @@ process MOBSUITE {
     if [ ! -f mobtyper_results.txt ];then
         touch mobtyper_results.txt
     fi
-    echo -e mobsuite'\t'\$CONDA_PREFIX'\t'\$(mob_recon -V) | csvtk add-header -t -n 'tool,conda_env,version' > version_mobsuite.txt
+    echo -e mobsuite'\t'\$CONDA_PREFIX'\t'\$(mob_recon -V)'\t'$db'\t'${params.mobsuite_ref} | csvtk add-header -t -n 'tool,conda_env,version,database,reference' > version_mobsuite.txt
     """
     
 }

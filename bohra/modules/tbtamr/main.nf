@@ -44,7 +44,7 @@ process TBTAMR {
     cp ${meta.id}/*_stats.txt .
     cp ${meta.id}/*_variants.csv .
     ${module_dir}/summarise_tbtamr.py ${meta.id}/tbtamr_linelist_report.csv tbtamr_summarised.txt
-    echo -e tbtamr'\t'\$CONDA_PREFIX'\t'\$(tbtamr -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_tbtamr.txt
+    echo -e tbtamr'\t'\$CONDA_PREFIX'\t'\$(tbtamr -v)'\t'${params.tbtamr_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_tbtamr.txt
     """
     
 }

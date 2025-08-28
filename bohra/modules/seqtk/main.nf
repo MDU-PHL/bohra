@@ -33,7 +33,7 @@ process SEQTK {
     """
     echo -e Bases'\t'C%'\t'G%'\t'AvgQ > seqtk_stats.txt
     cat ${reads[0]} ${reads[1]} | seqtk fqchk -q0 -  | grep ALL | cut -f2,4,5,8 >> seqtk_stats.txt
-    echo -e seqtk'\t'\$CONDA_PREFIX'\t'\$(seqtk |& grep Version | cut -f2 -d ':' | xargs) | csvtk add-header -t -n 'tool,conda_env,version' > version_seqtk.txt
+    echo -e seqtk'\t'\$CONDA_PREFIX'\t'\$(seqtk |& grep Version | cut -f2 -d ':' | xargs)'\t'${params.seqtk_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_seqtk.txt
     """
     
 }

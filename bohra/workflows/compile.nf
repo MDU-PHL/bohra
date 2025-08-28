@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 include { RUN_SMRYZR } from './../modules/datasmryzr/main'
-include { CSVTK_UNIQ } from './../modules/csvtk/main'
+include { CONCAT_FILES } from './../modules/utils/main'
 
 workflow RUN_COMPILE {
 
@@ -12,7 +12,7 @@ workflow RUN_COMPILE {
     main:
         versions = versions.collect()
                                 .map { files -> tuple("versions", files) }
-        CSVTK_UNIQ ( versions )
+        CONCAT_FILES ( versions )
 
         results = CSVTK_UNIQ.out.collated.concat ( results ).collect()
         // println results.view()

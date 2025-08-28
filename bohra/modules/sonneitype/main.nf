@@ -42,7 +42,7 @@ process SONNEITYPE {
     ${module_dir}/parse_mykrobe_predict.py --jsons ${meta.id}/${meta.id}.json --alleles ${module_dir}/alleles.txt --prefix ${meta.id}/sonneitype
     csvtk -t rename -f 'genome,final genotype,name' -n 'Isolate,Genotype_lineage,Genotype_name' ${meta.id}/sonneitype_predictResults.tsv | csvtk -t cut -f 'Isolate,Genotype_lineage,Genotype_name' > typer_sonneitype.txt
     cp ${meta.id}/sonneitype_predictResults.tsv sonneitype.txt
-    echo -e mykrobe \\(sonneitype\\)'\t'\$CONDA_PREFIX'\t'\$(mykrobe --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_sonneitype_mykrobe.txt
+    echo -e mykrobe \\(sonneitype\\)'\t'\$CONDA_PREFIX'\t'\$(mykrobe --version)'\t'${params.sonneitype_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_sonneitype_mykrobe.txt
     """
     
 }

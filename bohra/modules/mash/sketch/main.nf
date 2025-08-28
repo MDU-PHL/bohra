@@ -39,7 +39,7 @@ process MASH_SKETCH {
     script:
     """
     mash sketch -r ${reads[0]} -m 5 -k 21 -C $meta.id -o ${meta.id}
-    echo -e mash'\t'\$CONDA_PREFIX'\t'\$(mash --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_mash.txt
+    echo -e mash'\t'\$CONDA_PREFIX'\t'\$(mash --version)'\t'${params.mash_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_mash.txt
     """
     
 }

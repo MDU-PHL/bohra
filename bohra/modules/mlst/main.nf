@@ -45,7 +45,7 @@ process MLST {
     """
     mlst --json mlst.json --label $meta.id --nopath $contigs $_blast_db $_publst_db  $exclude > mlst.txt
     $module_dir/add_header_mlst.py mlst.json
-    echo -e mlst'\t'\$CONDA_PREFIX'\t'\$(mlst -v)'\t'$_blast_db,$_publst_db | csvtk add-header -t -n 'tool,conda_env,version,database' > version_mlst.txt
+    echo -e mlst'\t'\$CONDA_PREFIX'\t'\$(mlst -v)'\t'$_blast_db,$_publst_db'\t'${params.mlst_ref} | csvtk add-header -t -n 'tool,conda_env,version,database,reference' > version_mlst.txt
     """
     
 }

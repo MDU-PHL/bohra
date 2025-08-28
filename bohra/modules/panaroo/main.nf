@@ -44,6 +44,6 @@ process PANAROO {
     cp panaroo/gene_presence_absence_roary.csv .
     cp panaroo/gene_presence_absence.Rtab gene_presence_absence.Rtab
     ln -sf panaroo $launchDir/
-    echo -e panaroo'\t'\$CONDA_PREFIX'\t'\$(panaroo --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_panaroo.txt
+    echo -e panaroo'\t'\$CONDA_PREFIX'\t'\$(panaroo --version)'\t'${params.panaroo_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_panaroo.txt
     """
 }

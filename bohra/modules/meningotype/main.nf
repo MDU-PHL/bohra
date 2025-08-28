@@ -38,7 +38,7 @@ process MENINGOTYPE {
     meningotype --all $contigs  > meningotype.tab
     paste tmp.tab meningotype.tab | csvtk -t rename -f SEROGROUP -n Serogroup | csvtk -t cut -f -SAMPLE_ID,-MLST >typer_${getSoftwareName(task.process)}.txt
     rm -f tmp.tab
-    echo -e meningotype'\t'\$CONDA_PREFIX'\t'\$(meningotype --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_meningotype.txt
+    echo -e meningotype'\t'\$CONDA_PREFIX'\t'\$(meningotype --version)'\t'${params.meningotype_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_meningotype.txt
     """
     
 }

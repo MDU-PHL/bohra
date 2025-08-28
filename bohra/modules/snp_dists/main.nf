@@ -38,7 +38,7 @@ process SNP_DISTS {
     
     """
     snp-dists $core | csvtk rename -t -f 1 -n Isolate > distances.tsv
-    echo -e snp-dists'\t'\$CONDA_PREFIX'\t'\$(snp-dists -v 2>&1) | csvtk add-header -t -n 'tool,conda_env,version' > version_snpdists.txt
+    echo -e snp-dists'\t'\$CONDA_PREFIX'\t'\$(snp-dists -v 2>&1)'\t'${params.snpdists_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_snpdists.txt
     """
     
 }
