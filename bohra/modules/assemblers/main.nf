@@ -38,7 +38,7 @@ process ASSEMBLER_PE {
         if [ -e $meta.asm ]
         then
             cp $meta.asm contigs.fa
-            echo -e Assembly file supplied'\t'Not Applicable'\t'${meta.asm} | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
+            echo -e Assembly file supplied'\t'Not applicable'\t'${meta.asm}'\t'Not applicable | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_assembler.txt
         else
             echo "No assembly file found" >> assembly.log
         fi
@@ -48,14 +48,14 @@ process ASSEMBLER_PE {
         shovill --R1 ${reads[0]} --R2 ${reads[1]} --outdir current --cpus $task.cpus --ram 16 
         cp current/contigs.fa contigs.fa
         version=\$(shovill --version)
-        echo -e shovill'\t'\$CONDA_PREFIX'\t'\$(shovill -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
+        echo -e shovill'\t'\$CONDA_PREFIX'\t'\$(shovill -v)'\t'${params.shovill_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_assembler.txt
         """
     } else if ( meta.asm == "not_supplied" && params.assembler == "shovill_skesa" ) {
         """
         shovill --R1 ${reads[0]} --R2 ${reads[1]} --outdir current --cpus $task.cpus --ram 16 --assembler skesa
         cp current/contigs.fa contigs.fa
         version=\$(shovill --version)
-        echo -e shovill'\t'\$CONDA_PREFIX'\t'\$(shovill -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
+        echo -e shovill'\t'\$CONDA_PREFIX'\t'\$(shovill -v)'\t'${params.shovill_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_assembler.txt
         """
     } else if (meta.asm == "not_supplied" && params.assembler == "spades"  ) {
         """
@@ -63,13 +63,13 @@ process ASSEMBLER_PE {
         spades.py -1 ${reads[0]} -2 ${reads[1]} -o current -t $task.cpus $options.args2 --tmp-dir \$tmp_dir
         cp current/contigs.fasta contigs.fa
         rm -rf \$tmp_dir
-        echo -e spades'\t'\$CONDA_PREFIX'\t'\$(spades.py -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_spades.txt
+        echo -e spades'\t'\$CONDA_PREFIX'\t'\$(spades.py -v)'\t'${params.spades_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_spades.txt
         """
     } else if (meta.asm == "not_supplied" && params.assembler == "skesa"  ) {
         """
         skesa --fastq ${reads[0]},${reads[1]} --cores $task.cpus --vector_percent 1.0 \
         --contigs_out contigs.fa
-        echo -e skesa'\t'\$CONDA_PREFIX'\t'\$(skesa -v) | csvtk add-header -t -n 'tool,conda_env,version' > version_assembler.txt
+        echo -e skesa'\t'\$CONDA_PREFIX'\t'\$(skesa -v)'\t'${params.skesa_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_assembler.txt
         """
     } else {
         """

@@ -88,45 +88,45 @@ for key in "${!TOOLS[@]}";do
     if [[ $su -eq 1 ]]
         then
             if [ "$INSTALL" == "yes" ]
-            then
-            echo $key can not be found. Now setting up $key
-            echo Will now run $INSTALLER create --force -y -n $key ${TOOLS[$key]}
-            $INSTALLER create --force -y -n $key ${TOOLS[$key]}
-            if [[ "$key" == "$ENV_PREFIX-stype" ]]; then
-                echo "will install $key from github"
-                conda activate $key && \
-                pip3 install 'git+https://github.com/MDU-PHL/salmonella_typing'
-                # continue
-            fi
-            if [[ "$key" == "$ENV_PREFIX-mob_suite" ]]; then
-                echo "will need to add in db download $key"
-                echo "Will now initialise the mob_suite databases"
-                conda activate $key && \
-                mob_init
-                # continue
-            fi
+                then
+                echo $key can not be found. Now setting up $key
+                echo Will now run $INSTALLER create --force -y -n $key ${TOOLS[$key]}
+                $INSTALLER create --force -y -n $key ${TOOLS[$key]}
+                if [[ "$key" == "$ENV_PREFIX-stype" ]]; then
+                    echo "will install $key from github"
+                    conda activate $key && \
+                    pip3 install 'git+https://github.com/MDU-PHL/salmonella_typing'
+                    # continue
+                fi
+                if [[ "$key" == "$ENV_PREFIX-mob_suite" ]]; then
+                    echo "will need to add in db download $key"
+                    echo "Will now initialise the mob_suite databases"
+                    conda activate $key && \
+                    mob_init
+                    # continue
+                fi
 
-            if [[ "$key" == "$ENV_PREFIX-tbtamr" ]]; then
-                $INSTALLER create --force -y -n $key ${TOOLS[$key]}
-                echo "Will now finish installing tbtamr"
-                conda activate $key && \
-                pip3 install pysam joblib tqdm pydantic requests git+https://github.com/jodyphelan/pathogen-profiler@v4.3.0
-                # continue
-            fi
-            if [[ "$key" == "$ENV_PREFIX-datasmryzr" ]]; then
-                $INSTALLER create --force -y -n $key ${TOOLS[$key]}
-                echo "Will now finish installing datasmryzr"
-                conda activate $key && \
-                pip3 install git+https://github.com/kristyhoran/datasmryzr
-                # continue
-            fi
+                if [[ "$key" == "$ENV_PREFIX-tbtamr" ]]; then
+                    $INSTALLER create --force -y -n $key ${TOOLS[$key]}
+                    echo "Will now finish installing tbtamr"
+                    conda activate $key && \
+                    pip3 install pysam joblib tqdm pydantic requests git+https://github.com/jodyphelan/pathogen-profiler@v4.3.0
+                    # continue
+                fi
+                if [[ "$key" == "$ENV_PREFIX-datasmryzr" ]]; then
+                    $INSTALLER create --force -y -n $key ${TOOLS[$key]}
+                    echo "Will now finish installing datasmryzr"
+                    conda activate $key && \
+                    pip3 install git+https://github.com/kristyhoran/datasmryzr
+                    # continue
+                fi
             else
                 echo "$key is not installed. If you want to install it please run bohra install-deps. Please note if you do not wish to install, then nextflow will create conda environments for each analsysis. This is not the preferred behaviour."
                 DEPS_INSTALLED=1
             fi
         else
             echo $key is already setup. Nothing left to do
-        fi
+    fi
 #     # continue
     
     done

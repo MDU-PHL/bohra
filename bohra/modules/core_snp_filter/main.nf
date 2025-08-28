@@ -34,7 +34,7 @@ process CORE_SNP_FILTER {
     script:
     """
     coresnpfilter -c ${params.fuzzy_core_prop} --table core_snp_table.tsv -e $core_full_aln > core.filtered.aln 
-    echo -e core-snp-filter'\t'\$CONDA_PREFIX'\t'\$(coresnpfilter --version) | csvtk add-header -t -n 'tool,conda_env,version' > version_coresnp.txt
+    echo -e core-snp-filter'\t'\$CONDA_PREFIX'\t'\$(coresnpfilter --version)'\t'${params.core_snp_filter_ref} | csvtk add-header -t -n 'tool,conda_env,version' > version_coresnp.txt
     """
     
 }
