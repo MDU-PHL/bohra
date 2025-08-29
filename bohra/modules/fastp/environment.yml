@@ -3,8 +3,7 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - snippy=4.4.5
+  - fastp
   - csvtk=0.25.0
-  - samtools=1.9
 
   

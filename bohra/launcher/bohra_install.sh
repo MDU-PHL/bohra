@@ -75,6 +75,7 @@ declare -A TOOLS=([$ENV_PREFIX-csvtk]="csvtk=0.33"
 [$ENV_PREFIX-core-snp-filter]="core-snp-filter csvtk"
 [$ENV_PREFIX-cluster]="numpy pandas scikit-learn csvtk"
 [$ENV_PREFIX-classify-pangenome]="r-data.table=1.17.6 r-ggplot2=3.5.2 r-optparse=1.7.5"
+[$ENV_PREFIX-fastp]="fastp csvtk"
 # [$ENV_PREFIX-tbtamr]="datasmryzr",
 
 )
