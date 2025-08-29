@@ -226,6 +226,12 @@ def _get_common_options() -> list:
             "help":"The prefix for the conda environments to be used for each process. Default is 'bohra'.",
             "default":prefix,
             "show_default":True
+        },
+        {
+            "name":"trim/--no-trim",
+            "help":"Set if you want to trim reads using fastp. Please note that this will duplicate reads. You may notice that you use alot more disk space if you are trimming.",
+            "is_flag":True,
+            "default":False
         }
         ]
     
