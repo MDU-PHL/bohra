@@ -42,6 +42,7 @@ process FASTP {
     --out2 ${meta.id}_2.trim.fastq.gz \\
     --json ${meta.id}.fastp.json \\
     --thread $task.cpus \\
+    --trim_poly_g \\
     --detect_adapter_for_pe \\
     2> ${meta.id}.fastp.log
     echo -e fastp'\t'\$CONDA_PREFIX'\t'\$(fastp -v)'\t'${params.fastp_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_fastp.txt
