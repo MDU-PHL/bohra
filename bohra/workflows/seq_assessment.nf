@@ -23,10 +23,10 @@ workflow READ_ANALYSIS {
         // println reads_pe.view()
         reads_pe_checked = CHECK_FASTQ.out.pe_check.join( reads_pe )
         reads_pe_checked = reads_pe_checked.map { cfg, check, files -> tuple(cfg + [check:check], files) }
-        if (prams.modules.contains('trim')){
+        if (params.modules.contains('trim')){
             FASTP( reads_pe_checked )
             reads_pe_checked = FASTP.out.read
-            
+
         }
         // println reads_pe_checked.view()
         SEQKIT_STATS ( reads_pe_checked )
