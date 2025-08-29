@@ -9,6 +9,7 @@ include { PROKKA } from './../modules/prokka/main'
 include { CSVTK_CONCAT;CSVTK_UNIQ } from './../modules/csvtk/main'
 include { BOHRA_VERSION } from './../modules/utils/main'
 include { CHECK_FASTQ } from './../modules/check_fastq/main'
+include { FASTP } from './../modules/fastp/main'
 
 workflow READ_ANALYSIS {   
 
@@ -22,6 +23,11 @@ workflow READ_ANALYSIS {
         // println reads_pe.view()
         reads_pe_checked = CHECK_FASTQ.out.pe_check.join( reads_pe )
         reads_pe_checked = reads_pe_checked.map { cfg, check, files -> tuple(cfg + [check:check], files) }
+        if (prams.modules.contains('trim')){
+            FASTP( reads_pe_checked )
+            reads_pe_checked = FASTP.out.read
+            
+        }
         // println reads_pe_checked.view()
         SEQKIT_STATS ( reads_pe_checked )
         SEQKIT_GC ( reads_pe_checked )

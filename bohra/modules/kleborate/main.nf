@@ -38,7 +38,8 @@ process KLEBORATE {
     script:
     """
     echo -e Isolate'\t'Typing_tool'\n'${meta.id}'\t'kleborate >> tmp.tab
-    kleborate -k -o kleborate_raw.tab -a $contigs
+    kleborate -a $contigs -o kleborate_results -p kpsc --trim_headers
+    cp kleborate_results/klebsiella_pneumo_complex_output.txt kleborate_raw.tab
     paste tmp.tab kleborate_raw.tab | csvtk -t rename -f species -n Species | csvtk -t cut -f Isolate,Typing_tool,RmpADC,RmST,rmpA2,wzi,K_locus,K_type,O_locus,O_type > typer_${getSoftwareName(task.process)}.txt
     rm -f tmp.tab
     echo -e kleborate'\t'\$CONDA_PREFIX'\t'\$(kleborate --version)'\t'${params.kleborate_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_kleborate.txt
