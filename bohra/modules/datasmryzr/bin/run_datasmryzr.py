@@ -138,9 +138,12 @@ def _generate_summary_table(results_files: list, output:list, min_depth:40, minq
         bounds = check_asm(summary["# Contigs"].tolist())
         summary["Contigs check"] = summary[["# Contigs","is_control"]].apply(lambda x: check_contigs(bounds[1], bounds[0], x), axis=1)
 
-    check_cols = [i for i in summary.columns if "check" in i]
-    check_cols = "filesize"
+    check_cols = [i for i in list(summary.columns) if "check" in i]
+    print(check_cols)
+    check_cols.append("filesize")
+    print(summary.columns)
     summary = summary.fillna("")
+    print(summary)
     summary["Comment"] = summary[check_cols].apply(lambda x: make_comment(x.tolist()), axis=1)
     summary["Data assessment"] = summary[check_cols].apply(lambda x: 1 if all(i == 1 for i in x.tolist()) else 0, axis=1)
     
