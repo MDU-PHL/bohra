@@ -73,6 +73,7 @@ workflow {
     // seq assessment is always done on every input
     READ_ANALYSIS ( reads_pe )
     read_stats = READ_ANALYSIS.out.read_stats
+    reads_pe = READ_ANALYSIS.out.reads_pe
     results = results.concat( read_stats)
     versions = READ_ANALYSIS.out.version_seqkit_reads
     versions = versions.concat( READ_ANALYSIS.out.version_kmc )
