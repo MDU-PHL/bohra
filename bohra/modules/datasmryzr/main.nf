@@ -14,8 +14,8 @@ process RUN_SMRYZR {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"report") }
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}/datasmryzr").exists()) {
-            conda "${params.conda_path}/datasmryzr"
+        if (file("${params.conda_path}/${params.conda_prefix}-datasmryzr").exists()) {
+            conda "${params.conda_path}/${params.conda_prefix}-datasmryzr"
         } else {
             conda "${moduleDir}/environment.yml"
         }
