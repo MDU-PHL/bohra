@@ -1,0 +1,31 @@
+
+{% raw %}
+profiles {
+{% endraw %}
+   {{profile_name}} {% raw %} {
+      params.publish_dir_mode = 'copy'
+      executor {
+         name = 'local'
+        
+         cpus =  {% endraw %}{{avail}}
+         {% raw %}
+      }
+      process {
+      
+        withLabel: process_low {
+             cpus={% endraw %} {{low}}
+             {% raw %}
+          }
+        withLabel: process_medium {
+           cpus=  {% endraw %}{{medium}}
+           {% raw %}
+        }
+        withLabel: process_high {
+           cpus=  {% endraw %}{{high}}
+           {% raw %}
+        }
+      }
+    }
+     
+ }
+ {% endraw %}

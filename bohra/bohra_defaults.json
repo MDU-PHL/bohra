@@ -32,5 +32,19 @@
         "snippy",
         "ska",
         "mash"
-    ]
+    ],
+    "resource_levels":{
+        "profile": "lcl",
+        "levels":{
+                "low": {
+                    "cpus": 1
+                },
+                "medium": {
+                    "cpus": 4
+                },
+                "high": {
+                    "cpus": 8
+                }
+            }
+    }
 }

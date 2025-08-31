@@ -7,6 +7,7 @@ import shutil
 from shutil import SameFileError
 import os
 import json
+import jinja2
 import pandas as pd
 
 class CustomFormatter(logging.Formatter):
@@ -114,7 +115,7 @@ def _resource_opt() -> list:
         {   
             "name":"cpus",
             "help":"Number of max CPU cores to run, will define how many rules are run at a time, if 0 then the avail cpus will be determined at time of launch",
-            "default":0,
+            "default":1,
         },
         {
             "name":"workdir",
@@ -132,11 +133,6 @@ def _resource_opt() -> list:
             "name":"conda_path",
             "help":"The path to where your pre-installed conda bohra-envs are stored. This can be provided in your profiles settings as well - it assumes you have pre-configured all of your conda environments for each process run by bohra, this is an advanced setting. Please take care if you are changing it.",
             "default":pathlib.Path(os.getenv('CONDA_PREFIX', ''))
-        },
-        {
-            "name":"profile",
-            "help":"The profile to use for running the pipeline. If not using defaults, you will need to have nextflow config set up - ist should be set as an environment variable - see docs for help. If not set, it will default to 'lcl'.",
-            "default":f"{pathlib.Path(os.getenv('NF_PROFILE'))}" if os.getenv('NF_PROFILE') else 'lcl',
         },
         {
             "name":"profile_config",
@@ -642,3 +638,43 @@ def _check_mask(mask:str) -> bool:
         msk = f"{pathlib.Path.cwd() / dst}"
     
     return msk
+
+
+
+def _get_template(template:str) -> jinja2.Template:
+    """
+    Function to get the template.
+    Args:
+        template (str): Path to the template file.
+    Returns:
+        jinja2.Template: Jinja2 template object.
+    """
+    if _check_path(template):
+        with open(template, "r", encoding="utf-8") as file:
+            return jinja2.Template(file.read())
+    raise FileNotFoundError(f"Template file {template} not found.")
+
+
+def _get_target(outpath:str, title:str) -> str:
+    
+    """
+    Generate the target file path for an HTML file based on the given 
+    output path and title.
+
+    Args:
+        outpath (str): The directory path where the file should be saved.
+        title (str): The title of the file, which will be used to generate
+        the filename.
+
+    Returns:
+        str: The full path to the target HTML file.
+
+    Raises:
+        FileNotFoundError: If the specified output path does not exist.
+    """
+
+    if pathlib.Path(outpath).exists():
+        name = f"{title.replace(' ', '_').replace(':', '_').replace('/', '_').lower()}.nf.config"
+        return pathlib.Path(outpath) / name
+    raise FileNotFoundError(f"Output path {outpath} does not exist.")
+
