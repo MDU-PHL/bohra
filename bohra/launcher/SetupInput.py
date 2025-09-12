@@ -23,10 +23,6 @@ CFG = {
         "ext":"*.f*q.gz",
         "num_expected":2,
     },
-    "pe-reads": {
-        "ext":"*.f*q.gz",
-        "num_expected":2
-    },
     "se-reads": {
         "ext":"*.f*q*",
         "num_expected":1
@@ -84,9 +80,9 @@ def _order_pereads(reads: list) -> list:
     """
     
     
-    r1 = [r for r in reads if "_R1" in r.name or "_1" in r.name]
+    r1 = [r for r in reads if "_R1" in r.name or "_1.f" in r.name or "_r1" in r.name]
     r1 = sorted(r1, key=lambda f: f.stat().st_ctime)[-1]
-    r2 = [r for r in reads if "_R2" in r.name or "_2" in r.name]
+    r2 = [r for r in reads if "_R2" in r.name or "_2.f" in r.name or "_r2" in r.name]
     r2 = sorted(r2, key=lambda f: f.stat().st_ctime)[-1]
     
     return [r1,r2]
@@ -107,7 +103,7 @@ def _glob_sequences(_dir: pathlib.Path,
         
         for iso in isolates:
             
-            seqs = sorted(pathlib.Path(_dir).rglob(f"{iso}{CFG[sequence_type]['ext']}"))
+            seqs = sorted(pathlib.Path(_dir).rglob(f"*{iso}{CFG[sequence_type]['ext']}"))
             LOGGER.info(f"Found {len(seqs)} {sequence_type} for {iso} in {_dir}.")
             if seqs == []:
                 seqs = sorted(pathlib.Path(_dir).rglob(f"{iso}/{CFG[sequence_type]['ext']}"))
@@ -119,7 +115,7 @@ def _glob_sequences(_dir: pathlib.Path,
                     if len(seqs) > CFG[sequence_type]['num_expected']:
                         LOGGER.warning(f"Expected 2 reads for {iso}, but found {len(seqs)}. Will use the most recent.")
                 elif sequence_type == "asm":
-                    heads = ["asm"]
+                    heads = ["assembly"]
                 else:
                     LOGGER.error(f"Unexpected sequence type: {sequence_type}.")
                     raise SystemExit
@@ -127,7 +123,7 @@ def _glob_sequences(_dir: pathlib.Path,
                 line['Isolate'] = iso
                 data.append(line)
             elif len(seqs) < CFG[sequence_type]['num_expected']:
-                LOGGER.warning(f"There do not appear to be {CFG[sequence_type]['num_expected']} reads for {iso}. Skipping")
+                LOGGER.warning(f"There do not appear to be {CFG[sequence_type]['num_expected']} {sequence_type} for {iso}. Skipping")
             
         if data != []:
             return pd.DataFrame(data)

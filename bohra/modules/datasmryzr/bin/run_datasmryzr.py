@@ -175,9 +175,14 @@ def _extract_cluster_table(results_files: list, output:list) -> str:
     """
     # print(output)
     for file in results_files:
-        if pathlib.Path(file).exists() and "clusters" in file:       
-            output.append(file)
-            return f"-ct {file}", output
+        if pathlib.Path(file).exists() and "clusters" in file:
+            try:
+                pd.read_csv(file, sep = '\t')       
+                output.append(file)
+                return f"-ct {file}", output
+            except Exception as e:
+                print(f"Error reading cluster file {file}: {e}")
+                continue
     # print(output)
     return "",output
 
@@ -188,8 +193,13 @@ def _extract_distance_matrix(results_files: list, output:list) -> str:
     # print(output)
     for file in results_files:
         if pathlib.Path(file).exists() and "distances" in file and "tsv" in file:       
-            output.append(file)
-            return f"-dm {file}", output
+            try:
+                pd.read_csv(file, sep = '\t')       
+                output.append(file)
+                return f"-dm {file}", output
+            except Exception as e:
+                print(f"Error reading cluster file {file}: {e}")
+                continue
     # print(output)
     return "",output
 
@@ -395,14 +405,14 @@ def _run_datasmryzr(tree:str,
     """
     cmd = f"datasmryzr --title '{job_id}' -c bohra_config.json -bg '{bkgd_color}' -fc '{text_color}' --pipeline {pipeline} --pipeline_version '{pipeline_version}' {other_files} {pangenome_classification} {pangenome_rtab} {pangenome_groups} {tree} {distance_matrix} {cluster_table} {core_genome} {core_genome_report} {reference} {mask} {annotation} {read_assessment}"
     print(cmd)
-    p = subprocess.run(cmd, shell=True, capture_output=True)
-    if p.returncode != 0:
-        print(p.stderr.decode())
-        raise Exception(f"Error running datasmryzr: {p.stderr.decode()}")
-    else:
-        print(p.stdout.decode())
-        print("datasmryzr run complete")
-        return p.stdout.decode()
+    # p = subprocess.run(cmd, shell=True, capture_output=True)
+    # if p.returncode != 0:
+    #     print(p.stderr.decode())
+    #     raise Exception(f"Error running datasmryzr: {p.stderr.decode()}")
+    # else:
+    #     print(p.stdout.decode())
+    #     print("datasmryzr run complete")
+    #     return p.stdout.decode()
 
 def extract_cmd(launchdir: str) -> str:
     """

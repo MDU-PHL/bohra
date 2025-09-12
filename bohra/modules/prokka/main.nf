@@ -36,7 +36,7 @@ process PROKKA {
 
     script:
     """
-    prokka --outdir $meta.id --prefix $meta.id --mincontiglen 500 --notrna --fast --force $contigs --cpus $task.cpus
+    prokka --outdir $meta.id --prefix $meta.id --mincontiglen 500 --notrna --fast --force $contigs --cpus $task.cpus --compliant
     cp ${meta.id}/${meta.id}.gff ${meta.id}.gff
     grep -v '^##' ${meta.id}/${meta.id}.txt > ${meta.id}.txt
     echo -e prokka'\t'\$CONDA_PREFIX'\t'\$(prokka -v  2>&1)'\t'${params.prokka_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_prokka.txt

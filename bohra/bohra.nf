@@ -172,13 +172,16 @@ workflow {
             
             // RUN_SNIPPY ( reads_pe, Channel.from(file(params.reference)) )
         } else if (params.modules.contains("ska") || params.modules.contains("mash") ){
-            reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }.filter { cfg, files -> cfg.control != 'control' }
-            asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }.filter { cfg, files -> cfg.control != 'control' }
+            reads = reads_pe.filter { cfg,files -> cfg.control != 'control' }.map { cfg, files -> tuple(cfg.id, cfg, files) }
+            // 
+            asm_tmp = asm.filter { cfg,files -> cfg.control != 'control' }.map { cfg, files -> tuple(cfg.id, cfg , files) }
+            // println reads.view()
             sequences = reads.join(asm_tmp, remainder:true).map( v -> { v.size() == 4 ? v[1] ? [v[1],v[2]] : [v[2],v[3]]  : [v[1],v[2]]} )
            
         } 
-
-        RELATIONSHIPS ( sequences, Channel.fromPath(params.reference) )
+        reference = Channel.fromPath(params.reference).ifEmpty('no_file')
+        // println sequences.view()
+        RELATIONSHIPS ( sequences, reference )
       
         results = results.concat( RELATIONSHIPS.out.dists )
         results = results.concat( RELATIONSHIPS.out.core_vcf )

@@ -18,7 +18,7 @@ workflow RUN_MASH {
         CSVTK_UNIQ ( versions )
     emit:
         dists = MASH_TRIANGLE.out.dists
-        versions = CSVTK_UNIQ.out.collated
+        version = CSVTK_UNIQ.out.collated
        
 
 }

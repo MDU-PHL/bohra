@@ -4,6 +4,7 @@ include { RUN_SNPS } from './../subworkflows/snippy'
 include { RUN_SKA } from './../subworkflows/ska'
 include { MAKE_SNP_TREE } from './../subworkflows/trees'
 include { MAKE_DIST_TREE } from './../subworkflows/trees'
+include { RUN_MASH } from './../subworkflows/mash'
 
 workflow RELATIONSHIPS {
 
@@ -36,6 +37,7 @@ workflow RELATIONSHIPS {
             
         } else if ( params.modules.contains("mash") ) {
             // add in a join to combine reads and asm
+            println "Running mash"
             RUN_MASH ( sequences )
             dists = RUN_MASH.out.dists
             clusters = Channel.empty()

@@ -91,8 +91,8 @@ for key in "${!TOOLS[@]}";do
             if [ "$INSTALL" == "yes" ]
                 then
                 echo $key can not be found. Now setting up $key
-                echo Will now run $INSTALLER create --force -y -n $key ${TOOLS[$key]}
-                $INSTALLER create --force -y -n $key ${TOOLS[$key]}
+                echo Will now run $INSTALLER create -y -n $key ${TOOLS[$key]}
+                $INSTALLER create -y -n $key ${TOOLS[$key]}
                 if [[ "$key" == "$ENV_PREFIX-stype" ]]; then
                     echo "will install $key from github"
                     conda activate $key && \

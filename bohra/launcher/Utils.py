@@ -191,7 +191,7 @@ def _get_common_options() -> list:
         {
             "name":"kraken2_db",
             "help":"Path to DB for use with kraken2",
-            "default":f"{pathlib.Path(os.getenv('BOHRA_KRAKEN2_DB'))}" if os.getenv("BOHRA_KRAKEN2_DB") else f"{pathlib.Path(os.getenv('KRAKEN2_DEFAULT_DB'))}" ,
+            "default":f"{pathlib.Path(os.getenv('KRAKEN2_DEFAULT_DB'))}" if os.getenv("KRAKEN2_DEFAULT_DB") else  "",
             "metavar":'BOHRA_KRAKEN2_DB',
             "show_default":True
         },
@@ -572,7 +572,8 @@ def _compartive_args(tool:str,kwargs:dict, command:dict) -> dict:
         "ska":["ska_minfreq",
                "ska_alnargs",
             "ska2_kszise"
-    ]
+    ],
+        "mash":[],
     }
 
     for arg in comparative_args[tool]:
