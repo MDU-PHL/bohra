@@ -405,14 +405,14 @@ def _run_datasmryzr(tree:str,
     """
     cmd = f"datasmryzr --title '{job_id}' -c bohra_config.json -bg '{bkgd_color}' -fc '{text_color}' --pipeline {pipeline} --pipeline_version '{pipeline_version}' {other_files} {pangenome_classification} {pangenome_rtab} {pangenome_groups} {tree} {distance_matrix} {cluster_table} {core_genome} {core_genome_report} {reference} {mask} {annotation} {read_assessment}"
     print(cmd)
-    # p = subprocess.run(cmd, shell=True, capture_output=True)
-    # if p.returncode != 0:
-    #     print(p.stderr.decode())
-    #     raise Exception(f"Error running datasmryzr: {p.stderr.decode()}")
-    # else:
-    #     print(p.stdout.decode())
-    #     print("datasmryzr run complete")
-    #     return p.stdout.decode()
+    p = subprocess.run(cmd, shell=True, capture_output=True)
+    if p.returncode != 0:
+        print(p.stderr.decode())
+        raise Exception(f"Error running datasmryzr: {p.stderr.decode()}")
+    else:
+        print(p.stdout.decode())
+        print("datasmryzr run complete")
+        return p.stdout.decode()
 
 def extract_cmd(launchdir: str) -> str:
     """
