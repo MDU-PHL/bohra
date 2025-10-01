@@ -120,7 +120,7 @@ def _resource_opt() -> list:
         {
             "name":"workdir",
             "help":"The directory where Bohra will be run, default is current directory",
-            "default":pathlib.Path.cwd().absolute(),
+            "default":pathlib.Path(os.getenv('PWD', '')),
             "type":click.Path(exists=True)
         },
         {
