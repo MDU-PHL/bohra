@@ -57,7 +57,7 @@ def _check_test_data(path, isolate_list):
     LOGGER.info(f"All reads are found at {path}")
     return True
 
-def run_tests():
+def run_tests(cpus:int=1):
     download_stub = "https://raw.githubusercontent.com/MDU-PHL/bohra/master/data"
     read_path = f"{pathlib.Path.cwd() / 'test_data'}"
     isolate_list = ['ERR1102348','ERR1102353','ERR1102355','ERR1102356']
@@ -73,7 +73,7 @@ def run_tests():
     elif _check_test_data(path = read_path, isolate_list = isolate_list):
         find_data(reads = f"{read_path}",contigs="",isolate_ids ="" )
         
-    cmd = f"bohra run full -i bohra_input.tsv -ref {reference} --proceed Y"
+    cmd = f"bohra run full -i bohra_input.tsv -ref {reference} --proceed Y --cpus {cpus}"
     LOGGER.info(f"Now testing that the bohra installation has worked. Running command: {cmd}")
     proc = _run_subprocess(cmd=cmd)
 
