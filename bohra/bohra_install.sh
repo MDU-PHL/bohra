@@ -114,7 +114,7 @@ su=$(check_installation $ENV_PREFIX-mob_suite)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-mob_suite can not be found. Now setting up $ENV_PREFIX-mob_suite
-        $INSTALLER create -y -n $ENV_PREFIX-mob_suite csvtk mob_suite=3.0.2 numpy=1.21.1
+        $INSTALLER create -y -n $ENV_PREFIX-mob_suite csvtk mob_suite=3.1.6 numpy=1.21.1
     else
         echo $ENV_PREFIX-mob_suite is already setup. Nothing left to do
         conda activate $ENV_PREFIX-mob_suite
@@ -133,7 +133,7 @@ su=$(check_installation $ENV_PREFIX-panaroo)
 if [[ $su -eq 1 ]]
     then
         echo $ENV_PREFIX-panaroo can not be found. Now setting up $ENV_PREFIX-panaroo
-        $INSTALLER create -y -n $ENV_PREFIX-panaroo panaroo=1.2.9 csvtk
+        $INSTALLER create -y -n $ENV_PREFIX-panaroo panaroo=1.5.2 csvtk
     else
         echo $ENV_PREFIX-panaroo is already setup. Nothing left to do
 fi
