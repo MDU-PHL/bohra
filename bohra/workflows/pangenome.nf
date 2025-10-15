@@ -11,12 +11,17 @@ workflow RUN_PANAROO {
     main:
         PANAROO ( gff )     
         pangenome_rtab = PANAROO.out.pangenome_rtab
+        classification = Channel.empty().ifEmpty( 'no_results' )
+        groups = Channel.empty().ifEmpty( 'no_results' )
+        if (params.modules.contains("snippy") || (params.modules.contains("ska")) ){
         EXTRACT_GROUPS ( group )
         groups = EXTRACT_GROUPS.out.pangenome_groups
         CLASSIFY_PANGENOME ( pangenome_rtab, groups )
         
+        } 
+        
     emit:
-        classification = CLASSIFY_PANGENOME.out.pangenome_classification
+        classification = classification
         pangenome_rtab = pangenome_rtab
         groups = groups
         roary = PANAROO.out.pangenome_summary
