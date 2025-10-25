@@ -152,12 +152,12 @@ def run_bohra(
         else:
             LOGGER.info(f"Running the command: {cmd}")
             proc = _run_subprocess(cmd=cmd)
-            if proc.returncode == 0:
-                LOGGER.info(f"The {pipeline} pipeline has completed successfully.")
-                return True
-            else:
-                LOGGER.error(f"The {pipeline} pipeline failed with return code {proc.returncode}.")
-                return False
+            # if proc.returncode == 0:
+            #     LOGGER.info(f"The {pipeline} pipeline has completed successfully.")
+            #     return True
+            # else:
+            #     LOGGER.error(f"The {pipeline} pipeline failed with return code {proc.returncode}.")
+            #     return False
     else:
         LOGGER.error(f"Failed to create the working directory {kwargs['workdir']}.")
         raise SystemError

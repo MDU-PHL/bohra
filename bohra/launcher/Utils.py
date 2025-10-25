@@ -73,12 +73,14 @@ def _check_size_file( path:str):
 
 
 
-def _run_subprocess(cmd):
+def _run_subprocess(cmd : str, capture_output: bool = True) -> subprocess.CompletedProcess:
 
-    
-    p = subprocess.run(cmd, shell = True, capture_output=True, encoding= 'utf-8')
-    return p
-
+    if capture_output:
+        p = subprocess.run(cmd, shell = True, capture_output=True, encoding= 'utf-8')
+        return p
+    else:
+        p = subprocess.run(cmd, shell = True)
+        return p
 
 def _get_required_columns() -> dict:
     """

@@ -6,3 +6,5 @@ test/__pycache__/
 build
 dist
 bohra/.code-workspace.code-workspace
+*.sif
+*.log
