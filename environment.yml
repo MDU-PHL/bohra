@@ -1,4 +1,4 @@
-name: bohra3
+name: bohra
 channels:
   - conda-forge
   - bioconda
