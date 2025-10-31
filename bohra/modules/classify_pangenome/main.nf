@@ -19,6 +19,8 @@ process CLASSIFY_PANGENOME {
         conda null
     }
     scratch true
+    errorStrategy 'ignore'
+    
     
     input:
     path(rtab)

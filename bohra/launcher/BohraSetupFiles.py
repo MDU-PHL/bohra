@@ -153,4 +153,6 @@ def _make_workdir(_input:pd.DataFrame, workdir:str) -> bool:
                     except Exception as e:
                         LOGGER.critical(f"Could not link {user_supplied} to {wd / row[1][columns[0]]}/{target_file}. Error: {e}")
                         raise SystemExit
+                else:
+                    LOGGER.warning(f"File {user_supplied} does not exist or is not accessible. Skipping link creation.")
     return "input_checked.tsv"

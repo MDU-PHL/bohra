@@ -197,9 +197,7 @@ workflow {
 
         if( params.pangenome_groups == "clusters") {
             groups = RELATIONSHIPS.out.clusters
-        } else if (params.pangenome_groups == "mlst") {
-            groups = RELATIONSHIPS.out.mlst
-        } 
+        }
         gff = ASSEMBLY_ANALYSIS.out.gff
         RUN_PANAROO ( gff,groups )
 

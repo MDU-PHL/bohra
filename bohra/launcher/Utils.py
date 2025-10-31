@@ -33,7 +33,18 @@ class CustomFormatter(logging.Formatter):
         formatter = logging.Formatter(log_fmt,datefmt='%m/%d/%Y %I:%M:%S %p')
         return formatter.format(record)
     
-
+# Logger
+LOGGER =logging.getLogger(__name__) 
+LOGGER.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+ch.setFormatter(CustomFormatter())
+fh = logging.FileHandler('bohra_test.log')
+fh.setLevel(logging.DEBUG)
+formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p') 
+fh.setFormatter(formatter)
+LOGGER.addHandler(ch) 
+LOGGER.addHandler(fh)
 
 cfg_file = f"{pathlib.Path(__file__).parent.parent.resolve() / 'bohra_defaults.json'}"
 with open(cfg_file, 'r') as f:
@@ -62,12 +73,14 @@ def _check_size_file( path:str):
 
 
 
-def _run_subprocess(cmd):
+def _run_subprocess(cmd : str, capture_output: bool = True) -> subprocess.CompletedProcess:
 
-    
-    p = subprocess.run(cmd, shell = True, capture_output=True, encoding= 'utf-8')
-    return p
-
+    if capture_output:
+        p = subprocess.run(cmd, shell = True, capture_output=True, encoding= 'utf-8')
+        return p
+    else:
+        p = subprocess.run(cmd, shell = True)
+        return p
 
 def _get_required_columns() -> dict:
     """
@@ -110,7 +123,7 @@ def _get_pipelines(pipeline:str) -> list:
     }
 
 def _resource_opt() -> list:
-    pwd = f"{pathlib.Path.cwd().absolute()}"
+    pwd = f"{os.getenv('BOHRA_WD', pathlib.Path.cwd())}"
     resource_options = [
         {   
             "name":"cpus",
@@ -120,7 +133,7 @@ def _resource_opt() -> list:
         {
             "name":"workdir",
             "help":"The directory where Bohra will be run, default is current directory",
-            "default":pathlib.Path(os.getenv('PWD', '')),
+            "default":pwd,
             "type":click.Path(exists=True)
         },
         {
@@ -603,8 +616,10 @@ def _check_input_snippy(input_file:str) -> bool:
     reads = False
     if _check_path(input_file):
         df = pd.read_csv(input_file, sep='\t')
+        LOGGER.info(f"Read snippy input: {df}") 
         df = df.fillna('')
         for row in df.iterrows():
+            LOGGER.info(f"Checking snippy input: {row}")
             chk = _compare_r1_r2(r1=row[1]['r1'], r2=row[1]['r2'])
             if  chk:
                 reads = True
