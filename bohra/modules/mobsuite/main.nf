@@ -30,7 +30,7 @@ process MOBSUITE {
     output:
     tuple val(meta), path('contig_report.txt'), emit: contig_report
     tuple val(meta), path('mobtyper_results.txt'), emit: mobs
-    tuple val(meta), path('*.fasta') optional true
+    tuple val(meta), path('*.fasta'), optional: true
     tuple val(meta), path("version_mobsuite.txt"), emit: version
     // tuple val(meta), path('spades.log'), emit: log
 

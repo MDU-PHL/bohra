@@ -8,3 +8,5 @@ dist
 bohra/.code-workspace.code-workspace
 *.sif
 *.log
+token.json
+.pypirc
