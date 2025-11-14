@@ -143,9 +143,9 @@ def _resource_opt() -> list:
             "default":True
         },
         {
-            "name":"conda_path",
+            "name":"conda_prefix",
             "help":"The path to where your pre-installed conda bohra-envs are stored. This can be provided in your profiles settings as well - it assumes you have pre-configured all of your conda environments for each process run by bohra, this is an advanced setting. Please take care if you are changing it.",
-            "default":pathlib.Path(os.getenv('CONDA_PREFIX', ''))
+            "default":f"{pathlib.Path( os.getenv('CONDA_PREFIX') / 'bohra_envs')}" if os.getenv('CONDA_PREFIX') else f"",
         },
         {
             "name":"profile_config",
@@ -163,12 +163,6 @@ def _resource_opt() -> list:
             "help":"Add if you would like to force a complete restart of the pipeline. All previous logs will be lost.",
             "is_flag":True,
             "default":False
-        },
-        {
-            "name": "install_deps",
-            "help": "If you would like to install dependencies that are not already available using conda for each process, set this to 'Y'. Highly recommended.",
-            "default":'Y',
-            "type":click.Choice(['Y', 'N'])
         },
         
         
@@ -229,12 +223,6 @@ def _get_common_options() -> list:
             "name":"background_color",
             "help":"Color to use for the background in the report html. Default is '#343a40'.",
             "default":"#343a40",
-        },
-        {
-            "name":"conda_prefix",
-            "help":"The prefix for the conda environments to be used for each process. Default is 'bohra'.",
-            "default":prefix,
-            "show_default":True
         },
         {
             "name":"trim/--no-trim",

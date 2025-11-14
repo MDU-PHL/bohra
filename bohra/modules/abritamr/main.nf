@@ -19,8 +19,8 @@ process ABRITAMR {
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/abritamr" : 'bioconda::abritamr') : null) 
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}/${params.conda_prefix}-abritamr").exists()) {
-            conda "${params.conda_path}/${params.conda_prefix}-abritamr"
+        if (file("${params.conda_prefix}/abritamr").exists()) {
+            conda "${params.conda_prefix}/abritamr"
         } else {
             conda "${moduleDir}/environment.yml" }
     } else {
@@ -58,14 +58,8 @@ process ABRITAMR_GENERAL {
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"${meta.id}", publish_id:meta.id) }
-    // publishDir "abritamr",
-    //     mode: 'link',
-    //     saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
-    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/abritamr" : 'bioconda::abritamr') : null) 
-    
-    if ( params.enable_conda ) {
-        if (file("${params.conda_path}/${params.conda_prefix}-abritamr").exists()) {
-            conda "${params.conda_path}/${params.conda_prefix}-abritamr"
+    if (file("${params.conda_prefix}/abritamr").exists()) {
+            conda "${params.conda_prefix}/abritamr"
         } else {
             conda "${moduleDir}/environment.yml" }
     } else {
@@ -99,20 +93,15 @@ process ABRITAMR_INFER {
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"${meta.id}", publish_id:meta.id) }
-    // publishDir "abritamr",
-    //     mode: 'link',
-    //     saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
-    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/abritamr" : 'bioconda::abritamr') : null) 
-    
-    if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/${params.conda_prefix}-abritamr"
+    if (file("${params.conda_prefix}/abritamr").exists()) {
+            conda "${params.conda_prefix}/abritamr"
         } else {
             conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null
     }
+    errorStrategy 'ignore'
     scratch true
     input:
     tuple val(meta), path(summary_matches)
@@ -157,41 +146,3 @@ process COMBINE_AMR {
 
 }
 
-// process COLLATE_ABRITAMR {
-    
-//     label 'process_low'
-        
-//     cache 'lenient'
-//     input:
-//     val(abritamr_matches_isolates) 
-    
-//     output:
-//     path 'summary_matches.txt', emit: abritamr_matches
-    
-    
-//     script:
-    
-//     """
-//     $module_dir/concat.py summary_matches.txt $abritamr_matches_isolates
-//     """
-    
-// }
-
-// process COLLATE_ABRITAMR_PARTIALS {
-    
-//     label 'process_low'
-      
-//     cache 'lenient'
-//     input:
-//     val(abritamr_partials_isolates)
-
-//     output:
-//     path 'summary_partials.txt', emit: abritamr_partials
-    
-//     script:
-    
-//     """
-//     $module_dir/concat.py summary_partials.txt $abritamr_partials_isolates
-//     """
-    
-// }
