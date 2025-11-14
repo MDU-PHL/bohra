@@ -11,10 +11,10 @@ process GUBBINS {
         mode: params.publish_dir_mode
     scratch true
     cache 'lenient'
-    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/gubbins" : 'gubbins=2.4.1 snp-sites=2.5.1') : null)
+    
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}/${params.conda_prefix}-gubbins").exists()) {
-            conda "${params.conda_path}/${params.conda_prefix}-gubbins"
+        if (file("${params.conda_prefix}/gubbins").exists()) {
+            conda "${params.conda_prefix}/gubbins"
         } else {
             conda "${moduleDir}/environment.yml"
         }

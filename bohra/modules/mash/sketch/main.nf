@@ -12,11 +12,11 @@ process MASH_SKETCH {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     
     
-    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/mash" : 'mash') : null) 
+    
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}/${params.conda_prefix}-mash").exists()) {
-            conda "${params.conda_path}/${params.conda_prefix}-mash"
+        if (file("${params.conda_prefix}/mash").exists()) {
+            conda "${params.conda_prefix}/mash"
         } else {
             conda "${moduleDir}/environment.yml"
         }

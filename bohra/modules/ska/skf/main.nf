@@ -11,12 +11,9 @@ process SKA_BUILD {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     
-    
-    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/mash" : 'mash') : null) 
-    
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}/${params.conda_prefix}-ska2").exists()) {
-            conda "${params.conda_path}/${params.conda_prefix}-ska2"
+        if (file("${params.conda_prefix}/ska2").exists()) {
+            conda "${params.conda_prefix}/ska2"
         } else {
             conda "${moduleDir}/environment.yml"
         }

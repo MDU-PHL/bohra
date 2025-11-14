@@ -10,8 +10,8 @@ process KMC {
     // afterScript "rm -fr /tmp/\$USER/*"
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}/${params.conda_prefix}-kmc").exists()) {
-            conda "${params.conda_path}/${params.conda_prefix}-kmc"
+        if (file("${params.conda_prefix}/assemblers").exists()) {
+            conda "${params.conda_prefix}/assemblers"
         } else {
             conda "${moduleDir}/environment.yml"
         }

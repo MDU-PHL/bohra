@@ -11,13 +11,12 @@ process NGMASTER {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     
-    cpus options.args2// args2 needs to be cpus for shovill
     cache 'lenient'
     errorStrategy 'ignore'
     scratch true
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}/${params.conda_prefix}-ngmaster").exists()) {
-            conda "${params.conda_path}/${params.conda_prefix}-ngmaster"
+        if (file("${params.conda_prefix}/ngmaster").exists()) {
+            conda "${params.conda_prefix}/ngmaster"
         } else {
             conda "${moduleDir}/environment.yml"
         }

@@ -12,11 +12,10 @@ process SNP_DISTS {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
     
     
-    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/snpdists" : 'bioconda::snp-dists=0.8.2 bioconda::csvtk') : null) 
-    
+    scratch true
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}/${params.conda_prefix}-snpdists").exists()) {
-            conda "${params.conda_path}/${params.conda_prefix}-snpdists"
+        if (file("${params.conda_prefix}/snpdists").exists()) {
+            conda "${params.conda_prefix}/snpdists"
         } else {
             conda "${moduleDir}/environment.yml"
         }

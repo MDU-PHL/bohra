@@ -11,12 +11,9 @@ process QUICKTREE {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
     
-    
-    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/quicktree" : 'bioconda::quicktree=2.5') : null) 
-    
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}/${params.conda_prefix}-quicktree").exists()) {
-            conda "${params.conda_path}/${params.conda_prefix}-quicktree"
+        if (file("${params.conda_prefix}/trees").exists()) {
+            conda "${params.conda_prefix}/trees"
         } else {
             conda "${moduleDir}/environment.yml"
         }

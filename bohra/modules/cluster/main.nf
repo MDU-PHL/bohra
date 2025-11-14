@@ -11,8 +11,8 @@ process SNP_CLUSTER {
         mode: params.publish_dir_mode
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}/${params.conda_prefix}-cluster").exists()) {
-            conda "${params.conda_path}/${params.conda_prefix}-cluster"
+        if (file("${params.conda_prefix}/cluster").exists()) {
+            conda "${params.conda_prefix}/cluster"
         } else {
             conda "${moduleDir}/environment.yml"
         }

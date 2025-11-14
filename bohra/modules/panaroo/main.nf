@@ -11,8 +11,8 @@ process PANAROO {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"report", publish_id:'report') }
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}/${params.conda_prefix}-panaroo").exists()) {
-            conda "${params.conda_path}/${params.conda_prefix}-panaroo"
+        if (file("${params.conda_prefix}/panaroo").exists()) {
+            conda "${params.conda_prefix}/panaroo"
         } else {
             conda "${moduleDir}/environment.yml"
         }

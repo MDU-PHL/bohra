@@ -10,8 +10,8 @@ process CLASSIFY_PANGENOME {
     cache 'lenient'
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}/${params.conda_prefix}-classify-pangenome").exists()) {
-            conda "${params.conda_path}/${params.conda_prefix}-classify-pangenome"
+        if (file("${params.conda_prefix}/classify-pangenome").exists()) {
+            conda "${params.conda_prefix}/classify-pangenome"
         } else {
             conda "${moduleDir}/environment.yml"
         }

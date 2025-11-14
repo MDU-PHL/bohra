@@ -12,10 +12,10 @@ process IQTREE {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
     
-    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/iqtree2" : 'iqtree=2.1.4 snp-sites=2.5.1') : null)
+    
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}/${params.conda_prefix}-iqtree").exists()) {
-            conda "${params.conda_path}/${params.conda_prefix}-iqtree"
+        if (file("${params.conda_prefix}/trees").exists()) {
+            conda "${params.conda_prefix}/trees"
         } else {
             conda "${moduleDir}/environment.yml"
         }

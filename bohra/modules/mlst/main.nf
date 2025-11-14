@@ -15,11 +15,11 @@ process MLST {
     
     cache 'lenient'
     
-    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/mlst" : 'bioconda::mlst=2.19.0') : null) 
+    
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}/${params.conda_prefix}-mlst").exists()) {
-            conda "${params.conda_path}/${params.conda_prefix}-mlst"
+        if (file("${params.conda_prefix}/mlst").exists()) {
+            conda "${params.conda_prefix}/mlst"
         } else {
             conda "${moduleDir}/environment.yml"
         }
