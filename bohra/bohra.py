@@ -96,7 +96,7 @@ for opt in cmd_opts:
     create_subcommand_with_options(name = opt, options_dict = cmd_opts[opt])
 
 cli.add_command(check.check)
-# cli.add_command(install.install_deps)
+cli.add_command(install.install_deps)
 cli.add_command(generate_input.generate_input)
 cli.add_command(bohratest.test)
 

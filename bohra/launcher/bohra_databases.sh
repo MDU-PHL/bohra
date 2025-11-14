@@ -9,7 +9,7 @@ set -e
 eval "$(conda shell.bash hook)"
 
 
-DB_VARS=("BOHRA_KRAKEN2_DB" "BOHRA_PUBMLST_DB" "BOHRA_BLAST_DB" "BOHRA_MOBSUITE_DB")
+DB_VARS=("KRAKEN2_DEFAULT_DB" "BOHRA_PUBMLST_DB" "BOHRA_BLAST_DB" "BOHRA_MOBSUITE_DB")
 NONESSENTIAL_VARS=("BOHRA_PUBMLST_DB" "BOHRA_BLAST_DB" "BOHRA_MOBSUITE_DB") 
 declare -A DB_URL=(
     [1]="https://genome-idx.s3.amazonaws.com/kraken/k2_standard_20250402.tar.gz",

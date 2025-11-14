@@ -6,7 +6,7 @@ from bohra.launcher.BohraAssembly import _setup_assembly_args
 from bohra.launcher.BohraTyping import _setup_typing_args
 from bohra.launcher.BohraComparative import _setup_comparative_args
 from bohra.launcher.BohraPangenome import _setup_pangenome_args
-from bohra.launcher.CheckDeps import install_dependencies, check_databases
+from bohra.launcher.CheckDeps import check_dependencies
 
 import pandas as pd
 import pathlib
@@ -27,18 +27,6 @@ formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt
 fh.setFormatter(formatter)
 LOGGER.addHandler(ch) 
 LOGGER.addHandler(fh)
-
-
-def _check_deps_installed(prefix: str, check_only = False) -> bool:
-    script_path = f"{pathlib.Path(__file__).parent}"
-    
-    deps = install_dependencies(prefix=prefix, check_only = check_only)
-    if deps == 0:
-        # LOGGER.info("All dependencies are installed.")
-        return True
-    else:
-        LOGGER.error("One or more dependencies are not installed. Please run bohra check --install-deps to install them")
-        raise SystemExit
 
 
 
@@ -124,8 +112,7 @@ def run_bohra(
     if _make_workdir(workdir=kwargs["workdir"],   
                   _input=kwargs["input_file"]):
         LOGGER.info(f"Checking on the setup for the {pipeline} pipeline.")
-        check_only = True if kwargs['install_deps'] == 'N' else False
-        _check_deps_installed(prefix=kwargs.get('conda_prefix', 'bohra'), check_only = check_only)
+        check_dependencies(check = "check")
         max_cpus = int(_max_cpus(cpus=kwargs.get('cpus', 0)))
         LOGGER.info(f"Using {int(max_cpus)} CPUs for the {pipeline} pipeline.")
         profile,profile_config = _get_config(user_config=kwargs['profile_config'], title = kwargs['job_name'],cpus=max_cpus, wd = kwargs["workdir"])
