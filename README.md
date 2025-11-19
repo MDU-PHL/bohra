@@ -3,9 +3,6 @@
 
 **Bohra is currently undergoing some significant upgrades and redevelopment. We appreciate your patience while we make these changes. For those interested you can find some preliminary installation and usage instructions [here](https://mdu-phl.github.io/bohra/). The current stable version detailed below is still ofcourse available.**
 
-**Bohra is currently undergoing some significant upgrades and redevelopment. We appreciate your patience while we make these changes. For those interested you can find some preliminary installation and usage instructions [here](https://mdu-phl.github.io/bohra/). The current stable version detailed below is still ofcourse available.**
-
-
 # Bohra
 
 Bohra is microbial genomics pipeline, designed predominantly for use in public health, but may also be useful in research settings. At a minimum the pipeline takes as input a tab-delimited file with the isolate IDs followed by the path to READ1 and READ2, where reads are illumina reads (other platforms are not supported at this stage).
