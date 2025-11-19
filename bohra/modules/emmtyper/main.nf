@@ -16,8 +16,8 @@ process EMMTYPER {
     scratch true
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_prefix}/emmtyper").exists()) {
-            conda "${params.conda_prefix}/emmtyper"
+        if (file("${params.dependency_prefix}/emmtyper").exists()) {
+            conda "${params.dependency_prefix}/emmtyper"
         } else {
             conda "${moduleDir}/environment.yml"
         }

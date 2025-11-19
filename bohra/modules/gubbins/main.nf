@@ -13,8 +13,8 @@ process GUBBINS {
     cache 'lenient'
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_prefix}/gubbins").exists()) {
-            conda "${params.conda_prefix}/gubbins"
+        if (file("${params.dependency_prefix}/gubbins").exists()) {
+            conda "${params.dependency_prefix}/gubbins"
         } else {
             conda "${moduleDir}/environment.yml"
         }

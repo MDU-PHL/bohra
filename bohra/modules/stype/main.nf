@@ -17,8 +17,8 @@ process STYPE {
     scratch true
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_prefix}/stype").exists()) {
-            conda "${params.conda_prefix}/stype"
+        if (file("${params.dependency_prefix}/stype").exists()) {
+            conda "${params.dependency_prefix}/stype"
         } else {
             conda "${moduleDir}/environment.yml"
         }

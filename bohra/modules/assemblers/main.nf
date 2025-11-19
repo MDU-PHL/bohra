@@ -12,8 +12,8 @@ process ASSEMBLER_PE {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"${meta.id}", publish_id:meta.id) }
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_prefix}/assemblers").exists()) {
-            conda "${params.conda_prefix}/assemblers"
+        if (file("${params.dependency_prefix}/assemblers").exists()) {
+            conda "${params.dependency_prefix}/assemblers"
         } else {
             conda "${moduleDir}/environment.yml"
         }

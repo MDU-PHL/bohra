@@ -19,8 +19,8 @@ process ABRITAMR {
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/abritamr" : 'bioconda::abritamr') : null) 
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_prefix}/abritamr").exists()) {
-            conda "${params.conda_prefix}/abritamr"
+        if (file("${params.dependency_prefix}/abritamr").exists()) {
+            conda "${params.dependency_prefix}/abritamr"
         } else {
             conda "${moduleDir}/environment.yml" }
     } else {
@@ -58,8 +58,8 @@ process ABRITAMR_GENERAL {
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"${meta.id}", publish_id:meta.id) }
-    if (file("${params.conda_prefix}/abritamr").exists()) {
-            conda "${params.conda_prefix}/abritamr"
+    if (file("${params.dependency_prefix}/abritamr").exists()) {
+            conda "${params.dependency_prefix}/abritamr"
         } else {
             conda "${moduleDir}/environment.yml" }
     } else {
@@ -93,8 +93,8 @@ process ABRITAMR_INFER {
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"${meta.id}", publish_id:meta.id) }
-    if (file("${params.conda_prefix}/abritamr").exists()) {
-            conda "${params.conda_prefix}/abritamr"
+    if (file("${params.dependency_prefix}/abritamr").exists()) {
+            conda "${params.dependency_prefix}/abritamr"
         } else {
             conda "${moduleDir}/environment.yml"
         }

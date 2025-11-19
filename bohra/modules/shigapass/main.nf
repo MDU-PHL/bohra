@@ -17,8 +17,8 @@ process SHIGAPASS {
     scratch true
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_prefix}/shigapass").exists()) {
-            conda "${params.conda_prefix}/shigapass"
+        if (file("${params.dependency_prefix}/shigapass").exists()) {
+            conda "${params.dependency_prefix}/shigapass"
         } else {
             conda "${moduleDir}/environment.yml"
         }

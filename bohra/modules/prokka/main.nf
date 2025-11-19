@@ -15,8 +15,8 @@ process PROKKA {
     
    
     if ( params.enable_conda ) {
-        if (file("${params.conda_prefix}/prokka").exists()) {
-            conda "${params.conda_prefix}/prokka"
+        if (file("${params.dependency_prefix}/prokka").exists()) {
+            conda "${params.dependency_prefix}/prokka"
         } else {
             conda "${moduleDir}/environment.yml"
         }

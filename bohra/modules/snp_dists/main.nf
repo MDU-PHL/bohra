@@ -14,8 +14,8 @@ process SNP_DISTS {
     
     scratch true
     if ( params.enable_conda ) {
-        if (file("${params.conda_prefix}/snpdists").exists()) {
-            conda "${params.conda_prefix}/snpdists"
+        if (file("${params.dependency_prefix}/snpdists").exists()) {
+            conda "${params.dependency_prefix}/snpdists"
         } else {
             conda "${moduleDir}/environment.yml"
         }

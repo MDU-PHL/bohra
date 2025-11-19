@@ -13,8 +13,8 @@ process INSERTIQR {
     cache 'lenient'
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_prefix}/snippy").exists()) {
-            conda "${params.conda_prefix}/snippy"
+        if (file("${params.dependency_prefix}/snippy").exists()) {
+            conda "${params.dependency_prefix}/snippy"
         } else {
             conda "${moduleDir}/environment.yml"
         }

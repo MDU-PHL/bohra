@@ -15,8 +15,8 @@ process CORE_SNP_FILTER {
     cache 'lenient'
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_prefix}/trees").exists()) {
-            conda "${params.conda_prefix}/trees"
+        if (file("${params.dependency_prefix}/trees").exists()) {
+            conda "${params.dependency_prefix}/trees"
         } else {
             conda "${moduleDir}/environment.yml"
         }

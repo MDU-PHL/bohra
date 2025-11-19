@@ -16,8 +16,8 @@ process KLEBORATE {
     errorStrategy 'ignore'
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/spades" : 'bioconda::spades=3.15.2') : null) 
     if ( params.enable_conda ) {
-        if (file("${params.conda_prefix}/kleborate").exists()) {
-            conda "${params.conda_prefix}/kleborate"
+        if (file("${params.dependency_prefix}/kleborate").exists()) {
+            conda "${params.dependency_prefix}/kleborate"
         } else {
             conda "${moduleDir}/environment.yml"
         }

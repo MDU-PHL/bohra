@@ -14,8 +14,8 @@ process SKA_ALIGN {
     
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_prefix}/ska2").exists()) {
-            conda "${params.conda_prefix}/ska2"
+        if (file("${params.dependency_prefix}/ska2").exists()) {
+            conda "${params.dependency_prefix}/ska2"
         } else {
             conda "${moduleDir}/environment.yml"
         }

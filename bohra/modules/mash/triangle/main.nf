@@ -13,8 +13,8 @@ process MASH_TRIANGLE {
     
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_prefix}/mash").exists()) {
-            conda "${params.conda_prefix}/mash"
+        if (file("${params.dependency_prefix}/mash").exists()) {
+            conda "${params.dependency_prefix}/mash"
         } else {
             conda "${moduleDir}/environment.yml"
         }

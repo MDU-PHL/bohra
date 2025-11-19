@@ -12,8 +12,8 @@ process SKA_BUILD {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_prefix}/ska2").exists()) {
-            conda "${params.conda_prefix}/ska2"
+        if (file("${params.dependency_prefix}/ska2").exists()) {
+            conda "${params.dependency_prefix}/ska2"
         } else {
             conda "${moduleDir}/environment.yml"
         }

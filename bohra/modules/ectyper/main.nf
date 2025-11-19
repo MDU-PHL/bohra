@@ -18,8 +18,8 @@ process ECTYPER {
     scratch true
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_prefix}/ectyper").exists()) {
-            conda "${params.conda_prefix}/ectyper"
+        if (file("${params.dependency_prefix}/ectyper").exists()) {
+            conda "${params.dependency_prefix}/ectyper"
         } else {
             conda "${moduleDir}/environment.yml"
         }

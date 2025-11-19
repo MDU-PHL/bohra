@@ -15,8 +15,8 @@ process SEQTK {
     scratch true
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_prefix}/seqtk").exists()) {
-            conda "${params.conda_prefix}/seqtk"
+        if (file("${params.dependency_prefix}/seqtk").exists()) {
+            conda "${params.dependency_prefix}/seqtk"
         } else {
             conda "${moduleDir}/environment.yml"
         }

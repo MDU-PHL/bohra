@@ -18,8 +18,8 @@ process MLST {
     
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_prefix}/mlst").exists()) {
-            conda "${params.conda_prefix}/mlst"
+        if (file("${params.dependency_prefix}/mlst").exists()) {
+            conda "${params.dependency_prefix}/mlst"
         } else {
             conda "${moduleDir}/environment.yml"
         }

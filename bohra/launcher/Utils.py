@@ -143,9 +143,9 @@ def _resource_opt() -> list:
             "default":True
         },
         {
-            "name":"conda_prefix",
+            "name":"dependency_prefix",
             "help":"The path to where your pre-installed conda bohra-envs are stored. This can be provided in your profiles settings as well - it assumes you have pre-configured all of your conda environments for each process run by bohra, this is an advanced setting. Please take care if you are changing it.",
-            "default":f"{pathlib.Path( os.getenv('CONDA_PREFIX') / 'bohra_envs')}" if os.getenv('CONDA_PREFIX') else f"",
+            "default":f"{pathlib.Path( os.getenv('CONDA_PREFIX')) /  'conda_envs'}" if os.getenv('CONDA_PREFIX') else f"",
         },
         {
             "name":"profile_config",

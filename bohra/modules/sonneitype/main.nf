@@ -17,8 +17,8 @@ process SONNEITYPE {
     scratch true
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_prefix}/sonneitype").exists()) {
-            conda "${params.conda_prefix}/sonneitype"
+        if (file("${params.dependency_prefix}/sonneitype").exists()) {
+            conda "${params.dependency_prefix}/sonneitype"
         } else {
             conda "${moduleDir}/environment.yml"
         }

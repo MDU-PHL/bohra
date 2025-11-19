@@ -16,8 +16,8 @@ process FASTP {
     
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_prefix}/fastp").exists()) {
-            conda "${params.conda_prefix}/fastp"
+        if (file("${params.dependency_prefix}/fastp").exists()) {
+            conda "${params.dependency_prefix}/fastp"
         } else {
             conda "${moduleDir}/environment.yml"
         }
