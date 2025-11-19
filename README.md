@@ -3,6 +3,8 @@
 
 **Bohra is currently undergoing some significant upgrades and redevelopment. We appreciate your patience while we make these changes. For those interested you can find some preliminary installation and usage instructions [here](https://mdu-phl.github.io/bohra/). The current stable version detailed below is still ofcourse available.**
 
+**Bohra is currently undergoing some significant upgrades and redevelopment. We appreciate your patience while we make these changes. For those interested you can find some preliminary installation and usage instructions [here](https://mdu-phl.github.io/bohra/). The current stable version detailed below is still ofcourse available.**
+
 
 # Bohra
 
