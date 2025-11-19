@@ -1,7 +1,7 @@
 #!/bin/bash
 # Creates conda environments required for bohra
 
-BOHRA_CONDA_ENVS=$CONDA_PREFIX/bohra_envs
+BOHRA_CONDA_ENVS=$CONDA_PREFIX/conda_envs
 ENVS_FILES=$1
 INSTALL=$2
 # abort if any step fails
@@ -66,8 +66,9 @@ if [[ "$INSTALL" == "install" ]]
                 fi
             fi
 
-            
-            done
+        
+        done
+        
 elif [[ "$INSTALL" == "check" ]]
     then
         for key in ${TOOLS[@]};do

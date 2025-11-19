@@ -148,6 +148,11 @@ def _make_workdir(_input:pd.DataFrame, workdir:str) -> bool:
                         if not target.exists():
                             pathlib.Path(f"{wd / row[1][columns[0]]}").mkdir(parents=True, exist_ok=True)
                             target.symlink_to(user_supplied)
+                            if target.exists():
+                                LOGGER.info(f"Successfully linked {user_supplied} to {target}.")
+                            else:
+                                LOGGER.critical(f"{target} does not exist after linking.")
+                                raise SystemExit
                         else:
                             LOGGER.warning(f"File {target} already exists. Skipping link creation.")
                     except Exception as e:
