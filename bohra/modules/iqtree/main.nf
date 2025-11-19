@@ -12,12 +12,12 @@ process IQTREE {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
     
-    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/iqtree2" : 'iqtree=2.1.4 snp-sites=2.5.1') : null)
+    
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/bohra-iqtree"
+        if (file("${params.dependency_prefix}/trees").exists()) {
+            conda "${params.dependency_prefix}/trees"
         } else {
-            conda 'iqtree=2.1.4 snp-sites=2.5.1'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null
@@ -28,18 +28,35 @@ process IQTREE {
       
     input:
         path(aln)
-        path(full_aln)
+        val(full_aln)
 
     output:
-        path('core.newick'), emit: newick
+        path('snps.newick'), emit: newick
+        path('version_iqtree.txt'), emit: version
     
-    script:    
-    """
-    iqtree -fconst \$(snp-sites -C $full_aln) \\
-    -s $aln -pre core \\
-    -m GTR+G4 -bb 1000 -ntmax $task.cpus \\
-    -nt AUTO -st DNA
-    cp core.treefile core.newick
-    """
+    script:
+    if (full_aln == "no_full_aln") {
+        """
+        iqtree \\
+        -s $aln -pre snps \\
+        -m GTR+G4 -bb 1000 -ntmax $task.cpus \\
+        -nt AUTO -st DNA
+        gotree reroot midpoint -i snps.treefile -o snps.newick
+        echo -e iQtree'\t'\$CONDA_PREFIX'\t'\$(iqtree --version | grep version)'\t'${params.iqtree_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_iqtree.txt
+        echo -e gotree'\t'\$CONDA_PREFIX'\t'\$(gotree version)'\t'${params.gotree_ref}  >> version_iqtree.txt
+        """
+    } else {
+         """
+        iqtree -fconst \$(snp-sites -C $full_aln) \\
+        -s $aln -pre snps \\
+        -m GTR+G4 -bb 1000 -ntmax $task.cpus \\
+        -nt AUTO -st DNA
+        gotree reroot midpoint -i snps.treefile -o snps.newick
+        echo -e iQtree'\t'\$CONDA_PREFIX'\t'\$(iqtree --version | grep version)'\t'${params.iqtree_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_iqtree.txt
+        echo -e gotree'\t'\$CONDA_PREFIX'\t'\$(gotree version)'\t'${params.gotree_ref}  >> version_iqtree.txt
+        """ 
+    }
+        
+    
         
 }

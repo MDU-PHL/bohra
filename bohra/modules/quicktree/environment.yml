@@ -1,0 +1,8 @@
+name: bohra-quicktree
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - quicktree=2.5
+  - csvtk=0.25.0
+  - gotree

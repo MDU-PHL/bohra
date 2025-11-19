@@ -12,34 +12,31 @@ process SEQKIT_GC {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     
     cache 'lenient'
-    
+    // scratch true
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/seqkit" : 'csvtk seqkit=2.1.0') : null) 
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/bohra-seqkit"
+        if (file("${params.conda_path}/${params.dependency_prefix}-seqkit").exists()) {
+            conda "${params.conda_path}/${params.dependency_prefix}-seqkit"
         } else {
-            conda 'csvtk seqkit=2.1.0'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null
     }
-    // if (workflow.containerEngine == 'singularity' && !params.singularity_pull_docker_container) {
-    //     container 'https://depot.galaxyproject.org/singularity/fastp:0.20.1--h8b12597_0'
-    // } else {
-    //     container 'quay.io/biocontainers/fastp:0.20.1--h8b12597_0'
-    // }
+    
 
     input:
     tuple val(meta), path(input_files)
 
     output:
     tuple val(meta), path('read_qual.txt'), emit: stats
-
+    tuple val(meta), path('version_seqkit.txt'), emit: version
     script:
     """
     cat ${input_files[0]} ${input_files[1]} \
     | seqkit fx2tab -H --name --only-id --avg-qual --gc \
     | csvtk summary -t -i -f 2:mean,3:mean > read_qual.txt
+    echo -e seqkit'\t'\$CONDA_PREFIX'\t'\$(seqkit version)'\t'${params.seqkit_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_seqkit.txt
     """
 
     

@@ -1,0 +1,8 @@
+name: bohra-kraken2
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - kraken2=2.1.2
+  - csvtk=0.25.0
+  

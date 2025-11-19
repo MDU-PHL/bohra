@@ -11,18 +11,18 @@ process SNIPPY_CLEAN {
         mode: params.publish_dir_mode
     
     cache 'lenient'
-    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/snippy" : 'snippy=4.4.5') : null)
+    scratch true
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/bohra-snippy"
+        if (file("${params.dependency_prefix}/snippy").exists()) {
+            conda "${params.dependency_prefix}/snippy"
         } else {
-            conda 'bioconda::snippy=4.4.5'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null
     }
-
+    scratch true
 
     input:
     path(full_core)

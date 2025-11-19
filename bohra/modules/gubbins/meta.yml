@@ -1,13 +1,13 @@
-name: shovill
-description: Assemble bacterial isolate genomes from Illumina paired-end reads
+name: gubbins
+description: Remove potenetially recombined regions from a multiple sequence alignment
 keywords:
-  - assembly
+  - recombination
 tools:
-  - shovill:
+  - gubbins:
       description: |
-        Assemble bacterial isolate genomes from Illumina paired-end reads
-      documentation: https://github.com/tseemann/shovill
-      doi: 
+        Remove potentially recombined regions from a multiple sequence alignment
+      documentation: https://github.com/sanger-pathogens/gubbins
+      doi: https://doi.org/10.1093/nar/gku1196
 params:
   - outdir:
       type: string
@@ -24,38 +24,20 @@ params:
       description: |
         Run the module with Conda using the software specified
         via the `conda` directive
-  - singularity_pull_docker_container:
-      type: boolean
-      description: |
-        Instead of directly downloading Singularity images for use with Singularity,
-        force the workflow to pull and convert Docker containers instead.
-
+ 
 input:
-  - meta:
-      type: map
-      description: |
-        Groovy Map containing sample information
-        e.g. [ id:'test', single_end:false ]
-  - reads:
+
+  - cleaned_alignment:
       type: file
       description: |
-        List of input FastQ files of size 1 and 2 for single-end and paired-end data,
-        respectively.
+        A cleaned multiple sequence alignment file, typically in FASTA format,
+        that has been processed to remove low-quality sequences and regions.
 
 output:
-  - meta:
-      type: map
-      description: |
-        Groovy Map containing sample information
-        e.g. [ id:'test', single_end:false ]
-  - contigs:
+  - gubbins_output:
       type: file
-      description: The report file from kraken2
-      pattern: "*.contigs.fa"
-  - log:
-      type: file
-      description: fastq log file
-      pattern: "*.shovill.log"
+      description: alignment output from gubbins
+      pattern: "gubbins.aln"
   - version:
       type: file
       description: File containing software version

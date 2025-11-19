@@ -12,30 +12,32 @@ process SNP_DISTS {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
     
     
-    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/snpdists" : 'bioconda::snp-dists=0.8.2 bioconda::csvtk') : null) 
-    
+    scratch true
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/bohra-snpdists"
+        if (file("${params.dependency_prefix}/snpdists").exists()) {
+            conda "${params.dependency_prefix}/snpdists"
         } else {
-            conda 'bioconda::snp-dists=0.8.2 bioconda::csvtk'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null
     }
     
     cache 'lenient'
+    scratch true
     
     input:
     path(core) 
 
     output:
-    path('distances.tab'), emit: distances
+    path('distances.tsv'), emit: matrix
+    path('version_snpdists.txt'), emit: version
 
     script:
     
     """
-    snp-dists $core | csvtk rename -t -f 1 -n Isolate > distances.tab
+    snp-dists $core | csvtk rename -t -f 1 -n Isolate > distances.tsv
+    echo -e snp-dists'\t'\$CONDA_PREFIX'\t'\$(snp-dists -v 2>&1)'\t'${params.snpdists_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_snpdists.txt
     """
     
 }

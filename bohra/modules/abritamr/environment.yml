@@ -1,0 +1,11 @@
+name: bohra-abritamr
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - abritamr=1.0.14
+  - csvtk=0.25.0
+  - pandas=2.0.2
+  - numpy=1.24.3
+  - parallel
+  - ncbi-amrfinderplus=3.10.42

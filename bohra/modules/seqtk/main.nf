@@ -12,12 +12,13 @@ process SEQTK {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     
     cache 'lenient'
-    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/seqtk" : 'seqtk') : null) 
+    scratch true
+    
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/bohra-seqtk"
+        if (file("${params.dependency_prefix}/seqtk").exists()) {
+            conda "${params.dependency_prefix}/seqtk"
         } else {
-            conda 'bioconda::seqtk'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null
@@ -27,11 +28,12 @@ process SEQTK {
 
     output:
     tuple val(meta), path('seqtk_stats.txt'), emit: seqtk_stats
-
+    tuple val(meta), path('version_seqtk.txt'), emit: version
     script:
     """
     echo -e Bases'\t'C%'\t'G%'\t'AvgQ > seqtk_stats.txt
-    cat ${reads[0]} ${reads[1]} | seqtk fqchk -q0 -  | grep ALL | cut -f2,4,5,8 >>seqtk_stats.txt
+    cat ${reads[0]} ${reads[1]} | seqtk fqchk -q0 -  | grep ALL | cut -f2,4,5,8 >> seqtk_stats.txt
+    echo -e seqtk'\t'\$CONDA_PREFIX'\t'\$(seqtk |& grep Version | cut -f2 -d ':' | xargs)'\t'${params.seqtk_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_seqtk.txt
     """
     
 }

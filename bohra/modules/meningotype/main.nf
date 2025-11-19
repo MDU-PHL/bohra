@@ -11,15 +11,16 @@ process MENINGOTYPE {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     
-    cpus options.args2// args2 needs to be cpus for shovill
+    
     cache 'lenient'
+    scratch true
     errorStrategy 'ignore'
-    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/spades" : 'bioconda::spades=3.15.2') : null) 
+    
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/bohra-meningotype"
+        if (file("${params.dependency_prefix}/meningotype").exists()) {
+            conda "${params.dependency_prefix}/meningotype"
         } else {
-            conda 'meningotype csvtk'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null
@@ -29,7 +30,7 @@ process MENINGOTYPE {
 
     output:
     tuple val(meta), path("typer_${getSoftwareName(task.process)}.txt"), emit: typer
-    
+    tuple val(meta), path("version_meningotype.txt"), emit: version
 
     script:
     """
@@ -37,6 +38,7 @@ process MENINGOTYPE {
     meningotype --all $contigs  > meningotype.tab
     paste tmp.tab meningotype.tab | csvtk -t rename -f SEROGROUP -n Serogroup | csvtk -t cut -f -SAMPLE_ID,-MLST >typer_${getSoftwareName(task.process)}.txt
     rm -f tmp.tab
+    echo -e meningotype'\t'\$CONDA_PREFIX'\t'\$(meningotype --version)'\t'${params.meningotype_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_meningotype.txt
     """
     
 }

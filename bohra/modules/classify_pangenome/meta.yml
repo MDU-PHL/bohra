@@ -1,0 +1,40 @@
+name: rclassify_pangenome
+description: classify pangenome of bacterial isolates based on a user define lineage or grouping strategies
+keywords:
+  - pangenome
+tools:
+  - rclassify_genes:
+      description: |
+        Calssify pangenome of bacterial isolates based on a user define lineage or grouping strategies
+      documentation: https://github.com/ghoresh11/twilight/tree/master
+      doi: https://doi.org/10.1099/mgen.0.000670
+params:
+  
+  - publish_dir_mode:
+      type: string
+      description: |
+        Value for the Nextflow `publishDir` mode parameter.
+        Available: symlink, rellink, link, copy, copyNoFollow, move.
+  - enable_conda:
+      type: boolean
+      description: |
+        Run the module with Conda using the software specified
+        via the `conda` directive
+  
+
+input:
+  
+  - rtab:
+      type: file
+      description: |
+        The gene presence/absence table from panaroo in rtab format
+
+output:
+  - classification_tab:
+      type: file
+      description: Tab-delimted output of the classification
+      pattern: "classification.tab"
+  
+authors:
+  - "@kristyhoran"
+  

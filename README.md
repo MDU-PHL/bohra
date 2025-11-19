@@ -1,7 +1,10 @@
 [![CircleCI](https://dl.circleci.com/status-badge/img/gh/MDU-PHL/bohra/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/MDU-PHL/bohra/tree/master)
 [![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-390/)
 
-Bohra is currently undergoing some significant upgrades and redevelopment. We appreciate your patience while we make these changes. For those interested you can find some preliminary installation and usage instructions [here](https://mdu-phl.github.io/bohra/). The current stable version detailed below is still ofcourse available.
+**Bohra is currently undergoing some significant upgrades and redevelopment. We appreciate your patience while we make these changes. For those interested you can find some preliminary installation and usage instructions [here](https://mdu-phl.github.io/bohra/). The current stable version detailed below is still ofcourse available.**
+
+**Bohra is currently undergoing some significant upgrades and redevelopment. We appreciate your patience while we make these changes. For those interested you can find some preliminary installation and usage instructions [here](https://mdu-phl.github.io/bohra/). The current stable version detailed below is still ofcourse available.**
+
 
 # Bohra
 

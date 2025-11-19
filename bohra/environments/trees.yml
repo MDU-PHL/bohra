@@ -1,0 +1,15 @@
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - _libgcc_mutex=0.1
+  - _openmp_mutex=4.5
+  - core-snp-filter=0.2.0
+  - csvtk=0.31.0
+  - gotree=0.5.0
+  - iqtree=3.0.1
+  - libgcc=15.2.0
+  - libgomp=15.2.0
+  - libstdcxx=15.2.0
+  - quicktree=2.5
+  - veryfasttree=4.0.5

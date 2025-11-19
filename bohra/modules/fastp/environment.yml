@@ -1,0 +1,9 @@
+name: bohra-snippy
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - fastp
+  - csvtk=0.25.0
+
+  

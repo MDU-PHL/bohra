@@ -1,0 +1,7 @@
+name: bohra-prokka
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - prokka=1.14.6
+  - csvtk=0.25.0

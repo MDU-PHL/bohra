@@ -1,0 +1,9 @@
+name: bohra-shigapass
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - mykrobe
+  - pandas
+
+  

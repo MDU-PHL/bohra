@@ -1,0 +1,9 @@
+name: bohra-snpdists
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - snp-dists=0.8.2
+  - csvtk=0.25.0
+
+  

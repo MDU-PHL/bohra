@@ -1,0 +1,7 @@
+name: bohra-core-snp-filter
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - core-snp-filter=0.2.0
+  - csvtk=0.25.0

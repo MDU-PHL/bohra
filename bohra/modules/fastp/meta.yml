@@ -1,0 +1,54 @@
+name: fastp
+description: provides quality control and trimming for FASTQ files
+keywords:
+  - quality control
+tools:
+  - fastp:
+      description: |
+        fastp is an ultra-fast all-in-one FASTQ preprocessor
+        with quality control and trimming features.
+      documentation: https://github.com/OpenGene/fastp
+      doi: 
+params:
+  - outdir:
+      type: string
+      description: |
+        The pipeline's output directory. By default, the module will
+        output files into `$params.outdir/<SOFTWARE>`
+  - publish_dir_mode:
+      type: string
+      description: |
+        Value for the Nextflow `publishDir` mode parameter.
+        Available: symlink, rellink, link, copy, copyNoFollow, move.
+  - enable_conda:
+      type: boolean
+      description: |
+        Run the module with Conda using the software specified
+        via the `conda` directive
+  
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - reads:
+      type: file
+      description: |
+        List of input FastQ files of size 1 and 2 for single-end and paired-end data,
+        respectively.
+
+output:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  
+  - version:
+      type: file
+      description: File containing software version
+      pattern: "*.{version.txt}"
+authors:
+  - "@kristyhoran"
+  

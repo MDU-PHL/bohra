@@ -1,13 +1,15 @@
-name: shovill
-description: Assemble bacterial isolate genomes from Illumina paired-end reads
+name: kleborate
+description: kleborate is a tool for the rapid identification of Klebsiella pneumoniae
+  sequence types and virulence factors from whole genome sequencing data.
 keywords:
-  - assembly
+  - serotype
 tools:
-  - shovill:
+  - kleborate:
       description: |
-        Assemble bacterial isolate genomes from Illumina paired-end reads
-      documentation: https://github.com/tseemann/shovill
-      doi: 
+        kleborate is a tool for the rapid identification of Klebsiella pneumoniae
+        sequence types and virulence factors from whole genome sequencing data.
+      documentation: https://github.com/katholt/kleborate
+      doi:
 params:
   - outdir:
       type: string
@@ -36,11 +38,10 @@ input:
       description: |
         Groovy Map containing sample information
         e.g. [ id:'test', single_end:false ]
-  - reads:
+  - contigs:
       type: file
       description: |
-        List of input FastQ files of size 1 and 2 for single-end and paired-end data,
-        respectively.
+        List of input contig files for the alignment process.
 
 output:
   - meta:

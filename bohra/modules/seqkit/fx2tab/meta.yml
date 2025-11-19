@@ -1,12 +1,12 @@
-name: seqtk
+name: seqkit
 description: 
 keywords:
-  - assembly
+  - quality control
 tools:
-  - shovill:
+  - seqkit:
       description: |
-        Assemble bacterial isolate genomes from Illumina paired-end reads
-      documentation: https://github.com/tseemann/shovill
+        SeqKit is a tool for fast and efficient sequence manipulation.
+      documentation: https://github.com/shenwei356/seqkit
       doi: 
 params:
   - outdir:
@@ -36,11 +36,10 @@ input:
       description: |
         Groovy Map containing sample information
         e.g. [ id:'test', single_end:false ]
-  - reads:
+  - input_files:
       type: file
       description: |
-        List of input FastQ files of size 1 and 2 for single-end and paired-end data,
-        respectively.
+        fastq or fasta files to be processed by seqkit.
 
 output:
   - meta:
@@ -48,10 +47,10 @@ output:
       description: |
         Groovy Map containing sample information
         e.g. [ id:'test', single_end:false ]
-  - qscore:
+  - stats:
       type: file
-      description: The report file from kraken2
-      pattern: "qscore.txt"
+      description: The statistics file from seqkit
+      pattern: "read_qual.txt"
 authors:
   - "@kristyhoran"
   

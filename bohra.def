@@ -2,17 +2,15 @@ Bootstrap: docker
 From: condaforge/miniforge3:25.3.1-0
 Stage: spython-base
 
+%files
+. .
 %post
 
-apt-get update && apt-get install -y git-all sudo wget bzip2 tini vim less && rm -rf /var/lib/apt/lists/*
+apt-get update && apt-get install -y git-all wget bzip2 tini vim less && rm -rf /var/lib/apt/lists/*
 
 PATH="/opt/conda/bin:$PATH"
 
-
-
 conda config --add channels bioconda
-
-mamba create -y -n bohra bohra
 
 mamba create -y -n bohra-csvtk csvtk=0.33
 
@@ -67,21 +65,54 @@ mamba create -y -n bohra-stype sistr_cmd=1.1.1 csvtk
 
 mamba run -n bohra-stype pip3 install 'git+https://github.com/MDU-PHL/salmonella_typing'
 
+mamba create -y -n bohra-tbtamr python=3.10 tbtamr=1.0.3 csvtk
+mamba run -n bohra-tbtamr pip3 install pysam joblib tqdm pydantic requests git+https://github.com/jodyphelan/pathogen-profiler@v4.3.0
+
+
+mamba create -y -n bohra-veryfasttree veryfasttree csvtk gotree=0.4.5
+
+mamba create -y -n bohra-shigapass blast=2.16.0 csvtk
+
+mamba create -y -n bohra-sonneitype mykrobe pandas csvtk
+
+mamba create -y -n bohra-ska2 ska2 csvtk pandas
+
+mamba create -y -n bohra-core-snp-filter core-snp-filter csvtk
+
+mamba create -y -n bohra-cluster numpy pandas scikit-learn csvtk
+
+mamba create -y -n bohra-classify-pangenome r-data.table=1.17.6 r-ggplot2=3.5.2 r-optparse=1.7.5
+
+mamba create -y -n bohra-fastp fastp csvtk
+
 mamba create -y -n bohra-seqkit seqkit==2.1.0 csvtk
 
 mamba create -y -n bohra-lissero lissero python=3.11 csvtk
 
+
+mamba  create -y -n bohra-datasmryzr python=3.11 csvtk
+mamba run -n bohra-datasmryzr pip3  install git+https://github.com/kristyhoran/datasmryzr
+
+mamba env create -f environment.yml
+
+mamba run -n bohra pip3 install .
+
+apt-get update && apt-get install -y 
+
 conda clean -a -y
 
 mamba clean -a -y
-
+which tini
 TINI_SUBREAPER=true
+
 mkdir -p /home/bohra/workdir && chmod 777 -R /home/bohra/workdir
 ls -lathr /home/bohra/workdir
+BOHRA_WD=/home/bohra/workdir
 
 %environment
 export PATH="/opt/conda/bin:$PATH"
 export TINI_SUBREAPER=true
+export BOHRA_WD=/home/bohra/workdir
 
 
 %runscript
@@ -89,4 +120,3 @@ eval "$(conda shell.bash hook)"
 conda init bash >/dev/null 2>&1
 conda activate bohra
 exec "$@"
-

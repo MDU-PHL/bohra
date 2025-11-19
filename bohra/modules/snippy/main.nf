@@ -11,15 +11,15 @@ process SNIPPY {
         mode: params.publish_dir_mode
         // saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     
-    // scratch true
+    scratch true
     cache 'lenient'
     
-    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/snippy" : 'bioconda::snippy=4.4.5') : null) 
+    
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/bohra-snippy"
+        if (file("${params.dependency_prefix}/snippy").exists()) {
+            conda "${params.dependency_prefix}/snippy"
         } else {
-            conda 'bioconda::snippy=4.4.5'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null
@@ -28,12 +28,12 @@ process SNIPPY {
     tuple val(meta), path(reads), path(reference)
 
     output:
-    // tuple val(meta), path("${meta.id}/*"), emit: snippy_dir
     tuple val(meta), path("${meta.id}/snps.aligned.fa"), emit: aln
     tuple val(meta), path("${meta.id}/snps.raw.vcf"), emit: raw_vcf
     tuple val(meta), path("${meta.id}/snps.vcf"), emit: vcf
     tuple val(meta), path("${meta.id}/snps.log"), emit: log
     tuple val(meta), path("${meta.id}/snps.tab"), emit: tab
+    tuple val(meta), path("version_snippy.txt"), emit: version
     
 
     script:
@@ -45,6 +45,7 @@ process SNIPPY {
     --mincov ${params.mincov} --minfrac ${params.minfrac} \\
     --minqual ${params.minqual} \\
     --force --cpus $task.cpus
+    echo -e snippy'\t'\$CONDA_PREFIX'\t'\$(snippy -v 2>&1)'\t'${params.snippy_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_snippy.txt
     """
     
 }

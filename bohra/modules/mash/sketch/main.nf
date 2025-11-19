@@ -12,13 +12,13 @@ process MASH_SKETCH {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     
     
-    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/mash" : 'mash') : null) 
+    
     
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/bohra-mash"
+        if (file("${params.dependency_prefix}/mash").exists()) {
+            conda "${params.dependency_prefix}/mash"
         } else {
-            conda 'mash'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null
@@ -34,10 +34,12 @@ process MASH_SKETCH {
 
     output:
     tuple val(meta), path('*.msh'), emit: sketch
+    tuple val(meta), path('version_mash.txt'), emit: version
 
     script:
     """
     mash sketch -r ${reads[0]} -m 5 -k 21 -C $meta.id -o ${meta.id}
+    echo -e mash'\t'\$CONDA_PREFIX'\t'\$(mash --version)'\t'${params.mash_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_mash.txt
     """
     
 }

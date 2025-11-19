@@ -1,12 +1,12 @@
-name: seqtk
+name: quicktree
 description: 
 keywords:
-  - assembly
+  - phylogenetics
 tools:
-  - shovill:
+  - quicktree:
       description: |
-        Assemble bacterial isolate genomes from Illumina paired-end reads
-      documentation: https://github.com/tseemann/shovill
+        QuickTree is a tool for building trees from distances.
+      documentation: https://github.com/khowe/quicktree
       doi: 
 params:
   - outdir:
@@ -31,27 +31,17 @@ params:
         force the workflow to pull and convert Docker containers instead.
 
 input:
-  - meta:
-      type: map
-      description: |
-        Groovy Map containing sample information
-        e.g. [ id:'test', single_end:false ]
-  - reads:
+  
+  - distances:
       type: file
       description: |
-        List of input FastQ files of size 1 and 2 for single-end and paired-end data,
-        respectively.
+        Distance matrix for phylogenetic analysis.
 
 output:
-  - meta:
-      type: map
-      description: |
-        Groovy Map containing sample information
-        e.g. [ id:'test', single_end:false ]
-  - qscore:
+  - newick:
       type: file
-      description: The report file from kraken2
-      pattern: "qscore.txt"
+      description: The Newick format tree file
+      pattern: "*.newick"
 authors:
   - "@kristyhoran"
   

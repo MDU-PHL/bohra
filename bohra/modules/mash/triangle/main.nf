@@ -12,13 +12,11 @@ process MASH_TRIANGLE {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
     
     
-    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/mash" : 'mash') : null) 
-    
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/bohra-mash"
+        if (file("${params.dependency_prefix}/mash").exists()) {
+            conda "${params.dependency_prefix}/mash"
         } else {
-            conda 'mash'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null
@@ -31,12 +29,12 @@ process MASH_TRIANGLE {
     val(sketches)
 
     output:
-    path('preview_distances.tab'), emit: mash_distances
+    path('distances.tsv'), emit: dists
 
     script:
     def input_files = sketches.join(' ')
     """
-    mash triangle -C $input_files > preview_distances.tab
+    mash triangle -C $input_files > distances.tsv
     """
         
 }

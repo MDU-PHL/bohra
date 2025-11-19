@@ -1,0 +1,8 @@
+name: bohra-ectyper
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - ectyper 
+  - csvtk
+  

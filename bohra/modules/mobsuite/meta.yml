@@ -1,12 +1,13 @@
-name: shovill
-description: Assemble bacterial isolate genomes from Illumina paired-end reads
+name: mob_suite
+description: |
+  Software tools for clustering, reconstruction and typing of plasmids from draft assemblies
 keywords:
-  - assembly
+  - plasmid
 tools:
-  - shovill:
+  - mob_suite:
       description: |
-        Assemble bacterial isolate genomes from Illumina paired-end reads
-      documentation: https://github.com/tseemann/shovill
+        Software tools for clustering, reconstruction and typing of plasmids from draft assemblies
+      documentation: https://github.com/phac-nml/mob-suite
       doi: 
 params:
   - outdir:
@@ -36,11 +37,10 @@ input:
       description: |
         Groovy Map containing sample information
         e.g. [ id:'test', single_end:false ]
-  - reads:
+  - contigs:
       type: file
       description: |
-        List of input FastQ files of size 1 and 2 for single-end and paired-end data,
-        respectively.
+        List of input contig files for analysis.
 
 output:
   - meta:
@@ -48,14 +48,14 @@ output:
       description: |
         Groovy Map containing sample information
         e.g. [ id:'test', single_end:false ]
-  - contigs:
+  - contig_report:
       type: file
-      description: The report file from kraken2
-      pattern: "*.contigs.fa"
-  - log:
+      description: The contig_report file from mobsuite
+      pattern: "contig_report.txt"
+  - mobs:
       type: file
-      description: fastq log file
-      pattern: "*.shovill.log"
+      description: The mobs results file from mobsuite
+      pattern: "mobtype_results.txt"
   - version:
       type: file
       description: File containing software version

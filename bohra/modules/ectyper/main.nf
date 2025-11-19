@@ -15,12 +15,13 @@ process ECTYPER {
     cpus options.args2// args2 needs to be cpus for shovill
     cache 'lenient'
     errorStrategy 'ignore'
-    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/spades" : 'bioconda::spades=3.15.2') : null) 
+    scratch true
+    
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/bohra-ectyper"
+        if (file("${params.dependency_prefix}/ectyper").exists()) {
+            conda "${params.dependency_prefix}/ectyper"
         } else {
-            conda 'ectyper csvtk'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null
@@ -30,7 +31,7 @@ process ECTYPER {
 
     output:
     tuple val(meta), path("typer_${getSoftwareName(task.process)}.txt"), emit: typer
-
+    tuple val(meta), path("version_ectyper.txt"), emit: version
     
 
     script:
@@ -39,6 +40,7 @@ process ECTYPER {
     ectyper -i $contigs -o ectyper 
     paste tmp.tab ectyper/output.tsv | csvtk -t cut -f -Name,-Species,-QC > typer_${getSoftwareName(task.process)}.txt
     rm -f tmp.tab
+    echo -e ectyper'\t'\$CONDA_PREFIX'\t'\$(ectyper --version)'\t'${params.ectyper_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_ectyper.txt
     """
     
 }

@@ -1,0 +1,66 @@
+name: pe_assesmbler
+description: Assemble bacterial isolate genomes from Illumina paired-end reads
+keywords:
+  - assembly
+tools:
+  - shovill:
+      description: |
+        Assemble bacterial isolate genomes from Illumina paired-end reads
+      documentation: https://github.com/tseemann/shovill
+      doi: 
+  - skesa:
+      description: |
+        Skesa is a de novo assembler for large genomes, such as bacterial genomes.
+      documentation: https://github.com/sanger-pathogens/skesa
+      doi:
+  - spades:
+      description: |
+        SPAdes is a versatile genome assembler, designed for both single-cell and multi-cell sequencing.
+      documentation: https://github.com/ablab/spades
+      doi: 10.1038/nmeth.2166
+params:
+  - outdir:
+      type: string
+      description: |
+        The pipeline's output directory. By default, the module will
+        output files into `$params.outdir/<SOFTWARE>`
+  - publish_dir_mode:
+      type: string
+      description: |
+        Value for the Nextflow `publishDir` mode parameter.
+        Available: symlink, rellink, link, copy, copyNoFollow, move.
+  - enable_conda:
+      type: boolean
+      description: |
+        Run the module with Conda using the software specified
+        via the `conda` directive
+  
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - reads:
+      type: file
+      description: |
+        List of input FastQ files of size 1 and 2 for single-end and paired-end data,
+        respectively.
+
+output:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - contigs:
+      type: file
+      description: The report file from kraken2
+      pattern: "*.contigs.fa"
+  - version:
+      type: file
+      description: File containing software version
+      pattern: "*.{version.txt}"
+authors:
+  - "@kristyhoran"
+  

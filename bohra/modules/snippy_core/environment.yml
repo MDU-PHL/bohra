@@ -1,0 +1,10 @@
+name: bohra-snippy
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - snippy=4.4.5
+  - csvtk=0.25.0
+  - samtools=1.9
+
+  

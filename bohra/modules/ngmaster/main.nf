@@ -11,15 +11,14 @@ process NGMASTER {
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     
-    cpus options.args2// args2 needs to be cpus for shovill
     cache 'lenient'
     errorStrategy 'ignore'
-    
+    scratch true
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/bohra-ngmaster"
+        if (file("${params.dependency_prefix}/ngmaster").exists()) {
+            conda "${params.dependency_prefix}/ngmaster"
         } else {
-            conda 'ngmaster csvtk'
+            conda "${moduleDir}/environment.yml"
         }
        
     } else {
@@ -30,7 +29,7 @@ process NGMASTER {
 
     output:
     tuple val(meta), path("typer_${getSoftwareName(task.process)}.txt"), emit: typer
-    
+    tuple val(meta), path("version_ngmaster.txt"), emit: version
     
 
     script:
@@ -39,6 +38,7 @@ process NGMASTER {
     ngmaster  $contigs  > ngmaster.tab
     paste tmp.tab ngmaster.tab | csvtk -t cut -f -2> typer_${getSoftwareName(task.process)}.txt
     rm -f tmp.tab
+    echo -e ngmaster'\t'\$CONDA_PREFIX'\t'\$(ngmaster --version)'\t'${params.ngmaster_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_ngmaster.txt
     """
     
 }

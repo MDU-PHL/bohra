@@ -15,10 +15,10 @@ process PROKKA {
     
    
     if ( params.enable_conda ) {
-        if (file("${params.conda_path}").exists()) {
-            conda "${params.conda_path}/bohra-prokka"
+        if (file("${params.dependency_prefix}/prokka").exists()) {
+            conda "${params.dependency_prefix}/prokka"
         } else {
-            conda 'bioconda::prokka'
+            conda "${moduleDir}/environment.yml"
         }
     } else {
         conda null
@@ -31,13 +31,15 @@ process PROKKA {
 
     output:
     tuple val(meta), path('*.gff'), emit: gff
-    tuple val(meta), path('*.txt'), emit: prokka_txt
+    tuple val(meta), path("${meta.id}.txt"), emit: prokka_txt
+    tuple val(meta), path('version_prokka.txt'), emit: version
 
     script:
     """
-    prokka --outdir $meta.id --prefix $meta.id --mincontiglen 500 --notrna --fast --force $contigs --cpus $task.cpus
+    prokka --outdir $meta.id --prefix $meta.id --mincontiglen 500 --notrna --fast --force $contigs --cpus $task.cpus --compliant
     cp ${meta.id}/${meta.id}.gff ${meta.id}.gff
     grep -v '^##' ${meta.id}/${meta.id}.txt > ${meta.id}.txt
+    echo -e prokka'\t'\$CONDA_PREFIX'\t'\$(prokka -v  2>&1)'\t'${params.prokka_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_prokka.txt
     """
     
 }

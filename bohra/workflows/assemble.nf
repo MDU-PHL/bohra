@@ -1,53 +1,42 @@
 #!/usr/bin/env nextflow
 
-include { CSVTK_CONCAT } from './../modules/csvtk/main'
-include { SHOVILL } from './../modules/shovill/main' 
-include { SPADES } from './../modules/spades/main' addParams( options: [args2: "${params.spades_opt}"] )
-include { SKESA } from './../modules/skesa/main' 
-include { SEQKIT_STATS } from './../modules/seqkit/stats/main' addParams( options: [args2: 'contigs'] )
-include { PROKKA } from './../modules/prokka/main'
-include { COLLATE_ASM } from './../modules/collation/main'
+include { ASSEMBLER_PE } from './../modules/assemblers/main' 
+include { CSVTK_UNIQ } from './../modules/csvtk/main'
+include { INSERTIQR } from './../modules/insertiqr/main'
+include { CONCAT_FILES } from './../modules/utils/main'
+
 
 workflow RUN_ASSEMBLE {   
 
     take:
-        reads
+        input
         
     main:
-    if ( params.assembler == 'shovill'){
-        SHOVILL ( reads )   
-        contigs = SHOVILL.out.contigs    
-        } 
-        else if ( params.assembler == 'spades' ){
-        SPADES ( reads )
-        contigs = SPADES.out.contigs
-        } else if (params.assembler == 'skesa' ) {
-        SKESA ( reads )
-        contigs = SKESA.out.contigs
-        }
-        SEQKIT_STATS ( contigs )
-        RUN_PROKKA ( contigs )
-        APS = RUN_PROKKA.out.prokka_txt.join( SEQKIT_STATS.out.stats )
-        COLLATE_ASM ( APS )
-        asm_stats = CSVTK_CONCAT ( COLLATE_ASM.out.assembly.map { cfg, asm -> asm }.collect().map { files -> tuple("assembly", files)} )
-        
+    pe_reads = input.filter{ cfg,files -> cfg.input_type == 'pe_reads' }
+    println pe_reads.view()
+    ASSEMBLER_PE ( pe_reads )
+    contigs = ASSEMBLER_PE.out.contigs
+    contigs = contigs.map { cfg, files -> tuple(cfg + [input_type:"asm"], files) }
+    ctg = contigs.map { cfg, file -> tuple([id:cfg.id], file) }
+    per = pe_reads.map { cfg, files -> tuple([id:cfg.id], files)}
+    forinsert = ctg.join( per )
+    // println forinsert.view()
+                                        // .map { id, cfg_asm, files, cfg_pe, reads -> tuple(cfg_asm + [pe_reads:reads], files) }
+    INSERTIQR ( forinsert )
+    // log = ASSEMBLER_PE.out.log
+    // flye = reads.filter{ cfg,files -> cfg.assembler == 'flye' }
+    versions = ASSEMBLER_PE.out.version.map { cfg, file -> file }.collect()
+                                        .map { files -> tuple("version_assembler", files) }
+    CSVTK_UNIQ ( versions )
+    
+    insertiqr = INSERTIQR.out.stats.map{ cfg, file -> file}.collect()
+    insertiqr = insertiqr   .map { files -> tuple("insertiqr", files) }
+    CONCAT_FILES ( insertiqr )
+    // FLYE ( flye )
     emit:
         contigs
-        assembly_stats = asm_stats
-        gff = RUN_PROKKA.out.gff
-        prokka_txt = RUN_PROKKA.out.prokka_txt
+        insertiqr = CONCAT_FILES.out.collated
+        versions = CSVTK_UNIQ.out.collated
+        
         
 }
-
-workflow RUN_PROKKA {
-
-    take:
-        contigs
-    main:
-        PROKKA ( contigs )
-    emit:
-        gff = PROKKA.out.gff
-        prokka_txt = PROKKA.out.prokka_txt
-
-}
-

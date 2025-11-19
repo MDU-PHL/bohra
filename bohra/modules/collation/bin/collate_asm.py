@@ -3,7 +3,7 @@ import pathlib, subprocess, sys, pandas, numpy
 
 import pandas, pathlib
 
-HEADER = [f"Isolate\tbp\t# Contigs\t# Gaps\tMin Contig size\tMax Contig size\tAvg Contig size\tN50\tCDS\trRNA"]
+HEADER = [f"Isolate\tAssembly length\t# Contigs\t# Gaps\tMin Contig size\tMax Contig size\tAvg Contig size\tAssembly N50\tCDS\trRNA"]
 
 def combine(prokka, asm, isolate, output):
 
@@ -16,7 +16,7 @@ def combine(prokka, asm, isolate, output):
     cds = gff[gff['cond'] == 'CDS'][isolate].values[0].replace("\"","").strip()
     # print(rrna)
     # print(cds)
-    # print(df)
+    print(df)
     bp = df['sum_len'].values[0]
     contigs = df['num_seqs'].values[0]
     mincontigs = df['min_len'].values[0]

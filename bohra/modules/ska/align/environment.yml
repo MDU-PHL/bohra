@@ -1,0 +1,8 @@
+name: bohra-ska2
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - ska2=0.4.0
+  - csvtk=0.25.0
+  - pandas=2.2.3

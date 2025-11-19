@@ -1,12 +1,12 @@
-name: shovill
-description: Assemble bacterial isolate genomes from Illumina paired-end reads
+name: snpdists
+description: Calculate SNP distances between sequences
 keywords:
-  - assembly
+  - distances
 tools:
-  - shovill:
+  - snp-dists:
       description: |
-        Assemble bacterial isolate genomes from Illumina paired-end reads
-      documentation: https://github.com/tseemann/shovill
+        SNP-Dists is a tool for calculating SNP distances between sequences.
+      documentation: https://github.com/tseemann/snp-dists
       doi: 
 params:
   - outdir:
@@ -31,31 +31,16 @@ params:
         force the workflow to pull and convert Docker containers instead.
 
 input:
-  - meta:
-      type: map
-      description: |
-        Groovy Map containing sample information
-        e.g. [ id:'test', single_end:false ]
-  - reads:
+  
+  - aln:
       type: file
       description: |
-        List of input FastQ files of size 1 and 2 for single-end and paired-end data,
-        respectively.
-
+        aligned sequences in FASTA format for SNP distance calculation.
 output:
-  - meta:
-      type: map
-      description: |
-        Groovy Map containing sample information
-        e.g. [ id:'test', single_end:false ]
-  - contigs:
+  - distances:
       type: file
-      description: The report file from kraken2
-      pattern: "*.contigs.fa"
-  - log:
-      type: file
-      description: fastq log file
-      pattern: "*.shovill.log"
+      description: The SNP distance matrix file
+      pattern: "*.tsv"
   - version:
       type: file
       description: File containing software version

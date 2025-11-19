@@ -1,0 +1,57 @@
+name: tbtamr
+description: Mtb gDST and lineage calling
+keywords:
+  - amr
+tools:
+  - tbtamr:
+      description: |
+          Mtb gDST and lineage calling
+      documentation: https://github.com/mdu-phl/tbtamr
+      doi: 
+params:
+  - outdir:
+      type: string
+      description: |
+        The pipeline's output directory. By default, the module will
+        output files into `$params.outdir/<SOFTWARE>`
+  - publish_dir_mode:
+      type: string
+      description: |
+        Value for the Nextflow `publishDir` mode parameter.
+        Available: symlink, rellink, link, copy, copyNoFollow, move.
+  - enable_conda:
+      type: boolean
+      description: |
+        Run the module with Conda using the software specified
+        via the `conda` directive
+  
+input:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - reads:
+      type: file
+      description: |
+        List of input FastQ files of size 1 and 2 for single-end and paired-end data,
+        respectively.
+
+output:
+  - meta:
+      type: map
+      description: |
+        Groovy Map containing sample information
+        e.g. [ id:'test', single_end:false ]
+  - tbtamr_txt:
+      type: file
+      description: The processed file from tbtamr for display in bohra report
+      pattern: "tbtamr_summarised.txt"
+  
+  - version:
+      type: file
+      description: File containing software version
+      pattern: "*.{version.txt}"
+authors:
+  - "@kristyhoran"
+  

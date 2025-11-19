@@ -1,0 +1,46 @@
+name: core-snp-filter
+description: Apply fuzzy-core logic to core alignment output from snippy
+keywords:
+  - core genome
+tools:
+  - shovill:
+      description: |
+        Assemble bacterial isolate genomes from Illumina paired-end reads
+      documentation: https://github.com/rrwick/Core-SNP-filter
+      doi: https://doi.org/10.1099/mgen.0.001346
+params:
+  - outdir:
+      type: string
+      description: |
+        The pipeline's output directory. By default, the module will
+        output files into `$params.outdir/<SOFTWARE>`
+  - publish_dir_mode:
+      type: string
+      description: |
+        Value for the Nextflow `publishDir` mode parameter.
+        Available: symlink, rellink, link, copy, copyNoFollow, move.
+  - enable_conda:
+      type: boolean
+      description: |
+        Run the module with Conda using the software specified
+        via the `conda` directive
+  
+input:
+  - core_full_aln:
+      type: file
+      description: |
+        output from snippy-core containing the full alignment of the core genome
+
+output:
+  
+  - filtered_core:
+      type: file
+      description: The report file from kraken2
+      pattern: "*.aln"
+  - version:
+      type: file
+      description: File containing software version
+      pattern: "*.{version.txt}"
+authors:
+  - "@kristyhoran"
+  

@@ -1,0 +1,8 @@
+name: bohra-gubbins
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - gubbins=2.4.0
+  - csvtk=0.25.0
+  - snp-sites=2.5.1
