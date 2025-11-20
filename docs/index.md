@@ -83,15 +83,14 @@ Commands:
 
 It is highly recommended that you allow `bohra` to setup the required dependencies for the pipeline. 
 
-This step will setup conda environments in your `~/.conda` or `~/.miniconda3` (depending on how you have configured your `conda` installation). These environments will be prefixed with the name of the environment that you have installed `bohra` into. For example if you used the `environment.yml` file in step 2 your prefix will be `bohra-3pr`. This will ensure consistency and prevent duplication of environments across a file system. 
+This step will setup conda environments under the `path/to/conda/envs/bohra`(depending on how you have configured your `conda` installation). 
 
-This is also useful for public health users, were the versions of software and databases needs to be strictly controlled.
 
 Additionally, `bohra` depends upon either a correctly configure `kraken2` compatible database OR a `sylph` compatible database. The `bohra install-deps` command will optionally download the databases for your and also set the appropriate environment variables for you.
 
 1. Activate your environment from step 2 above
 ```
-conda activate bohra-3pr
+conda activate bohra
 ```
 
 2. Run the bohra dependency installation

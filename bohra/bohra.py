@@ -21,7 +21,7 @@ from click.exceptions import UsageError
 from click._compat import get_text_stderr
 
 from bohra.launcher.Utils import _get_cmd_options
-from bohra.commands.check import check
+from bohra.commands.init_databases import init_databases
 from bohra.commands.install import install 
 from bohra.commands.generate_input import generate_input
 from bohra.commands.test import bohratest
@@ -95,7 +95,7 @@ cmd_opts = _get_cmd_options()
 for opt in cmd_opts:
     create_subcommand_with_options(name = opt, options_dict = cmd_opts[opt])
 
-cli.add_command(check.check)
+cli.add_command(init_databases.init_databases)
 cli.add_command(install.install_deps)
 cli.add_command(generate_input.generate_input)
 cli.add_command(bohratest.test)

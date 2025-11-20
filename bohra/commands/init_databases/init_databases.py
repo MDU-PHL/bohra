@@ -2,16 +2,11 @@ import click
 import pathlib
 import os
 
-from bohra.launcher.CheckDeps import check_dependencies
+from bohra.launcher.CheckDeps import _check_databases
 
-
-@click.option('--envs',
-              default=f"{pathlib.Path(__file__).parent.parent}/environments",
-              help='The prefix for your environments, this will be used to create the conda environments for each process.',
-              )
 
 @click.command()
-def check(prefix, install_deps, databases):
+def init_databases():
     """
     Check that dependencies are installed correctly.
     """
@@ -23,5 +18,5 @@ def check(prefix, install_deps, databases):
     print("Please be patient.")
     
     print("Will now check you installation and install anything that may be required. ")
-    check_dependencies()
+    _check_databases(db_install=True)
     
