@@ -7,7 +7,7 @@ from bohra.launcher.CheckDeps import check_dependencies
 
 @click.command()
 
-def init():
+def install_deps():
     """
     Install dependencies for Bohra - Highly recommended to run this before running the pipeline.
     """
