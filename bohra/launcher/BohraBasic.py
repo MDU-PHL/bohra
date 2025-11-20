@@ -61,9 +61,8 @@ def _accessory_params(kwargs:dict, command:dict) -> list:
     
     if kwargs['use_conda']:
 
-        if _check_path(kwargs['conda_path']):
-            conda_path = pathlib.Path(kwargs['conda_path']).parent
-            command['params'].append(f"--conda_path {conda_path}")
+        if _check_path(kwargs['dependency_prefix']):
+            command['params'].append(f"--dependency_prefix {kwargs['dependency_prefix']}")
             command['params'].append("-with-conda")
             command['params'].append(f"--enable_conda { 'true' if kwargs['use_conda'] else 'false' }")
     if not kwargs['force']:

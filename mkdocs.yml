@@ -3,7 +3,6 @@ site_url: https://mduphl.github.io/bohra/
 
 nav:
   - About: index.md
-  - Installation: installation.md
   - Usage:
       - Overview: usage/overview.md
       - Running Bohra: usage/running_bohra.md

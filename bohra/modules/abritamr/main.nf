@@ -62,9 +62,7 @@ process ABRITAMR_GENERAL {
             conda "${params.dependency_prefix}/abritamr"
         } else {
             conda "${moduleDir}/environment.yml" }
-    } else {
-        conda null
-        }
+    
 
     scratch true
     input:
@@ -98,9 +96,7 @@ process ABRITAMR_INFER {
         } else {
             conda "${moduleDir}/environment.yml"
         }
-    } else {
-        conda null
-    }
+    
     errorStrategy 'ignore'
     scratch true
     input:

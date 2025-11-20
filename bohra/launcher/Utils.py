@@ -604,10 +604,8 @@ def _check_input_snippy(input_file:str) -> bool:
     reads = False
     if _check_path(input_file):
         df = pd.read_csv(input_file, sep='\t')
-        LOGGER.info(f"Read snippy input: {df}") 
         df = df.fillna('')
         for row in df.iterrows():
-            LOGGER.info(f"Checking snippy input: {row}")
             chk = _compare_r1_r2(r1=row[1]['r1'], r2=row[1]['r2'])
             if  chk:
                 reads = True

@@ -13,7 +13,7 @@ workflow RUN_ASSEMBLE {
         
     main:
     pe_reads = input.filter{ cfg,files -> cfg.input_type == 'pe_reads' }
-    println pe_reads.view()
+    // println pe_reads.view()
     ASSEMBLER_PE ( pe_reads )
     contigs = ASSEMBLER_PE.out.contigs
     contigs = contigs.map { cfg, files -> tuple(cfg + [input_type:"asm"], files) }

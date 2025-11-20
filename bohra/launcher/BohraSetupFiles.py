@@ -110,9 +110,9 @@ def _get_input_types(cols_provided: list, cols_required:list) -> dict:
 
 def _infer_correct_read(file_path:str) -> str:
 
-    if '_R1' in file_path or '_1' in file_path:
+    if '_R1' in file_path or '_1.fastq' in file_path or 'r1' in file_path:
         return "R1.fastq.gz"
-    elif '_R2' in file_path or '_2' in file_path:
+    elif '_R2' in file_path or '_2.fastq' in file_path or 'r2' in file_path:
         return "R2.fastq.gz"
     else:
         return "unknown"
