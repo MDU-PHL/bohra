@@ -36,22 +36,28 @@ If you do not already have `conda` installed, you can check out the documentatio
 
 ### 2. Setup the `bohra` environment and install the pipeline co-ordinator
 
-1. You can download the `environment.yml` file [here](https://github.com/MDU-PHL/bohra/blob/rethink_structure/environment.yml). Please note that on the last line you may need to update the path to where your conda environments are stored. For example if you installed `miniconda` as above you should chnage this to line to:
+1. Clone the `bohra` repository
 
 ```
-prefix: ~/miniconda/envs/bohra-3pr
+git clone git@github.com:MDU-PHL/bohra.git
 ```
+
+
 2. Create the environment 
 
+
 ```
-conda env create -f environment.yml
+cd bohra
+conda env create -f environment.yml -n bohra
 ```
 
 3. Install the `bohra` co-ordinator
 
-```
 
 ```
+pip3 install /path/to/the/repository_for/bohra
+```
+
 4. Test this has worked as expected
 ```
 bohra --help
