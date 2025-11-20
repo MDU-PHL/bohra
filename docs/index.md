@@ -29,31 +29,10 @@ Stand alone html reports are generated for easy sharing and visualisation of the
 
 ## Create the environment
 
-### 1. Install conda
+### 1. Install conda (skip this step if you already have conda installed)
 
-If you do not already have `conda` installed, you can check out the documentation [here](https://docs.conda.io/projects/conda/en/stable/user-guide/install/index.html). We recommend you install `miniconda`
+If you do not already have `conda` installed, you can check out the documentation [here](https://docs.conda.io/projects/conda/en/stable/user-guide/install/index.html). We recommend you install [`miniforge`](https://github.com/conda-forge/miniforge)
 
-Below are instructions to install `miniconda` on a linux machine, however there are other distributions for Windows and MacOS [here](https://www.anaconda.com/docs/getting-started/miniconda/install)
-
-1. Download and install miniconda 
-
-```
-mkdir -p ~/miniconda3
-wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O ~/miniconda3/miniconda.sh
-bash ~/miniconda3/miniconda.sh -b -u -p ~/miniconda3
-rm ~/miniconda3/miniconda.sh
-```
-2. Restart your terminal and then 
-
-```
-source ~/miniconda3/bin/activate
-```
-
-3. Initialise `conda`
-
-```
-conda init --all
-```
 
 ### 2. Setup the `bohra` environment and install the pipeline co-ordinator
 
@@ -71,7 +50,7 @@ conda env create -f environment.yml
 3. Install the `bohra` co-ordinator
 
 ```
-pip3 install git+https://github.com/MDU-PHL/bohra.git@rethink_structure
+
 ```
 4. Test this has worked as expected
 ```
