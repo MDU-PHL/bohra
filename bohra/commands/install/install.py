@@ -7,7 +7,7 @@ from bohra.launcher.CheckDeps import check_dependencies
 
 @click.command()
 
-def install_deps():
+def install_deps(force_reinstall:bool=False):
     """
     Install dependencies for Bohra - Highly recommended to run this before running the pipeline.
     """
@@ -15,4 +15,4 @@ def install_deps():
     print("This will take some time.")
     print("Please be patient.")
     print("Will now check and install anything that may be required. ")
-    check_dependencies( )
+    check_dependencies(force_reinstall=str(force_reinstall).lower() )
