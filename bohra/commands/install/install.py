@@ -6,6 +6,10 @@ from bohra.launcher.CheckDeps import check_dependencies
 
 
 @click.command()
+@click.option('--force_reinstall',
+              is_flag=True,
+            #   default=False,
+              help="Force reinstallation of all dependencies, even if they are already installed.")
 
 def install_deps(force_reinstall:bool=False):
     """
@@ -15,4 +19,5 @@ def install_deps(force_reinstall:bool=False):
     print("This will take some time.")
     print("Please be patient.")
     print("Will now check and install anything that may be required. ")
+    # print(str(force_reinstall).lower())
     check_dependencies(force_reinstall=str(force_reinstall).lower() )
