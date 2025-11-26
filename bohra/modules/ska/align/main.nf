@@ -14,11 +14,9 @@ process SKA_ALIGN {
     
     
     if ( params.enable_conda ) {
-        if (file("${params.dependency_prefix}/ska2").exists()) {
-            conda "${params.dependency_prefix}/ska2"
-        } else {
-            conda "${moduleDir}/environment.yml"
-        }
+        if (file("${params.dependency_prefix}/relationships").exists()) {
+            conda "${params.dependency_prefix}/relationships"
+        } 
     } else {
         conda null
     }

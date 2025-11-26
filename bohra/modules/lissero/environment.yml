@@ -1,7 +1,0 @@
-name: bohra-lissero
-channels:
-  - conda-forge
-  - bioconda
-dependencies:
-  - lissero=0.4.9
-  - csvtk=0.25.0

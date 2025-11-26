@@ -13,15 +13,15 @@ process RUN_SMRYZR {
         mode: 'copy',
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"report") }
     
-    if ( params.enable_conda ) {
-        if (file("${params.dependency_prefix}/datasmryzr").exists()) {
-            conda "${params.dependency_prefix}/datasmryzr"
-        } else {
-            conda "${moduleDir}/environment.yml"
-        }
-    } else {
-        conda null
-    }
+    // if ( params.enable_conda ) {
+    //     if (file("${params.dependency_prefix}/datasmryzr").exists()) {
+    //         conda "${params.dependency_prefix}/datasmryzr"
+    //     } else {
+    //         conda "${moduleDir}/environment.yml"
+    //     }
+    // } else {
+    //     conda null
+    // }
     cache 'lenient'
     scratch true
     

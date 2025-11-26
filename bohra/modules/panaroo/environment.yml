@@ -1,7 +1,0 @@
-name: bohra-panaroo
-channels:
-  - conda-forge
-  - bioconda
-dependencies:
-  - panaroo=1.2.9
-  - csvtk=0.25.0

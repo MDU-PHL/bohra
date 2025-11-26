@@ -18,9 +18,7 @@ process SNIPPY {
     if ( params.enable_conda ) {
         if (file("${params.dependency_prefix}/snippy").exists()) {
             conda "${params.dependency_prefix}/snippy"
-        } else {
-            conda "${moduleDir}/environment.yml"
-        }
+        } 
     } else {
         conda null
     }

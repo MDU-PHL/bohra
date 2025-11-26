@@ -1,9 +1,0 @@
-name: bohra-mlst
-channels:
-  - conda-forge
-  - bioconda
-dependencies:
-  - mlst=2.23.0
-  - csvtk=0.25.0
-  - pandas
-  - numpy

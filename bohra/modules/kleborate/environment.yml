@@ -1,8 +1,0 @@
-name: bohra-kleborate
-channels:
-  - conda-forge
-  - bioconda
-dependencies:
-  - kleborate=2.3.2
-  - csvtk=0.25.0
-  

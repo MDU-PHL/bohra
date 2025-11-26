@@ -13,15 +13,15 @@ process CSVTK_CONCAT {
     
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/csvtk" : 'bioconda::csvtk') : null)
     
-    if ( params.enable_conda ) {
-        if (file("${params.dependency_prefix}/csvtk").exists()) {
-            conda "${params.dependency_prefix}/csvtk"
-        } else {
-            conda "${moduleDir}/environment.yml"
-        }
-    } else {
-        conda null
-    }
+    // if ( params.enable_conda ) {
+    //     if (file("${params.dependency_prefix}/csvtk").exists()) {
+    //         conda "${params.dependency_prefix}/csvtk"
+    //     } else {
+    //         conda "${moduleDir}/environment.yml"
+    //     }
+    // } else {
+    //     conda null
+    // }
 
     cache 'lenient'
     scratch true

@@ -17,8 +17,8 @@ process MENINGOTYPE {
     errorStrategy 'ignore'
     
     if ( params.enable_conda ) {
-        if (file("${params.dependency_prefix}/meningotype").exists()) {
-            conda "${params.dependency_prefix}/meningotype"
+        if (file("${params.dependency_prefix}/torstyverse").exists()) {
+            conda "${params.dependency_prefix}/torstyverse"
         } else {
             conda "${moduleDir}/environment.yml"
         }

@@ -1,8 +1,0 @@
-name: bohra-emmtyper
-channels:
-  - conda-forge
-  - bioconda
-dependencies:
-  - emmtyper=0.2.0
-  - csvtk
-  

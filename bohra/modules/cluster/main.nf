@@ -10,15 +10,15 @@ process SNP_CLUSTER {
     publishDir "${params.outdir}/report",
         mode: params.publish_dir_mode
     
-    if ( params.enable_conda ) {
-        if (file("${params.dependency_prefix}/cluster").exists()) {
-            conda "${params.dependency_prefix}/cluster"
-        } else {
-            conda "${moduleDir}/environment.yml"
-        }
-    } else {
-        conda null
-    }
+    // if ( params.enable_conda ) {
+    //     if (file("${params.dependency_prefix}/cluster").exists()) {
+    //         conda "${params.dependency_prefix}/cluster"
+    //     } else {
+    //         conda "${moduleDir}/environment.yml"
+    //     }
+    // } else {
+    //     conda null
+    // }
 
     cache 'lenient'
     scratch true

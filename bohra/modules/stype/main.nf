@@ -19,10 +19,7 @@ process STYPE {
     if ( params.enable_conda ) {
         if (file("${params.dependency_prefix}/stype").exists()) {
             conda "${params.dependency_prefix}/stype"
-        } else {
-            conda "${moduleDir}/environment.yml"
-        }
-        
+        } 
     } else {
         conda null
     }

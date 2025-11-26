@@ -14,8 +14,8 @@ process IQTREE {
     
     
     if ( params.enable_conda ) {
-        if (file("${params.dependency_prefix}/trees").exists()) {
-            conda "${params.dependency_prefix}/trees"
+        if (file("${params.dependency_prefix}/relationships").exists()) {
+            conda "${params.dependency_prefix}/relationships"
         } else {
             conda "${moduleDir}/environment.yml"
         }

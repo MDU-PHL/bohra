@@ -18,8 +18,6 @@ process KLEBORATE {
     if ( params.enable_conda ) {
         if (file("${params.dependency_prefix}/kleborate").exists()) {
             conda "${params.dependency_prefix}/kleborate"
-        } else {
-            conda "${moduleDir}/environment.yml"
         }
         
     } else {

@@ -1,8 +1,0 @@
-name: bohra-datasmryzr
-channels:
-  - conda-forge
-  - bioconda
-dependencies:
-  - pip
-  - pip:
-    - 'git+https://github.com/kristyhoran/datasmryzr'

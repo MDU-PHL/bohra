@@ -1,6 +1,0 @@
-name: bohra-csvtk
-channels:
-  - conda-forge
-  - bioconda
-dependencies:
-  - csvtk=0.25.0

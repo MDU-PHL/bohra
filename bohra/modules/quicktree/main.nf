@@ -12,11 +12,9 @@ process QUICKTREE {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
     
     if ( params.enable_conda ) {
-        if (file("${params.dependency_prefix}/trees").exists()) {
-            conda "${params.dependency_prefix}/trees"
-        } else {
-            conda "${moduleDir}/environment.yml"
-        }
+        if (file("${params.dependency_prefix}/relationships").exists()) {
+            conda "${params.dependency_prefix}/relationships"
+        } 
     } else {
         conda null
     }

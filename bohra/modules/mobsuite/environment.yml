@@ -1,7 +1,0 @@
-name: bohra-mobsuite
-channels:
-  - conda-forge
-  - bioconda
-dependencies:
-  - mob_suite=3.1.4
-  - csvtk=0.25.0

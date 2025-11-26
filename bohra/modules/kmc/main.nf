@@ -10,11 +10,9 @@ process KMC {
     // afterScript "rm -fr /tmp/\$USER/*"
     
     if ( params.enable_conda ) {
-        if (file("${params.dependency_prefix}/assemblers").exists()) {
-            conda "${params.dependency_prefix}/assemblers"
-        } else {
-            conda "${moduleDir}/environment.yml"
-        }
+        if (file("${params.dependency_prefix}/torstyverse").exists()) {
+            conda "${params.dependency_prefix}/torstyverse"
+        } 
     } else {
         conda null
     }

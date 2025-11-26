@@ -13,11 +13,9 @@ process GUBBINS {
     cache 'lenient'
     
     if ( params.enable_conda ) {
-        if (file("${params.dependency_prefix}/gubbins").exists()) {
-            conda "${params.dependency_prefix}/gubbins"
-        } else {
-            conda "${moduleDir}/environment.yml"
-        }
+        if (file("${params.dependency_prefix}/relationships").exists()) {
+            conda "${params.dependency_prefix}/relationships"
+        } 
     } else {
         conda null
     }
