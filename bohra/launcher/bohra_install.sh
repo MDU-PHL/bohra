@@ -29,95 +29,86 @@ fi
 
 # declare TOOLS=(mash assemblers seqtk seqkit trees prokka snippy mlst kraken2 mob_suite panaroo abritamr gubbins snpdists ectyper emmtyper kleborate lissero meningotype ngmaster stype tbtamr datasmryzr shigapass sonneitype ska2 cluster classify-pangenome fastp)
 declare -A TOOLS=(
-# [mash]="mash --version && csvtk --version"
-[torstyverse]="ngmaster --version && meningotype --version  && lissero --version && shovill --version && spades.py -v && skesa --version && mlst --version && prokka --version && csvtk --version "
-[seqquality]="seqkit -h && fastp -h &&csvtk --version"
-# [seqkit]="csvtk --version" # seqkit does not have a --version flag
-[relationships]="gubbins -h && mash --version && coresnpfilter --version && iqtree --version && quicktree -v && VeryFastTree --help && gotree version && csvtk --version"
-# [prokka]=" && csvtk --version"
-[snippy]="snippy --version && csvtk --version"
-# [mlst]="mlst --version && csvtk --version"
-[kraken2]="kraken2 --version && csvtk --version"
-# [mob_suite]="mob_recon --version && csvtk --version"
-[panaroo]="panaroo --version && csvtk --version"
-[abritamr]="abritamr --version && csvtk --version"
-[gubbins]="gubbins -h && csvtk --version"
-[snpdists]="snp-dists -v && csvtk --version"
-# [ectyper]="ectyper --version && csvtk --version"
-[emmtyper]="emmtyper --version && csvtk --version"
-[kleborate]="kleborate --version && csvtk --version"
-# [lissero]="lissero --version && csvtk --version"
-# [meningotype]="meningotype --version && csvtk --version"
-# [ngmaster]="ngmaster --version && csvtk --version"
-[stype]="sistr --version && stype --version && csvtk --version"
-[tbtamr]="tbtamr --version && csvtk --version"
-[datasmryzr]="datasmryzr --help && csvtk --version"
-[shigapass]="blastn -version && csvtk --version"
-[sonneitype]="mykrobe --version && csvtk --version"
-[ska2]="ska  --version && csvtk --version"
-[cluster]="csvtk --version"
+[torstyverse]="meningotype --version,lissero --version,shovill --version,spades.py -v,skesa --version,mlst --version,prokka --version,snp-dists -v,ngmaster --version,emmtyper --version,csvtk version"
+[seqquality]="seqkit --help,fastp --help,csvtk version"
+[relationships]="kraken2 --version,gubbins -h,mash --version,coresnpfilter --version,iqtree --version,quicktree -v,VeryFastTree --help,gotree version,csvtk version,ska --version"
+[snippy]="snippy --version,csvtk version"
+[mob_suite]="mob_recon --version,csvtk version"
+[panaroo]="panaroo --version,csvtk version"
+[ectyper]="ectyper --version,csvtk version"
+[kleborate]="kleborate --version,csvtk version"
+[stype]="sistr --version,stype --version,csvtk version"
+[tamr]="abritamr --version && tbtamr --version && csvtk version"
+[datasmryzr]="datasmryzr --help && csvtk version"
+[sonneitype]="mykrobe --version,csvtk version"
 [classify-pangenome]="R --version"
-# [fastp]="fastp --help && csvtk --version"
 )
 
 
 function check_installation(){
-    echo conda activate $1 && ${TOOLS[$2]}
-    rt=$(conda activate $1 && ${TOOLS[$2]} 2>&1 )
-    echo "$rt"
-    echo "$?"
+    # echo "conda activate $1 && ${TOOLS[$2]}"
+    IFS=',' read -r -a deps <<< "${TOOLS[$2]}"
+    # echo deps array: ${deps[@]}
+    found_error=0
+    for dep in "${deps[@]}"; do
+        # echo "Checking: $dep"
+        conda activate $1 && $dep > /dev/null 2>&1
+        if [[   "$?" -ne 0 ]] 
+            then
+                echo -e "\e[1mError: $dep failed\e[0m"
+                found_error=1
+                # return
+        fi
+    done
+    echo $found_error
     
+
 }
 
 function install_tool(){
-    force=""
-    if [[ "$FORCE_REINSTALL" == "true" ]]
-        then
-        force="--force"
-    fi
-    # echo "Force reinstall is set to true. Will remove existing environment for $1"
-    echo Running $INSTALLER env create -p $BOHRA_CONDA_ENVS/$1 -f $ENVS_FILES/$1.yml $force
-    $INSTALLER env create -p $BOHRA_CONDA_ENVS/$1 -f $ENVS_FILES/$1.yml $force
-    # echo "$?"
-    echo "Will check installation was successful."
+    
+    echo Running $INSTALLER env create -p $BOHRA_CONDA_ENVS/$1 -f $ENVS_FILES/$1.yml
+    time $INSTALLER env create -p $BOHRA_CONDA_ENVS/$1 -f $ENVS_FILES/$1.yml
+    echo "Will check $2 setup was successful"
     checkinstalled=$(check_installation $BOHRA_CONDA_ENVS/$1 $1)
-    echo "Check installed returned $checkinstalled"
-    if [[ $checkinstalled -eq 1 ]] 
+    if [[ $checkinstalled -ne 0 ]] 
         then
             echo "There was an error installing $1. Please check the error messages above"
             echo -e "\e[1mExiting now. Please contact the Bohra developers if you need help\e[0m"
             exit 1
     else
-        echo "$1 installed"
+        echo "$1 has been set up successfully"
     fi
 }
 
     
 for key in ${!TOOLS[@]};do
-
-    echo Checking set up for $key
-    echo "Will run conda activate $BOHRA_CONDA_ENVS/$key && ${TOOLS[$key]}"
-    isinstalled=$(check_installation $BOHRA_CONDA_ENVS/$key $key)
-    echo "isinstalled returned $isinstalled"
-    if [[ "$isinstalled" != 0 ]]
+    if [[ $FORCE_REINSTALL == "true" && $INSTALL == "install" ]]
         then
-        echo Looks like $key is not installed. 
-        if [[ "$INSTALL" == "install" ]]
-            then
-            echo Installing $key now
-            install_tool $key
-        else
-            echo -e "\e[1m$key is not installed\e[0m"
-            echo -e "\e[1mYour installation is incomplete.Exiting now. Please contact the Bohra developers if you need help\e[0m"
-            exit 1
-        fi
-    elif [[ "$FORCE_REINSTALL" == "true" && "$isinstalled" == 0 ]]
-        then
-        echo "Force reinstall is set to true. Will reinstall $key"
+        echo "Removing existing environment for $key"
+        echo "Running rm -rf $BOHRA_CONDA_ENVS/$key"
+        # rm -rf $BOHRA_CONDA_ENVS/$key
+        echo "Will reinstall $key"
         install_tool $key
     else
-        echo "$key is installed"
-    fi
-        
+        echo Checking set up for $key environment
+        isinstalled=$(check_installation $BOHRA_CONDA_ENVS/$key $key)
+        echo "is installed :$isinstalled"
+        if [[ "$isinstalled" != 0 ]]
+            then
+            echo Looks like $key is not installed. 
+            if [[ "$INSTALL" == "install" ]]
+                then
+                echo Setting up $key environment now
+                install_tool $key
+            else
+                echo -e "\e[1m$key is not installed\e[0m"
+                echo -e "\e[1mYour installation is incomplete.Exiting now. Please contact the Bohra developers if you need help\e[0m"
+                exit 1
+            fi
+        else
+            echo "$key is set up correctly"
+        fi
+    fi  
 done
         

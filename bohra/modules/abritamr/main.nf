@@ -19,8 +19,8 @@ process ABRITAMR {
     // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/abritamr" : 'bioconda::abritamr') : null) 
     
     if ( params.enable_conda ) {
-        if (file("${params.dependency_prefix}/abritamr").exists()) {
-            conda "${params.dependency_prefix}/abritamr"
+        if (file("${params.dependency_prefix}/tamr").exists()) {
+            conda "${params.dependency_prefix}/tamr"
         } else {
             conda "${moduleDir}/environment.yml" }
     } else {
