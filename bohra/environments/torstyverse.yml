@@ -1,6 +1,7 @@
 channels:
   - conda-forge
   - bioconda
+  - defaults
 dependencies:
   - _libgcc_mutex=0.1
   - _openmp_mutex=4.5
@@ -11,7 +12,7 @@ dependencies:
   - barrnap=0.9
   - beautifulsoup4=4.14.2
   - bedtools=2.31.1
-  - biopython=1.86
+  - biopython=1.85
   - blast=2.16.0
   - blast-legacy=2.2.26
   - boost-cpp=1.71.0
@@ -127,6 +128,7 @@ dependencies:
   - openmpi=4.1.6
   - openssl=3.6.0
   - paml=4.10.9
+  - pandas=2.3.3
   - parallel=20250822
   - pasta=1.9.2
   - pcre=8.45
@@ -238,7 +240,6 @@ dependencies:
   - perl-www-robotrules=6.02
   - perl-xml-dom=1.46
   - perl-xml-dom-xpath=0.14
-  - perl-xml-namespacesupport=1.12
   - perl-xml-parser=2.44_01
   - perl-xml-regexp=0.04
   - perl-xml-sax=1.02
@@ -263,7 +264,10 @@ dependencies:
   - pymongo=4.15.4
   - pysocks=1.7.1
   - python=3.12.3
+  - python-dateutil=2.9.0.post0
+  - python-tzdata=2025.2
   - python_abi=3.12
+  - pytz=2025.2
   - raxml=8.2.13
   - readline=8.2
   - requests=2.32.5
@@ -274,6 +278,7 @@ dependencies:
   - seqtk=1.4
   - setuptools=80.9.0
   - shovill=1.1.0
+  - six=1.17.0
   - skesa=2.5.1
   - sniffio=1.3.1
   - snp-dists=0.8.2

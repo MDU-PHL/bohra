@@ -21,10 +21,7 @@ process ABRITAMR {
     if ( params.enable_conda ) {
         if (file("${params.dependency_prefix}/tamr").exists()) {
             conda "${params.dependency_prefix}/tamr"
-        } else {
-            conda "${moduleDir}/environment.yml" }
-    } else {
-        conda null
+        }  
         }
     
 
@@ -58,12 +55,9 @@ process ABRITAMR_GENERAL {
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"${meta.id}", publish_id:meta.id) }
-    if (file("${params.dependency_prefix}/abritamr").exists()) {
-            conda "${params.dependency_prefix}/abritamr"
-        } else {
-            conda "${moduleDir}/environment.yml" }
-    
-
+    if (file("${params.dependency_prefix}/tamr").exists()) {
+            conda "${params.dependency_prefix}/tamr"
+        } 
     scratch true
     input:
     tuple val(meta), path(summary_matches), path(summary_partials)
@@ -91,12 +85,9 @@ process ABRITAMR_INFER {
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"${meta.id}", publish_id:meta.id) }
-    if (file("${params.dependency_prefix}/abritamr").exists()) {
-            conda "${params.dependency_prefix}/abritamr"
-        } else {
-            conda "${moduleDir}/environment.yml"
-        }
-    
+    if (file("${params.dependency_prefix}/tamr").exists()) {
+            conda "${params.dependency_prefix}/tamr"
+        } 
     errorStrategy 'ignore'
     scratch true
     input:

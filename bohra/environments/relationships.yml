@@ -1,6 +1,7 @@
 channels:
   - conda-forge
   - bioconda
+  - defaults
 dependencies:
   - _libgcc_mutex=0.1
   - _openmp_mutex=4.5
@@ -9,6 +10,7 @@ dependencies:
   - bioconductor-ggtree=3.14.0
   - bioconductor-treeio=1.30.0
   - biopython=1.86
+  - blast=2.17.0
   - bwidget=1.10.1
   - bzip2=1.0.8
   - c-ares=1.34.5
@@ -20,6 +22,7 @@ dependencies:
   - curl=8.17.0
   - dendropy=5.0.8
   - dill=0.4.0
+  - entrez-direct=24.0
   - fasttree=2.2.0
   - font-ttf-dejavu-sans-mono=2.37
   - font-ttf-inconsolata=3.000
@@ -34,6 +37,7 @@ dependencies:
   - gfortran_impl_linux-64=15.2.0
   - gmp=6.3.0
   - gotree=0.5.0
+  - gperftools=2.17.2
   - graphite2=1.3.14
   - gsl=2.8
   - gubbins=3.4.3
@@ -43,6 +47,7 @@ dependencies:
   - iqtree=2.4.0
   - kernel-headers_linux-64=4.18.0
   - keyutils=1.6.3
+  - kraken2=2.17.1
   - krb5=1.21.3
   - ld_impl_linux-64=2.45
   - lerc=4.0.0
@@ -65,6 +70,7 @@ dependencies:
   - libglib=2.80.2
   - libgomp=15.2.0
   - libiconv=1.18
+  - libidn2=2.3.8
   - libjpeg-turbo=3.1.2
   - liblapack=3.11.0
   - libllvm14=14.0.6
@@ -81,6 +87,8 @@ dependencies:
   - libstdcxx-devel_linux-64=15.2.0
   - libstdcxx-ng=15.2.0
   - libtiff=4.6.0
+  - libunistring=0.9.10
+  - libunwind=1.8.3
   - libuuid=2.41.2
   - libwebp-base=1.6.0
   - libxcb=1.17.0
@@ -88,24 +96,51 @@ dependencies:
   - libxml2=2.13.9
   - libzlib=1.3.1
   - llvmlite=0.43.0
+  - lz4-c=1.10.0
   - make=4.4.1
   - mash=2.3
   - mpi=1.0
   - multiprocess=0.70.18
+  - ncbi-vdb=3.2.1
   - ncurses=6.5
   - numba=0.60.0
   - numpy=1.23.0
   - openmpi=4.1.6
   - openssl=3.6.0
+  - pandas=2.3.3
   - pandoc=3.8.2.1
   - pango=1.54.0
   - pcre2=10.43
   - perl=5.32.1
+  - perl-archive-tar=3.04
+  - perl-carp=1.50
+  - perl-common-sense=3.75
+  - perl-compress-raw-bzip2=2.214
+  - perl-compress-raw-zlib=2.214
+  - perl-encode=3.21
+  - perl-exporter=5.74
+  - perl-exporter-tiny=1.002002
+  - perl-extutils-makemaker=7.70
+  - perl-io-compress=2.214
+  - perl-io-zlib=1.15
+  - perl-json=4.10
+  - perl-json-xs=4.04
+  - perl-list-moreutils=0.430
+  - perl-list-moreutils-xs=0.430
+  - perl-parent=0.243
+  - perl-pathtools=3.75
+  - perl-scalar-list-utils=1.70
+  - perl-storable=3.15
+  - perl-types-serialiser=1.01
   - pip=25.3
   - pixman=0.46.4
+  - popt=1.16
   - pthread-stubs=0.4
   - python=3.10.19
+  - python-dateutil=2.9.0.post0
+  - python-tzdata=2025.2
   - python_abi=3.10
+  - pytz=2025.2
   - quicktree=2.5
   - r-ape=5.8_1
   - r-aplot=0.2.9
@@ -231,15 +266,19 @@ dependencies:
   - raxml=8.2.13
   - raxml-ng=1.2.2
   - readline=8.2
+  - rsync=3.4.1
   - scipy=1.13.1
   - sed=4.9
   - setuptools=80.9.0
+  - six=1.17.0
   - ska2=0.5.0
   - sysroot_linux-64=2.28
+  - tar=1.35
   - tk=8.6.13
   - tktable=2.10
   - tzdata=2025b
   - veryfasttree=4.0.5
+  - wget=1.21.4
   - wheel=0.45.1
   - xorg-libice=1.1.2
   - xorg-libsm=1.2.6
@@ -249,6 +288,7 @@ dependencies:
   - xorg-libxext=1.3.6
   - xorg-libxrender=0.9.12
   - xorg-libxt=1.3.1
+  - xxhash=0.8.3
   - xz=5.8.1
   - xz-gpl-tools=5.8.1
   - xz-tools=5.8.1
