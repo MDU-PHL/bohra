@@ -9,7 +9,7 @@ from bohra.launcher.CheckDeps import _check_databases
 @click.option('--setup_databases',
               is_flag=True,
             #   default=False,
-              help="Force reinstallation of all dependencies, even if they are already installed.")
+              help="Download and/or setup required databases.")
 def init_databases(setup_databases:bool=False):
     """
     Check that dependencies are installed correctly.
