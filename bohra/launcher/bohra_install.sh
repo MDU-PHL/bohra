@@ -92,7 +92,7 @@ for key in ${!TOOLS[@]};do
     else
         echo Checking set up for $key environment
         isinstalled=$(check_installation $BOHRA_CONDA_ENVS/$key $key)
-        echo "is installed :$isinstalled"
+        # echo "is installed :$isinstalled"
         if [[ "$isinstalled" != 0 ]]
             then
             echo Looks like $key is not installed. 

@@ -25,6 +25,7 @@ from bohra.commands.init_databases import init_databases
 from bohra.commands.install import install 
 from bohra.commands.generate_input import generate_input
 from bohra.commands.test import bohratest
+from bohra.commands.check_setup import check_setup
 from bohra.launcher.BohraRun import run_bohra
 
 
@@ -97,6 +98,7 @@ for opt in cmd_opts:
 
 cli.add_command(init_databases.init_databases)
 cli.add_command(install.install_deps)
+cli.add_command(check_setup.check_deps)
 cli.add_command(generate_input.generate_input)
 cli.add_command(bohratest.test)
 

@@ -96,20 +96,19 @@ conda activate bohra
 2. Run the bohra dependency installation
 
 ```
-bohra install-deps
+bohra install-deps --setup_databases
 ```
 
-The initial creation of the conda environments may take some time. Once the environments are set up, `bohra` will try to set up your database environment variables. Although this is not essential it is HIGHLY recommended for ease of running and reproducibility. 
+The initial creation of the conda environments may take some time (~10 - 15 minutes). Once the environments are set up, `bohra` will try to set up your database environment variables. Although this is *not* essential it is **HIGHLY** recommended for ease of running and reproducibility. 
 
 Please be aware of the following:
 
-* If you elect to say no to setting up a `BOHRA_KRAKEN2_DB` or `BOHRA_SYLPH_DB`, you will need to provide EITHER the `--kraken2_db` OR a `--sylph_db` flag each time you run `bohra` if you wish to do speciation or use any features which depend on species (typing and AMR).
+* If you elect to say no to setting up a `KRAKEN2_DEFAULT_DB` you will need to provide the `--kraken2_db` flag each time you run `bohra` if you wish to do speciation or use any features which depend on species (typing and AMR).
 
 * If you are happy to use the `mlst` database that comes bundled with the `mlst` [tool](https://github.com/tseemann/mlst), then you can decline setting the `BOHRA_PUBMLST_DB` and `BOHRA_BLAST_DB`.
 
-* If you are working in your own environments (`~/.conda` or `~/.miniconda`) you skip setting the `BOHRA_MOBSUITE_DB` environment variable. However, please note if you are setting up `bohra` in a share environment, you may run into permissions issues if `mobsuite` database requires updating at the time of running (this can happen) - so please ensure that you have a properly set up `mob_suite` database and provide this path when requested during set up.
 
-* If you already have a kraken2 database and/or a sylph database you can press 'n' when asked if you want to download. If you select 'y' please make sure that you have enough storage space for the databases. Some are quite large, up to 600 GB (half-terabyte).
+* If you already have a kraken2 database you can press 'n' when asked if you want to download. If you select 'y' please make sure that you have enough storage space for the databases. Some are quite large, up to 600 GB (half-terabyte).
 
 
 
