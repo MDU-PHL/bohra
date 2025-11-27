@@ -8,7 +8,8 @@ set -e
 # resets to base env
 eval "$(conda shell.bash hook)"
 DB_VARS=("KRAKEN2_DEFAULT_DB" "BOHRA_PUBMLST_DB" "BOHRA_BLAST_DB" "BOHRA_MOBSUITE_DB")
-NONESSENTIAL_VARS=("BOHRA_PUBMLST_DB" "BOHRA_BLAST_DB" "BOHRA_MOBSUITE_DB") 
+NONESSENTIAL_VARS=("BOHRA_PUBMLST_DB" "BOHRA_BLAST_DB" "BOHRA_MOBSUITE_DB")
+# KRAKEN2_ESSENTIAL_FILES=("hash.k2d" "opts.k2d" "taxo.k2d" "tree.k2d" "names.dmp" "nodes.dmp")
 declare -A DB_URL=(
     [1]="https://genome-idx.s3.amazonaws.com/kraken/k2_standard_20250402.tar.gz",
     [2]="https://genome-idx.s3.amazonaws.com/kraken/k2_standard_08gb_20250402.tar.gz",
@@ -90,4 +91,5 @@ for db in "${DB_VARS[@]}"; do
         echo "Current value of $db: ${!db}"
 done
 
+# add in a check to make sure that the kraken2 files are present in the database path and not empty
 echo "Finished checking and setting environment variables for databases."

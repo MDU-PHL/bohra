@@ -138,7 +138,14 @@ def run_bohra(
             LOGGER.info(f"Please paste the following command to run the pipeline:\n\033[1m{cmd}\033[0m")
         else:
             LOGGER.info(f"Running the command: {cmd}")
-            proc = _run_subprocess(cmd=cmd)
+            proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+
+# Read and print the combined output line by line in real time
+            for line in proc.stdout:
+                print(line, end='')
+
+            # Wait for the process to complete and get the return code
+            proc.wait()
             # if proc.returncode == 0:
             #     LOGGER.info(f"The {pipeline} pipeline has completed successfully.")
             #     return True

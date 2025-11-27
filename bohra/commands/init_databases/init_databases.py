@@ -6,7 +6,11 @@ from bohra.launcher.CheckDeps import _check_databases
 
 
 @click.command()
-def init_databases():
+@click.option('--setup_databases',
+              is_flag=True,
+            #   default=False,
+              help="Force reinstallation of all dependencies, even if they are already installed.")
+def init_databases(setup_databases:bool=False):
     """
     Check that dependencies are installed correctly.
     """
@@ -16,7 +20,7 @@ def init_databases():
     print("Will now install dependencies for Bohra.")
     print("This will take some time.")
     print("Please be patient.")
-    
-    print("Will now check you installation and install anything that may be required. ")
-    _check_databases(db_install=True)
+    db_install = True if setup_databases else False
+    print(f"Will now check your databases{' and install anything that may be required' if db_install else ''}. ")
+    _check_databases(db_install=db_install)
     

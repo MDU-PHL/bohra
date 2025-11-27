@@ -39,7 +39,6 @@ declare -A TOOLS=(
 [kleborate]="kleborate --version,csvtk version"
 [stype]="sistr --version,stype --version,csvtk version"
 [tamr]="abritamr --version && tbtamr --version && csvtk version"
-[datasmryzr]="datasmryzr --help && csvtk version"
 [sonneitype]="mykrobe --version,csvtk version"
 [classify-pangenome]="R --version"
 )
@@ -87,7 +86,7 @@ for key in ${!TOOLS[@]};do
         then
         echo "Removing existing environment for $key"
         echo "Running rm -rf $BOHRA_CONDA_ENVS/$key"
-        # rm -rf $BOHRA_CONDA_ENVS/$key
+        rm -rf $BOHRA_CONDA_ENVS/$key
         echo "Will reinstall $key"
         install_tool $key
     else

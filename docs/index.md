@@ -72,11 +72,11 @@ Options:
   --help     Show this message and exit.
 
 Commands:
-  check           Check that dependencies are installed correctly.
   generate-input  Generare input files for the Bohra pipeline.
+  init-databases  Check that dependencies are installed correctly.
   install-deps    Install dependencies for Bohra - Highly recommended to...
   run             Run the Bohra pipeline.
-  test            Check that bohra is installed correctly
+  test            Check that bohra is installed correctly and runs as...
 ```
 
 ### 3. Install dependencies and setup environment variables
@@ -86,7 +86,7 @@ It is highly recommended that you allow `bohra` to setup the required dependenci
 This step will setup conda environments under the `path/to/conda/envs/bohra`(depending on how you have configured your `conda` installation). 
 
 
-Additionally, `bohra` depends upon either a correctly configure `kraken2` compatible database OR a `sylph` compatible database. The `bohra install-deps` command will optionally download the databases for your and also set the appropriate environment variables for you.
+Additionally, `bohra` depends upon either a correctly configure `kraken2` compatible database. The `bohra install-deps` command will optionally download the databases for your and also set the appropriate environment variables for you.
 
 1. Activate your environment from step 2 above
 ```
