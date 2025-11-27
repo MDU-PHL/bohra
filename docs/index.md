@@ -27,14 +27,12 @@ Stand alone html reports are generated for easy sharing and visualisation of the
 
 `bohra` is a large pipeline with many dependencies, including databases required for speciation. Currently `bohra` is only available for installation with `conda`.
 
-### Create the environment
-
-#### 1. Install conda (skip this step if you already have conda installed)
+**1. Install conda (skip this step if you already have conda installed)**
 
 If you do not already have `conda` installed, you can check out the documentation [here](https://docs.conda.io/projects/conda/en/stable/user-guide/install/index.html). We recommend you install [`miniforge`](https://github.com/conda-forge/miniforge)
 
 
-#### 2. Setup the `bohra` environment and install the pipeline co-ordinator
+**2. Setup the `bohra` environment and install the pipeline co-ordinator**
 
 1. Clone the `bohra` repository
 
@@ -79,7 +77,7 @@ Commands:
   test            Check that bohra is installed correctly and runs as...
 ```
 
-#### 3. Install dependencies and setup environment variables
+**3. Install dependencies and setup environment variables**
 
 It is highly recommended that you allow `bohra` to setup the required dependencies for the pipeline. 
 
