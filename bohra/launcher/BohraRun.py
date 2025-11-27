@@ -134,24 +134,22 @@ def run_bohra(
         # command = _funcs()[pipeline](kwargs=kwargs, command=command)
         
         cmd = _make_command(command=command)
-        if kwargs["proceed"] == "N":
+        if not kwargs["no_auto_run"]:
             LOGGER.info(f"Please paste the following command to run the pipeline:\n\033[1m{cmd}\033[0m")
         else:
             LOGGER.info(f"Running the command: {cmd}")
             proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-
-# Read and print the combined output line by line in real time
             for line in proc.stdout:
                 print(line, end='')
 
             # Wait for the process to complete and get the return code
             proc.wait()
-            # if proc.returncode == 0:
-            #     LOGGER.info(f"The {pipeline} pipeline has completed successfully.")
-            #     return True
-            # else:
-            #     LOGGER.error(f"The {pipeline} pipeline failed with return code {proc.returncode}.")
-            #     return False
+            if proc.returncode == 0:
+                LOGGER.info(f"The {pipeline} pipeline has completed successfully.")
+                return True
+            else:
+                LOGGER.error(f"The {pipeline} pipeline failed with return code {proc.returncode}.")
+                return False
     else:
         LOGGER.error(f"Failed to create the working directory {kwargs['workdir']}.")
         raise SystemError

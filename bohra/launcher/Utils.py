@@ -209,10 +209,10 @@ def _get_common_options() -> list:
             "default":"kraken2"
         },
         {
-            "name":"proceed",
-            "type":click.Choice(['Y', 'N']),
-            "default":"N",
-            "help":"Set to 'Y' if you want the pipeline to automatically proceed, otherwise a command will be printed to the screen and user can manually launch."
+            "name":"--no-auto-run",
+            "default":False,
+            "is_flag":True,
+            "help":"Set --no-auto-run to prevent the pipeline from running automatically. You will need to copy and paste the command to run the pipeline yourself."
         },
         {
             "name":"text_color",
