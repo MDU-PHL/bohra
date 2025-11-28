@@ -6,9 +6,7 @@ nav:
   - Usage:
       - Overview: usage/overview.md
       - Running Bohra: usage/running_bohra.md
-      - Modules: usage/modules.md
   - Guides:
-      - Overview: guides/overview.md
       - Quality Control: guides/quality_control.md
       - Comparative Genomics: guides/comparative_genomics.md
       - TB Analysis: guides/tb_analysis.md
