@@ -55,7 +55,7 @@ This will generate a file called `bohra_input.tsv` which you can use as input in
 
 `bohra` is a flexible pipeline and allows users to customise the workflows used. Below is an overview of each workflow. More detail on tools and options for each workflow can be found [here](usage/running_bohra.md) and [here](usage/modules.md). Further explanations and detailed guides can be found [here](guides/overview.md)
 
-**basic**
+**[basic](running_bohra#basic)**
 
 This workflow will run on fastq and/or fasta (depending user supplied input) and is the first step in all other workflows implmented by `bohra`. It can also be used alone as a simply quality control workflow.
 ```mermaid
