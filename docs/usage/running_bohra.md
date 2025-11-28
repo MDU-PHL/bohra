@@ -18,8 +18,7 @@ and help for each pipeline
 ```
 bohra run <pipeline> --help
 ```
-For any pipeline you can elect to run speciation using `--speciation sylph` or `--speciation kraken2` or you can turn off speciation by using `--speciation none`.
-
+If you do not want to or need to run speciation (ie you have this information supplied in your input file) you can add `--speciation none` to any pipeline.
 
 ## Genome characterisation pipelines
 
