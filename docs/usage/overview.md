@@ -64,7 +64,7 @@ sequence --> sequence_assessment --> report
 sequence --> speciation --> report
 ```
 
-**assembly**
+**[assembly](running_bohra#amr_typing)**
 
 This workflow will simple generate assemblies from paired-end fastq, run basic genome annotation with `prokka` and assess the quality of both the input reads and the resulting assemblies. This workflow forms the basis for amr, typing and pangenome analysis.
 
@@ -77,7 +77,7 @@ fastq --> speciation --> report
 
 ```
 
-**amr and typing**
+**[amr and typing](running_bohra#amr_typing)**
 
 This workflow will use user supplied species or the species detected in the sequence to determine the appropriate typing and AMR pipeline to use. Additional inferrence of genomic DST/AST will be undertaken for _S. enterica_ and _M. tuberculosis_.
 
@@ -97,7 +97,7 @@ fastq --> sequence_assessment --> report
 fastq --> speciation --> report
 ```
 
-**comparative analysis**
+**[comparative analysis](running_bohra#comparative)**
 
 This workflow undertakes a comparative anaysis of all the sequences included in the analysis. You can use reference based alignments with `snippy` or you can use reference free approaches with `mash` and `ska2`. 
 
@@ -109,7 +109,7 @@ sequence --> variant_detection --> distances --> cluster --> report
 variant_detection --> alignment --> tree_generation --> report
 ```
 
-**full**
+**[full](running_bohra#full)**
 
 The full workflow includes all the workflows outlined above with the addition of pangenome analysis using `panaroo`.
 
@@ -129,7 +129,7 @@ fastq --> variant_detection --> distances --> cluster --> report
 variant_detection --> alignment --> tree_generation --> report
 ```
 
-**tb**
+**[tb](running_bohra#tb)**
 
 `bohra` now has a _M. tuberulosis_ specific workflow, which does not run MLST or other assembly based tools. And undertakes _M. tuberculosis_ relevant gDST. It uses the H37rV reference genome, masking repetitive sites and `tbtAMR` for generation of an inferred antibiogram.
 ```mermaid
