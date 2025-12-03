@@ -51,7 +51,7 @@ def make_amr_df(genes_dict: dict, genes_on_plasmid:list, plasmid:pd.DataFrame, a
                 if gene in genes_on_plasmid:
                     ctg = amrout[amrout["Gene symbol"] == gene]["Contig id"].unique()[0]
                     plasmid_designation, plasmid_species = get_plasmid_designation_species(plasmid, ctg)
-                    gene = f"{gene} (possible {plasmid_designation} {plasmid_species})"
+                    gene = f"{gene}[P]"
                 
                 res.append(gene)
             genes_dict[row] = ",".join(res)
