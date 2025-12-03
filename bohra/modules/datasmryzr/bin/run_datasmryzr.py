@@ -78,7 +78,7 @@ def make_comment(comments:list) -> str:
 
 
 
-def _generate_summary_table(results_files: list, output:list, min_depth:40, minquality : 30, minaln:70) -> list:
+def _generate_summary_table(input_file: str, results_files: list, output:list, min_depth:40, minquality : 30, minaln:70) -> list:
     print("Generating summary table")
     list_of_filename = {
         "read_assessment.txt" : ["Isolate","Reads","GC", "Depth","Genome size", "is_control", "filesize", "Qscore"],
@@ -88,6 +88,11 @@ def _generate_summary_table(results_files: list, output:list, min_depth:40, minq
         "mlst.txt":["Isolate","Scheme","ST"],
         # "cluster.txt":[]
     }
+    colsblcklst = [ "r1","r2","assembly"]
+    input_data = pd.read_csv(input_file, sep='\t')
+    for col in input_data.columns:
+        if col in colsblcklst:
+            input_data = input_data.drop(columns=[col])
     # print(list_of_filename)
     summary = pd.DataFrame()
     for file in results_files:
@@ -152,6 +157,7 @@ def _generate_summary_table(results_files: list, output:list, min_depth:40, minq
     summary.drop(columns=check_cols, inplace=True)
     print(summary)
     if not summary.empty:
+        summary = pd.merge(input_data, summary, how = 'left', on = "Isolate")
         summary.to_csv("summary.tsv", sep = '\t', index = False)
         output.append("summary.tsv")
         return "-f summary.tsv", output
@@ -509,7 +515,7 @@ def _compile(args):
     cluster_table,output = _extract_cluster_table(results_files, output)
     core_genome,output = _extract_core_genome(results_files, output)
     core_genome_report,output = _extract_core_genome_report(results_files, output)
-    summary,output = _generate_summary_table(results_files, output, 40, 30, 70)
+    summary,output = _generate_summary_table(args.input_file, results_files, output, 40, 30, 70)
     print(read_assessment)
     
     panclass,output = _extract_pangenome_classification(results_files, output)
