@@ -24,7 +24,7 @@ def check_species(species:list) -> str:
     if len(sp) == 1:
         return 1
     elif len(sp) > 1:
-        return f"Species from reads: {species[0]} and assembly: {species[1]} are different."
+        return f"Species inconsistency."
 def check_val(val:float, min_val:float,metric) -> str:
     """
     Check if the coverage is above the minimum coverage
@@ -116,6 +116,7 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
     summary["Comment"] = ""
     summary["Data assessment"] = 1
     summary["is_control"] = summary["is_control"].fillna(False)
+    summary = pd.merge(input_data, summary, how = 'left', on = "Isolate")
     summary = summary.fillna("")
     summary = summary.rename(columns = {"Match 1 (reads)":"Species (reads)","Match 1 (asm)":"Species (assembly)"})
     if 'ST' in summary.columns:
@@ -158,7 +159,7 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
     summary.drop(columns=check_cols, inplace=True)
     print(summary)
     if not summary.empty:
-        summary = pd.merge(input_data, summary, how = 'left', on = "Isolate")
+        
         summary.to_csv("summary.tsv", sep = '\t', index = False)
         output.append("summary.tsv")
         return "-f summary.tsv", output
