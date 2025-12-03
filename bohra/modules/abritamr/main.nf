@@ -41,7 +41,7 @@ process ABRITAMR {
     sp=\$($module_dir/extract_species.py $contigs)
     abritamr run -c $contigs -px ${meta.id} -j $task.cpus \$sp
     cp ${meta.id}/* .
-    $module_dir/add_species.py ${meta.species} summary_matches.txt summary_partials.txt
+    $module_dir/add_species.py '${meta.species}' summary_matches.txt summary_partials.txt
     echo -e abritamr'\t'\$CONDA_PREFIX'\t'\$(abritamr -v)'\t'${params.abritamr_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_abritamr.txt
     """
 }
