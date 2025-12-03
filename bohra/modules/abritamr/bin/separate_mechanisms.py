@@ -30,10 +30,10 @@ replace_negs = {
     "CPase_16S_mcr_NEG":""
 }
 df = df.replace(replace_negs)
-df['Reportable AMR mechanisms - genes'] = df['Reportable AMR mechanisms'].apply(lambda x: get_genes(x))
-df['Reportable AMR mechanisms - SNPs'] = df['Reportable AMR mechanisms'].apply(lambda x: get_snps(x))
-df['Other AMR mechanisms - genes'] = df['Other AMR mechanisms'].apply(lambda x: get_genes(x))
-df['Other AMR mechanisms - SNPs'] = df['Other AMR mechanisms'].apply(lambda x: get_snps(x))
+df['Reportable AMR genes'] = df['Reportable AMR mechanisms'].apply(lambda x: get_genes(x))
+df['Reportable AMR SNPs'] = df['Reportable AMR mechanisms'].apply(lambda x: get_snps(x))
+df['Other AMR genes'] = df['Other AMR mechanisms'].apply(lambda x: get_genes(x))
+df['Other AMR SNPs'] = df['Other AMR mechanisms'].apply(lambda x: get_snps(x))
 
 df[['Isolate',
     'Reportable AMR genes',
