@@ -65,8 +65,7 @@ def _init_command_dict(profile:str, cpus:int, job_name:str, prefix:str, pipeline
     command_dict = {"params":[
         f"--report_outdir {report_outdir}",
         f"-profile {profile}",
-        f"--outdir ",
-        f"--outdir ",
+        f"--outdir {outdir}",
         f"--pipeline {pipeline}",
         f"-executor.cpus {cpus}",
         "-with-trace",

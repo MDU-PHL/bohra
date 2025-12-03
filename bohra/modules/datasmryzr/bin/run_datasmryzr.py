@@ -124,6 +124,7 @@ def _generate_summary_table(results_files: list, output:list, min_depth:40, minq
     if sp_cols:
         summary["Species check"] = summary[sp_cols].apply(lambda x: check_species(x.tolist()), axis=1)
         summary["Species"] = summary[sp_cols].apply(lambda x: ':'.join(list(set(x))), axis=1)
+        summary.drop(columns=sp_cols, inplace=True)
         cols = [i for i in summary.columns if i not in sp_cols]
     if "filesize" in summary.columns:
         summary["File size check"] = summary[["filesize","Reads"]].apply(lambda x: check_filesize(x), axis=1)
@@ -140,7 +141,7 @@ def _generate_summary_table(results_files: list, output:list, min_depth:40, minq
 
     check_cols = [i for i in list(summary.columns) if "check" in i]
     print(check_cols)
-    check_cols.append("filesize")
+    check_cols.append("File size check")
     print(summary.columns)
     summary = summary.fillna("")
     print(summary)

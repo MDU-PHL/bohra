@@ -58,7 +58,7 @@ process COLLATE_KRAKENS {
     label 'process_medium'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:report_outdir, publish_id:report_outdir) }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:params.report_outdir, publish_id:report_outdir) }
         
     cache 'lenient'
 
@@ -79,7 +79,7 @@ process COLLATE_SEQDATA {
     label 'process_medium'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:report_outdir, publish_id:report_outdir) }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:params.report_outdir, publish_id:report_outdir) }
         
     cache 'lenient'
     input:
@@ -146,7 +146,7 @@ process COLLATE_MOBSUITE {
     label 'process_medium'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:report_outdir, publish_id:report_outdir) }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:params.report_outdir, publish_id:report_outdir) }
         
     cache 'lenient'
     input:
@@ -167,7 +167,7 @@ process COLLATE_SNIPPY_QCS {
     label 'process_medium'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:report_outdir, publish_id:report_outdir) }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:params.report_outdir, publish_id:report_outdir) }
         
     cache 'lenient'
 
@@ -211,7 +211,7 @@ process COMPILE {
     label 'process_medium'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:report_outdir, publish_id:report_outdir) }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:params.report_outdir, publish_id:report_outdir) }
         
     cache 'lenient'
     input:
@@ -234,7 +234,7 @@ process COLLATE_ABRITMAR {
     label 'process_medium'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:report_outdir, publish_id:report_outdir) }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:params.report_outdir, publish_id:report_outdir) }
         
     cache 'lenient'
     input:
