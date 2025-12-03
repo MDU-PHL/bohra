@@ -88,8 +88,9 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
         "mlst.txt":["Isolate","Scheme","ST"],
         # "cluster.txt":[]
     }
-    colsblcklst = [ "r1","r2","assembly"]
+    colsblcklst = [ "r1","r2","assembly", "is_control"]
     input_data = pd.read_csv(input_file, sep='\t')
+    input_data = input_data.rename(columns = {"species":"Species_expected"})
     for col in input_data.columns:
         if col in colsblcklst:
             input_data = input_data.drop(columns=[col])
@@ -604,6 +605,10 @@ def set_parsers():
     default = ''
     )
     parser.add_argument('--pipeline',
+    help = '',
+    default = ''
+    )
+    parser.add_argument('--report_outdir',
     help = '',
     default = ''
     )
