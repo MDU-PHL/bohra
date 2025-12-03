@@ -91,6 +91,7 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
     colsblcklst = [ "r1","r2","assembly", "is_control"]
     input_data = pd.read_csv(input_file, sep='\t')
     input_data = input_data.rename(columns = {"species":"Species_expected"})
+    input_data = input_data.replace("not_supplied","")
     for col in input_data.columns:
         if col in colsblcklst:
             input_data = input_data.drop(columns=[col])
@@ -130,7 +131,7 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
     # print(summary)
     if sp_cols:
         summary["Species check"] = summary[sp_cols].apply(lambda x: check_species(x.tolist()), axis=1)
-        summary["Species"] = summary[sp_cols].apply(lambda x: ':'.join(list(set(x))), axis=1)
+        summary["Species"] = summary[sp_cols].apply(lambda x: ':'.join(list(set(x))).strip(":"), axis=1)
         summary.drop(columns=sp_cols, inplace=True)
         cols = [i for i in summary.columns if i not in sp_cols]
     if "filesize" in summary.columns:
