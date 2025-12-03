@@ -117,11 +117,24 @@ def _infer_correct_read(file_path:str) -> str:
     else:
         return "unknown"
 
-def _make_workdir(_input:pd.DataFrame, workdir:str) -> bool:
+def _check_outdir(workdir:str, report_outdir:str, replace_report:bool = False) -> bool:
+
+    out = pathlib.Path(workdir,report_outdir)
+    if out.exists() and not replace_report:
+        LOGGER.critical(f"Output directory {out} already exists. Please choose a different output directory or use the --replace-report flag to overwrite.")
+        raise SystemExit
+    elif out.exists() and replace_report:
+        LOGGER.warning(f"Output directory {out} already exists. Overwriting as per user request.")
+        shutil.rmtree(out)
+        out.mkdir(parents=True, exist_ok=True)
+        return True
+    return True
+
+def _make_workdir(_input:pd.DataFrame, workdir:str, report_outdir:str, replace_report:bool = False) -> bool:
 
     columns = _get_columns_list()
     pereads = ["r1","r2"]
-    if _check_path(workdir):
+    if _check_path(workdir) and _check_outdir(workdir, report_outdir, replace_report):
         
         wd = pathlib.Path(workdir)
         input_table = _open_input_file(_file=_input)

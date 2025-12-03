@@ -35,7 +35,7 @@ def _check_keep(keep:str)->bool:
     if keep.lower() in ["yes", "y", "true", "t"]:
         now = datetime.datetime.today().strftime("%d_%m_%y_%H")
         try:
-            cmd = f"cp -r {pathlib.Path.cwd() / 'report'} {pathlib.Path.cwd() / 'report_' + now + '_archive'}"
+            cmd = f"cp -r {pathlib.Path.cwd() / report_outdir} {pathlib.Path.cwd() / 'report_' + now + '_archive'}"
             proc = _run_subprocess(cmd=cmd)
             if proc.returncode == 0:
                 LOGGER.info(f"Report directory archived successfully to {pathlib.Path.cwd() / 'report_' + now + '_archive'}.")
@@ -60,10 +60,13 @@ def _setup_working_directory(input_file:str,
     
     return True
 
-def _init_command_dict(profile:str, cpus:int, job_name:str, prefix:str, pipeline:str, profile_config:str, trim:bool) -> dict:
+def _init_command_dict(profile:str, cpus:int, job_name:str, prefix:str, pipeline:str, profile_config:str, trim:bool, report_outdir:str, outdir: str) -> dict:
 
     command_dict = {"params":[
+        f"--report_outdir {report_outdir}",
         f"-profile {profile}",
+        f"--outdir ",
+        f"--outdir ",
         f"--pipeline {pipeline}",
         f"-executor.cpus {cpus}",
         "-with-trace",
@@ -110,20 +113,21 @@ def run_bohra(
     
     
     if _make_workdir(workdir=kwargs["workdir"],   
-                  _input=kwargs["input_file"]):
+                  _input=kwargs["input_file"], 
+                  report_outdir=kwargs["report_outdir"], 
+                  replace_report=kwargs["replace_report"]):
         LOGGER.info(f"Checking on the setup for the {pipeline} pipeline.")
         check_dependencies(check = "check")
         max_cpus = int(_max_cpus(cpus=kwargs.get('cpus', 0)))
         LOGGER.info(f"Using {int(max_cpus)} CPUs for the {pipeline} pipeline.")
         profile,profile_config = _get_config(user_config=kwargs['profile_config'], title = kwargs['job_name'],cpus=max_cpus, wd = kwargs["workdir"])
-        command = _init_command_dict(profile=profile, profile_config = profile_config, cpus=max_cpus, job_name = kwargs.get('job_name', 'bohra'), prefix=kwargs.get('conda_prefix', 'bohra'), pipeline=pipeline, trim = kwargs["trim"])
-        LOGGER.info(f"Checking if report directory needs to archived.")
-        _check_keep(keep = kwargs["keep"])
+        command = _init_command_dict(profile=profile, profile_config = profile_config, cpus=max_cpus, job_name = kwargs.get('job_name', 'bohra'), prefix=kwargs.get('conda_prefix', 'bohra'), pipeline=pipeline, trim = kwargs["trim"], report_outdir=kwargs["report_outdir"], outdir=kwargs['workdir'])
+        
         # update kwargs with checked input file
         kwargs["input_file"] = "input_checked.tsv"
     # add in the workdir and input file to the command to be run
-        command["params"].append(f"--outdir {kwargs['workdir']}")
-        LOGGER.info(f"Working directory {kwargs['workdir']} added to command successfully.")
+        # command["params"].append(f"--outdir ")
+        # LOGGER.info(f"Working directory {kwargs['workdir']} added to command successfully.")
         command["params"].append(f"--isolates {kwargs['input_file']}")
         LOGGER.info(f"Input file {kwargs['input_file']} added to command successfully.")
         command = _setup_basic_args(kwargs=kwargs, command=command)
@@ -134,7 +138,7 @@ def run_bohra(
         # command = _funcs()[pipeline](kwargs=kwargs, command=command)
         
         cmd = _make_command(command=command)
-        if not kwargs["no_auto_run"]:
+        if kwargs["no_auto_run"]:
             LOGGER.info(f"Please paste the following command to run the pipeline:\n\033[1m{cmd}\033[0m")
         else:
             LOGGER.info(f"Running the command: {cmd}")

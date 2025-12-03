@@ -11,7 +11,7 @@ process RUN_SMRYZR {
     label 'process_high'
     publishDir "${params.outdir}",
         mode: 'copy',
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"report") }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:params.report_outdir) }
     
     // if ( params.enable_conda ) {
     //     if (file("${params.dependency_prefix}/datasmryzr").exists()) {
@@ -49,5 +49,6 @@ process RUN_SMRYZR {
     --results_files ${input_files} \
     --launchdir ${launchDir} \
     --pipeline ${params.pipeline} \
+    --report_outdir '${params.report_outdir}' \
     """
 }

@@ -5,7 +5,7 @@ from Bio import SeqIO
 
 alt.data_transformers.disable_max_rows()
 
-def _get_tree_string(pipeline, wd,phylo):
+def _get_tree_string(pipeline, wd,phylo, report_outdir='report'):
     '''
     Generate a tree image from a newick
     input:
@@ -13,7 +13,7 @@ def _get_tree_string(pipeline, wd,phylo):
     output:
         string reporesentation of the path to the tree image
     '''
-    tree_file = pathlib.Path(wd, 'report','preview.newick') if pipeline == 'preview' else pathlib.Path(wd, 'report','core.newick')
+    tree_file = pathlib.Path(wd, report_outdir,'preview.newick') if pipeline == 'preview' else pathlib.Path(wd, report_outdir,'core.newick')
     if tree_file.exists() and phylo == 'true':
         with open(f"{tree_file}", 'r') as t:
             tree = t.read().strip()
@@ -152,7 +152,7 @@ def _plot_snpdensity(reference,wd, isos, mask_file = ''):
     
     return chart
 
-def _plot_distances(wd):
+def _plot_distances(wd,report_outdir='report'):
 
     '''
     generate a snp-density plot - using the distacnes.tab file
@@ -162,7 +162,7 @@ def _plot_distances(wd):
         :distancescript: the javascript string for insert into html
         :distancesdiv: the html div for inster in html doc
     '''
-    distance = f"{pathlib.Path(wd, 'report','distances.tab')}"
+    distance = f"{pathlib.Path(wd, report_outdir,'distances.tab')}"
     try:
         df = pandas.read_csv(distance, sep = '\t')
         # get a list of isolate names
@@ -186,15 +186,15 @@ def _plot_distances(wd):
     except:
         return {}
 
-def _subset_versions( _typers, wd, _types ):
+def _subset_versions( _typers, wd, _types, report_outdir='report'):
 
     if _types != set():
-        vs = pandas.read_csv(f"{pathlib.Path(wd, 'report', 'versions.txt')}", sep = '\t')
+        vs = pandas.read_csv(f"{pathlib.Path(wd, report_outdir, 'versions.txt')}", sep = '\t')
         print(vs)
         to_remove = [i for i in vs['tool'].unique() if (i in _typers['typers'] and (i not in _types))]
         vs = vs[~vs['tool'].isin(to_remove)]
         print(vs)
-        vs.to_csv(f"{pathlib.Path(wd, 'report', 'versions.txt')}", sep = '\t', index = False)
+        vs.to_csv(f"{pathlib.Path(wd, report_outdir, 'versions.txt')}", sep = '\t', index = False)
 
 def _extract_typer( _typers, wd ):
     
@@ -212,10 +212,10 @@ def _extract_typer( _typers, wd ):
     return _types
 
 
-def _get_pan_genome(d, wd):
+def _get_pan_genome(d, wd, report_outdir='report'):
 
     image = d[1]['image']
-    path = pathlib.Path(wd, 'report', image)
+    path = pathlib.Path(wd, report_outdir, image)
     # print(path)
     if path.exists():
         with open(f"{path}", 'r') as f:
@@ -230,13 +230,13 @@ def _get_isos(wd, iso_list):
     
     return isos
 
-def _generate_table(d, columns,comment, tables, wd, iso_dict, id_col):
+def _generate_table(d, columns,comment, tables, wd, iso_dict, id_col, report_outdir='report'):
     
     if id_col == '':
         return tables,columns,comment
     cols = []
     try:
-        with open(f"{pathlib.Path(wd, 'report', d['file'])}", 'r') as f:
+        with open(f"{pathlib.Path(wd, report_outdir, d['file'])}", 'r') as f:
             reader = csv.DictReader(f, delimiter = '\t')
             comment[d['link']] = d['comment']
             tables[d['link']] = {'table':[], 'name': d['title'], 'link':d['link']}
@@ -361,12 +361,12 @@ def _compile(args):
         'num_isos':len(isos),
         # 'version_head': version_head,
         # 'version_body':version_body,
-        'snp_distances': _plot_distances(wd = args.launchdir) if args.pipeline not in ['preview', 'assemble','amr_typing'] else {0:0},
-        'snp_density': _plot_snpdensity(reference=args.reference, wd = args.launchdir, isos = isos, mask_file = args.mask) if args.pipeline not in ['preview', 'assemble','amr_typing'] else {0:0},
-        'pan_svg': _get_pan_genome(d = _dict[args.pipeline], wd = args.launchdir) if args.pipeline == 'full' else ''
+        'snp_distances': _plot_distances(wd = args.launchdir, report_outdir=args.report_outdir) if args.pipeline not in ['preview', 'assemble','amr_typing'] else {0:0},
+        'snp_density': _plot_snpdensity(reference=args.reference, wd = args.launchdir, isos = isos, mask_file = args.mask, report_outdir=args.report_outdir) if args.pipeline not in ['preview', 'assemble','amr_typing'] else {0:0},
+        'pan_svg': _get_pan_genome(d = _dict[args.pipeline], wd = args.launchdir, report_outdir=args.report_outdir) if args.pipeline == 'full' else ''
         }
     
-    data['newick'] = _get_tree_string(pipeline = args.pipeline, wd = args.launchdir, phylo = args.iqtree)
+    data['newick'] = _get_tree_string(pipeline = args.pipeline, wd = args.launchdir, phylo = args.iqtree, report_outdir=args.report_outdir)
     
     print("rendering html")
     report_template = jinja2.Template(pathlib.Path(indexhtml).read_text())
@@ -408,6 +408,9 @@ def set_parsers():
         help = '',
         default = '')
     parser.add_argument('--iqtree',
+        help = '',
+        default = '')
+    parser.add_argument('--report_outdir',
         help = '',
         default = '')
     

@@ -9,7 +9,7 @@ process QUICKTREE {
     label 'process_medium'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:'report', publish_id:'report') }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:report_outdir, publish_id:report_outdir) }
     
     if ( params.enable_conda ) {
         if (file("${params.dependency_prefix}/relationships").exists()) {

@@ -8,7 +8,7 @@ process PANAROO {
     label 'process_high'
     publishDir "${params.outdir}",
         mode: 'copy',
-        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"report", publish_id:'report') }
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:report_outdir, publish_id:report_outdir) }
     
     if ( params.enable_conda ) {
         if (file("${params.dependency_prefix}/panaroo").exists()) {

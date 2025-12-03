@@ -137,6 +137,19 @@ def _resource_opt() -> list:
             "type":click.Path(exists=True)
         },
         {
+            "name":"report_outdir",
+            "short_name":"-ro",
+            "help":f"The directory where Bohra will output results, default is {pwd}/report",
+            "default":f"{pwd}/report",
+            "help":"Please supply an output directory for bohra results.",
+        },
+        {
+            "name":"replace-report",
+            "help":"If you are rerunning bohra over an exisiting directory set --replace-report to override report files.",
+            "is_flag":True,
+            "default":False
+        },
+        {
             "name":"use_conda",
             "help":"Use separate conda environments for each nextflow process.",
             "is_flag":True,
@@ -152,15 +165,23 @@ def _resource_opt() -> list:
             "help":"Path to the profile config file.",
             "default":f"{pathlib.Path( os.getenv('NF_PROFILE_CONFIG'))}" if os.getenv('NF_PROFILE_CONFIG') else f"",
         },
+        
         {
-            "name":"keep",
-            "help":"If you are rerunning bohra over an exisiting directory set --keep to 'Y' to archive report files - otherwise previous report files will be removed.",
-            "default":'N',
-            "type":click.Choice(['Y', 'N'])
+            "name":"report_outdir",
+            "short_name":"-ro",
+            "help":f"The directory where Bohra will output results, default is {pwd}/report",
+            "default":f"{pwd}/report",
+            "help":"Please supply an output directory for bohra results.",
+        },
+        {
+            "name":"replace-report",
+            "help":"If you are rerunning bohra over an exisiting directory set --replace-report to override report files.",
+            "is_flag":True,
+            "default":False
         },
         {
             "name":"force",
-            "help":"Add if you would like to force a complete restart of the pipeline. All previous logs will be lost.",
+            "help":"Add if you would like to force a complete restart of the pipeline. All previous logs and outputs will be lost.",
             "is_flag":True,
             "default":False
         },
@@ -209,7 +230,7 @@ def _get_common_options() -> list:
             "default":"kraken2"
         },
         {
-            "name":"--no-auto-run",
+            "name":"no-auto-run",
             "default":False,
             "is_flag":True,
             "help":"Set --no-auto-run to prevent the pipeline from running automatically. You will need to copy and paste the command to run the pipeline yourself."
