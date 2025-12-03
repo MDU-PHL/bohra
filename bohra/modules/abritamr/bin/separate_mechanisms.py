@@ -36,8 +36,8 @@ df['Other AMR mechanisms - genes'] = df['Other AMR mechanisms'].apply(lambda x: 
 df['Other AMR mechanisms - SNPs'] = df['Other AMR mechanisms'].apply(lambda x: get_snps(x))
 
 df[['Isolate',
-    'Reportable AMR mechanisms - genes',
-    'Reportable AMR mechanisms - SNPs',
-    'Other AMR mechanisms - genes',
-    'Other AMR mechanisms - SNPs',
+    'Reportable AMR genes',
+    'Reportable AMR SNPs',
+    'Other AMR genes',
+    'Other AMR SNPs',
     'Species']].to_csv("reportable_amr_matches.txt", sep='\t', index=False)
