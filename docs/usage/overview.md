@@ -20,7 +20,7 @@ Additionally, you can also supply the species value and any optional sample meta
 | r1 | The path to read 1 | If an assembly file is not supplied you must supply reads | 
 | r2 | The path to read 2 | If an assembly file is not supplied you must supply reads |
 | assembly | The path to the assembly for the isolate | If reads are not supplied you must supply an assembly file |
-| species | The expected species of the sample or 'control'.  | No |
+| Species_expected | The expected species of the sample or 'control'.  | No |
 
 **Species column**
 

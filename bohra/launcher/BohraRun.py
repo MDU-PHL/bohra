@@ -30,26 +30,6 @@ LOGGER.addHandler(fh)
 
 
 
-def _check_keep(keep:str)->bool:
-
-    if keep.lower() in ["yes", "y", "true", "t"]:
-        now = datetime.datetime.today().strftime("%d_%m_%y_%H")
-        try:
-            cmd = f"cp -r {pathlib.Path.cwd() / report_outdir} {pathlib.Path.cwd() / 'report_' + now + '_archive'}"
-            proc = _run_subprocess(cmd=cmd)
-            if proc.returncode == 0:
-                LOGGER.info(f"Report directory archived successfully to {pathlib.Path.cwd() / 'report_' + now + '_archive'}.")
-                return True
-            else:
-                LOGGER.error(f"Failed to archive the report directory. Command: {cmd}")
-                return False
-        except Exception as e:
-            LOGGER.error(f"An error occurred while archiving the report directory: {e}")
-            return False
-    else:
-        LOGGER.info("Report directory will be overridden by new results.")
-        return True
-
 def _setup_working_directory(input_file:str,
                              workdir : str) -> bool:
 

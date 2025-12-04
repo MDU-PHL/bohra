@@ -104,7 +104,7 @@ def _get_columns_list() -> list:
         "r1",
         "r2",
         "assembly",
-        "species",
+        "Species_expected",
         "is_control"
     ]
 

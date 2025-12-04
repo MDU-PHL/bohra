@@ -11,7 +11,7 @@
 1. Quality assessment of the input data
 2. Speciation and appropriate _in silico_ serotyping (where applicable).
 3. MLST
-4. Species relevant recovery of AMR mechanisms and inference of genomic AST/DST were available (_S. enterica_ and _M. tuberulosis_).
+4. Species relevant recovery of AMR mechanisms and inference of genomic AST/DST were available (_S. enterica_ and _M. tuberculosis_).
 5. Plasmid information
 6. Comparative analysis using a reference-free or reference-based appproaches.
 7. Pangenome analysis.
@@ -41,18 +41,12 @@ git clone git@github.com:MDU-PHL/bohra.git
 ```
 
 
-2. Create the environment 
+2. Create the environment and install `bohra`
 
 
 ```
 cd bohra
 conda env create -f environment.yml -n bohra
-```
-
-3. Install the `bohra` co-ordinator
-
-
-```
 pip3 install /path/to/the/repository_for/bohra
 ```
 
@@ -79,10 +73,8 @@ Commands:
 
 **3. Install dependencies and setup environment variables**
 
-It is highly recommended that you allow `bohra` to setup the required dependencies for the pipeline. 
 
 This step will setup conda environments under the `path/to/conda/envs/bohra`(depending on how you have configured your `conda` installation). 
-
 
 Additionally, `bohra` depends upon either a correctly configure `kraken2` compatible database. The `bohra install-deps` command will optionally download the databases for your and also set the appropriate environment variables for you.
 
@@ -111,4 +103,4 @@ Please be aware of the following:
 
 ## Etymology
 
-The name 'bohra', is the name of an exinct species of tree kangaroo that lived on the Nullarbor plain in Australia was chosen to reflect the fact that it was originally developed to used to build trees, relies on [snippy](https://github.com/tseemann/snippy) (named for a very famous kangaroo) and was inspired by [nullarbor](https://github.com/tseemann/nullarbor).
+The name 'bohra', is the name of an exinct species of tree kangaroo that lived on the Nullarbor plain in Australia and was chosen to reflect the fact that it was originally developed to used to build trees, relies on [snippy](https://github.com/tseemann/snippy) (named for a very famous kangaroo) and was inspired by [nullarbor](https://github.com/tseemann/nullarbor).
