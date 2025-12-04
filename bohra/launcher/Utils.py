@@ -237,6 +237,12 @@ def _get_common_options() -> list:
             "help":"Set if you want to trim reads using fastp. Please note that this will duplicate reads. You may notice that you use alot more disk space if you are trimming.",
             "is_flag":True,
             "default":False
+        },
+        {
+            "name":"no-downloadable-tables",
+            "help":"Disable downloadable tables in the report html.",
+            "is_flag":True,
+            "default":False
         }
         ]
     

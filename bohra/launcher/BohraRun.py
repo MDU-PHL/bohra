@@ -40,12 +40,13 @@ def _setup_working_directory(input_file:str,
     
     return True
 
-def _init_command_dict(profile:str, cpus:int, job_name:str, prefix:str, pipeline:str, profile_config:str, trim:bool, report_outdir:str, outdir: str) -> dict:
+def _init_command_dict(profile:str, cpus:int, job_name:str, prefix:str, pipeline:str, profile_config:str, trim:bool, report_outdir:str, outdir: str, no_downloadable_tables: bool) -> dict:
 
     command_dict = {"params":[
         f"--report_outdir {report_outdir}",
         f"-profile {profile}",
         f"--outdir {outdir}",
+        f"--no_downloadable_tables {'true' if no_downloadable_tables else 'false'}",
         f"--pipeline {pipeline}",
         f"-executor.cpus {cpus}",
         "-with-trace",
@@ -100,13 +101,10 @@ def run_bohra(
         max_cpus = int(_max_cpus(cpus=kwargs.get('cpus', 0)))
         LOGGER.info(f"Using {int(max_cpus)} CPUs for the {pipeline} pipeline.")
         profile,profile_config = _get_config(user_config=kwargs['profile_config'], title = kwargs['job_name'],cpus=max_cpus, wd = kwargs["workdir"])
-        command = _init_command_dict(profile=profile, profile_config = profile_config, cpus=max_cpus, job_name = kwargs.get('job_name', 'bohra'), prefix=kwargs.get('conda_prefix', 'bohra'), pipeline=pipeline, trim = kwargs["trim"], report_outdir=kwargs["report_outdir"], outdir=kwargs['workdir'])
+        command = _init_command_dict(profile=profile, profile_config = profile_config, cpus=max_cpus, job_name = kwargs.get('job_name', 'bohra'), prefix=kwargs.get('conda_prefix', 'bohra'), pipeline=pipeline, trim = kwargs["trim"], report_outdir=kwargs["report_outdir"], outdir=kwargs['workdir'], no_downloadable_tables=kwargs['no_downloadable_tables'])
         
         # update kwargs with checked input file
         kwargs["input_file"] = "input_checked.tsv"
-    # add in the workdir and input file to the command to be run
-        # command["params"].append(f"--outdir ")
-        # LOGGER.info(f"Working directory {kwargs['workdir']} added to command successfully.")
         command["params"].append(f"--isolates {kwargs['input_file']}")
         LOGGER.info(f"Input file {kwargs['input_file']} added to command successfully.")
         command = _setup_basic_args(kwargs=kwargs, command=command)
