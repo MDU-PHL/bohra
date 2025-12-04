@@ -48,9 +48,9 @@ AND/OR
 `bohra` can generate the input file for you. 
 
 ```
-bohra generate-input --isolate_ids <table_name>.txt --reads /path/to/reads --contigs /path/to/contigs
+bohra generate-input --isolate_ids <table_name>.txt --reads /path/to/reads --contigs /path/to/contigs --outname my_data.txt
 ```
-This will generate a file called `bohra_input.tsv` which you can use as input into `bohra`.
+This will generate a file which you can use as input into `bohra`.
 
 **Note that on large file systems this may take a while**
 
