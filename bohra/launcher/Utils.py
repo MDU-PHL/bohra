@@ -137,19 +137,6 @@ def _resource_opt() -> list:
             "type":click.Path(exists=True)
         },
         {
-            "name":"report_outdir",
-            "short_name":"-ro",
-            "help":f"The directory where Bohra will output results, default is {pwd}/report",
-            "default":f"{pwd}/report",
-            "help":"Please supply an output directory for bohra results.",
-        },
-        {
-            "name":"replace-report",
-            "help":"If you are rerunning bohra over an exisiting directory set --replace-report to override report files.",
-            "is_flag":True,
-            "default":False
-        },
-        {
             "name":"use_conda",
             "help":"Use separate conda environments for each nextflow process.",
             "is_flag":True,
