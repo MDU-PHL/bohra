@@ -14,8 +14,12 @@ from bohra.launcher.SetupInput import find_data
 @click.option('--isolate_ids',
               default='',
               help="Path to a file containing at least one column 'Isolate' with isolate names. Optionally add 'species' and other columns you wish to use for further annotation of trees.")
+@click.option('--outname',
+              default='bohra_input.tsv',
+              help="Name of the file to write the generated input table to.")
 
-def generate_input(reads, contigs, isolate_ids):
+
+def generate_input(reads, contigs, isolate_ids, outname):
     """
     Generare input files for the Bohra pipeline.
     """
@@ -31,6 +35,7 @@ def generate_input(reads, contigs, isolate_ids):
         isolate_ids=isolate_ids,
         reads=reads,
         contigs=contigs,
+        outname=outname
     )
 
   

@@ -159,6 +159,7 @@ def _extract_isolates(isolate_ids:str)-> pd.DataFrame:
 def find_data(reads:str,
               contigs:str,
               isolate_ids:str,
+              outname:str,
               ) -> None:
     """
     Find data in the path provided
@@ -206,5 +207,5 @@ def find_data(reads:str,
         # bohra_df = bohra_df.loc[:,~bohra_df.columns.duplicated()]
         bohra_df = bohra_df.sort_values(by='Isolate')
         bohra_df = bohra_df.fillna('not_supplied')
-        bohra_df.to_csv('bohra_input.tsv',sep = "\t", index=False)
-        LOGGER.info("Input files generated successfully and saved to 'bohra_input.tsv'.")
+        bohra_df.to_csv(outname,sep = "\t", index=False)
+        LOGGER.info(f"Input files generated successfully and saved to '{outname}'.")

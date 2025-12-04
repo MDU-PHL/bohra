@@ -24,11 +24,16 @@ Additionally, you can also supply the species value and any optional sample meta
 
 **Species column**
 
-If you do not require speciation as part of the pipeline and already know the species, you can provide it here. Please note if no speciation is undertaken, `bohra` will use this value to undertake typing and AMR mechanisms/inferrence. If the species in this column is NOT accurate - unexpected results may occur. Furthermore if your analysis includes control sequences you can provide that information here (`control`) and the sequence will not be included in any comparative analysis.
+If you do not require speciation as part of the pipeline and already know the species, you can provide it here. Please note if no speciation is undertaken, `bohra` will use this value to undertake typing and AMR mechanisms/inferrence. If the species in this column is NOT accurate - unexpected results may occur.
 
-**Annotation**
+**Controls**
 
-Where you are undertaking a comparative analysis (`snippy`, `ska2`, `mash`) you may also provide additional columns of relevant metadata in your input file. `bohra` will do data validation on these columns - that is up to the user. But any additional metadata provided will be visible on the tree provided in the report file.
+If you include controls in an analysis you can add an `is_control` column to your input file and supply the type of control. Note that anything designated as a control will have single-sample analyses done (were possible) but will NOT be included in any comparative analyses.
+
+
+**Tree Annotation and additional metadata**
+
+You may also provide additional columns of relevant metadata in your input file. `bohra` will NOT do any data validation on these columns - that is up to the user. But any additional metadata provided will be visible on the tree provided in the report file and the summary table.
 
 **`bohra` can generate the input file for you**
 
@@ -43,7 +48,7 @@ AND/OR
 `bohra` can generate the input file for you. 
 
 ```
-bohra generate-input --isolate_ids <table_name>.tsv --reads /path/to/reads --contigs /path/to/contigs
+bohra generate-input --isolate_ids <table_name>.txt --reads /path/to/reads --contigs /path/to/contigs
 ```
 This will generate a file called `bohra_input.tsv` which you can use as input into `bohra`.
 
