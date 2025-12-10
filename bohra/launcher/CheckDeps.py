@@ -51,7 +51,7 @@ def _check_databases(db_install:bool=False)->int:
     script_path = f"{pathlib.Path(__file__).parent}"
     LOGGER.info(f"Will now check databases required for Bohra. Please be patient this may take some time!!... Maybe get coffee.")
     db_check_cmd = 'get' if db_install else 'check'
-    process = subprocess.Popen(['bash', f"{script_path}/bohra_databases.sh", f"{db_check_cmd}"], stdout=subprocess.PIPE, encoding='utf-8')
+    process = subprocess.Popen(['bash', f"{script_path}/bohra_databases.sh", f"{db_check_cmd}"],stderr=subprocess.STDOUT, stdout=subprocess.PIPE, encoding='utf-8')
     while process.poll() is None:
         l = process.stdout.readline().strip() # This blocks until it receives a newline.
         LOGGER.info(f"{l}")
