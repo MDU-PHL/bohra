@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-#set -e -u -o pipefail
+set -e -u -o pipefail
 
 # check parameters
 if [ "$#" -ne 3 ]; then
@@ -9,17 +9,17 @@ if [ "$#" -ne 3 ]; then
 	exit 255
 fi
 
-ENVSDIR=$1
+YAML_DIR=$1
 ACTION=$2
 FORCE=$3
 
-BOHRA_CONDA_ENVS="$CONDA_PREFIX/conda_envs"
-#BOHRA_CONDA_ENVS="$HOME/.conda/envs"
+ENVS_DIR="$CONDA_PREFIX/conda_envs"
 INSTALLER="conda"
 
 # resets to base env
 eval "$(conda shell.bash hook)"
 $INSTALLER -V
+mkdir -p "$ENVS_DIR"
 
 # check that mamba is installed
 if [ -x "$(which mamba)" ] ; then
@@ -64,22 +64,22 @@ declare -A TOOLS=(
 for tool in ${!TOOLS[@]}; do
     print_bold "Setting up: $tool"
 
+    envdir="$ENVS_DIR/$tool"
+
     if [[ $FORCE == "true" ]] ; then
-        run_cmd "rm -rf $BOHRA_CONDA_ENVS/$tool"
+        run_cmd "rm -rf $envdir"
     fi
 
     if [[ $ACTION == "install" ]]; then
-        run_cmd "$INSTALLER env create -p $BOHRA_CONDA_ENVS/$tool -f $ENVSDIR/$tool.yml"
-
-        
+        run_cmd "$INSTALLER env create -p $envdir -f $YAML_DIR/$tool.yml"        
     fi
 
     tests=${TOOLS[$tool]}
     IFS=',' read -r -a cmds <<< "$tests"
     for i in "${!cmds[@]}"; do 
       cmd=${cmds[$i]}
-      run_cmd "conda run -p $BOHRA_CONDA_ENVS/$tool $cmd"
-      #echo "$tool => $cmd"
+      print_bold "$tool :: $cmd"
+      run_cmd "conda run -p $envdir $cmd"
     done
 done
         
