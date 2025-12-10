@@ -1,0 +1,38 @@
+name: BigCI
+
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash -el {0}
+    steps:
+      - name: Pull bohra
+        uses: actions/checkout@v5
+
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          #python-version: 3.12
+          miniforge-version: latest
+          channels: conda-forge,bioconda
+          conda-remove-defaults: true
+          channel-priority: strict
+          activate-environment: bohra
+          environment-file: environment.yml
+          auto-update-conda: true
+
+      - name: Install bohra
+        run: |
+          pip3 install .
+          #bohra install-deps
+
+      - name: Test Prokka
+        run: |
+          bohra --version
+          bohra --help
