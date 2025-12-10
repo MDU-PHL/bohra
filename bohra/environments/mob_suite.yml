@@ -2,5 +2,5 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - mobsuite
+  - mob_suite
   - csvtk
