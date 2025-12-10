@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 
+# Safery first!
 set -e -u -o pipefail
+
+# Issue #133 - Redurectr akk stederr ti stdout 
+exec 2>&1
 
 # check parameters
 if [ "$#" -ne 3 ]; then
@@ -36,8 +40,7 @@ function print_bold {
 function run_cmd {
   local cmd=$1
   echo "RUNNING: $cmd"
-  #eval "$cmd"
-  $cmd
+  eval "$cmd"
   ec=$?
   if [ $ec -ne 0 ] ; then
     print_bold "ERROR: '$cmd' returned $?"
