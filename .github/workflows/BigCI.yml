@@ -31,10 +31,17 @@ jobs:
         run: |
           pip3 install .
           bohra install-deps
+
+      - name: Check bohra installtion
+        run: |
           bohra check-deps
 
-      - name: Test bohra
+      - name: Simple bohra test
         run: |
           bohra --version
           bohra --help
+          bohra run --help
+
+      - name: Big bohra test
+        run: |
           bohra test
