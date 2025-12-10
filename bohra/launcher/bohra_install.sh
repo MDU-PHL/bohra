@@ -39,7 +39,7 @@ function run_cmd {
   eval "$cmd"
   ec=$?
   if [ $ec -ne 0 ] ; then
-    print_bold "ERROR: '$1' returned $?"
+    print_bold "ERROR: '$cmd' returned $?"
     exit $ec
   fi
 }
@@ -69,7 +69,9 @@ for tool in ${!TOOLS[@]}; do
     fi
 
     if [[ $ACTION == "install" ]]; then
-        run_cmd "$INSTALLER env create -p $BOHRA_CONDA_ENVS/$1 -f $ENVSDIR/$1.yml"
+        run_cmd "$INSTALLER env create -p $BOHRA_CONDA_ENVS/$tool -f $ENVSDIR/$tool.yml"
+
+        
     fi
 
     tests=${TOOLS[$tool]}
