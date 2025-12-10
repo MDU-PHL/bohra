@@ -3,3 +3,5 @@ channels:
   - bioconda
 dependencies:
   - kleborate<3
+  - csvtk
+
