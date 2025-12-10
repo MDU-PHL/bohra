@@ -7,21 +7,6 @@ dependencies:
   - mutamr
   - csvtk
   - pip:
-    - annotated-types==0.7.0
-    - certifi==2025.1.31
-    - charset-normalizer==3.4.1
-    - idna==3.10
-    - iniconfig==2.1.0
-    - joblib==1.4.2
-    - packaging==24.2
     - git+https://github.com/jodyphelan/pathogen-profiler@v4.3.0
-    - pluggy==1.5.0
-    - pydantic==2.11.0
-    - pydantic-core==2.33.0
-    - pysam==0.23.0
-    - pytest==8.3.5
-    - requests==2.32.3
-    - tqdm==4.67.1
-    - typing-extensions==4.13.0
-    - typing-inspection==0.4.0
-    - urllib3==2.3.0
+    - pydantic
+    - pysam
