@@ -25,5 +25,5 @@ def check_deps(install_dbs:bool=False, setup_databases:bool=False):
     print("Please be patient.")
     print("Will now check and install anything that may be required. ")
     # print(str(force_reinstall).lower())
-    check_dependencies(force_reinstall='false' )
+    check_dependencies(check = "check", force_reinstall='false' )
     _check_databases(db_install=install_dbs or setup_databases)

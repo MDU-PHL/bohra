@@ -69,7 +69,7 @@ declare -A TOOLS=(
 # MAIN LOOP OVER ALL ENVS
     
 for tool in ${!TOOLS[@]}; do
-    print_bold "Setting up: $tool"
+    print_bold "${ACTION}ing : $tool"
 
     envdir="$ENVS_DIR/$tool"
 
@@ -79,7 +79,7 @@ for tool in ${!TOOLS[@]}; do
 
     if [[ $ACTION == "install" && ! -d "$envdir" ]]; then
         run_cmd "$INSTALLER env create -p $envdir -f $YAML_DIR/$tool.yml"      
-        run_cmd "$INSTALLER clean -a -y"  
+        # run_cmd "$INSTALLER clean -a -y"  
     fi
 
     tests=${TOOLS[$tool]}

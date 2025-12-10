@@ -5,7 +5,8 @@ ENV_PREFIX=$CONDA_PREFIX
 GET_DB=$1
 
 # resets to base env
-eval "$(conda shell.bash hook)"
+# eval "$(conda shell.bash hook)"
+source "$(conda info --base)/etc/profile.d/conda.sh"
 
 DB_VARS=("KRAKEN2_DEFAULT_DB" "BOHRA_PUBMLST_DB" "BOHRA_BLAST_DB" "BOHRA_MOBSUITE_DB")
 NONESSENTIAL_VARS=("BOHRA_PUBMLST_DB" "BOHRA_BLAST_DB" "BOHRA_MOBSUITE_DB")
