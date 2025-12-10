@@ -9,3 +9,4 @@ dependencies:
   - lissero
   - ngmaster
   - prokka
+  - biopython=1.81
