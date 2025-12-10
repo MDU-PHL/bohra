@@ -44,7 +44,7 @@ jobs:
           echo "Disk space usage:"
           df -h
           echo "Directory space usage:"
-          ncdu -sh /home/runner/work /usr /opt 
+          du -sh /home/runner/work /usr /opt 
       - name: Install bohra
         run: |
           pip3 install .
