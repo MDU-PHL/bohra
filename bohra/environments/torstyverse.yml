@@ -10,3 +10,4 @@ dependencies:
   - ngmaster
   - prokka
   - biopython=1.81
+  - snp-dists
