@@ -2,7 +2,7 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - abritanr
+  - abritamr
   - tbtamr
   - mutamr
   - csvtk
