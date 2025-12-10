@@ -36,7 +36,8 @@ function print_bold {
 function run_cmd {
   local cmd=$1
   echo "RUNNING: $cmd"
-  eval "$cmd"
+  #eval "$cmd"
+  $cmd
   ec=$?
   if [ $ec -ne 0 ] ; then
     print_bold "ERROR: '$cmd' returned $?"
