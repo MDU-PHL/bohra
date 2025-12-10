@@ -34,8 +34,9 @@ function print_bold {
 
 # run a command and exit if it fails
 function run_cmd {
-  echo "RUNNING: $1"
-  echo $1
+  local cmd=$1
+  echo "RUNNING: $cmd"
+  $cmd
   ec=$?
   if [ $ec -ne 0 ] ; then
     print_bold "ERROR: '$1' returned $?"
