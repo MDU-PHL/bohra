@@ -8,9 +8,8 @@ on:
 
 env:
   K2DB_URL: "https://github.com/MDU-PHL/babykraken/raw/refs/heads/master/dist/babykraken.tar.gz"
-#  KRAKEN2_DEFAULT_DB: ""
-#  BOHRA_PUBMLST_DB: ""
-#  BOHRA_BLAST_DB: ""
+#  "https://github.com/MDU-PHL/babykraken/raw/refs/heads/master/dist/babykraken.tar.gz"
+#  KRAKEN2_DEFAULT_DB: "" BOHRA_PUBMLST_DB: "" BOHRA_BLAST_DB: ""
 #  BOHRA_MOBSUITE_DB: ""
     
 jobs:
