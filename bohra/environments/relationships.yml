@@ -7,7 +7,7 @@ dependencies:
   - csvtk
   - iqtree>=2
   - veryfasttree
-  - fastreee
+  - quicktree
   - mash
   - gubbins>=3
   - ska2
