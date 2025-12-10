@@ -1,4 +1,3 @@
-[![CircleCI](https://dl.circleci.com/status-badge/img/gh/MDU-PHL/bohra/tree/master.svg?style=svg)](https://dl.circleci.com/status-badge/redirect/gh/MDU-PHL/bohra/tree/master)
 [![Python 3.9](https://img.shields.io/badge/python-3.9-blue.svg)](https://www.python.org/downloads/release/python-390/)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/MDU-PHL/bohra)](https://github.com/MDU-PHL/bohra/releases/latest)
 [![Conda Downloads](https://img.shields.io/conda/dn/bioconda/bohra)](https://anaconda.org/bioconda/bohra)
