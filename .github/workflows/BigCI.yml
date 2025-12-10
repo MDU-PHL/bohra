@@ -5,6 +5,13 @@ on:
     branches: [ master ]
   pull_request:
     branches: [ master ]
+
+env:
+  K2DB_URL: "https://github.com/MDU-PHL/babykraken/raw/refs/heads/master/dist/babykraken.tar.gz"
+#  KRAKEN2_DEFAULT_DB: ""
+#  BOHRA_PUBMLST_DB: ""
+#  BOHRA_BLAST_DB: ""
+#  BOHRA_MOBSUITE_DB: ""
     
 jobs:
   build:
@@ -27,10 +34,16 @@ jobs:
           environment-file: BigCI.env.yml
           auto-update-conda: true
 
+      - name: Install Kraken2 database
+        run: |
+          curl ${K2DB_URL} | tar zxvf -
+          export KRAKEN2_DEFAULT_DB="$PWD/babykraken"
+
       - name: Install bohra
         run: |
           pip3 install .
           bohra install-deps
+
 
       - name: Check bohra installtion
         run: |
