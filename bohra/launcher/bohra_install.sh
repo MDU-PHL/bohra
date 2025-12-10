@@ -19,9 +19,12 @@ FORCE=$3
 
 ENVS_DIR="$CONDA_PREFIX/conda_envs"
 INSTALLER="conda"
-
+echo "Using YAML dir: $YAML_DIR"
+echo "Testing conda version"
 # resets to base env
-eval "$(conda shell.bash hook)"
+# eval "$(conda shell.bash hook)"
+source "$(conda info --base)/etc/profile.d/conda.sh"
+
 $INSTALLER -V
 mkdir -p "$ENVS_DIR"
 
@@ -74,7 +77,7 @@ for tool in ${!TOOLS[@]}; do
         run_cmd "rm -rf $envdir"
     fi
 
-    if [[ $ACTION == "install" ]]; then
+    if [[ $ACTION == "install" && ! -d "$envdir" ]]; then
         run_cmd "$INSTALLER env create -p $envdir -f $YAML_DIR/$tool.yml"        
     fi
 
