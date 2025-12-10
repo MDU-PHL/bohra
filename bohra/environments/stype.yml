@@ -3,6 +3,7 @@ channels:
   - bioconda
 dependencies:
   - sistr_cmd
+  - python=3.8
   - csvtk
   - pip:
     - git+https://github.com/MDU-PHL/salmonella_typing
