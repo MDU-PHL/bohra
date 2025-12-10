@@ -29,7 +29,7 @@ def check_dependencies(check:str = "install",
     """
     script_path = f"{pathlib.Path(__file__).parent}"
     LOGGER.info(f"Will now try {check} dependencies. Please be patient this may take some time!!... Maybe get coffee.")
-    process = subprocess.Popen(['bash', f"{script_path}/bohra_install.sh", f"{envs}", f"{check}", f"{force_reinstall}"], stdout=subprocess.PIPE,stderr=subprocess.PIPE, encoding='utf-8')
+    process = subprocess.Popen(['bash', f"{script_path}/bohra_install.sh", f"{envs}", f"{check}", f"{force_reinstall}"], stdout=subprocess.PIPE, encoding='utf-8')
     while process.poll() is None:
         l = process.stdout.readline().strip() # This blocks until it receives a newline.
         LOGGER.info(f"{l}")
@@ -57,7 +57,7 @@ def _check_databases(db_install:bool=False)->int:
         LOGGER.info(f"{l}")
 
     if process.returncode != 0:
-        LOGGER.error(f"Error checking databases: {process.stderr}")
+        LOGGER.error(f"Error checking databases.")
         # raise SystemError
         return 1
     else:
