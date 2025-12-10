@@ -28,7 +28,7 @@ jobs:
           python-version: 3.11
           miniforge-version: latest
           channels: conda-forge,bioconda
-          conda-remove-defaults: true
+          #conda-remove-defaults: true
           channel-priority: strict
           activate-environment: bohra
           environment-file: BigCI.env.yml
@@ -44,7 +44,6 @@ jobs:
         run: |
           pip3 install .
           bohra install-deps
-
 
       - name: Check bohra installtion
         run: |
