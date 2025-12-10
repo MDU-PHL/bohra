@@ -2,7 +2,7 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - sistr
+  - sistr_cmd
   - csvtk
   - pip:
     - git+https://github.com/MDU-PHL/salmonella_typing
