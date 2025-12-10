@@ -37,8 +37,8 @@ def check_dependencies(check:str = "install",
     if process.returncode != 0:
         # LOGGER.info(f"{process.stderr.read()}")
         LOGGER.error(f"Error {check}ing dependencies.")
-        # raise SystemError
-        return 1
+        raise SystemError
+        # return 1
     else:
         LOGGER.info("Dependencies installed successfully.")
         LOGGER.info("Bohra is ready to go!")
@@ -59,7 +59,7 @@ def _check_databases(db_install:bool=False)->int:
     if process.returncode != 0:
         LOGGER.error(f"Error checking databases: {process.stderr}")
         # raise SystemError
-        return 1
+        # return 1
     else:
         LOGGER.info("Databases checked successfully.")
         LOGGER.info("Bohra is ready to go!")
