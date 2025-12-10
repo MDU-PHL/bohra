@@ -78,7 +78,8 @@ for tool in ${!TOOLS[@]}; do
     fi
 
     if [[ $ACTION == "install" && ! -d "$envdir" ]]; then
-        run_cmd "$INSTALLER env create -p $envdir -f $YAML_DIR/$tool.yml"        
+        run_cmd "$INSTALLER env create -p $envdir -f $YAML_DIR/$tool.yml"      
+        run_cmd "$INSTALLER clean -a -y"  
     fi
 
     tests=${TOOLS[$tool]}
