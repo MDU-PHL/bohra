@@ -18,18 +18,18 @@ jobs:
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
-          #python-version: 3.12
+          python-version: 3.11
           miniforge-version: latest
           channels: conda-forge,bioconda
           conda-remove-defaults: true
           channel-priority: strict
           activate-environment: bohra
-          environment-file: environment.yml
+          environment-file: BigCI.env.yml
           auto-update-conda: true
 
       - name: Install bohra
         run: |
-          pip3 install .
+          #pip3 install .
           #bohra install-deps
 
       - name: Test Prokka
