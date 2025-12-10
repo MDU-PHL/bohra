@@ -1,12 +1,12 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -e -u -o pipefail
 
 ENV_PREFIX=$CONDA_PREFIX
 GET_DB=$1
 
-# abort if any step fails
-set -e
 # resets to base env
 eval "$(conda shell.bash hook)"
+
 DB_VARS=("KRAKEN2_DEFAULT_DB" "BOHRA_PUBMLST_DB" "BOHRA_BLAST_DB" "BOHRA_MOBSUITE_DB")
 NONESSENTIAL_VARS=("BOHRA_PUBMLST_DB" "BOHRA_BLAST_DB" "BOHRA_MOBSUITE_DB")
 # KRAKEN2_ESSENTIAL_FILES=("hash.k2d" "opts.k2d" "taxo.k2d" "tree.k2d" "names.dmp" "nodes.dmp")
@@ -93,3 +93,4 @@ done
 
 # add in a check to make sure that the kraken2 files are present in the database path and not empty
 echo "Finished checking and setting environment variables for databases."
+
