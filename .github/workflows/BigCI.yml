@@ -7,6 +7,7 @@ on:
     branches: [ master ]
 
 env:
+  K2DB: "babykraken"
   K2DB_URL: "https://github.com/MDU-PHL/babykraken/raw/refs/heads/master/dist/babykraken.tar.gz"
 #  "https://github.com/MDU-PHL/babykraken/raw/refs/heads/master/dist/babykraken.tar.gz"
 #  KRAKEN2_DEFAULT_DB: "" BOHRA_PUBMLST_DB: "" BOHRA_BLAST_DB: ""
@@ -35,8 +36,9 @@ jobs:
 
       - name: Install Kraken2 database
         run: |
-          curl ${K2DB_URL} | tar zxvf -
-          export KRAKEN2_DEFAULT_DB="$PWD/babykraken"
+          wget ${K2DB_URL}
+          tar zxvf ${K2DB}.tar.gz
+          export KRAKEN2_DEFAULT_DB="$PWD/$K2DB"
 
       - name: Install bohra
         run: |
