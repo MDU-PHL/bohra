@@ -29,10 +29,10 @@ jobs:
 
       - name: Install bohra
         run: |
-          #pip3 install .
+          pip3 install .
           #bohra install-deps
 
-      - name: Test Prokka
+      - name: Test bohra
         run: |
           bohra --version
           bohra --help
