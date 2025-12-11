@@ -42,12 +42,10 @@ jobs:
           wget ${K2DB_URL}
           tar zxvf ${K2DB}.tar.gz
           export KRAKEN2_DEFAULT_DB="$PWD/$K2DB"
+
       - name: Check disk usage
-        run: |
-          echo "Disk space usage:"
-          df -h
-          echo "Directory space usage:"
-          du -sh /home/runner/work /usr /opt 
+        run: df -I -h .
+
       - name: Install bohra
         run: |
           pip3 install .
