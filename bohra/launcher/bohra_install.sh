@@ -108,7 +108,7 @@ for tool in ${!TOOLS[@]}; do
         run_cmd "find $envdir -name ncbi_plasmid_full_seqs.fas -print -delete"
         run_cmd "find $envdir -name src.zip -print -delete"
         run_cmd "rm -fr $envdir/share/EMBOSS"
-        run_cmd "rm -frv $envdir/{man,include,docs,doc,legal}"
+        run_cmd "rm -fr $envdir/{man,include,docs,doc,legal}"
         disk_nspace
     fi
 
