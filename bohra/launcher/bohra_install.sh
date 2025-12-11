@@ -44,7 +44,7 @@ print_bold () {
 
 disk_space () {
   print_bold "DISK SPACE"
-  space=$(df -I .)
+  space=$(df -h .)
   print_bold "$space"
 }
 
