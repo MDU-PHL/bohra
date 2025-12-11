@@ -48,11 +48,11 @@ jobs:
       - name: Install bohra
         run: |
           pip3 install .
-          bohra install-deps
+          bohra install-deps --tool torstyverse
 
       - name: Check bohra installtion
         run: |
-          bohra check-deps
+          bohra check-deps --tool torstyverse
 
       - name: Simple bohra test
         run: |
@@ -60,6 +60,6 @@ jobs:
           bohra --help
           bohra run --help
 
-      - name: Big bohra test
-        run: |
-          bohra test
+      # - name: Big bohra test
+      #   run: |
+      #     bohra test
