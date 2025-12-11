@@ -44,27 +44,27 @@ print_bold () {
 
 disk_space () {
   print_bold "DISK SPACE"
-  space=$(df -h .)
-  print_bold "$space"
+  df -h .
 }
 
 # run a command and exit if it fails
 run_cmd () {
   local cmd=$1
-  echo "RUNNING: $cmd"
+  echo "Running: $cmd"
   eval "$cmd"
   ec=$?
   if [ $ec -ne 0 ] ; then
     print_bold "ERROR: '$cmd' returned $?"
     exit $ec
   fi
+  disk_space
 }
 
 declare -A TOOLS=(
   [torstyverse]="meningotype --version,lissero --version,shovill --version,spades.py -v,skesa --version,mlst --version,prokka --version,snp-dists -v,ngmaster --version,emmtyper --version,csvtk version"
   [seqquality]="seqkit version,fastp --version,csvtk version"
   [relationships]="kraken2 --version,gubbins -h,mash --version,coresnpfilter --version,iqtree --version,quicktree -v,VeryFastTree --help,gotree version,csvtk version,ska --version"
-  [snippy]="snippy --version,csvtk version"
+#  [snippy]="snippy --version,csvtk version"
   [mob_suite]="mob_recon --version,csvtk version"
   [panaroo]="panaroo --version,csvtk version"
 #  [ectyper]="ectyper --version,csvtk version"
@@ -101,31 +101,25 @@ for tool in ${!TOOLS[@]}; do
 
     if [[ $ACTION == "install" && ! -d "$envdir" ]]; then
         run_cmd "$INSTALLER env create --quiet -p $envdir -f $YAML_DIR/$tool.yml"      
-        disk_space
-        run_cmd "$INSTALLER clean --all --yes"
-        disk_space
-        # delete crap
-        run_cmd "find . -type d -name PyQt5 | xargs rm -fr"
-        disk_space
+        # clean up conda
+        #run_cmd "$INSTALLER clean --all --yes --quiet"
+        # remove crap
+        run_cmd "find $envdir -name '*.pyc' -delete"
+        run_cmd "find $envdir -type d -name PyQt5 | xargs rm -fr"
         run_cmd "find $envdir -name ncbi_plasmid_full_seqs.fas -print -delete"
-        disk_space
         run_cmd "find $envdir -name src.zip -print -delete"
-        disk_space
         run_cmd "find $envdir -name '*.a' -print -delete"
-        disk_space
         run_cmd "rm -fr $envdir/share/EMBOSS"
-        disk_space
         run_cmd "rm -fr $envdir/{man,include,docs,doc,legal}"
-        disk_space
         run_cmd "rm -fr $envdir/lib/libLLVM*"
-        disk_space
     fi
 
     tests=${TOOLS[$tool]}
     IFS=',' read -r -a cmds <<< "$tests"
+    numtests=${#cmds[@]}
     for i in "${!cmds[@]}"; do 
       cmd=${cmds[$i]}
-      print_bold "$tool :: $cmd"
+      print_bold "$tool :: $i/$numtests :: $cmd"
       run_cmd "conda run -p $envdir $cmd"
       disk_space
     done
