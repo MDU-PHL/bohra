@@ -1,5 +1,4 @@
-name: torstyverseCI
-
+name: tamrCI
 on:
   push:
     branches: [ master ]

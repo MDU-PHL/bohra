@@ -1,4 +1,4 @@
-name: torstyverseCI
+name: kleborateCI
 
 on:
   push:
