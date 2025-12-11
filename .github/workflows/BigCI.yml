@@ -44,7 +44,7 @@ jobs:
           export KRAKEN2_DEFAULT_DB="$PWD/$K2DB"
 
       - name: Check disk usage
-        run: df -I -h .
+        run: df -h .
 
       - name: Install bohra
         run: |
