@@ -21,7 +21,7 @@ from bohra.launcher.CheckDeps import check_dependencies, _check_databases
               help="Download and/or setup required databases.")
 @click.option('--tool',
               # is_flag=True,
-              type=click.Choice(['all', 'torstyverse', 'seqquality', 'relationships','ectyper','mob_suite','panaroo','kleborate','stype','tamr','sonneitype','classify-pangenome'], case_sensitive=False),
+              type=click.Choice(['all', 'torstyverse', 'seqquality', 'relationships','snippy', 'ectyper','mob_suite','panaroo','kleborate','stype','tamr','sonneitype','classify-pangenome'], case_sensitive=False),
               default="all",
               help="Install only a specific set of tools from a single environment. Should really only be used for development and/or testing purposes.")
 
