@@ -9,9 +9,6 @@ on:
 env:
   K2DB: "babykraken"
   K2DB_URL: "https://github.com/MDU-PHL/babykraken/raw/refs/heads/master/dist/babykraken.tar.gz"
-#  "https://github.com/MDU-PHL/babykraken/raw/refs/heads/master/dist/babykraken.tar.gz"
-#  KRAKEN2_DEFAULT_DB: "" BOHRA_PUBMLST_DB: "" BOHRA_BLAST_DB: ""
-#  BOHRA_MOBSUITE_DB: ""
     
 jobs:
   build:
@@ -33,6 +30,12 @@ jobs:
           activate-environment: bohra
           environment-file: BigCI.env.yml
           auto-update-conda: true
+
+      - name: Clean APT
+        run: |
+          sudo apt clean
+          sudo apt autoremove -y
+          sudo apt autoclean
 
       - name: Install Kraken2 database
         run: |
