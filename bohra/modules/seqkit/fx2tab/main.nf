@@ -40,3 +40,43 @@ process SEQKIT_GC {
     
     
 }
+
+
+
+process SEQKIT_ALIGNMENT {
+    tag "$meta.id"
+    label 'process_medium'
+    publishDir "${params.outdir}",
+        mode: params.publish_dir_mode,
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
+    
+    cache 'lenient'
+    // scratch true
+    // conda (params.enable_conda ? (file("${params.conda_path}").exists() ? "${params.conda_path}/seqkit" : 'csvtk seqkit=2.1.0') : null) 
+    if ( params.enable_conda ) {
+        if (file("${params.dependency_prefix}/seqquality").exists()) {
+            conda "${params.dependency_prefix}/seqquality"
+        } 
+    } else {
+        conda null
+    }
+    
+
+    input:
+    tuple val(meta), path(input_files)
+
+    output:
+    tuple val(meta), path('aln_qual.txt'), emit: stats
+    tuple val(meta), path('version_seqkit.txt'), emit: version
+    script:
+    
+    """
+    echo -e Isolate'\n'${meta.id}'>> tmp.tab
+    seqkit fx2tab -B ATCG -l --header-line  -n ${input_files[0]} | csvtk -t -C ! cut -f 'length,ATCG' > aln_tmp.txt
+    paste tmp.tab aln_tmp.txt > aln_qual.txt
+    echo -e seqkit'\t'\$CONDA_PREFIX'\t'\$(seqkit version)'\t'${params.seqkit_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_seqkit.txt
+    """
+
+    
+    
+}
