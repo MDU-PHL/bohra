@@ -38,18 +38,18 @@ fi
 echo "Using installer: $INSTALLER"
 
 # print a bold string
-function print_bold {
+print_bold () {
     echo -e "\033[1m${1}\033[0m"
 }
 
-function disk_space {
+disk_space () {
   print_bold "DISK SPACE"
   space=$(df -I .)
   print_bold "$space"
 }
 
 # run a command and exit if it fails
-function run_cmd {
+run_cmd () {
   local cmd=$1
   echo "RUNNING: $cmd"
   eval "$cmd"
@@ -88,7 +88,6 @@ if [[ "$TOOL" != "all" ]]; then
     
 fi
 
-
 # MAIN LOOP OVER ALL ENVS
     
 for tool in ${!TOOLS[@]}; do
@@ -102,8 +101,9 @@ for tool in ${!TOOLS[@]}; do
 
     if [[ $ACTION == "install" && ! -d "$envdir" ]]; then
         run_cmd "$INSTALLER env create -p $envdir -f $YAML_DIR/$tool.yml"      
-        disk_spaae
-        # run_cmd "$INSTALLER clean -a -y"  
+        disk_space
+        run_cmd "$INSTALLER clean --all --yes"
+        disk_space
     fi
 
     tests=${TOOLS[$tool]}
