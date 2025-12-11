@@ -105,13 +105,19 @@ for tool in ${!TOOLS[@]}; do
         run_cmd "$INSTALLER clean --all --yes"
         disk_space
         # delete crap
+        run_cmd "find . -type d -name PyQt5 | xargs rm -fr"
+        disk_space
         run_cmd "find $envdir -name ncbi_plasmid_full_seqs.fas -print -delete"
+        disk_space
         run_cmd "find $envdir -name src.zip -print -delete"
-        #run_cmd "rm -fr $envdir/*/src.zip"
-        #run_cmd "rm -fr $envdir/*/*/src.zip"
-        #run_cmd "rm -fr $envdir/*/*/*/src.zip"
+        disk_space
+        run_cmd "find $envdir -name '*.a' -print -delete"
+        disk_space
         run_cmd "rm -fr $envdir/share/EMBOSS"
+        disk_space
         run_cmd "rm -fr $envdir/{man,include,docs,doc,legal}"
+        disk_space
+        run_cmd "rm -fr $envdir/lib/libLLVM*"
         disk_space
     fi
 
@@ -119,10 +125,10 @@ for tool in ${!TOOLS[@]}; do
     IFS=',' read -r -a cmds <<< "$tests"
     for i in "${!cmds[@]}"; do 
       cmd=${cmds[$i]}
+      disk_space
       print_bold "$tool :: $cmd"
       run_cmd "conda run -p $envdir $cmd"
     done
 done
         
 disk_space
-c
