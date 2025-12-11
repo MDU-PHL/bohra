@@ -10,7 +10,7 @@ include { CSVTK_CONCAT;CSVTK_UNIQ } from './../modules/csvtk/main'
 include { CORE_SNP_FILTER } from './../modules/core_snp_filter/main'
 include { SNP_CLUSTER } from './../modules/cluster/main'
 include { SEQKIT_ALIGNMENT } from './../modules/seqkit/fx2tab/main'
-
+include { CHECK_CORE } from './../modules/check_core/main'
 workflow RUN_SNPS {
 
     take:
@@ -23,7 +23,15 @@ workflow RUN_SNPS {
                                         .map { files -> tuple("version_snippy", files) }
         CSVTK_UNIQ ( versions )
         SNIPPY_QC ( SNIPPY.out.aln )
+        alns_qc = SNIPPY_QC.out.snippy_qc.map { cfg, snippy_qc -> snippy_qc }.collect()
+        all_core_stats = CHECK_CORE ( alns_qc )
+        // need to come up with a way to add a flag to a aln to prevent inclusion.... 
         alns =  SNIPPY.out.aln.map { cfg, aln -> aln.getParent() }.collect()
+        // alns_checked = 
+        
+
+        
+
         SNIPPY_CORE ( alns, reference )  
         CORE_SNP_FILTER ( SNIPPY_CORE.out.core_full_aln )
         core_aln =  CORE_SNP_FILTER.out.aln

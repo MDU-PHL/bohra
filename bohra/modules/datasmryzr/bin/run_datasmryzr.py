@@ -38,6 +38,23 @@ def check_val(val:float, min_val:float,metric) -> str:
     else:
         return f"{metric}: {val}, should be at least {min_val}`"
 
+def check_val_aln(val:float, min_val:float,metric) -> str:
+    """
+    Check if the coverage is above the minimum coverage and not an outlier
+    """
+    if val[1]:
+        return 1
+    if val[0] == "" and val[2] == "":
+        return 1
+    elif int(val[0]) >= min_val and val[2] == "":
+        return 1
+    elif val[2] != "":
+        return f"Isolate marked as outlier in core genome analysis. Should be remove from dataset."
+    else:
+        return f"{metric}: {val}, should be at least {min_val}`"
+
+
+
 def check_contigs(upper, lower, contigs:list) -> str:
     """
     Check if the number of contigs is within the expected range
@@ -83,7 +100,7 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
     list_of_filename = {
         "read_assessment.txt" : ["Isolate","Reads","GC", "Depth","Genome size", "is_control", "filesize", "Qscore"],
         "assembly_assessment.txt":["Isolate","Length","# Contigs","Assembly N50"],
-        "core_genome_stats.txt":["Isolate","% Aligned"],
+        "core_genome_stats.txt":["Isolate","% Aligned", "Aln_outlier"],
         "speciation.txt":["Isolate","Species (reads)","Match 1 (reads)", "Match 1 (asm)"],
         "mlst.txt":["Isolate","Scheme","ST"],
         # "cluster.txt":[]
@@ -140,7 +157,7 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
     if "Depth" in summary.columns:
         summary["Coverage check"] = summary[["Depth","is_control"]].apply(lambda x: check_val(x, min_depth, "Avg depth"),axis=1)
     if "% Aligned" in summary.columns:
-        summary["Alignment check"] = summary[["% Aligned", "is_control"]].apply(lambda x:check_val(x, minaln, "Alignment %"), axis=1)
+        summary["Alignment check"] = summary[["% Aligned", "is_control", "Aln_outlier"]].apply(lambda x:check_val_aln(x, minaln, "Alignment %"), axis=1)
 
     if "# Contigs" in summary.columns:
         print("Checking number of contigs")
@@ -150,6 +167,7 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
     check_cols = [i for i in list(summary.columns) if "check" in i]
     print(check_cols)
     check_cols.append("File size check")
+    check_cols.append("Aln_outlier")
     print(summary.columns)
     summary = summary.fillna("")
     print(summary)
