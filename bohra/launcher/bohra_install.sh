@@ -100,10 +100,16 @@ for tool in ${!TOOLS[@]}; do
     fi
 
     if [[ $ACTION == "install" && ! -d "$envdir" ]]; then
-        run_cmd "$INSTALLER env create -p $envdir -f $YAML_DIR/$tool.yml"      
+        run_cmd "$INSTALLER env create --quiet -p $envdir -f $YAML_DIR/$tool.yml"      
         disk_space
         run_cmd "$INSTALLER clean --all --yes"
         disk_space
+        # delete crap
+        run_cmd "find $envdir -name ncbi_plasmid_full_seqs.fas -print -delete"
+        run_cmd "find $envdir -name src.zip -print -delete"
+        run_cmd "rm -fr $envdir/share/EMBOSS"
+        run_cmd "rm -frv $envdir/{man,include,docs,doc,legal}""
+        disk_nspace
     fi
 
     tests=${TOOLS[$tool]}
@@ -116,3 +122,4 @@ for tool in ${!TOOLS[@]}; do
 done
         
 disk_space
+c
