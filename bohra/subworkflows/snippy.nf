@@ -9,6 +9,7 @@ include { SNIPPY_CLEAN } from './../modules/snippy_clean/main'
 include { CSVTK_CONCAT;CSVTK_UNIQ } from './../modules/csvtk/main'
 include { CORE_SNP_FILTER } from './../modules/core_snp_filter/main'
 include { SNP_CLUSTER } from './../modules/cluster/main'
+include { SEQKIT_ALIGNMENT } from './../modules/seqkit/fx2tab/main'
 
 workflow RUN_SNPS {
 
