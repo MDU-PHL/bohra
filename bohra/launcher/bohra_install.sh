@@ -62,12 +62,12 @@ run_cmd () {
 
 declare -A TOOLS=(
   [torstyverse]="meningotype --version,lissero --version,shovill --version,spades.py -v,skesa --version,mlst --version,prokka --version,snp-dists -v,ngmaster --version,emmtyper --version,csvtk version"
-  [seqquality]="seqkit --help,fastp --help,csvtk version"
+  [seqquality]="seqkit version,fastp --version,csvtk version"
   [relationships]="kraken2 --version,gubbins -h,mash --version,coresnpfilter --version,iqtree --version,quicktree -v,VeryFastTree --help,gotree version,csvtk version,ska --version"
   [snippy]="snippy --version,csvtk version"
   [mob_suite]="mob_recon --version,csvtk version"
   [panaroo]="panaroo --version,csvtk version"
-  [ectyper]="ectyper --version,csvtk version"
+#  [ectyper]="ectyper --version,csvtk version"
   [kleborate]="kleborate --version,csvtk version"
   [stype]="sistr --version,stype --version,csvtk version"
   [tamr]="abritamr --version,tbtamr --version,csvtk version"
@@ -125,9 +125,9 @@ for tool in ${!TOOLS[@]}; do
     IFS=',' read -r -a cmds <<< "$tests"
     for i in "${!cmds[@]}"; do 
       cmd=${cmds[$i]}
-      disk_space
       print_bold "$tool :: $cmd"
       run_cmd "conda run -p $envdir $cmd"
+      disk_space
     done
 done
         
