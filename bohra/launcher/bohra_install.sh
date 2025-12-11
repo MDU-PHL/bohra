@@ -7,15 +7,18 @@ set -e -u -o pipefail
 exec 2>&1
 
 # check parameters
-if [ "$#" -ne 3 ]; then
+if [ "$#" -ne 4 ]; then
 	EXE=$(basename $0)
-	echo "USAGE: $EXE <envsdirr=path> <action=install|check> <force=true|false>"
+	echo "USAGE: $EXE <envsdirr=path> <action=install|check> <force=true|false> [tool=all|toolname]"
 	exit 255
 fi
 
 YAML_DIR=$1
 ACTION=$2
 FORCE=$3
+TOOL=$4
+
+# echo $TOOL
 
 ENVS_DIR="$CONDA_PREFIX/conda_envs"
 INSTALLER="conda"
@@ -65,6 +68,20 @@ declare -A TOOLS=(
   [sonneitype]="mykrobe --version,csvtk version"
   [classify-pangenome]="R --version"
 )
+
+# if TOOL is "all", use all tools
+
+echo "Tools to process: ${TOOL}"
+# echo "${TOOLS[$TOOL]}"
+if [[ "$TOOL" != "all" ]]; then
+    
+    TMP_TOOLS="${TOOLS[$TOOL]}"
+    echo "Selected tools: ${TMP_TOOLS}"
+    TOOLS=()
+    TOOLS[$TOOL]=$TMP_TOOLS
+    
+fi
+
 
 # MAIN LOOP OVER ALL ENVS
     

@@ -8,4 +8,9 @@ Assessing quality of your sequence data is vitally important to facillitate appr
 
 The `bohra` pipeline outputs a html report with all results for the pipeline that was run. The summary table will be the first or second tab (if you have run one of the [comparative pipelines](../usage/running_bohra.md#comparative-pipelines)) you see when opening up the file in your browser.
 
+## Key metrics
+
+Depending upon your input data and the pipeline run some or all of the following may be available to you.
+
+### 
 
