@@ -17,10 +17,21 @@ jobs:
       run:
         shell: bash -el {0}
     steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 32768
+          temp-reserve-mb: 16384
+          swap-size-mb: 16384
+          remove-dotnet: true
+          remove-android: true
+          remove-haskell: true
+
       - name: Pull bohra
         uses: actions/checkout@v5
 
-      - uses: conda-incubator/setup-miniconda@v3
+      - name: Setup conda
+        uses: conda-incubator/setup-miniconda@v3
         with:
           python-version: 3.11
           miniforge-version: latest
@@ -37,14 +48,14 @@ jobs:
           sudo apt autoremove -y
           sudo apt autoclean
 
+      - name: Check disk usage
+        run: df -h
+
       - name: Install Kraken2 database
         run: |
           wget ${K2DB_URL}
           tar zxvf ${K2DB}.tar.gz
           export KRAKEN2_DEFAULT_DB="$PWD/$K2DB"
-
-      - name: Check disk usage
-        run: df -h .
 
       - name: Install bohra
         run: |

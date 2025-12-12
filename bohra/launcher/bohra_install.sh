@@ -4,7 +4,7 @@
 set -e -u -o pipefail
 
 # Issue #133 - Redurectr akk stederr ti stdout 
-exec 2>&1
+#exec 2>&1
 
 # check parameters
 if [ "$#" -ne 4 ]; then
@@ -22,8 +22,10 @@ TOOL=$4
 
 ENVS_DIR="$CONDA_PREFIX/conda_envs"
 INSTALLER="conda"
-echo "Using YAML dir: $YAML_DIR"
-echo "Testing conda version"
+
+#echo "Using YAML dir: $YAML_DIR"
+#echo "Testing conda version"
+
 # resets to base env
 # eval "$(conda shell.bash hook)"
 source "$(conda info --base)/etc/profile.d/conda.sh"
@@ -44,7 +46,7 @@ print_bold () {
 
 disk_space () {
   print_bold "DISK SPACE"
-  df -h .
+  df -h
 }
 
 # run a command and exit if it fails
@@ -59,6 +61,8 @@ run_cmd () {
   fi
   # disk_space
 }
+
+disk_space
 
 declare -A TOOLS=(
   [torstyverse]="meningotype --version,lissero --version,shovill --version,spades.py -v,skesa --version,mlst --version,prokka --version,snp-dists -v,ngmaster --version,emmtyper --version,csvtk version"
@@ -122,7 +126,7 @@ for tool in ${!TOOLS[@]}; do
       # c=$i + 1
       print_bold "$tool :: $i/$numtests :: $cmd"
       run_cmd "conda run -p $envdir $cmd"
-      # disk_space
+      disk_space
     done
 done
         
