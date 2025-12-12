@@ -48,14 +48,14 @@ jobs:
           sudo apt autoremove -y
           sudo apt autoclean
 
+      - name: Check disk usage
+        run: df -h
+
       - name: Install Kraken2 database
         run: |
           wget ${K2DB_URL}
           tar zxvf ${K2DB}.tar.gz
           export KRAKEN2_DEFAULT_DB="$PWD/$K2DB"
-
-      - name: Check disk usage
-        run: df -h .
 
       - name: Install bohra
         run: |
