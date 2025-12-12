@@ -44,7 +44,7 @@ print_bold () {
 
 disk_space () {
   print_bold "DISK SPACE"
-  df -h .
+  df -i -h
 }
 
 # run a command and exit if it fails
@@ -121,7 +121,6 @@ for tool in ${!TOOLS[@]}; do
       cmd=${cmds[$i]}
       print_bold "$tool :: $i/$numtests :: $cmd"
       run_cmd "conda run -p $envdir $cmd"
-      disk_space
     done
 done
         
