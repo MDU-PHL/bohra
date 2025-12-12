@@ -9,19 +9,34 @@ import argparse
 
 def _assess(args):
     
-    qc = pd.read_csv(f"{arg.qc}", sep = "\t")
-    fail = [i for i in qc["Aln_outlier"].unique() if "below" in i]
+    qc = pd.read_csv(f"{args.qc}", sep = "\t")
+    qc = qc.fillna("")
+    if args.strict == 'true':
+        fail = [i for i in qc["Aln_outlier"].unique() if "below" in i]
 
-    if fail != []:
-        print("exclude")
+        if fail != []:
+            print("exclude")
+        else:
+            print("include")
     else:
-        print("include")
+        qc = qc[(qc["Isolate"] == args.seqid) & (qc['Aln_outlier'].contains("below"))]
+        if qc.empty:
+            print("inlcude")
+        else:
+            print("exclude")
+
 
 
 def set_parsers():
     # setup the parser
     parser = argparse.ArgumentParser(description='Collate and write bohra report',formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('--qc',
+        help='',
+        default = '')
+    parser.add_argument('--seqid',
+        help='',
+        default = '')
+    parser.add_argument('--strict',
         help='',
         default = '')
     

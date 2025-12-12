@@ -7,31 +7,6 @@ import numpy as np
 import argparse
 
 
-def check_aln(aln:list)-> tuple:
-    alns = [i for i in aln if not isinstance(i, str)]
-    q1, q3 = np.percentile(alns, [25, 75])
-    iqr = q3 - q1
-    lower_bound = q1 - (1.5 * iqr)
-    upper_bound = q3 + (1.5 * iqr)
-    # print(f"Lower bound: {lower_bound}, Upper bound: {upper_bound}")
-    return lower_bound, upper_bound
-
-
-
-def report_aln(upper, lower, aln) -> str:
-    """
-    Check if the number of contigs is within the expected range
-    """
-    # print(contigs[0])
-    # print(lower, upper)
-    
-    
-    if (aln < lower):
-        return f"Alignment percentage: {aln} is below the expected range of {lower}."
-    else:
-        return f""
-
-
 def _assess(args):
     
     qc = []
@@ -44,10 +19,13 @@ def _assess(args):
             continue
 
     qc = pd.concat(qc, ignore_index=True)
-    lower, upper = check_aln(qc["% Aligned"].tolist())
-    qc["Aln_outlier"] = qc["% Aligned"].apply(lambda x: report_aln(upper, lower, x))
+    sd2 = qc["% Aligned"].std()*2
+    mean = qc["% Aligned"].mean()
+    lower = mean - sd2
+    
+    qc["Aln_outlier"] = np.where(qc["% Aligned"] < lower, f"Alignment percentage is below the expected range of {lower}.", "")
     qc.to_csv(args.output, sep='\t', index=False)
-    print(lower)
+    # print(lower)
 
 
 def set_parsers():

@@ -18,15 +18,15 @@ process CHECK_CORE {
     scratch true
     
     input:
-    val(alns)
+    val(snippy_qc)
 
     output:
     path("core_genome_stats.txt"), emit: stats
     
-    def core = alns.join(' ')
+    // def cre = snippy_qc.join(' ')
     script:
     """
-    $module_dir/check_core.py --snippy_qc ${core} --output core_genome_stats.txt
+    $module_dir/check_core.py --snippy_qc ${snippy_qc} --output core_genome_stats.txt 
     """
     
 }
@@ -44,7 +44,7 @@ process FILTER_CORE {
     scratch true
     
     input:
-    tuple val(meta), path(aln),path(core_qc)
+    tuple val(meta), val(aln), path(core_qc)
 
     output:
     
@@ -54,7 +54,7 @@ process FILTER_CORE {
     // for now this will add exclude to every aln if any are outliers - this behviour may change in the future
     script:
     """
-    $module_dir/filter.py --qc ${core_qc} 
+    $module_dir/filter.py --qc ${core_qc} --strict ${params.strict_core}
     """
     
 }

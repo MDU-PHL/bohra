@@ -23,13 +23,15 @@ workflow RUN_SNPS {
                                         .map { files -> tuple("version_snippy", files) }
         CSVTK_UNIQ ( versions )
         SNIPPY_QC ( SNIPPY.out.aln )
-        snippy_qc = SNIPPY_QC.out.snippy_qc.map { cfg, snippy_qc -> snippy_qc }.collect()
-        println snippy_qc.view()
-    //     all_core_stats = CHECK_CORE ( snippy_qc )
+        snippy_qc = SNIPPY_QC.out.snippy_qc.map { cfg, snippy_qc -> snippy_qc }.collect().map { it.join(' ') }
+        // println snippy_qc.view()
+        // println snippy_qc.channelType()
+        CHECK_CORE ( snippy_qc )
+        all_core_stats = CHECK_CORE.out.stats
     //     // need to come up with a way to add a flag to a aln to prevent inclusion.... 
-    //     FILTER_CORE ( SNIPPY.out.aln.combine( all_core_stats ))
-    //     alns_qc = FILTER_CORE.out.aln.join ( SNIPPY.out.aln )
-
+        FILTER_CORE ( SNIPPY.out.aln.combine( all_core_stats ))
+        alns_qc = FILTER_CORE.out.aln_filter.join ( SNIPPY.out.aln )
+        println alns_qc
     //     alns_qc = alns_qc.map { cfg, val, aln -> tuple( cfg + [filter:val.trim()]), aln}.filter { cfg, aln -> cfg.filer != "exclude"}
     //     alns =  alns_qc.map { cfg, aln -> aln.getParent() }.collect()
 
