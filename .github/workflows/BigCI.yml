@@ -17,10 +17,18 @@ jobs:
       run:
         shell: bash -el {0}
     steps:
+      - name: Maximize build space
+        uses: easimon/maximize-build-space@master
+        with:
+          root-reserve-mb: 512
+          swap-size-mb: 1024
+          remove-dotnet: 'true'
+
       - name: Pull bohra
         uses: actions/checkout@v5
 
-      - uses: conda-incubator/setup-miniconda@v3
+      - name: Setup conda
+        uses: conda-incubator/setup-miniconda@v3
         with:
           python-version: 3.11
           miniforge-version: latest
