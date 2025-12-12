@@ -26,9 +26,11 @@ workflow RUN_SNPS {
         alns_qc = SNIPPY_QC.out.snippy_qc.map { cfg, snippy_qc -> snippy_qc }.collect()
         all_core_stats = CHECK_CORE ( alns_qc )
         // need to come up with a way to add a flag to a aln to prevent inclusion.... 
-        alns =  SNIPPY.out.aln.map { cfg, aln -> aln.getParent() }.collect()
-        // alns_checked = 
-        
+        FILTER_CORE ( SNIPPY.out.aln.combine( all_core_stats ))
+        alns_qc = FILTER_CORE.out.aln.join ( SNIPPY.out.aln )
+
+        alns_qc = alns_qc.map { cfg, val, aln -> tuple( cfg + [filter:val.trim()]), aln}.filter { cfg, aln -> cfg.filer != "exclude"}
+        alns =  alns_qc.map { cfg, aln -> aln.getParent() }.collect()
 
         
 
@@ -51,9 +53,7 @@ workflow RUN_SNPS {
         } else {
             SNP_CLUSTER.out.clusters = Chanel.empty().ifEmpty("not_available")
         }
-        // SNP_CLUSTER ( SNP_DISTS.out.matrix )
-        stats = SNIPPY_QC.out.snippy_qc.map { cfg, core_stats -> core_stats }.collect().map { files -> tuple("core_genome_stats", files)}
-        all_core_stats = CSVTK_CONCAT ( stats )
+        
     emit:
         
         dists = SNP_DISTS.out.matrix

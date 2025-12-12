@@ -47,10 +47,7 @@ def _assess(args):
     lower, upper = check_aln(qc["% Aligned"].tolist())
     qc["Aln_outlier"] = qc["% Aligned"].apply(lambda x: report_aln(upper, lower, x))
     qc.to_csv(args.output, sep='\t', index=False)
-    if qc["Aln_outlier"].str.contains("below").any():
-        print("outlier")
-    else:
-        print("ok")
+    print(lower)
 
 
 def set_parsers():
