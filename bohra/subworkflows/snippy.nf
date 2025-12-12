@@ -31,41 +31,42 @@ workflow RUN_SNPS {
     //     // need to come up with a way to add a flag to a aln to prevent inclusion.... 
         FILTER_CORE ( SNIPPY.out.aln.combine( all_core_stats ))
         alns_qc = FILTER_CORE.out.aln_filter.join ( SNIPPY.out.aln )
-        println alns_qc
-    //     alns_qc = alns_qc.map { cfg, val, aln -> tuple( cfg + [filter:val.trim()]), aln}.filter { cfg, aln -> cfg.filer != "exclude"}
-    //     alns =  alns_qc.map { cfg, aln -> aln.getParent() }.collect()
+        
+        alns_qc = alns_qc.map { cfg, val, aln -> tuple( cfg + [filter:val.trim()]), aln}.filter { cfg, aln -> cfg.filter != "exclude"}
+        // println alns_qc.view()
+        alns =  alns_qc.map { cfg, aln -> aln.getParent() }.collect()
 
-        
+        // println alns.view()
 
-    //     SNIPPY_CORE ( alns, reference )  
-    //     CORE_SNP_FILTER ( SNIPPY_CORE.out.core_full_aln )
-    //     core_aln =  CORE_SNP_FILTER.out.aln
-    //     core_full_aln = SNIPPY_CORE.out.core_full_aln
-    //     core_vcf = SNIPPY_CORE.out.core_vcf
-    //     SNIPPY_CLEAN ( core_full_aln )
-    //     cleaned_aln = SNIPPY_CLEAN.out.cleaned
+        SNIPPY_CORE ( alns, reference )  
+        CORE_SNP_FILTER ( SNIPPY_CORE.out.core_full_aln )
+        core_aln =  CORE_SNP_FILTER.out.aln
+        core_full_aln = SNIPPY_CORE.out.core_full_aln
+        core_vcf = SNIPPY_CORE.out.core_vcf
+        SNIPPY_CLEAN ( core_full_aln )
+        cleaned_aln = SNIPPY_CLEAN.out.cleaned
         
-    //     if ( params.gubbins ){
-    //         GUBBINS ( cleaned_aln )
-    //         core_aln = GUBBINS.out.gubbins
-    //     }
+        if ( params.gubbins ){
+            GUBBINS ( cleaned_aln )
+            core_aln = GUBBINS.out.gubbins
+        }
         
-    //     SNP_DISTS ( core_aln )
-    //     if ( params.cluster ) {
-    //         SNP_CLUSTER ( SNP_DISTS.out.matrix )
-    //     } else {
-    //         SNP_CLUSTER.out.clusters = Chanel.empty().ifEmpty("not_available")
-    //     }
+        SNP_DISTS ( core_aln )
+        if ( params.cluster ) {
+            SNP_CLUSTER ( SNP_DISTS.out.matrix )
+        } else {
+            SNP_CLUSTER.out.clusters = Chanel.empty().ifEmpty("not_available")
+        }
         
-    // emit:
+    emit:
         
-    //     dists = SNP_DISTS.out.matrix
-    //     aln = core_aln
-    //     core_full_aln = core_full_aln
-    //     core_vcf = core_vcf
-    //     // cleaned_aln = cleaned_aln
-    //     stats = all_core_stats
-    //     clusters = SNP_CLUSTER.out.clusters
-    //     version = CSVTK_UNIQ.out.collated
+        dists = SNP_DISTS.out.matrix
+        aln = core_aln
+        core_full_aln = core_full_aln
+        core_vcf = core_vcf
+        // cleaned_aln = cleaned_aln
+        stats = all_core_stats
+        clusters = SNP_CLUSTER.out.clusters
+        version = CSVTK_UNIQ.out.collated
 
 }

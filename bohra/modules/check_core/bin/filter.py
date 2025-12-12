@@ -19,7 +19,7 @@ def _assess(args):
         else:
             print("include")
     else:
-        qc = qc[(qc["Isolate"] == args.seqid) & (qc['Aln_outlier'].contains("below"))]
+        qc = qc[(qc["Isolate"] == args.seqid) & (qc['Aln_outlier'].str.contains("below"))]
         if qc.empty:
             print("inlcude")
         else:
