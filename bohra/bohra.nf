@@ -165,49 +165,49 @@ workflow {
         
     }
     
-    if (params.modules.contains("snippy") || (params.modules.contains("ska")) || (params.modules.contains("mash"))){
+    // if (params.modules.contains("snippy") || (params.modules.contains("ska")) || (params.modules.contains("mash"))){
         
-        if (params.modules.contains("snippy") ){
-            sequences = reads_pe.filter { cfg, files -> cfg.control != 'control' }
+    //     if (params.modules.contains("snippy") ){
+    //         sequences = reads_pe.filter { cfg, files -> cfg.control != 'control' }
             
-            // RUN_SNIPPY ( reads_pe, Channel.from(file(params.reference)) )
-        } else if (params.modules.contains("ska") || params.modules.contains("mash") ){
-            reads = reads_pe.filter { cfg,files -> cfg.control != 'control' }.map { cfg, files -> tuple(cfg.id, cfg, files) }
-            // 
-            asm_tmp = asm.filter { cfg,files -> cfg.control != 'control' }.map { cfg, files -> tuple(cfg.id, cfg , files) }
-            // println reads.view()
-            sequences = reads.join(asm_tmp, remainder:true).map( v -> { v.size() == 4 ? v[1] ? [v[1],v[2]] : [v[2],v[3]]  : [v[1],v[2]]} )
+    //         // RUN_SNIPPY ( reads_pe, Channel.from(file(params.reference)) )
+    //     } else if (params.modules.contains("ska") || params.modules.contains("mash") ){
+    //         reads = reads_pe.filter { cfg,files -> cfg.control != 'control' }.map { cfg, files -> tuple(cfg.id, cfg, files) }
+    //         // 
+    //         asm_tmp = asm.filter { cfg,files -> cfg.control != 'control' }.map { cfg, files -> tuple(cfg.id, cfg , files) }
+    //         // println reads.view()
+    //         sequences = reads.join(asm_tmp, remainder:true).map( v -> { v.size() == 4 ? v[1] ? [v[1],v[2]] : [v[2],v[3]]  : [v[1],v[2]]} )
            
-        } 
-        reference = Channel.fromPath(params.reference).ifEmpty('no_file')
-        // println sequences.view()
-        RELATIONSHIPS ( sequences, reference )
+    //     } 
+    //     reference = Channel.fromPath(params.reference).ifEmpty('no_file')
+    //     // println sequences.view()
+    //     RELATIONSHIPS ( sequences, reference )
       
-        results = results.concat( RELATIONSHIPS.out.dists )
-        results = results.concat( RELATIONSHIPS.out.core_vcf )
-        results = results.concat( RELATIONSHIPS.out.clusters )
-        results = results.concat( RELATIONSHIPS.out.stats )
-        results = results.concat( RELATIONSHIPS.out.tree)
-        versions = versions.concat( RELATIONSHIPS.out.version )
-        versions = versions.concat( RELATIONSHIPS.out.tree_version )
+    //     results = results.concat( RELATIONSHIPS.out.dists )
+    //     results = results.concat( RELATIONSHIPS.out.core_vcf )
+    //     results = results.concat( RELATIONSHIPS.out.clusters )
+    //     results = results.concat( RELATIONSHIPS.out.stats )
+    //     results = results.concat( RELATIONSHIPS.out.tree)
+    //     versions = versions.concat( RELATIONSHIPS.out.version )
+    //     versions = versions.concat( RELATIONSHIPS.out.tree_version )
 
-    }
+    // }
 
-    if (params.modules.contains("pangenome")){
+    // if (params.modules.contains("pangenome")){
 
-        if( params.pangenome_groups == "clusters") {
-            groups = RELATIONSHIPS.out.clusters
-        }
-        gff = ASSEMBLY_ANALYSIS.out.gff
-        RUN_PANAROO ( gff,groups )
+    //     if( params.pangenome_groups == "clusters") {
+    //         groups = RELATIONSHIPS.out.clusters
+    //     }
+    //     gff = ASSEMBLY_ANALYSIS.out.gff
+    //     RUN_PANAROO ( gff,groups )
 
         
-        results = results.concat( RUN_PANAROO.out.pangenome_rtab )
-        results = results.concat( RUN_PANAROO.out.classification )
-        results = results.concat( RUN_PANAROO.out.groups )
-        versions = versions.concat( RUN_PANAROO.out.version )
-    }
+    //     results = results.concat( RUN_PANAROO.out.pangenome_rtab )
+    //     results = results.concat( RUN_PANAROO.out.classification )
+    //     results = results.concat( RUN_PANAROO.out.groups )
+    //     versions = versions.concat( RUN_PANAROO.out.version )
+    // }
 
-    // println results.view()
-    RUN_COMPILE ( results, versions )
+    // // println results.view()
+    // RUN_COMPILE ( results, versions )
 }
