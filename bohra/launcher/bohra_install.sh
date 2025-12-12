@@ -44,7 +44,7 @@ print_bold () {
 
 disk_space () {
   print_bold "DISK SPACE"
-  df -i -h
+  df -h
 }
 
 # run a command and exit if it fails
