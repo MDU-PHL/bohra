@@ -4,7 +4,7 @@
 set -e -u -o pipefail
 
 # Issue #133 - Redurectr akk stederr ti stdout 
-exec 2>&1
+#exec 2>&1
 
 # check parameters
 if [ "$#" -ne 4 ]; then
