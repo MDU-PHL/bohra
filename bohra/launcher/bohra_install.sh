@@ -22,8 +22,10 @@ TOOL=$4
 
 ENVS_DIR="$CONDA_PREFIX/conda_envs"
 INSTALLER="conda"
-echo "Using YAML dir: $YAML_DIR"
-echo "Testing conda version"
+
+#echo "Using YAML dir: $YAML_DIR"
+#echo "Testing conda version"
+
 # resets to base env
 # eval "$(conda shell.bash hook)"
 source "$(conda info --base)/etc/profile.d/conda.sh"
@@ -59,6 +61,8 @@ run_cmd () {
   fi
   disk_space
 }
+
+disk_space
 
 declare -A TOOLS=(
   [torstyverse]="meningotype --version,lissero --version,shovill --version,spades.py -v,skesa --version,mlst --version,prokka --version,snp-dists -v,ngmaster --version,emmtyper --version,csvtk version"
