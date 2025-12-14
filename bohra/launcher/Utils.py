@@ -222,6 +222,7 @@ def _get_common_options() -> list:
             "is_flag":True,
             "help":"Set --no-auto-run to prevent the pipeline from running automatically. You will need to copy and paste the command to run the pipeline yourself."
         },
+        
         {
             "name":"text_color",
             "help":"Color to use for the text in the report html. Default is 'white'.",
@@ -359,6 +360,12 @@ def _get_cmd_options() -> dict:
                 "type":float
             },
             {
+                "name":"ignore_warnings",
+                "help":"Set to ignore warnings during pipeline. Please note that this may lead to unexpected results.",
+                "is_flag":True,
+                "default":False
+            },
+            {
                 "name":"ska_minfreq",
                 "help":"Ska - minimum frequency for variant calling.",
                 "default":0.9
@@ -475,6 +482,12 @@ def _get_cmd_options() -> dict:
                 "short_name":"-mf",
                 "help":"Snippy - minimum proportion for variant evidence",
                 "default":0
+            },
+            {
+                "name":"ignore_warnings",
+                "help":"Set to ignore warnings during pipeline. Please note that this may lead to unexpected results.",
+                "is_flag":True,
+                "default":False
             },
             {
                 "name":"fuzzy_core_prop",

@@ -43,6 +43,7 @@ def _setup_comparative_args(kwargs:dict, command:dict, mtb:bool) -> dict:
     command['params'].append(f"--tree_input {kwargs['tree_input'] if kwargs['comparative_tool'] != 'mash' else 'distance'}")
     command['modules'].append(f"{kwargs['tree_builder'] if kwargs['comparative_tool'] != 'mash' else 'quicktree'}")
     command['params'].append(f"--cluster {'false' if kwargs['comparative_tool'] == 'mash' else kwargs['cluster']}")
+    command['params'].append(f"--ignore_warnings {'true' if kwargs['ignore_warnings'] else 'false'}")
     
     if kwargs['comparative_tool'] == "snippy" and not _check_input_snippy(kwargs['input_file']):
         LOGGER.critical("You have selected snippy as your tool for snp detection. Currently this requires paired-end reads. Please check your input file and try again.")

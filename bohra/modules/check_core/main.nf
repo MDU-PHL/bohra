@@ -54,7 +54,7 @@ process FILTER_CORE {
     // for now this will add exclude to every aln if any are outliers - this behviour may change in the future
     script:
     """
-    $module_dir/filter.py --qc ${core_qc} --strict ${params.strict_core}
+    $module_dir/filter.py --qc ${core_qc} --strict ${params.ignore_warnings}
     """
     
 }
