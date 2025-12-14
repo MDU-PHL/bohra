@@ -167,13 +167,13 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
     check_cols = [i for i in list(summary.columns) if "check" in i]
     print(check_cols)
     check_cols.append("File size check")
-    check_cols.append("Aln_outlier")
+    
     print(summary.columns)
     summary = summary.fillna("")
     print(summary)
     summary["Comment"] = summary[check_cols].apply(lambda x: make_comment(x.tolist()), axis=1)
     summary["Data assessment"] = summary[check_cols].apply(lambda x: 1 if all(i == 1 for i in x.tolist()) else 0, axis=1)
-    
+    check_cols.append("Aln_outlier")
     # print(summary)
     summary.drop(columns=check_cols, inplace=True)
     print(summary)

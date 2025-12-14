@@ -21,7 +21,8 @@ process SNIPPY_CORE {
     cpus options.args2// args2 needs to be cpus for shovill
     cache 'lenient'
     scratch true
-    
+    errorStrategy 'ignore'
+
     input:
     val(alns) // this needs to be a list of sample! not .aln since snippy core uses relative path and the name of the folder to name results!
     path(reference)
