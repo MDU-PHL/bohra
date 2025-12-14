@@ -11,19 +11,12 @@ def _assess(args):
     
     qc = pd.read_csv(f"{args.qc}", sep = "\t")
     qc = qc.fillna("")
-    if args.strict == 'true':
-        fail = [i for i in qc["Aln_outlier"].unique() if "below" in i]
-
-        if fail != []:
-            print("exclude")
-        else:
-            print("include")
+    
+    qc = qc[(qc["Isolate"] == args.seqid) & (qc['Aln_outlier'].str.contains("below"))]
+    if qc.empty:
+        print("include")
     else:
-        qc = qc[(qc["Isolate"] == args.seqid) & (qc['Aln_outlier'].str.contains("below"))]
-        if qc.empty:
-            print("inlcude")
-        else:
-            print("exclude")
+        print("exclude")
 
 
 

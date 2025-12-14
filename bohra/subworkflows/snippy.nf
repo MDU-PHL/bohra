@@ -30,13 +30,16 @@ workflow RUN_SNPS {
         all_core_stats = CHECK_CORE.out.stats
     //     // need to come up with a way to add a flag to a aln to prevent inclusion.... 
         FILTER_CORE ( SNIPPY.out.aln.combine( all_core_stats ))
-        alns_qc = FILTER_CORE.out.aln_filter.join ( SNIPPY.out.aln )
-        
-        alns_qc = alns_qc.map { cfg, val, aln -> tuple( cfg + [filter:val.trim()]), aln}.filter { cfg, aln -> cfg.filter != "exclude"}
-        // println alns_qc.view()
-        alns =  alns_qc.map { cfg, aln -> aln.getParent() }.collect()
 
-        // println alns.view()
+        
+        alns_qc = FILTER_CORE.out.aln_filter.join ( SNIPPY.out.aln )
+        alns_qc = alns_qc.map { cfg, val, aln -> tuple( cfg + [filter:"include"]), aln}
+        if ( params.ignore_warnings ) {
+            alns_qc = alns_qc.filter { cfg, aln -> cfg.filter != "exclude"}
+        } 
+        
+        
+        alns =  alns_qc.map { cfg, aln -> aln.getParent() }.collect()
 
         SNIPPY_CORE ( alns, reference )  
         CORE_SNP_FILTER ( SNIPPY_CORE.out.core_full_aln )
