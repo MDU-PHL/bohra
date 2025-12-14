@@ -39,11 +39,10 @@ process PANAROO {
     def gffs_str = gffs.join(' ')
     """
     mkdir results
-    panaroo -i $gffs_str -o panaroo --clean-mode strict
+    panaroo -i $gffs_str -o panaroo --clean-mode strict --remove-invalid-genes
     csvtk add-header -t -T -n 'Genes,Range,Total' panaroo/summary_statistics.txt > pangenome_statistics.txt
     cp panaroo/gene_presence_absence_roary.csv .
     cp panaroo/gene_presence_absence.Rtab gene_presence_absence.Rtab
-    ln -sf panaroo $launchDir/
     echo -e panaroo'\t'\$CONDA_PREFIX'\t'\$(panaroo --version)'\t'${params.panaroo_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_panaroo.txt
     """
 }

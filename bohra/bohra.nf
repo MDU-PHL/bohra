@@ -183,31 +183,31 @@ workflow {
         // println sequences.view()
         RELATIONSHIPS ( sequences, reference )
       
-        // results = results.concat( RELATIONSHIPS.out.dists )
-        // results = results.concat( RELATIONSHIPS.out.core_vcf )
-        // results = results.concat( RELATIONSHIPS.out.clusters )
-        // results = results.concat( RELATIONSHIPS.out.stats )
-        // results = results.concat( RELATIONSHIPS.out.tree)
-        // versions = versions.concat( RELATIONSHIPS.out.version )
-        // versions = versions.concat( RELATIONSHIPS.out.tree_version )
+        results = results.concat( RELATIONSHIPS.out.dists )
+        results = results.concat( RELATIONSHIPS.out.core_vcf )
+        results = results.concat( RELATIONSHIPS.out.clusters )
+        results = results.concat( RELATIONSHIPS.out.stats )
+        results = results.concat( RELATIONSHIPS.out.tree)
+        versions = versions.concat( RELATIONSHIPS.out.version )
+        versions = versions.concat( RELATIONSHIPS.out.tree_version )
 
     }
 
-    // if (params.modules.contains("pangenome")){
+    if (params.modules.contains("pangenome")){
 
-    //     if( params.pangenome_groups == "clusters") {
-    //         groups = RELATIONSHIPS.out.clusters
-    //     }
-    //     gff = ASSEMBLY_ANALYSIS.out.gff
-    //     RUN_PANAROO ( gff,groups )
+        if( params.pangenome_groups == "clusters") {
+            groups = RELATIONSHIPS.out.clusters
+        }
+        gff = ASSEMBLY_ANALYSIS.out.gff
+        RUN_PANAROO ( gff,groups )
 
         
-    //     results = results.concat( RUN_PANAROO.out.pangenome_rtab )
-    //     results = results.concat( RUN_PANAROO.out.classification )
-    //     results = results.concat( RUN_PANAROO.out.groups )
-    //     versions = versions.concat( RUN_PANAROO.out.version )
-    // }
+        results = results.concat( RUN_PANAROO.out.pangenome_rtab )
+        results = results.concat( RUN_PANAROO.out.classification )
+        results = results.concat( RUN_PANAROO.out.groups )
+        versions = versions.concat( RUN_PANAROO.out.version )
+    }
 
-    // // println results.view()
-    // RUN_COMPILE ( results, versions )
+    // println results.view()
+    RUN_COMPILE ( results, versions )
 }
