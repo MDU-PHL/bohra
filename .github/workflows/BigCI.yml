@@ -3,8 +3,20 @@ name: BigCI
 on:
   push:
     branches: [ master ]
+    paths:
+      - 'bohra/**'
+      - '.github/workflows/BigCI.yml'
+      - 'bohra/environments/**'
+      - 'pyproject.toml'
+      - 'BigCI.env.yml'
   pull_request:
     branches: [ master ]
+    paths:
+      - 'bohra/**'
+      - '.github/workflows/BigCI.yml'
+      - 'bohra/environments/**'
+      - 'pyproject.toml'
+      - 'BigCI.env.yml'
 
 env:
   K2DB: "babykraken"
