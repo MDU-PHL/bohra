@@ -33,13 +33,19 @@ workflow RUN_SNPS {
 
         
         alns_qc = FILTER_CORE.out.aln_filter.join ( SNIPPY.out.aln )
-        alns_qc = alns_qc.map { cfg, val, aln -> tuple( cfg + [filter:"include"]), aln}
-        if ( params.ignore_warnings ) {
-            alns_qc = alns_qc.filter { cfg, aln -> cfg.filter != "exclude"}
-        } 
+        alns_qc = alns_qc.map { cfg, val, aln -> tuple( cfg + [filter:val.trim()]), aln}
         
         
-        alns =  alns_qc.map { cfg, aln -> aln.getParent() }.collect()
+        if ( params.ignore_warnings == true) {
+            println "Including all sequences in core genome alignment regardless of QC metrics."
+            alns = alns_qc.map { cfg, aln -> aln.getParent() }.collect()
+        } else {
+            println "Excluding outlier sequences from core genome alignment based on QC metrics."
+            
+            alns = alns_qc.filter { cfg, aln -> cfg.filter == "include"}.map { cfg, aln -> aln.getParent() }.collect()
+            
+        }
+               
 
         SNIPPY_CORE ( alns, reference )  
         CORE_SNP_FILTER ( SNIPPY_CORE.out.core_full_aln )

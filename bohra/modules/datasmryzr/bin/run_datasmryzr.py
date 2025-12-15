@@ -36,9 +36,9 @@ def check_val(val:float, min_val:float,metric) -> str:
     elif int(val[0]) >= min_val:
         return 1
     else:
-        return f"{metric}: {val}, should be at least {min_val}`"
+        return f"{metric}: {val[0]}, should be at least {min_val}`"
 
-def check_val_aln(val:float, min_val:float,metric) -> str:
+def check_val_aln(val:float, min_val:float,metric:str,strict:bool) -> str:
     """
     Check if the coverage is above the minimum coverage and not an outlier
     """
@@ -49,9 +49,9 @@ def check_val_aln(val:float, min_val:float,metric) -> str:
     elif int(val[0]) >= min_val and val[2] == "":
         return 1
     elif val[2] != "":
-        return f"Isolate marked as outlier in core genome analysis. Should be remove from dataset."
+        return f"Isolate marked as outlier in core genome analysis. It is recommended to remove from comparative dataset and rerun." if strict else f"Isolate marked as outlier in core genome analysis. Should be removed from comparative dataset." 
     else:
-        return f"{metric}: {val}, should be at least {min_val}`"
+        return f"{metric}: {val[0]}, should be at least {min_val}`"
 
 
 
@@ -95,7 +95,7 @@ def make_comment(comments:list) -> str:
 
 
 
-def _generate_summary_table(input_file: str, results_files: list, output:list, min_depth:40, minquality : 30, minaln:70) -> list:
+def _generate_summary_table(input_file: str, results_files: list, output:list, min_depth:40, minquality : 30, minaln:70, strict:str) -> list:
     print("Generating summary table")
     list_of_filename = {
         "read_assessment.txt" : ["Isolate","Reads","GC", "Depth","Genome size", "is_control", "filesize", "Qscore"],
@@ -105,6 +105,7 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
         "mlst.txt":["Isolate","Scheme","ST"],
         # "cluster.txt":[]
     }
+    strict = True if strict.lower() == "true" else False
     colsblcklst = [ "r1","r2","assembly", "is_control"]
     input_data = pd.read_csv(input_file, sep='\t')
     input_data = input_data.rename(columns = {"species":"Species_expected"})
@@ -157,7 +158,7 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
     if "Depth" in summary.columns:
         summary["Coverage check"] = summary[["Depth","is_control"]].apply(lambda x: check_val(x, min_depth, "Avg depth"),axis=1)
     if "% Aligned" in summary.columns:
-        summary["Alignment check"] = summary[["% Aligned", "is_control", "Aln_outlier"]].apply(lambda x:check_val_aln(x, minaln, "Alignment %"), axis=1)
+        summary["Alignment check"] = summary[["% Aligned", "is_control", "Aln_outlier"]].apply(lambda x:check_val_aln(x, minaln, "Alignment %",strict), axis=1)
 
     if "# Contigs" in summary.columns:
         print("Checking number of contigs")
@@ -171,7 +172,7 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
     print(summary.columns)
     summary = summary.fillna("")
     print(summary)
-    summary["Comment"] = summary[check_cols].apply(lambda x: make_comment(x.tolist()), axis=1)
+    summary["Comment"] = summary[check_cols].apply(lambda x: make_comment(x), axis=1)
     summary["Data assessment"] = summary[check_cols].apply(lambda x: 1 if all(i == 1 for i in x.tolist()) else 0, axis=1)
     check_cols.append("Aln_outlier")
     # print(summary)
@@ -537,7 +538,7 @@ def _compile(args):
     cluster_table,output = _extract_cluster_table(results_files, output)
     core_genome,output = _extract_core_genome(results_files, output)
     core_genome_report,output = _extract_core_genome_report(results_files, output)
-    summary,output = _generate_summary_table(args.input_file, results_files, output, 40, 30, 70)
+    summary,output = _generate_summary_table(args.input_file, results_files, output, 40, 30, 70,args.ignore_warnings)
     print(read_assessment)
     
     panclass,output = _extract_pangenome_classification(results_files, output)
@@ -595,6 +596,10 @@ def set_parsers():
         help = '',
         default = '')
     parser.add_argument("--annot_cols",
+        help="",
+        default = '',
+    )
+    parser.add_argument("--ignore_warnings",
         help="",
         default = '',
     )

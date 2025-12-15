@@ -25,7 +25,7 @@ def _assess(args):
     
     qc["Aln_outlier"] = np.where(qc["% Aligned"] < lower, f"Alignment percentage is below the expected range of {lower}.", "")
     qc.to_csv(args.output, sep='\t', index=False)
-    # print(lower)
+    print(lower)
 
 
 def set_parsers():

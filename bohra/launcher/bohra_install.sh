@@ -62,7 +62,7 @@ run_cmd () {
   # disk_space
 }
 
-disk_space
+# disk_space
 
 declare -A TOOLS=(
   [torstyverse]="meningotype --version,lissero --version,shovill --version,spades.py -v,skesa --version,mlst --version,prokka --version,snp-dists -v,ngmaster --version,emmtyper --version,csvtk version"
@@ -116,6 +116,7 @@ for tool in ${!TOOLS[@]}; do
         run_cmd "rm -fr $envdir/share/EMBOSS"
         run_cmd "rm -fr $envdir/{man,include,docs,doc,legal}"
         run_cmd "rm -fr $envdir/lib/libLLVM*"
+        disk_space
     fi
 
     tests=${TOOLS[$tool]}
@@ -126,7 +127,7 @@ for tool in ${!TOOLS[@]}; do
       # c=$i + 1
       print_bold "$tool :: $i/$numtests :: $cmd"
       run_cmd "conda run -p $envdir $cmd"
-      disk_space
+      
     done
 done
         
