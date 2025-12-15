@@ -9,7 +9,8 @@ nav:
       - Basic pipeline: usage/basic.md
       - Assembly pipeline: usage/assemble.md
       - Comparative pipeline: usage/comparative.md
-      - Running Bohra: usage/running_bohra.md
+      - Full pipeline: usage/full.md
+      - TB pipeline: usage/tb.md
   - Guides:
       - Quality Control: guides/quality_control.md
       - Comparative Genomics: guides/comparative_genomics.md
