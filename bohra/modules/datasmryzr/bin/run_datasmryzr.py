@@ -174,7 +174,8 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
     print(summary)
     summary["Comment"] = summary[check_cols].apply(lambda x: make_comment(x), axis=1)
     summary["Data assessment"] = summary[check_cols].apply(lambda x: 1 if all(i == 1 for i in x.tolist()) else 0, axis=1)
-    check_cols.append("Aln_outlier")
+    if "Aln_outlier" in summary.columns:
+        check_cols.append("Aln_outlier")
     # print(summary)
     summary.drop(columns=check_cols, inplace=True)
     print(summary)
