@@ -49,7 +49,7 @@ def check_val_aln(val:float, min_val:float,metric:str,strict:bool) -> str:
     elif int(val[0]) >= min_val and val[2] == "":
         return 1
     elif val[2] != "":
-        return f"Isolate marked as outlier in core genome analysis. It is recommended to remove from comparative dataset and rerun." if strict else f"Isolate marked as outlier in core genome analysis. Should be removed from comparative dataset." 
+        return f"Isolate marked as outlier in core genome analysis and is remove from comparative dataset." if strict else f"Isolate marked as outlier in core genome analysis. Should be removed from comparative dataset and bohra rerun." 
     else:
         return f"{metric}: {val[0]}, should be at least {min_val}`"
 
@@ -105,7 +105,7 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
         "mlst.txt":["Isolate","Scheme","ST"],
         # "cluster.txt":[]
     }
-    strict = True if strict.lower() == "true" else False
+    strict = True if strict.lower() == "false" else False
     colsblcklst = [ "r1","r2","assembly", "is_control"]
     input_data = pd.read_csv(input_file, sep='\t')
     input_data = input_data.rename(columns = {"species":"Species_expected"})
