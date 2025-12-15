@@ -62,9 +62,9 @@ This will generate a file which you can use as input into `bohra`.
 
 | Pipelines | |
 |:--- | :--- |
-| **[basic](basic)** | **[assembly](amr_typing)**|
-|**[amr and typing](amr_typing)**| **[comparative analysis](comparative)**|
-|**[full](full)** | **[tb](tb)**|
+| **[basic](usage/basic)** | **[assembly](usage/assemble)**|
+|**[amr and typing](usage/amr_typing)**| **[comparative analysis](usage/comparative)**|
+|**[full](usage/full)** | **[tb](usage/tb)**|
 
 
 
