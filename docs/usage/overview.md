@@ -58,13 +58,13 @@ This will generate a file which you can use as input into `bohra`.
 
 ## Pipelines
 
-`bohra` is a flexible pipeline and allows users to customise the workflows used. Below is an overview of each workflow. More detail on tools and options for each workflow can be found [here](usage/running_bohra.md) and [here](usage/modules.md). Further explanations and detailed guides can be found [here](guides/overview.md)
+`bohra` is a flexible pipeline and allows users to customise the workflows used. Below is an overview of each workflow. Links for each workflow can be found below. Further explanations and detailed guides can be found [here](guides/overview.md)
 
 | Pipelines | |
 |:--- | :--- |
-| **[basic](usage/basic)** | **[assembly](usage/assemble)**|
-|**[amr and typing](usage/amr_typing)**| **[comparative analysis](usage/comparative)**|
-|**[full](usage/full)** | **[tb](usage/tb)**|
+| **[basic](../usage/basic)** | **[assembly](../usage/assemble)**|
+|**[amr and typing](../usage/amr_typing)**| **[comparative analysis](../usage/comparative)**|
+|**[full](../usage/full)** | **[tb](../usage/tb)**|
 
 
 
