@@ -56,96 +56,17 @@ This will generate a file which you can use as input into `bohra`.
 
 
 
-## Workflows
+## Pipelines
 
 `bohra` is a flexible pipeline and allows users to customise the workflows used. Below is an overview of each workflow. More detail on tools and options for each workflow can be found [here](usage/running_bohra.md) and [here](usage/modules.md). Further explanations and detailed guides can be found [here](guides/overview.md)
 
-**[basic](running_bohra#basic)**
+| Pipelines | |
+|:--- | :--- |
+| **[basic](basic)** | **[assembly](amr_typing)**|
+|**[amr and typing](amr_typing)**| **[comparative analysis](comparative)**|
+|**[full](full)** | **[tb](tb)**|
 
-This workflow will run on fastq and/or fasta (depending user supplied input) and is the first step in all other workflows implmented by `bohra`. It can also be used alone as a simply quality control workflow.
-```mermaid
-flowchart LR
-sequence --> sequence_assessment --> report
-sequence --> speciation --> report
-```
 
-**[assembly](running_bohra#amr_typing)**
-
-This workflow will simple generate assemblies from paired-end fastq, run basic genome annotation with `prokka` and assess the quality of both the input reads and the resulting assemblies. This workflow forms the basis for amr, typing and pangenome analysis.
-
-```mermaid
-flowchart LR
-fastq --> assembly --> annotation --> sequence_assessment
-assembly --> speciation
-fastq --> sequence_assessment --> report
-fastq --> speciation --> report
-
-```
-
-**[amr and typing](running_bohra#amr_typing)**
-
-This workflow will use user supplied species or the species detected in the sequence to determine the appropriate typing and AMR pipeline to use. Additional inferrence of genomic DST/AST will be undertaken for _S. enterica_ and _M. tuberculosis_.
-
-If assembly is required and fastq are used as input - the assembly workflow will be triggered. 
-
-Note that for AMR and gDST in _M. tuberculosis_ paired-end fastq are required. We recommend to use the `bohra run tb` workflow for _M. tuberculosis_.
-
-```mermaid
-flowchart LR
-fastq --> assembly --> annotation --> sequence_assessment
-assembly --> typing
-assembly --> AMR
-assembly --> speciation
-speciation --> typing --> report
-speciation --> AMR --> report
-fastq --> sequence_assessment --> report
-fastq --> speciation --> report
-```
-
-**[comparative analysis](running_bohra#comparative)**
-
-This workflow undertakes a comparative anaysis of all the sequences included in the analysis. You can use reference based alignments with `snippy` or you can use reference free approaches with `mash` and `ska2`. 
-
-```mermaid
-flowchart LR
-sequence --> sequence_assessment --> report
-sequence --> speciation --> report
-sequence --> variant_detection --> distances --> cluster --> report
-variant_detection --> alignment --> tree_generation --> report
-```
-
-**[full](running_bohra#full)**
-
-The full workflow includes all the workflows outlined above with the addition of pangenome analysis using `panaroo`.
-
-```mermaid
-flowchart LR
-fastq --> assembly --> annotation --> sequence_assessment
-assembly --> speciation
-fastq --> sequence_assessment --> report
-fastq --> speciation --> report
-speciation --> typing --> report
-assembly --> typing
-speciation --> AMR --> report
-assembly --> AMR
-assembly --> pangenome --> report
-assembly -- "only possible with reference free" --> variant_detection
-fastq --> variant_detection --> distances --> cluster --> report
-variant_detection --> alignment --> tree_generation --> report
-```
-
-**[tb](running_bohra#tb)**
-
-`bohra` now has a _M. tuberulosis_ specific workflow, which does not run MLST or other assembly based tools. And undertakes _M. tuberculosis_ relevant gDST. It uses the H37rV reference genome, masking repetitive sites and `tbtAMR` for generation of an inferred antibiogram.
-```mermaid
-flowchart LR
-fastq --> sequence_assessment --> report
-fastq --> speciation --> report
-speciation --> lineage --> report
-fastq --> AMR --> report
-fastq --> variant_detection --> distances --> cluster --> report
-variant_detection --> alignment --> tree_generation --> report
-```
 
 
 ## A note on databases

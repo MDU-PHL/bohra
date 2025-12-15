@@ -3,8 +3,12 @@ site_url: https://mduphl.github.io/bohra/
 
 nav:
   - About: index.md
-  - Usage:
+  - Installation: installation.md
+  - Running Bohra:
       - Overview: usage/overview.md
+      - Basic pipeline: usage/basic.md
+      - Assembly pipeline: usage/assemble.md
+      - Comparative pipeline: usage/comparative.md
       - Running Bohra: usage/running_bohra.md
   - Guides:
       - Quality Control: guides/quality_control.md
