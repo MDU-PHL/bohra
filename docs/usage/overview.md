@@ -58,7 +58,7 @@ This will generate a file which you can use as input into `bohra`.
 
 ## Pipelines
 
-`bohra` is a flexible pipeline and allows users to customise the workflows used. Below is an overview of each workflow. Links for each workflow can be found below. Further explanations and detailed guides can be found [here](guides/overview.md)
+`bohra` is a flexible pipeline and allows users to customise the workflows used. Below is an overview of each workflow. Links for each workflow can be found below. 
 
 | Pipelines | |
 |:--- | :--- |

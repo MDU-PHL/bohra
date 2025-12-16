@@ -21,7 +21,7 @@ def deploy(ctx):
     twine upload dist/*
     git push --tags
     """
-    ctx.run("python3 setup.py sdist bdist_wheel")
+    ctx.run("python3 -m build")
     ctx.run("python3 -m twine check dist/*")
     ctx.run(f"python3 -m twine upload --config-file {pathlib.Path(__file__).parent / '.pypirc' } dist/*")
     
