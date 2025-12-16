@@ -14,7 +14,7 @@ If you do not already have `conda` installed, you can check out the documentatio
 1. Clone the `bohra` repository
 
 ```
-git clone git@github.com:MDU-PHL/bohra.git
+git clone https://github.com/MDU-PHL/bohra.git
 ```
 
 
@@ -24,7 +24,8 @@ git clone git@github.com:MDU-PHL/bohra.git
 ```
 cd bohra
 conda env create -f environment.yml -n bohra
-pip3 install /path/to/the/repository_for/bohra
+conda activate bohra
+pip3 install .
 ```
 
 4. Test this has worked as expected
@@ -63,10 +64,10 @@ conda activate bohra
 2. Run the bohra dependency installation
 
 ```
-bohra install-deps --setup_databases
+bohra install-deps (optional add --setup-database )
 ```
 
-The initial creation of the conda environments may take some time (~10 - 15 minutes). Once the environments are set up, `bohra` will try to set up your database environment variables. Although this is *not* essential it is **HIGHLY** recommended for ease of running and reproducibility. 
+The initial creation of the conda environments may take some time (~10 - 15 minutes). Once the environments are set up,  if you have added the `--setup-databases`, `bohra` will try to set up your database environment variables. Although this is *not* essential it is **HIGHLY** recommended for ease of running and reproducibility. 
 
 Please be aware of the following:
 
