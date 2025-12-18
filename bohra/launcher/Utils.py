@@ -250,7 +250,42 @@ def _get_common_options() -> list:
 
     return common_options
 
-def _get_cmd_options() -> dict:
+def _get_dep_cmd_options() -> dict:
+    """
+    Get the click options available for each dependency
+    :return: dict of options
+    """
+    deps_opts = {
+        "install": [
+            {
+                "name": "tool",
+                "type":click.Choice(['all', 'torstyverse', 'seqquality', 'relationships','snippy', 'ectyper','mob_suite','panaroo','kleborate','stype','tamr','sonneitype','classify-pangenome'], case_sensitive=False),
+                "default":"all",
+                "help":"Install only a specific set of tools from a single environment. Should really only be used for development and/or testing purposes."
+            }
+        ],
+        "update":[
+            {
+                "name": "tool",
+                "type":click.Choice(['all', 'torstyverse', 'seqquality', 'relationships','snippy', 'ectyper','mob_suite','panaroo','kleborate','stype','tamr','sonneitype','classify-pangenome'], case_sensitive=False),
+                "default":"all",
+                "help":"Update only a specific set of tools from a single environment. Should really only be used for development and/or testing purposes."
+            }
+        ],
+        "check":[
+            {
+                "name": "tool",
+                "type":click.Choice(['all', 'torstyverse', 'seqquality', 'relationships','snippy', 'ectyper','mob_suite','panaroo','kleborate','stype','tamr','sonneitype','classify-pangenome'], case_sensitive=False),
+                "default":"all",
+                "help":"Update only a specific set of tools from a single environment. Should really only be used for development and/or testing purposes."
+            }
+        ]
+
+    }
+
+    return deps_opts
+
+def _get_run_cmd_options() -> dict:
     """
     Get the click options available for each pipeline
     :return: dict of options

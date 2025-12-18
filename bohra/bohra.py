@@ -20,7 +20,7 @@ from bohra.version import version
 from click.exceptions import UsageError
 from click._compat import get_text_stderr
 
-from bohra.launcher.Utils import _get_cmd_options
+from bohra.launcher.Utils import _get_run_cmd_options, _get_dep_cmd_options
 from bohra.commands.init_databases import init_databases
 from bohra.commands.install import install 
 from bohra.commands.generate_input import generate_input
@@ -54,8 +54,55 @@ def run():
     pass
 
 
+@cli.group(no_args_is_help=True,invoke_without_command=True)
+def deps():
+    """
+    Manage bohra dependencies.
+    """
+    pass
 
-def create_subcommand_with_options(name, options_dict):
+
+def generic_options(_func: click.Command, options: dict) -> click.Command:
+    """Add generic options to a Click command."""
+    for opt in options:
+        if 'short_name' in opt:
+            click.option(
+                f"--{opt['name']}",
+                f"{opt['short_name']}",
+                type=opt.get('type', None),
+                default=opt.get('default', None),
+                help=opt.get('help', ''),
+                show_default= True,
+                is_flag= opt.get('is_flag', False),
+            )(_func) # Apply the decorator to the function
+        else:
+            click.option(
+                f"--{opt['name']}",
+                type=opt.get('type', None),
+                default=opt.get('default', None),
+                help=opt.get('help', ''),
+                show_default= True,
+                is_flag= opt.get('is_flag', False),
+            )(_func)
+    return _func
+    
+
+def create_deps_subcommand_with_options(name, options_dict):
+    f"""Dynamically created a subcommand with options from a list."""
+
+    @deps.command(name=name, help = f"Help for {name}ing dependencies.")
+    def deps_subcommand(**kwargs):
+        try:
+            install.install_dependencies(dependency=name, kwargs=kwargs)
+        except Exception as e:
+            raise UsageError(f"An error occurred while installing the {name} dependencies: {e}")
+
+
+    deps_subcommand = generic_options(deps_subcommand, options_dict)
+    return deps_subcommand
+
+
+def create_run_subcommand_with_options(name, options_dict):
     f"""Dynamically created a subcommand with options from a list."""
 
     @run.command(name=name, help = f"Help for the {name} pipeline.")
@@ -68,37 +115,41 @@ def create_subcommand_with_options(name, options_dict):
         # except Exception as e:
         #     raise UsageError(f"An error occurred while running the {name} pipeline: {e}")
 
-    for opt in options_dict:
+    # for opt in options_dict:
         
-        if 'short_name' in opt:
-            click.option(
-                f"--{opt['name']}",
-                f"{opt['short_name']}",
-                type=opt.get('type', None),
-                default=opt.get('default', None),
-                help=opt.get('help', ''),
-                show_default= True,
-                is_flag= opt.get('is_flag', False),
-            )(run_subcommand) # Apply the decorator to the function
-        else:
-            click.option(
-                f"--{opt['name']}",
-                type=opt.get('type', None),
-                default=opt.get('default', None),
-                help=opt.get('help', ''),
-                show_default= True,
-                is_flag= opt.get('is_flag', False),
-            )(run_subcommand)
+    #     if 'short_name' in opt:
+    #         click.option(
+    #             f"--{opt['name']}",
+    #             f"{opt['short_name']}",
+    #             type=opt.get('type', None),
+    #             default=opt.get('default', None),
+    #             help=opt.get('help', ''),
+    #             show_default= True,
+    #             is_flag= opt.get('is_flag', False),
+    #         )(run_subcommand) # Apply the decorator to the function
+    #     else:
+    #         click.option(
+    #             f"--{opt['name']}",
+    #             type=opt.get('type', None),
+    #             default=opt.get('default', None),
+    #             help=opt.get('help', ''),
+    #             show_default= True,
+    #             is_flag= opt.get('is_flag', False),
+    #         )(run_subcommand)
+    run_subcommand = generic_options(run_subcommand, options_dict)
     return run_subcommand
 
-cmd_opts = _get_cmd_options()
+run_cmd_opts = _get_run_cmd_options()
+dep_cmd_opt = _get_dep_cmd_options()
+for opt in run_cmd_opts:
+    create_run_subcommand_with_options(name = opt, options_dict = run_cmd_opts[opt])
 
-for opt in cmd_opts:
-    create_subcommand_with_options(name = opt, options_dict = cmd_opts[opt])
+for opt in dep_cmd_opt:
+    create_deps_subcommand_with_options(name = opt, options_dict = dep_cmd_opt[opt])
 
 cli.add_command(init_databases.init_databases)
-cli.add_command(install.install_deps)
-cli.add_command(check_setup.check_deps)
+# cli.add_command(install.install_deps)
+# cli.add_command(check_setup.check_deps)
 cli.add_command(generate_input.generate_input)
 cli.add_command(bohratest.test)
 
