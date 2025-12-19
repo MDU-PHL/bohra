@@ -2,14 +2,15 @@
 
 # Safery first!
 set -e -u -o pipefail
+# set -x
 
 # Issue #133 - Redurectr akk stederr ti stdout 
 #exec 2>&1
 
 # check parameters
-if [ "$#" -ne 4 ]; then
+if [ "$#" -ne 5 ]; then
 	EXE=$(basename $0)
-	echo "USAGE: $EXE <envsdirr=path> <action=install|check> <force=true|false> [tool=all|toolname]"
+	echo "USAGE: $EXE <envsdirr=path> <action=install|check> <force=true|false> [tool=all|toolname] <config=path>"
 	exit 255
 fi
 
@@ -17,6 +18,7 @@ YAML_DIR=$1
 ACTION=$2
 FORCE=$3
 TOOL=$4
+CONFIG=$5
 
 # echo $TOOL
 
@@ -64,24 +66,19 @@ run_cmd () {
 
 # disk_space
 
-declare -A TOOLS=(
-  [torstyverse]="meningotype --version,lissero --version,shovill --version,spades.py -v,skesa --version,mlst --version,prokka --version,snp-dists -v,ngmaster --version,emmtyper --version,csvtk version"
-  [seqquality]="seqkit version,fastp --version,csvtk version"
-  [relationships]="kraken2 --version,gubbins -h,mash --version,coresnpfilter --version,iqtree --version,quicktree -v,VeryFastTree --help,gotree version,csvtk version,ska --version"
- [snippy]="snippy --version,csvtk version"
-  [mob_suite]="mob_recon --version,csvtk version"
-  [panaroo]="panaroo --version,csvtk version"
- [ectyper]="ectyper --version,csvtk version"
-  [kleborate]="kleborate --version,csvtk version"
-  [stype]="sistr --version,stype --version,csvtk version"
-  [tamr]="abritamr --version,tbtamr --version,csvtk version"
-  [sonneitype]="mykrobe --version,csvtk version"
-  [classify-pangenome]="R --version"
-)
+declare -A TOOLS
+# echo $TOOLS
+
+while IFS= read -r -d '' key && IFS= read -r -d '' value; do
+    k=$(echo $key | xargs)
+    v=$(echo $value | xargs)
+    TOOLS["$k"]="$v"
+done < <(jq -r 'to_entries[] | .key + "\u0000" + .value + "\u0000"' "$CONFIG")
+
 
 # if TOOL is "all", use all tools
 
-echo "Tools to process: ${TOOL}"
+
 # echo "${TOOLS[$TOOL]}"
 if [[ "$TOOL" != "all" ]]; then
     
@@ -92,7 +89,7 @@ if [[ "$TOOL" != "all" ]]; then
     
 fi
 
-# MAIN LOOP OVER ALL ENVS
+# # MAIN LOOP OVER ALL ENVS
     
 for tool in ${!TOOLS[@]}; do
     print_bold "${ACTION}ing : $tool"
@@ -118,8 +115,10 @@ for tool in ${!TOOLS[@]}; do
         run_cmd "rm -fr $envdir/lib/libLLVM*"
         disk_space
     fi
+    # echo "$tool"
 
     tests=${TOOLS[$tool]}
+
     IFS=',' read -r -a cmds <<< "$tests"
     numtests=${#cmds[@]}
     for i in "${!cmds[@]}"; do 
