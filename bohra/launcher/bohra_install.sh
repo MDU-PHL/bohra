@@ -10,7 +10,7 @@ set -e -u -o pipefail
 # check parameters
 if [ "$#" -ne 5 ]; then
 	EXE=$(basename $0)
-	echo "USAGE: $EXE <envsdirr=path> <action=install|check> <force=true|false> [tool=all|toolname] <config=path>"
+	echo "USAGE: $EXE <envsdirr=path> <action=install|check> <force=true|false> <tool=all|toolname> <config=path>"
 	exit 255
 fi
 
