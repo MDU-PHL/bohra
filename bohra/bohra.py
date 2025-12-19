@@ -22,11 +22,12 @@ from click._compat import get_text_stderr
 
 from bohra.launcher.Utils import _get_run_cmd_options, _get_dep_cmd_options
 from bohra.commands.init_databases import init_databases
-from bohra.commands.install import install 
+# from bohra.commands.install import install 
 from bohra.commands.generate_input import generate_input
 from bohra.commands.test import bohratest
-from bohra.commands.check_setup import check_setup
+# from bohra.commands.check_setup import check_setup
 from bohra.launcher.BohraRun import run_bohra
+from bohra.launcher.Deps import dependencies
 
 
 def _show_usage_error(self, file=None):
@@ -93,7 +94,7 @@ def create_deps_subcommand_with_options(name, options_dict):
     @deps.command(name=name, help = f"Help for {name}ing dependencies.")
     def deps_subcommand(**kwargs):
         try:
-            install.install_dependencies(dependency=name, kwargs=kwargs)
+            dependencies(_action=name, kwargs=kwargs)
         except Exception as e:
             raise UsageError(f"An error occurred while installing the {name} dependencies: {e}")
 

@@ -6,7 +6,7 @@ from bohra.launcher.BohraAssembly import _setup_assembly_args
 from bohra.launcher.BohraTyping import _setup_typing_args
 from bohra.launcher.BohraComparative import _setup_comparative_args
 from bohra.launcher.BohraPangenome import _setup_pangenome_args
-from bohra.launcher.CheckDeps import check_dependencies
+from bohra.launcher.Deps import dependencies
 
 import pandas as pd
 import pathlib
@@ -97,7 +97,7 @@ def run_bohra(
                   report_outdir=kwargs["report_outdir"], 
                   replace_report=kwargs["replace_report"]):
         LOGGER.info(f"Checking on the setup for the {pipeline} pipeline.")
-        check_dependencies(check = "check")
+        dependencies(_action = "check")
         max_cpus = int(_max_cpus(cpus=kwargs.get('cpus', 0)))
         LOGGER.info(f"Using {int(max_cpus)} CPUs for the {pipeline} pipeline.")
         profile,profile_config = _get_config(user_config=kwargs['profile_config'], title = kwargs['job_name'],cpus=max_cpus, wd = kwargs["workdir"])

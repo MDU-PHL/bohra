@@ -21,22 +21,26 @@ LOGGER.addHandler(ch)
 LOGGER.addHandler(fh)
 
     
-def check_dependencies(check:str = "install",
+def dependencies(_action:str = "install",
                        envs:str=f"{pathlib.Path(__file__).parent.parent}/environments",
-                       force_reinstall:str="false", tool:str="all")->int:
+                       kwargs: dict = {})->int:
     """
     Install bohra dependencies.
     """
     script_path = f"{pathlib.Path(__file__).parent}"
-    LOGGER.info(f"Will now try {check} dependencies. Please be patient this may take some time!!... Maybe get coffee.")
-    process = subprocess.Popen(['bash', f"{script_path}/bohra_install.sh", f"{envs}", f"{check}", f"{force_reinstall}", f"{tool}"], stdout=subprocess.PIPE, encoding='utf-8')
+    force_reinstall = 'false'
+    if _action == "update":
+        force_reinstall= "true"
+    
+    LOGGER.info(f"Will now try {_action} dependencies. Please be patient this may take some time!!... Maybe get coffee.")
+    process = subprocess.Popen(['bash', f"{script_path}/bohra_install.sh", f"{envs}", f"{_action}", f"{force_reinstall}", f"{kwargs.get('tool', 'all')}"], stdout=subprocess.PIPE, encoding='utf-8')
     while process.poll() is None:
         l = process.stdout.readline().strip() # This blocks until it receives a newline.
         LOGGER.info(f"{l}")
 
     if process.returncode != 0:
         # LOGGER.info(f"{process.stderr.read()}")
-        LOGGER.error(f"Error {check}ing dependencies.")
+        LOGGER.error(f"Error {_action}ing dependencies.")
         raise SystemError
         # return 1
     else:

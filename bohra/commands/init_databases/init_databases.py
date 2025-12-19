@@ -2,7 +2,7 @@ import click
 import pathlib
 import os
 
-from bohra.launcher.CheckDeps import _check_databases
+from bohra.launcher.Deps import _check_databases
 
 
 @click.command()

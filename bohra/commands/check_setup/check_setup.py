@@ -2,7 +2,7 @@ import click
 import pathlib
 import os
 
-from bohra.launcher.CheckDeps import check_dependencies, _check_databases
+from bohra.launcher.Deps import dependencies ,_check_databases
 
 
 @click.command()
@@ -30,5 +30,5 @@ def check_deps(install_dbs:bool=False, setup_databases:bool=False, tool:str="all
     print("Please be patient.")
     print("Will now check and install anything that may be required. ")
     # print(str(force_reinstall).lower())
-    check_dependencies(check = "check", force_reinstall='false', tool=tool )
+    dependencies(check = "check", force_reinstall='false', tool=tool )
     _check_databases(db_install=install_dbs or setup_databases)
