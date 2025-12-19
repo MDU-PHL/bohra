@@ -72,11 +72,11 @@ jobs:
       - name: Install bohra
         run: |
           pip3 install .
-          bohra install-deps
+          bohra deps install
 
       - name: Check bohra installtion
         run: |
-          bohra check-deps
+          bohra deps check
 
       - name: Simple bohra test
         run: |
