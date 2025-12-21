@@ -3,7 +3,7 @@
   "lissero":["lissero --version","csvtk version"],
   "mlst":["mlst --version","csvtk version"],
   "prokka":["prokka --version","csvtk version"],
-  "snp-dists":["snp-dists -v","csvtk version"],
+  "snpdists":["snp-dists -v","csvtk version"],
   "ngmaster":["ngmaster --version","csvtk version"],
   "assemblers":["shovill --version","spades.py -v","skesa --version","csvtk version"],
   "emmtyper":"emmtyper --version,csvtk version",
@@ -26,5 +26,7 @@
   "abritamr":["abritamr --version","csvtk version"],
   "tbtamr":["tbtamr --version","csvtk version"],
   "sonneitype":["mykrobe --version","csvtk version"],
-  "classify-pangenome":["R --version"]
+  "classify-pangenome":["R --version"],
+  "datasmryzr":["datasmryzr --version","csvtk version"],
+  "seqtk":["csvtk version"] 
 }

@@ -1,0 +1,15 @@
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - tbtamr
+  - mutamr
+  - csvtk
+  - pip:
+    - git+https://github.com/jodyphelan/pathogen-profiler@v4.3.0
+    - pydantic
+    - pysam
+    - joblib
+    - pytest
+    - requests
+    - tqdm
