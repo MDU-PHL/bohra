@@ -33,9 +33,9 @@ def _run_cmd(cmd:list)-> bool:
             LOGGER.info(f"{l}")
 
     if process.returncode != 0:
-        LOGGER.critical(f"Error running command: {' '.join(cmd)}")
+        LOGGER.warning(f"Error running command: {' '.join(cmd)}")
         if len( process.stdout.read().strip()) > 0:
-            LOGGER.critical(f"{process.stdout.read()}")
+            LOGGER.warning(f"{process.stdout.read()}")
         return False
     else:
         LOGGER.info(f"Command completed successfully: {' '.join(cmd)}")

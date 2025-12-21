@@ -15,7 +15,7 @@
   "coresnpfilter":["coresnpfilter --version","csvtk version"],
   "iqtree":["iqtree --version","gotree version","csvtk version"],
   "quicktree":["quicktree -v","csvtk version","gotree version"],
-  "veryfastfree":["VeryFastTree --help","csvtk version","gotree version"],
+  "veryfasttree":["VeryFastTree --help","csvtk version","gotree version"],
   "ska":["ska --version","csvtk version"],
  "snippy":["snippy --version","csvtk version"],
   "mob_suite":["mob_recon --version","csvtk version"],
