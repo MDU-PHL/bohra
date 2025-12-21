@@ -5,7 +5,7 @@ import logging
 import subprocess
 import pathlib
 import os
-
+import json
 
 # Logger
 LOGGER =logging.getLogger(__name__) 
@@ -20,35 +20,121 @@ fh.setFormatter(formatter)
 LOGGER.addHandler(ch) 
 LOGGER.addHandler(fh)
 
-    
-def dependencies(_action:str = "install",
-                       envs:str=f"{pathlib.Path(__file__).parent.parent}/environments",
-                       kwargs: dict = {})->int:
+
+def _run_cmd(cmd:list)-> bool:
+
     """
-    Install bohra dependencies.
+    Run a command and log output.
     """
-    script_path = f"{pathlib.Path(__file__).parent}"
-    force_reinstall = 'false'
-    if _action == "update":
-        force_reinstall= "true"
-    
-    LOGGER.info(f"Will now try {_action} dependencies. Please be patient this may take some time!!... Maybe get coffee.")
-    LOGGER.info(f"Running: bash {script_path}/bohra_install.sh {envs} {_action} {force_reinstall} {kwargs.get('tool', 'all')} {kwargs.get('config', f'{pathlib.Path(__file__).parent.parent}/config/dependencies.json')}")
-    process = subprocess.Popen(['bash', f"{script_path}/bohra_install.sh", f"{envs}", f"{_action}", f"{force_reinstall}", f"{kwargs.get('tool', 'all')}"], stdout=subprocess.PIPE, encoding='utf-8')
+    LOGGER.info(f"Running command: {' '.join(cmd)}")
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
     while process.poll() is None:
         l = process.stdout.readline().strip() # This blocks until it receives a newline.
         LOGGER.info(f"{l}")
 
     if process.returncode != 0:
-        # LOGGER.info(f"{process.stderr.read()}")
-        LOGGER.error(f"Error {_action}ing dependencies.")
-        raise SystemError
-        # return 1
+        LOGGER.critical(f"Error running command: {' '.join(cmd)}")
+        LOGGER.critical(f"{process.stdout.read()}")
+        return False
     else:
-        LOGGER.info("Dependencies installed successfully.")
-        LOGGER.info("Bohra is ready to go!")
-        return 0
+        LOGGER.info(f"Command completed successfully: {' '.join(cmd)}")
+        return True
 
+def _extract_tool_list(config_file:str)->dict:
+    """
+    Extract tool list from config file.
+    """
+    try:
+        with open(config_file, 'r') as f:
+            config = json.load(f)
+            return config
+    except Exception as e:
+        LOGGER.critical(f"Error reading config file: {e}")
+        raise SystemExit
+    
+def _check_envs(cfg:dict)->bool:
+    """
+    Check if conda environments directory exists.
+    """
+    for env in cfg:
+
+        for dep in cfg[env]:
+
+            cmd = ["conda", "run", "-n", env, dep]
+            if not _run_cmd(cmd):
+                LOGGER.critical(f"Dependency {dep} not installed properly.")
+                return False
+    return True
+
+
+def _install_envs(cfg:dict, envs_path:str, env:str="all",force_reinstall:bool=False)->bool:
+    """
+    Install conda environments.
+    """
+    # checking if mamba is installed
+    installer = "conda"
+    proc = subprocess.run(["which", "mamba"], capture_output=True, text=True)
+    if proc.returncode == 0:
+        installer = "mamba"
+        LOGGER.info("Using mamba to install dependencies.")
+    else:
+        LOGGER.info("Using conda to install dependencies.")
+    # check if envs path exists
+    bohra_env_dir = f"{os.getenv("CONDA_PREFIX")}"
+    if pathlib.Path(bohra_env_dir).exists():
+        target_envs_dir = f"{bohra_env_dir}/bohra_conda_envs"
+        LOGGER.info(f"Dependency environments will be installed in: {target_envs_dir}")
+    else:
+        LOGGER.critical("CONDA_PREFIX environment variable not set. Please activate a conda environment before installing dependencies.")
+        raise SystemExit
+    if env != "all":
+        cfg = {env: cfg[env]}
+    for env_name in cfg:
+        yml_file = f"{envs_path}/{env_name}.yaml"
+        if not pathlib.Path(yml_file).exists():
+            LOGGER.critical(f"Environment file {yml_file} does not exist.")
+            raise SystemExit
+        cmd = [installer, "env", "create", "-f", yml_file, "-p", f"{target_envs_dir}/{env_name}"]
+        if force_reinstall:
+            cmd.append("--force-reinstall")
+        if not _run_cmd(cmd):
+            return False
+    return True
+
+
+def dependencies(_action:str = "install",
+                       envs:str=f"{pathlib.Path(__file__).parent.parent}/environments",
+                       config:str=f"{pathlib.Path(__file__).parent.parent}/config/dependencies.json",
+                       kwargs: dict = {})->int:
+    """
+    Install bohra dependencies.
+    """
+    script_path = f"{pathlib.Path(__file__).parent}"
+    dep_cfg = _extract_tool_list(config)
+    actions = ['install', 'update', 'check']
+    
+    LOGGER.info(f"Will now try {_action} dependencies. Please be patient this may take some time!!... Maybe get coffee.")
+    if _action not in actions:
+        LOGGER.critical(f"Invalid action: {_action}. Must be one of {actions}.")
+        raise SystemExit
+    if _action == 'check':
+        if not _check_envs(dep_cfg):
+            LOGGER.critical("Some dependencies are missing or not installed properly.")
+            return 1
+        else:
+            LOGGER.info("All dependencies are installed properly.")
+            return 0
+    elif _action in ['install', 'update']:
+        force_reinstall = True if _action == 'update' else False
+        env_to_install = kwargs.get('tool', 'all')
+        if not _install_envs(dep_cfg, envs, env=env_to_install, force_reinstall=force_reinstall):
+            LOGGER.critical("Error installing dependencies.")
+            return 1
+        else:
+            LOGGER.info("All dependencies installed successfully.")
+            return 0
+        
+        
 def _check_databases(db_install:bool=False)->int:
     """
     Check that required databases are installed.
