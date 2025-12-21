@@ -33,6 +33,7 @@ def dependencies(_action:str = "install",
         force_reinstall= "true"
     
     LOGGER.info(f"Will now try {_action} dependencies. Please be patient this may take some time!!... Maybe get coffee.")
+    LOGGER.info(f"Running: bash {script_path}/bohra_install.sh {envs} {_action} {force_reinstall} {kwargs.get('tool', 'all')} {kwargs.get('config', f'{pathlib.Path(__file__).parent.parent}/config/dependencies.json')}")
     process = subprocess.Popen(['bash', f"{script_path}/bohra_install.sh", f"{envs}", f"{_action}", f"{force_reinstall}", f"{kwargs.get('tool', 'all')}"], stdout=subprocess.PIPE, encoding='utf-8')
     while process.poll() is None:
         l = process.stdout.readline().strip() # This blocks until it receives a newline.
