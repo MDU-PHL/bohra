@@ -1,6 +1,5 @@
 
-from bohra.launcher.Utils import CustomFormatter
-
+from bohra.launcher.Utils import CustomFormatter, _extract_tool_list
 import logging
 import subprocess
 import pathlib
@@ -30,27 +29,19 @@ def _run_cmd(cmd:list)-> bool:
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
     while process.poll() is None:
         l = process.stdout.readline().strip() # This blocks until it receives a newline.
-        LOGGER.info(f"{l}")
+        if len(l.split()) > 0:
+            LOGGER.info(f"{l}")
 
     if process.returncode != 0:
         LOGGER.critical(f"Error running command: {' '.join(cmd)}")
-        LOGGER.critical(f"{process.stdout.read()}")
+        if len( process.stdout.read().strip()) > 0:
+            LOGGER.critical(f"{process.stdout.read()}")
         return False
     else:
         LOGGER.info(f"Command completed successfully: {' '.join(cmd)}")
-        return True
+    return True
 
-def _extract_tool_list(config_file:str)->dict:
-    """
-    Extract tool list from config file.
-    """
-    try:
-        with open(config_file, 'r') as f:
-            config = json.load(f)
-            return config
-    except Exception as e:
-        LOGGER.critical(f"Error reading config file: {e}")
-        raise SystemExit
+
     
 def _check_envs(cfg:dict)->bool:
     """
@@ -62,7 +53,7 @@ def _check_envs(cfg:dict)->bool:
 
             cmd = ["conda", "run", "-n", env, dep]
             if not _run_cmd(cmd):
-                LOGGER.critical(f"Dependency {dep} not installed properly.")
+                LOGGER.critical(f"Dependency {env} not installed properly.")
                 return False
     return True
 
@@ -80,7 +71,7 @@ def _install_envs(cfg:dict, envs_path:str, env:str="all",force_reinstall:bool=Fa
     else:
         LOGGER.info("Using conda to install dependencies.")
     # check if envs path exists
-    bohra_env_dir = f"{os.getenv("CONDA_PREFIX")}"
+    bohra_env_dir = f"{os.getenv('CONDA_PREFIX')}"
     if pathlib.Path(bohra_env_dir).exists():
         target_envs_dir = f"{bohra_env_dir}/bohra_conda_envs"
         LOGGER.info(f"Dependency environments will be installed in: {target_envs_dir}")
@@ -90,15 +81,20 @@ def _install_envs(cfg:dict, envs_path:str, env:str="all",force_reinstall:bool=Fa
     if env != "all":
         cfg = {env: cfg[env]}
     for env_name in cfg:
-        yml_file = f"{envs_path}/{env_name}.yaml"
-        if not pathlib.Path(yml_file).exists():
-            LOGGER.critical(f"Environment file {yml_file} does not exist.")
-            raise SystemExit
-        cmd = [installer, "env", "create", "-f", yml_file, "-p", f"{target_envs_dir}/{env_name}"]
-        if force_reinstall:
-            cmd.append("--force-reinstall")
-        if not _run_cmd(cmd):
-            return False
+        if _check_envs(cfg={env_name: cfg[env_name]}) and not force_reinstall:
+            LOGGER.info(f"Environment {env_name} already installed and force_reinstall is False. Skipping installation.")
+            # continue
+        else:
+            LOGGER.info(f"Setting up environment: {env_name}")
+            yml_file = f"{envs_path}/{env_name}.yml"
+            if not pathlib.Path(yml_file).exists():
+                LOGGER.critical(f"Environment file {yml_file} does not exist.")
+                raise SystemExit
+            cmd = [installer, "env", "create", "-f", yml_file, "-p", f"{target_envs_dir}/{env_name}"]
+            if force_reinstall:
+                cmd.append("--force-reinstall")
+            if not _run_cmd(cmd):
+                return False
     return True
 
 
@@ -134,7 +130,7 @@ def dependencies(_action:str = "install",
             LOGGER.info("All dependencies installed successfully.")
             return 0
         
-        
+
 def _check_databases(db_install:bool=False)->int:
     """
     Check that required databases are installed.

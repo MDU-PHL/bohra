@@ -145,7 +145,7 @@ def _resource_opt() -> list:
         {
             "name":"dependency_prefix",
             "help":"The path to where your pre-installed conda bohra-envs are stored. This can be provided in your profiles settings as well - it assumes you have pre-configured all of your conda environments for each process run by bohra, this is an advanced setting. Please take care if you are changing it.",
-            "default":f"{pathlib.Path( os.getenv('CONDA_PREFIX')) /  'conda_envs'}" if os.getenv('CONDA_PREFIX') else f"",
+            "default":f"{pathlib.Path( os.getenv('CONDA_PREFIX')) /  'bohra_conda_envs'}" if os.getenv('CONDA_PREFIX') else f"",
         },
         {
             "name":"profile_config",
@@ -250,16 +250,31 @@ def _get_common_options() -> list:
 
     return common_options
 
+
+def _extract_tool_list(config_file:str)->dict:
+    """
+    Extract tool list from config file.
+    """
+    try:
+        with open(config_file, 'r') as f:
+            config = json.load(f)
+            return config
+    except Exception as e:
+        LOGGER.critical(f"Error reading config file: {e}")
+        raise SystemExit
+    
 def _get_dep_cmd_options() -> dict:
     """
     Get the click options available for each dependency
     :return: dict of options
     """
+    envs_list = _extract_tool_list(f"{pathlib.Path(__file__).parent.parent}/config/dependencies.json")
+    envs_list = list(envs_list.keys())
     deps_opts = {
         "install": [
             {
                 "name": "tool",
-                "type":click.Choice(['all', 'torstyverse', 'seqquality', 'relationships','snippy', 'ectyper','mob_suite','panaroo','kleborate','stype','tamr','sonneitype','classify-pangenome'], case_sensitive=False),
+                "type":click.Choice(envs_list + ["all"], case_sensitive=False),
                 "default":"all",
                 "help":"Install only a specific set of tools from a single environment. Should really only be used for development and/or testing purposes."
             }
@@ -267,7 +282,7 @@ def _get_dep_cmd_options() -> dict:
         "update":[
             {
                 "name": "tool",
-                "type":click.Choice(['all', 'torstyverse', 'seqquality', 'relationships','snippy', 'ectyper','mob_suite','panaroo','kleborate','stype','tamr','sonneitype','classify-pangenome'], case_sensitive=False),
+                "type":click.Choice(envs_list + ["all"], case_sensitive=False),
                 "default":"all",
                 "help":"Update only a specific set of tools from a single environment. Should really only be used for development and/or testing purposes."
             }
@@ -275,7 +290,7 @@ def _get_dep_cmd_options() -> dict:
         "check":[
             {
                 "name": "tool",
-                "type":click.Choice(['all', 'torstyverse', 'seqquality', 'relationships','snippy', 'ectyper','mob_suite','panaroo','kleborate','stype','tamr','sonneitype','classify-pangenome'], case_sensitive=False),
+                "type":click.Choice(envs_list + ["all"], case_sensitive=False),
                 "default":"all",
                 "help":"Update only a specific set of tools from a single environment. Should really only be used for development and/or testing purposes."
             }
