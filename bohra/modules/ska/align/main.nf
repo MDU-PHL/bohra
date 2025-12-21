@@ -15,7 +15,7 @@ process SKA_ALIGN {
     
     if ( params.enable_conda ) {
         if (file("${params.dependency_prefix}/ska").exists()) {
-            conda "${params.dependency_prefix}/relationships"
+            conda "${params.dependency_prefix}/ska"
         } 
     } else {
         conda null
