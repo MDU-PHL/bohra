@@ -15,8 +15,8 @@ process NGMASTER {
     errorStrategy 'ignore'
     scratch true
     if ( params.enable_conda ) {
-        if (file("${params.dependency_prefix}/torstyverse").exists()) {
-            conda "${params.dependency_prefix}/torstyverse"
+        if (file("${params.dependency_prefix}/ngmaster").exists()) {
+            conda "${params.dependency_prefix}/ngmaster"
         } 
        
     } else {

@@ -15,8 +15,8 @@ process SEQTK {
     scratch true
     
     if ( params.enable_conda ) {
-        if (file("${params.dependency_prefix}/seqquality").exists()) {
-            conda "${params.dependency_prefix}/seqquality"
+        if (file("${params.dependency_prefix}/seqtk").exists()) {
+            conda "${params.dependency_prefix}/seqtk"
         } 
     } else {
         conda null

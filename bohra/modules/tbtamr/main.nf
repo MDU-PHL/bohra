@@ -15,8 +15,8 @@ process TBTAMR {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"${meta.id}", publish_id:meta.id) }
     
     if ( params.enable_conda ) {
-        if (file("${params.dependency_prefix}/tamr").exists()) {
-            conda "${params.dependency_prefix}/tamr"
+        if (file("${params.dependency_prefix}/tbtamr").exists()) {
+            conda "${params.dependency_prefix}/tbtamr"
         } 
     } else {
         conda null

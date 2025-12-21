@@ -15,8 +15,8 @@ process PROKKA {
     
    
     if ( params.enable_conda ) {
-        if (file("${params.dependency_prefix}/panaroo").exists()) {
-            conda "${params.dependency_prefix}/panaroo"
+        if (file("${params.dependency_prefix}/prokka").exists()) {
+            conda "${params.dependency_prefix}/prokka"
         } 
     } else {
         conda null

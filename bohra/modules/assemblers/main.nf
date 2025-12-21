@@ -12,8 +12,8 @@ process ASSEMBLER_PE {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"${meta.id}", publish_id:meta.id) }
     
     if ( params.enable_conda ) {
-        if (file("${params.dependency_prefix}/torstyverse").exists()) {
-            conda "${params.dependency_prefix}/torstyverse"
+        if (file("${params.dependency_prefix}/assemblers").exists()) {
+            conda "${params.dependency_prefix}/assemblers"
         } 
     } else {
         conda null

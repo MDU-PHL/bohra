@@ -15,8 +15,8 @@ process SEQKIT_STATS {
     scratch true
      
     if ( params.enable_conda ) {
-        if (file("${params.dependency_prefix}/seqquality").exists()) {
-            conda "${params.dependency_prefix}/seqquality"
+        if (file("${params.dependency_prefix}/seqkit").exists()) {
+            conda "${params.dependency_prefix}/seqkit"
         } 
     } else {
         conda null

@@ -12,8 +12,8 @@ process SKA_BUILD {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     
     if ( params.enable_conda ) {
-        if (file("${params.dependency_prefix}/relationships").exists()) {
-            conda "${params.dependency_prefix}/relationships"
+        if (file("${params.dependency_prefix}/ska").exists()) {
+            conda "${params.dependency_prefix}/ska"
         } 
     } else {
         conda null

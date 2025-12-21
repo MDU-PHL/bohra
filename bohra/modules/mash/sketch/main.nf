@@ -15,8 +15,8 @@ process MASH_SKETCH {
     
     
     if ( params.enable_conda ) {
-        if (file("${params.dependency_prefix}/relationships").exists()) {
-            conda "${params.dependency_prefix}/relationships"
+        if (file("${params.dependency_prefix}/mash").exists()) {
+            conda "${params.dependency_prefix}/mash"
         } 
     } else {
         conda null

@@ -15,8 +15,8 @@ process CORE_SNP_FILTER {
     cache 'lenient'
     
     if ( params.enable_conda ) {
-        if (file("${params.dependency_prefix}/relationships").exists()) {
-            conda "${params.dependency_prefix}/relationships"
+        if (file("${params.dependency_prefix}/coresnpfilter").exists()) {
+            conda "${params.dependency_prefix}/coresnpfilter"
         } 
     } else {
         conda null
