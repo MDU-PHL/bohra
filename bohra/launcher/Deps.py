@@ -20,7 +20,7 @@ LOGGER.addHandler(ch)
 LOGGER.addHandler(fh)
 
 
-def _run_cmd(cmd:list)-> bool:
+def _run_cmd(cmd:list, check:bool=False)-> bool:
 
     """
     Run a command and log output.
@@ -29,7 +29,7 @@ def _run_cmd(cmd:list)-> bool:
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
     while process.poll() is None:
         l = process.stdout.readline().strip() # This blocks until it receives a newline.
-        if len(l.split()) > 0:
+        if len(l.split()) > 0 and not check:
             LOGGER.info(f"{l}")
 
     if process.returncode != 0:
@@ -39,7 +39,7 @@ def _run_cmd(cmd:list)-> bool:
             LOGGER.warning(f"{process.stdout.read()}")
         return False
     else:
-        LOGGER.info(f"Command completed successfully: {' '.join(cmd)}")
+        LOGGER.info(f"Command completed successfully")
     return True
 
 
@@ -59,7 +59,7 @@ def _check_envs(cfg:dict)->bool:
                 return False
             cmd = ["conda", "run", "-p", env_name]
             cmd.extend(dep.split())
-            if not _run_cmd(cmd):
+            if not _run_cmd(cmd, check=True):
                 LOGGER.critical(f"Dependency {env} not installed properly.")
                 return False
     return True
