@@ -2,8 +2,16 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - bzip2
+  - python >=3.11,<4
+  - pip
+  - nextflow
+  - pandas
+  - numpy
+  - scipy
+  - pytest
+  - altair
+  - click
+  - jinja2
+  - psutil
   - csvtk
   - curl
-  - nextflow
-  
