@@ -2,7 +2,7 @@
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/MDU-PHL/bohra)](https://github.com/MDU-PHL/bohra/releases/latest)
 [![Conda Downloads](https://img.shields.io/conda/dn/bioconda/bohra)](https://anaconda.org/bioconda/bohra)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-
+[![BigCI](https://github.com/MDU-PHL/bohra/actions/workflows/BigCI.yml/badge.svg)](https://github.com/MDU-PHL/bohra/actions/workflows/BigCI.yml)
 
 
 # Bohra
