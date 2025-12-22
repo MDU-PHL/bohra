@@ -4,6 +4,6 @@ channels:
 dependencies:
   - kleborate<3
   - csvtk
-  - kaptive<3
+  - kaptive=2.0.6
   - python=3.9
 
