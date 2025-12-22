@@ -99,7 +99,7 @@ def _install_envs(cfg:dict, envs_path:str, env:str="all",force_reinstall:bool=Fa
                 raise SystemExit
             cmd = [installer, "env", "create", "-f", yml_file, "-p", f"{target_envs_dir}/{env_name}"]
             if force_reinstall:
-                cmd.append("--force-reinstall")
+                cmd.append("--force")
             if not _run_cmd(cmd):
                 return False
     return True
@@ -134,8 +134,14 @@ def dependencies(_action:str = "install",
             LOGGER.critical("Error installing dependencies.")
             return 1
         else:
-            LOGGER.info("All dependencies installed successfully.")
-            return 0
+            if _check_envs(dep_cfg):
+                LOGGER.info("All dependencies installed successfully and verified.")
+                return 0
+            else:
+                LOGGER.critical("Some dependencies failed verification after installation.")
+                return 1
+
+            
         
 
 def _check_databases(db_install:bool=False)->int:
