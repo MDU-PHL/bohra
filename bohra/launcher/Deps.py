@@ -31,7 +31,6 @@ def _run_cmd(cmd:list, check:bool=False)-> bool:
         l = process.stdout.readline().strip() # This blocks until it receives a newline.
         if len(l.split()) > 0 and not check:
             LOGGER.info(f"{l}")
-
     if process.returncode != 0:
         print(process.args)
         LOGGER.warning(f"Error running command: {' '.join(cmd)}")
