@@ -1,19 +1,19 @@
-name: BigCI
+name: CI
 
 on:
   push:
     branches: [ master ]
     paths:
       - 'bohra/**'
-      - '.github/workflows/BigCI.yml'
+      - '.github/workflows/CI.yml'
       - 'bohra/environments/**'
       - 'pyproject.toml'
-      - 'BigCI.env.yml'
+      - 'environmet.yml'
   pull_request:
     branches: [ master ]
     paths:
       - 'bohra/**'
-      - '.github/workflows/BigCI.yml'
+      - '.github/workflows/CI.yml'
       - 'bohra/environments/**'
       - 'pyproject.toml'
       - 'environment.yml'
@@ -21,7 +21,7 @@ on:
 env:
   K2DB: "babykraken"
   K2DB_URL: "https://github.com/MDU-PHL/babykraken/raw/refs/heads/master/dist/babykraken.tar.gz"
-    
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -45,20 +45,12 @@ jobs:
       - name: Setup conda
         uses: conda-incubator/setup-miniconda@v3
         with:
-          python-version: 3.11
           miniforge-version: latest
           channels: conda-forge,bioconda
-          #conda-remove-defaults: true
           channel-priority: strict
           activate-environment: bohra
           environment-file: environment.yml
           auto-update-conda: true
-
-      - name: Clean APT
-        run: |
-          sudo apt clean
-          sudo apt autoremove -y
-          sudo apt autoclean
 
       - name: Check disk usage
         run: df -h
@@ -67,16 +59,10 @@ jobs:
         run: |
           wget ${K2DB_URL}
           tar zxvf ${K2DB}.tar.gz
-          export KRAKEN2_DEFAULT_DB="$PWD/$K2DB"
 
       - name: Install bohra
         run: |
-          pip3 install .
-          bohra deps install
-
-      - name: Check bohra installtion
-        run: |
-          bohra deps check
+          pip3 install --no-deps .
 
       - name: Simple bohra test
         run: |
@@ -84,6 +70,15 @@ jobs:
           bohra --help
           bohra run --help
 
+      - name: Install bohra deps
+        run: |
+          bohra deps install
+
+      - name: Check bohra deps
+        run: |
+          bohra deps check
+
       - name: Big bohra test
         run: |
+          export KRAKEN2_DEFAULT_DB="$PWD/$K2DB"
           bohra test
