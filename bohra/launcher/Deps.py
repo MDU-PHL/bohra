@@ -113,7 +113,7 @@ def dependencies(_action:str = "install",
     Install bohra dependencies.
     """
     script_path = f"{pathlib.Path(__file__).parent}"
-    dep_cfg = _extract_tool_list(config)
+    dep_cfg = _extract_tool_list(config, tool=kwargs.get('tool', 'all'))
     actions = ['install', 'update', 'check']
     
     LOGGER.info(f"Will now try {_action} dependencies. Please be patient this may take some time!!... Maybe get coffee.")

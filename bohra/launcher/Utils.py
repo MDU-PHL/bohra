@@ -251,13 +251,15 @@ def _get_common_options() -> list:
     return common_options
 
 
-def _extract_tool_list(config_file:str)->dict:
+def _extract_tool_list(config_file:str, tool:str = "all")->dict:
     """
     Extract tool list from config file.
     """
     try:
         with open(config_file, 'r') as f:
             config = json.load(f)
+            if tool != "all":
+                return {tool: config[tool]}
             return config
     except Exception as e:
         LOGGER.critical(f"Error reading config file: {e}")
