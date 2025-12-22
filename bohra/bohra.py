@@ -94,7 +94,10 @@ def create_deps_subcommand_with_options(name, options_dict):
     @deps.command(name=name, help = f"Help for {name}ing dependencies.")
     def deps_subcommand(**kwargs):
         try:
-            dependencies(_action=name, kwargs=kwargs)
+            if dependencies(_action=name, kwargs=kwargs) == 0:
+                click.echo(f"Successfully completed {name}ing dependencies.")
+            else:
+                raise UsageError(f"An error occurred while {name}ing dependencies.")
         except Exception as e:
             raise UsageError(f"An error occurred while installing the {name} dependencies: {e}")
 

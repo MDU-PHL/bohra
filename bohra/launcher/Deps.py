@@ -55,7 +55,7 @@ def _check_envs(cfg:dict)->bool:
         for dep in cfg[env]:
             env_name = f"{target_envs_dir}/{env}"
             if not pathlib.Path(env_name).exists():
-                LOGGER.critical(f"Conda environment {env} not found at {env_name}.")
+                LOGGER.warning(f"Conda environment {env} not found at {env_name}.")
                 return False
             cmd = ["conda", "run", "-p", env_name]
             cmd.extend(dep.split())
