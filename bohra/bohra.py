@@ -97,9 +97,9 @@ def create_deps_subcommand_with_options(name, options_dict):
             if dependencies(_action=name, kwargs=kwargs) == 0:
                 click.echo(f"Successfully completed {name}ing dependencies.")
             else:
-                raise UsageError(f"An error occurred while {name}ing dependencies.")
+                raise UsageError(f"Dependency {name}ing failed.")
         except Exception as e:
-            raise UsageError(f"An error occurred while installing the {name} dependencies: {e}")
+            raise UsageError(f"{e}")
 
 
     deps_subcommand = generic_options(deps_subcommand, options_dict)
