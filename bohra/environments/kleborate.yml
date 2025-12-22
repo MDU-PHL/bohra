@@ -2,8 +2,9 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
+  - python=3.9
+  - kaptive<3
   - kleborate<3
   - csvtk
-  - kaptive=2.0.6
-  - python=3.9
+  
 
