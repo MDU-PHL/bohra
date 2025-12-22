@@ -16,7 +16,7 @@ on:
       - '.github/workflows/BigCI.yml'
       - 'bohra/environments/**'
       - 'pyproject.toml'
-      - 'BigCI.env.yml'
+      - 'environment.yml'
 
 env:
   K2DB: "babykraken"
