@@ -56,5 +56,5 @@ path = "bohra/version.py"
 
 [tool.hatch.build.targets.sdist]
 include = [
-    "/bohra/*","/bohra/modules/*","bohra/templates/*", "bohra/workflows/*", "bohra/subworkflows/*","bohra/references/*"
+    "/bohra/*","bohra/config/*", "bohra/modules/*","bohra/templates/*", "bohra/workflows/*", "bohra/subworkflows/*","bohra/references/*"
 ]
