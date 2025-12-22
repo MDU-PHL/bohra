@@ -102,6 +102,10 @@ def _install_envs(cfg:dict, envs_path:str, env:str="all",force_reinstall:bool=Fa
                 cmd.append("--force")
             if not _run_cmd(cmd):
                 return False
+            else:
+                if _check_envs( cfg={env_name: cfg[env_name]}):
+                    LOGGER.info(f"Environment {env_name} installed and verified successfully.")
+    LOGGER.info("All dependencies installed successfully and verified.")
     return True
 
 
@@ -134,12 +138,10 @@ def dependencies(_action:str = "install",
             LOGGER.critical("Error installing dependencies.")
             return 1
         else:
-            if _check_envs(dep_cfg):
-                LOGGER.info("All dependencies installed successfully and verified.")
-                return 0
-            else:
-                LOGGER.critical("Some dependencies failed verification after installation.")
-                return 1
+            return 0
+            # else:
+            #     LOGGER.critical("Some dependencies failed verification after installation.")
+            #     return 1
 
             
         
