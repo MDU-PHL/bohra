@@ -77,7 +77,7 @@ def run_tests(cpus:int=1):
     LOGGER.info(f"Now testing that the bohra installation has worked. Running command: {cmd}")
     proc = _run_subprocess(cmd=cmd)
 
-    if proc.returncode == 0:
+    if pathlib.Path(f"bohra_test_output_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}", "bohra.html").exists():
         LOGGER.info(f"bohra test has completed successfully!!")
     else:
         LOGGER.critical(f"bohra run was not successful... The following error was reported : {proc.stderr}. Please raise an issue on github.")
