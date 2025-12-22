@@ -4,3 +4,4 @@ channels:
 dependencies:
   - lissero
   - csvtk
+  - python=3.11

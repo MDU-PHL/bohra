@@ -51,7 +51,7 @@ jobs:
           #conda-remove-defaults: true
           channel-priority: strict
           activate-environment: bohra
-          environment-file: BigCI.env.yml
+          environment-file: environment.yml
           auto-update-conda: true
 
       - name: Clean APT
