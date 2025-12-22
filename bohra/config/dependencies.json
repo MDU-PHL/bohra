@@ -6,7 +6,7 @@
   "snpdists":["snp-dists -v","csvtk version"],
   "ngmaster":["ngmaster --version","csvtk version"],
   "assemblers":["shovill --version","spades.py -v","skesa --version","csvtk version"],
-  "emmtyper":"emmtyper --version,csvtk version",
+  "emmtyper":["emmtyper --version","csvtk version"],
   "seqkit":["seqkit version","csvtk version"],
   "fastp":["fastp --version","csvtk version"],
   "kraken2":["kraken2 --version","csvtk version"],
