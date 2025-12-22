@@ -33,6 +33,7 @@ def _run_cmd(cmd:list)-> bool:
             LOGGER.info(f"{l}")
 
     if process.returncode != 0:
+        print(process.args)
         LOGGER.warning(f"Error running command: {' '.join(cmd)}")
         if len( process.stdout.read().strip()) > 0:
             LOGGER.warning(f"{process.stdout.read()}")
@@ -47,11 +48,17 @@ def _check_envs(cfg:dict)->bool:
     """
     Check if conda environments directory exists.
     """
+    bohra_env_dir = f"{os.getenv('CONDA_PREFIX')}"
+    target_envs_dir = f"{bohra_env_dir}/bohra_conda_envs"
     for env in cfg:
 
         for dep in cfg[env]:
-
-            cmd = ["conda", "run", "-n", env, dep]
+            env_name = f"{target_envs_dir}/{env}"
+            if not pathlib.Path(env_name).exists():
+                LOGGER.critical(f"Conda environment {env} not found at {env_name}.")
+                return False
+            cmd = ["conda", "run", "-p", env_name]
+            cmd.extend(dep.split())
             if not _run_cmd(cmd):
                 LOGGER.critical(f"Dependency {env} not installed properly.")
                 return False
