@@ -3,6 +3,7 @@ import datetime
 import logging
 from bohra.launcher.Utils import CustomFormatter, _check_path, _run_subprocess
 from bohra.launcher.SetupInput import find_data
+from bohra.launcher.Deps import dependencies
 # Logger
 LOGGER =logging.getLogger(__name__) 
 LOGGER.setLevel(logging.DEBUG)
@@ -58,6 +59,7 @@ def _check_test_data(path, isolate_list):
     return True
 
 def run_tests(cpus:int=1):
+    dependencies(_action = "check")
     download_stub = "https://raw.githubusercontent.com/MDU-PHL/bohra/master/data"
     read_path = f"{pathlib.Path.cwd() / 'test_data'}"
     isolate_list = ['ERR1102348','ERR1102353','ERR1102355','ERR1102356']
@@ -75,6 +77,7 @@ def run_tests(cpus:int=1):
         
     cmd = f"bohra run full -i bohra_input.tsv -ref {reference} --cpus {cpus} --report_outdir bohra_test_output_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
     LOGGER.info(f"Now testing that the bohra installation has worked. Running command: {cmd}")
+    
     proc = _run_subprocess(cmd=cmd)
 
     if pathlib.Path(f"bohra_test_output_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}", "bohra.html").exists():
