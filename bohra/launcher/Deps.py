@@ -105,6 +105,9 @@ def _install_envs(cfg:dict, envs_path:str, env:str="all",force_reinstall:bool=Fa
             else:
                 if _check_envs( cfg={env_name: cfg[env_name]}):
                     LOGGER.info(f"Environment {env_name} installed and verified successfully.")
+                else:
+                    LOGGER.critical(f"Environment {env_name} failed verification after installation.")
+                    return False
     LOGGER.info("All dependencies installed successfully and verified.")
     return True
 
