@@ -27,6 +27,6 @@
   "tbtamr":["tbtamr --version","csvtk version"],
   "sonneitype":["mykrobe --version","csvtk version"],
   "classify-pangenome":["R --version"],
-  "datasmryzr":["datasmryzr --version","csvtk version"],
+  "datasmryzr":["datasmryzr --help","csvtk version"],
   "seqtk":["csvtk version"] 
 }
