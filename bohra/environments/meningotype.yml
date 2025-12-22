@@ -4,3 +4,4 @@ channels:
 dependencies:
   - meningotype
   - csvtk
+  - biopython=1.85
