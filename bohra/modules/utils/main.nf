@@ -48,7 +48,7 @@ process BOHRA_VERSION {
     script:
     
     """
-    echo -e bohra'\t'\$CONDA_PREFIX'\t'\$(bohra --version | cut -f 3 -d' ') | csvtk space2tab | csvtk add-header -t -n 'tool,conda_env,version' > version_bohra.txt
+    echo -e bohra'\t'\$CONDA_PREFIX'\t'\$(bohra --version | cut -f 2 -d' ') | csvtk space2tab | csvtk add-header -t -n 'tool,conda_env,version' > version_bohra.txt
     """ 
         
 }

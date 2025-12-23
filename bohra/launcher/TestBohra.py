@@ -96,15 +96,6 @@ def run_tests(cpus:int=1):
             LOGGER.critical(f"The bohra run failed with return code {proc.returncode}. Please check the log for details.")
             raise SystemExit
         
-        
-        LOGGER.info(f"Now testing that the bohra installation has worked. Running command: {cmd}")
-        proc = _run_subprocess(cmd=cmd)
-        LOGGER.info(f"bohra test run has finished. Checking for output report now.: {expected_output_dir / 'bohra.html'}")
-        if (expected_output_dir /  "bohra.html").exists():
-            LOGGER.info(f"bohra test has completed successfully!!")
-        else:
-            LOGGER.critical(f"bohra run was not successful... The following error was reported : {proc.stderr}. Please raise an issue on github.")
-            raise SystemError
     else:
         LOGGER.critical(f"Some bohra dependencies are missing or not installed properly. Please run 'bohra deps install' and try again.")
         raise SystemExit    
