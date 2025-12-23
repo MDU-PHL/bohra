@@ -39,7 +39,8 @@ def _run_cmd(cmd:list, check:bool=False)-> bool:
             LOGGER.warning(f"{process.stdout.read()}")
         return False
     else:
-        LOGGER.info(f"Command completed successfully")
+        if not check:
+            LOGGER.info(f"Command completed successfully")
     return True
 
 
@@ -131,7 +132,7 @@ def dependencies(_action:str = "install",
         raise SystemExit
     if _action == 'check':
         if not _check_envs(dep_cfg):
-            LOGGER.critical("Some dependencies are missing or not installed properly.")
+            LOGGER.critical(f"{kwargs.get('tool', 'all')} is missing or not installed properly.")
             return 1
         else:
             LOGGER.info("All dependencies are installed properly.")

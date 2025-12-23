@@ -80,16 +80,19 @@ def run_tests(cpus:int=1):
             LOGGER.info(f"Reads have been downloaded to {read_path}.")
             LOGGER.info(f"Now generating the input file from the reads.")
             find_data(reads = f"{read_path}",contigs="",isolate_ids ="", outname="bohra_input.tsv" )
-        cmd = f"bohra run full -i bohra_input.tsv -ref {reference} --cpus {cpus} --report_outdir bohra_test_output_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        LOGGER.info(f"Now testing that the bohra installation has worked. Running command: {cmd}")
         
+        report_outdir = f"bohra_test_output_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
+        cmd = f"bohra run full -i bohra_input.tsv -ref {reference} --cpus {cpus} --report_outdir {report_outdir}"
+        expected_output_dir = pathlib.Path.cwd() / report_outdir
+        
+        LOGGER.info(f"Now testing that the bohra installation has worked. Running command: {cmd}")
         proc = _run_subprocess(cmd=cmd)
-
-        if pathlib.Path(f"bohra_test_output_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}", "bohra.html").exists():
+        LOGGER.info(f"bohra test run has finished. Checking for output report now.: {expected_output_dir / 'bohra.html'}")
+        if (expected_output_dir /  "bohra.html").exists():
             LOGGER.info(f"bohra test has completed successfully!!")
         else:
             LOGGER.critical(f"bohra run was not successful... The following error was reported : {proc.stderr}. Please raise an issue on github.")
-            raise SystemError()
+            raise SystemError
     else:
         LOGGER.critical(f"Some bohra dependencies are missing or not installed properly. Please run 'bohra deps install' and try again.")
         raise SystemExit    

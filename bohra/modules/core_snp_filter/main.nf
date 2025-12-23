@@ -7,9 +7,10 @@ def options    = initOptions(params.options)
 process CORE_SNP_FILTER {
     
     label 'process_medium'
-    publishDir "${params.outdir}/report",
-        mode: params.publish_dir_mode
-        
+    publishDir "${params.outdir}",
+        mode: params.publish_dir_mode,
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:params.report_outdir, publish_id:params.report_outdir) }
+    
     
     scratch true
     cache 'lenient'

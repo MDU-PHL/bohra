@@ -125,11 +125,12 @@ def run_bohra(
 
             # Wait for the process to complete and get the return code
             proc.wait()
-            if proc.returncode == 0:
+            output_file = pathlib.Path(kwargs['report_outdir']) / f"{kwargs['job_name']}.html"
+            if pathlib.Path(output_file).exists() and proc.returncode == 0:
                 LOGGER.info(f"The {pipeline} pipeline has completed successfully.")
                 return True
             else:
-                LOGGER.error(f"The {pipeline} pipeline failed with return code {proc.returncode}.")
+                LOGGER.error(f"The {pipeline} pipeline failed to generate the expected output: {output_file}.")
                 return False
     else:
         LOGGER.error(f"Failed to create the working directory {kwargs['workdir']}.")

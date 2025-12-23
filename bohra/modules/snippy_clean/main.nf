@@ -8,7 +8,8 @@ process SNIPPY_CLEAN {
     
     label 'process_high'
     publishDir "${params.outdir}",
-        mode: params.publish_dir_mode
+        mode: params.publish_dir_mode,
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:params.report_outdir, publish_id:params.report_outdir) }
     
     cache 'lenient'
     scratch true

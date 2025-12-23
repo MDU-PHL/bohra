@@ -99,7 +99,7 @@ def create_deps_subcommand_with_options(name, options_dict):
             else:
                 raise UsageError(f"Dependency {name}ing failed.")
         except Exception as e:
-            raise UsageError(f"{e}")
+            raise SystemExit
 
 
     deps_subcommand = generic_options(deps_subcommand, options_dict)
