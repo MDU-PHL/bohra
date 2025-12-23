@@ -30,7 +30,7 @@ class CustomFormatter(logging.Formatter):
 
     def format(self, record):
         log_fmt = self.FORMATS.get(record.levelno)
-        formatter = logging.Formatter(log_fmt,datefmt='%m/%d/%Y %I:%M:%S %p')
+        formatter = logging.Formatter(log_fmt,datefmt='%Y/%m/%d %I:%M:%S %p')
         return formatter.format(record)
     
 # Logger
@@ -39,12 +39,12 @@ LOGGER.setLevel(logging.DEBUG)
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 ch.setFormatter(CustomFormatter())
-fh = logging.FileHandler('bohra_test.log')
-fh.setLevel(logging.DEBUG)
-formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%m/%d/%Y %I:%M:%S %p') 
-fh.setFormatter(formatter)
+# fh = logging.FileHandler('bohra_test.log')
+# fh.setLevel(logging.DEBUG)
+formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y/%m/%d %I:%M:%S %p') 
+# fh.setFormatter(formatter)
 LOGGER.addHandler(ch) 
-LOGGER.addHandler(fh)
+# LOGGER.addHandler(fh)
 
 cfg_file = f"{pathlib.Path(__file__).parent.parent.resolve() / 'bohra_defaults.json'}"
 with open(cfg_file, 'r') as f:
