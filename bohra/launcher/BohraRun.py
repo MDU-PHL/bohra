@@ -86,11 +86,9 @@ def _make_command(command: dict) -> str:
     
     return cmd
 
-def run_bohra(
+def _generate_bohra_command(
         pipeline: str,
-        kwargs: dict) -> bool:
-    
-    
+        kwargs: dict) -> str:
     
     if _make_workdir(workdir=kwargs["workdir"],   
                   _input=kwargs["input_file"], 
@@ -115,24 +113,42 @@ def run_bohra(
         # command = _funcs()[pipeline](kwargs=kwargs, command=command)
         
         cmd = _make_command(command=command)
-        if kwargs["no_auto_run"]:
-            LOGGER.info(f"Please paste the following command to run the pipeline:\n\033[1m{cmd}\033[0m")
-        else:
-            LOGGER.info(f"Running the command: {cmd}")
-            proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
-            for line in proc.stdout:
-                print(line, end='')
-
-            # Wait for the process to complete and get the return code
-            proc.wait()
-            output_file = pathlib.Path(kwargs['report_outdir']) / f"{kwargs['job_name']}.html"
-            if pathlib.Path(output_file).exists() and proc.returncode == 0:
-                LOGGER.info(f"The {pipeline} pipeline has completed successfully.")
-                return True
-            else:
-                LOGGER.error(f"The {pipeline} pipeline failed to generate the expected output: {output_file}.")
-                return False
+        return cmd
     else:
         LOGGER.error(f"Failed to create the working directory {kwargs['workdir']}.")
         raise SystemError
         
+def _run_bohra_cmd(
+        cmd: str) -> subprocess.CompletedProcess:
+    
+    LOGGER.info(f"Running the command: {cmd}")
+    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    for line in proc.stdout:
+        print(line, end='')
+
+    # Wait for the process to complete and get the return code
+    proc.wait()
+
+def _check_bohra_success(expected_output: str, proc: subprocess.CompletedProcess) -> bool:
+    if pathlib.Path(expected_output).exists() and proc.returncode == 0:
+        LOGGER.info(f"The bohra run has completed successfully.")
+        return True
+    else:
+        LOGGER.critical(f"The bohra run failed to generate the expected output: {expected_output}.")
+        raise SystemExit
+
+def run_bohra(
+        pipeline: str,
+        kwargs: dict) -> bool:
+    
+        # generate the command
+        cmd = _generate_bohra_command(pipeline=pipeline, kwargs=kwargs)
+        # if no_auto_run is set, just print the command OR run it
+        if kwargs["no_auto_run"]:
+            LOGGER.info(f"Please paste the following command to run the pipeline:\n\033[1m{cmd}\033[0m")
+        else:
+            proc = _run_bohra_cmd(cmd=cmd)
+            # check for success
+            _check_bohra_success(expected_output=pathlib.Path(kwargs['report_outdir']) / f"{kwargs['job_name']}.html", proc=proc)
+            
+        return True
