@@ -16,3 +16,4 @@ dependencies:
   - psutil
   - csvtk
   - curl
+  - biopython=1.85

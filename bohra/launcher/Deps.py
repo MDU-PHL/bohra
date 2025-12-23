@@ -132,7 +132,8 @@ def dependencies(_action:str = "install",
         raise SystemExit
     if _action == 'check':
         if not _check_envs(dep_cfg):
-            LOGGER.critical(f"{kwargs.get('tool', 'all')} is missing or not installed properly.")
+            tool = kwargs.get('tool', 'all')
+            LOGGER.critical(f"There are missing or improperly installed dependencies. Please run 'bohra deps install' to install.")
             return 1
         else:
             LOGGER.info("All dependencies are installed properly.")
