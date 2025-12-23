@@ -25,7 +25,8 @@ def _run_cmd(cmd:list, check:bool=False)-> bool:
     """
     Run a command and log output.
     """
-    LOGGER.info(f"Running command: {' '.join(cmd)}")
+    if not check:
+        LOGGER.info(f"Running command: {' '.join(cmd)}")
     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
     while process.poll() is None:
         l = process.stdout.readline().strip() # This blocks until it receives a newline.
@@ -61,6 +62,8 @@ def _check_envs(cfg:dict)->bool:
             if not _run_cmd(cmd, check=True):
                 LOGGER.critical(f"Dependency {env} not installed properly.")
                 return False
+            else:
+                LOGGER.info(f"Dependency {env} found and {dep.split()[0]} appear to be installed properly.")
     return True
 
 
