@@ -64,7 +64,7 @@ def _check_envs(cfg:dict)->bool:
                 LOGGER.critical(f"Dependency {env} not installed properly.")
                 return False
             else:
-                LOGGER.info(f"Dependency {env} found and {dep.split()[0]} appear to be installed properly.")
+                LOGGER.info(f"{env} environment is found and {dep.split()[0]} appear to be installed properly.")
     return True
 
 
