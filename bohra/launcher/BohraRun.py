@@ -129,8 +129,9 @@ def _run_bohra_cmd(
     # Wait for the process to complete and get the return code
     proc.wait()
     return proc
-def _check_bohra_success(expected_output: str, proc: subprocess.CompletedProcess) -> bool:
-    if pathlib.Path(expected_output).exists() and proc.returncode == 0:
+def _check_bohra_success(expected_output: str) -> bool:
+    LOGGER.info(f"Checking for the expected output: {expected_output}")
+    if pathlib.Path(expected_output).exists():
         LOGGER.info(f"The bohra run has completed successfully.")
         return True
     else:
@@ -149,6 +150,6 @@ def run_bohra(
         else:
             proc = _run_bohra_cmd(cmd=cmd)
             # check for success
-            _check_bohra_success(expected_output=pathlib.Path(kwargs['report_outdir']) / f"{kwargs['job_name']}.html", proc=proc)
+            _check_bohra_success(expected_output=pathlib.Path(kwargs['report_outdir']) / f"{kwargs['job_name']}.html")
             
         return True

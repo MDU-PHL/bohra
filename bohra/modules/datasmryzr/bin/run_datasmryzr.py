@@ -451,7 +451,7 @@ def extract_cmd(launchdir: str) -> str:
     """
     cmd = ""
     if pathlib.Path(launchdir).exists():
-        with open(pathlib.Path(launchdir) / "bohra_run.log", "r") as f:
+        with open(pathlib.Path(launchdir) / "bohra.log", "r") as f:
             cmd = f.read().strip().split("\n")[-1].strip('\x1b[1m[0m')
         if cmd.startswith("nextflow"):
             # cmd = cmd.replace("nextflow", "bohra")

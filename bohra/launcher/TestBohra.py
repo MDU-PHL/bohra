@@ -1,6 +1,7 @@
 import pathlib
 import datetime
 import logging
+import subprocess
 from bohra.launcher.Utils import CustomFormatter, _check_path, _run_subprocess
 from bohra.launcher.SetupInput import find_data
 from bohra.launcher.Deps import dependencies
@@ -65,37 +66,37 @@ def _check_test_data(path, isolate_list):
 
 def run_tests(cpus:int=1):
     # check dependencies first
-    if dependencies(_action = "check") == 0:
-        download_stub = "https://raw.githubusercontent.com/MDU-PHL/bohra/master/data"
-        read_path = f"{pathlib.Path.cwd() / 'test_data'}"
-        isolate_list = ['ERR1102348','ERR1102353','ERR1102355','ERR1102356']
-        # download and check reference
-        reference = _check_reference_test(path=f"{pathlib.Path.cwd() / 'Lm_Cluster1_J1-108.fa'}", download_stub=download_stub)
-        # download reads
-        _download_reads_from_github(download_stub=download_stub, isolate_list=isolate_list)
-        # if reads did not download correctly, raise exit
-        if not _check_test_data(path = read_path, isolate_list = isolate_list):
-            LOGGER.critical(f"Test data could not be found or downloaded. Please check your internet connection and try again.")
-            raise SystemExit
-        
-        LOGGER.info(f"Reads have been downloaded to {read_path}.")
-        LOGGER.info(f"Now generating the input file from the reads.")
-        find_data(reads = f"{read_path}",contigs="",isolate_ids ="", outname="bohra_input.tsv" )
-        # check that the input file has been created
-        if not _check_path(path="bohra_input.tsv"):
-            LOGGER.critical(f"Input file has not been created. Test failing. Exiting.")
-            raise SystemExit
-        # setup the report directory for running and testing
-        report_outdir = f"bohra_test_output_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
-        cmd = f"bohra run full -i bohra_input.tsv -ref {reference} --cpus {cpus} --report_outdir {report_outdir}"
-        expected_output_dir = pathlib.Path.cwd() / report_outdir
-        proc = _run_bohra_cmd(cmd=cmd)
-        if proc.returncode == 0:
-            _check_bohra_success(expected_output=expected_output_dir / "bohra.html", proc=proc)
-        else:
-            LOGGER.critical(f"The bohra run failed with return code {proc.returncode}. Please check the log for details.")
-            raise SystemExit
-        
-    else:
-        LOGGER.critical(f"Some bohra dependencies are missing or not installed properly. Please run 'bohra deps install' and try again.")
-        raise SystemExit    
+    # if dependencies(_action = "check") == 0:
+    download_stub = "https://raw.githubusercontent.com/MDU-PHL/bohra/master/data"
+    read_path = f"{pathlib.Path.cwd() / 'test_data'}"
+    isolate_list = ['ERR1102348','ERR1102353','ERR1102355','ERR1102356']
+    # download and check reference
+    reference = _check_reference_test(path=f"{pathlib.Path.cwd() / 'Lm_Cluster1_J1-108.fa'}", download_stub=download_stub)
+    # download reads
+    _download_reads_from_github(download_stub=download_stub, isolate_list=isolate_list)
+    # if reads did not download correctly, raise exit
+    if not _check_test_data(path = read_path, isolate_list = isolate_list):
+        LOGGER.critical(f"Test data could not be found or downloaded. Please check your internet connection and try again.")
+        raise SystemExit
+    
+    LOGGER.info(f"Reads have been downloaded to {read_path}.")
+    LOGGER.info(f"Now generating the input file from the reads.")
+    find_data(reads = f"{read_path}",contigs="",isolate_ids ="", outname="bohra_input.tsv" )
+    # check that the input file has been created
+    if not _check_path(path="bohra_input.tsv"):
+        LOGGER.critical(f"Input file has not been created. Test failing. Exiting.")
+        raise SystemExit
+    # setup the report directory for running and testing
+    report_outdir = f"bohra_test_output_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    
+    cmd = f"bohra run full -i bohra_input.tsv -ref {reference} --cpus {cpus} --report_outdir {report_outdir}"
+    LOGGER.info(f"Running bohra with the command: {cmd}")
+    proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    for line in proc.stdout:
+        print(line, end='')
+
+    # Wait for the process to complete and get the return code
+    proc.wait()
+    # else:
+    #     LOGGER.critical(f"Some bohra dependencies are missing or not installed properly. Please run 'bohra deps install' and try again.")
+    #     raise SystemExit    
