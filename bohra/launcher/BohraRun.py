@@ -9,6 +9,7 @@ from bohra.launcher.BohraPangenome import _setup_pangenome_args
 from bohra.launcher.Deps import dependencies
 
 import pandas as pd
+import sys
 import pathlib
 import os
 import logging
@@ -152,6 +153,6 @@ def run_bohra(
             # check for success
             if not _check_bohra_success(expected_output=pathlib.Path(kwargs['report_outdir']) / f"{kwargs['job_name']}.html"):
                 LOGGER.critical(f"Bohra pipeline failed.")
-                raise SystemExit
+                return sys.exit(1)
             
         return True
