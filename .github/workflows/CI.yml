@@ -81,4 +81,4 @@ jobs:
       - name: Big bohra test
         run: |
           export KRAKEN2_DEFAULT_DB="$PWD/$K2DB"
-          bohra test --shovill_ram 8 --cpus 4
+          bohra test --shovill_ram 8
