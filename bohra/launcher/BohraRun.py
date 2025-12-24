@@ -136,7 +136,7 @@ def _check_bohra_success(expected_output: str) -> bool:
         return True
     else:
         LOGGER.critical(f"The bohra run failed to generate the expected output: {expected_output}.")
-        raise SystemExit
+        return False
 
 def run_bohra(
         pipeline: str,
