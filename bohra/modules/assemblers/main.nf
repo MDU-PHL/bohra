@@ -43,7 +43,7 @@ process ASSEMBLER_PE {
         """
     else if ( meta.asm == "not_supplied" && params.assembler == "shovill_spades" ) {
         """
-        shovill --R1 ${reads[0]} --R2 ${reads[1]} --outdir current --cpus $task.cpus --ram 16 
+        shovill --R1 ${reads[0]} --R2 ${reads[1]} --outdir current --cpus $task.cpus --ram ${params.shovill_ram}
         cp current/contigs.fa contigs.fa
         version=\$(shovill --version)
         echo -e shovill'\t'\$CONDA_PREFIX'\t'\$(shovill -v)'\t'${params.shovill_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_assembler.txt
@@ -58,7 +58,7 @@ process ASSEMBLER_PE {
     } else if (meta.asm == "not_supplied" && params.assembler == "spades"  ) {
         """
         tmp_dir=\$(mktemp -d)
-        spades.py -1 ${reads[0]} -2 ${reads[1]} -o current -t $task.cpus $options.args2 --tmp-dir \$tmp_dir
+        spades.py -1 ${reads[0]} -2 ${reads[1]} -o current -t $task.cpus ${params.spades_args} --tmp-dir \$tmp_dir
         cp current/contigs.fasta contigs.fa
         rm -rf \$tmp_dir
         echo -e spades'\t'\$CONDA_PREFIX'\t'\$(spades.py -v)'\t'${params.spades_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_spades.txt
