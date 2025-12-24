@@ -153,6 +153,6 @@ def run_bohra(
             # check for success
             if not _check_bohra_success(expected_output=pathlib.Path(kwargs['report_outdir']) / f"{kwargs['job_name']}.html"):
                 LOGGER.critical(f"Bohra pipeline failed.")
-                return sys.exit(1)
+                raise SystemError
             
         return True

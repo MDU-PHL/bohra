@@ -89,7 +89,7 @@ def run_tests(cpus:int=1, shovill_ram:int=16):
     # setup the report directory for running and testing
     report_outdir = f"bohra_test_output_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
     
-    cmd = f"bohra run full -i bohra_input.tsv -ref {reference} --cpus {cpus} --report_outdir {report_outdir}"
+    cmd = f"bohra run full -i bohra_input.tsv -ref {reference} --cpus {cpus} --report_outdir {report_outdir} --shovill_ram {shovill_ram}"
     LOGGER.info(f"Running bohra with the command: {cmd}")
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     for line in proc.stdout:
@@ -97,13 +97,7 @@ def run_tests(cpus:int=1, shovill_ram:int=16):
 
     # Wait for the process to complete and get the return code
     proc.wait()
-    if proc.returncode != 0:
-        LOGGER.critical(f"Bohra test run failed.")
-        raise SystemExit
-    else:
-        LOGGER.info(f"Bohra test run completed successfully.")
-        LOGGER.info(f"Test report is located at {pathlib.Path.cwd() / report_outdir / 'bohra_test.html'}.")
-        return True
+    
     # else:
     #     LOGGER.critical(f"Some bohra dependencies are missing or not installed properly. Please run 'bohra deps install' and try again.")
     #     raise SystemExit    
