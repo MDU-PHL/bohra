@@ -97,6 +97,13 @@ def run_tests(cpus:int=1, shovill_ram:int=16):
 
     # Wait for the process to complete and get the return code
     proc.wait()
+    if proc.returncode != 0:
+        LOGGER.critical(f"Bohra test run failed.")
+        raise SystemExit
+    else:
+        LOGGER.info(f"Bohra test run completed successfully.")
+        LOGGER.info(f"Test report is located at {pathlib.Path.cwd() / report_outdir / 'bohra_test.html'}.")
+        return True
     # else:
     #     LOGGER.critical(f"Some bohra dependencies are missing or not installed properly. Please run 'bohra deps install' and try again.")
     #     raise SystemExit    

@@ -27,6 +27,7 @@ def _setup_assembly_args(kwargs:dict, command:dict, mtb:False) -> dict:
 
     command['modules'].append('assemble')
     command['params'].append(f"--assembler {kwargs['assembler']}")
+    command['params'].append(f"--shovill_ram {kwargs['shovill_ram']}")
     if kwargs["spades_args"] != "":
         command['params'].append(f"--spades_args {kwargs['spades_args']}")
     
