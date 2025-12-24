@@ -330,7 +330,13 @@ def _get_run_cmd_options() -> dict:
                 "name":"spades_args",
                 "help":"Use to add arguments to spades (when running with --assembler spades) for example: '--cov-cutoff auto'",
                 "default":""
+            },
+            {
+                "name":"shovill_ram",
+                "help":"Amount of RAM to allocate to shovill assembler.",
+                "default":16
             }
+
         ],
         "amr_typing": [
             {

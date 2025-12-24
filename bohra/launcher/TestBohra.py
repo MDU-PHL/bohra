@@ -64,7 +64,7 @@ def _check_test_data(path, isolate_list):
     LOGGER.info(f"All reads are found at {path}")
     return True
 
-def run_tests(cpus:int=1):
+def run_tests(cpus:int=1, shovill_ram:int=16):
     # check dependencies first
     # if dependencies(_action = "check") == 0:
     download_stub = "https://raw.githubusercontent.com/MDU-PHL/bohra/master/data"
