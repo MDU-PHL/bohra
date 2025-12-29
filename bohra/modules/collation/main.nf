@@ -48,7 +48,7 @@ process SNIPPY_QC {
     script:
     def prefix   = options.suffix ? "${meta.id}${options.suffix}" : "${meta.id}"
     """
-    $module_dir/snippy_qc.py $meta.id $aln snippy_qc.txt ${params.min_aln}
+    $module_dir/snippy_qc.py $meta.id $aln snippy_qc.txt
     """
     
 }
