@@ -9,7 +9,7 @@ from bohra.launcher.TestBohra import run_tests
               help="Number of CPUs to use for testing Bohra installation.") 
 @click.option('--shovill_ram',
               default=16,
-              help="Number of CPUs to use for testing Bohra installation.") 
+              help="Amount of RAM to allocate to shovill assembler.") 
 def test(cpus:int=1, shovill_ram:int=16):
     """
     Check that bohra is installed correctly and runs as expected.
