@@ -7,8 +7,6 @@ dependencies:
   - nextflow
   - pandas
   - numpy
-  - scipy
-  - scikit-learn
   - pytest
   - altair
   - click
