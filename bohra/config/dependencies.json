@@ -29,5 +29,6 @@
   "classify-pangenome":["R --version"],
   "datasmryzr":["datasmryzr --help","csvtk version"],
   "seqtk":["csvtk version"],
-  "shigapass":["blastn -version","csvtk version"]
+  "shigapass":["blastn -version","csvtk version"],
+  "cluster":["csvtk version"]
 }

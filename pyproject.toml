@@ -33,9 +33,7 @@ dependencies = [
     "numpy",
     "jinja2",
     "psutil",
-    "biopython",
-    "scipy",
-    "scikit-learn"
+    "biopython"
     
 ]
 

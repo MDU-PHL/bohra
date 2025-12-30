@@ -10,15 +10,15 @@ process SNP_CLUSTER {
         mode: 'copy',
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:params.report_outdir) }
     
-    // if ( params.enable_conda ) {
-    //     if (file("${params.dependency_prefix}/cluster").exists()) {
-    //         conda "${params.dependency_prefix}/cluster"
-    //     } else {
-    //         conda "${moduleDir}/environment.yml"
-    //     }
-    // } else {
-    //     conda null
-    // }
+    if ( params.enable_conda ) {
+        if (file("${params.dependency_prefix}/cluster").exists()) {
+            conda "${params.dependency_prefix}/cluster"
+        } else {
+            conda "${moduleDir}/environment.yml"
+        }
+    } else {
+        conda null
+    }
 
     cache 'lenient'
     scratch true
