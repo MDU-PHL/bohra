@@ -40,6 +40,6 @@ def main(inputs, isolate, output):
 inputs = sys.argv[2]
 isolate = sys.argv[1]
 output = sys.argv[3]
-minaln= sys.argv[4]
+
 
 main(inputs = inputs, isolate = isolate, output = output)
