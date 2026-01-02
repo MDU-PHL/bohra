@@ -1,0 +1,17 @@
+{
+    "essential": {
+        "KRAKENX_DEFAULT_DB": {
+                        "urls": [
+                        {"key": 1, "name":"Standard",  "size":"~87GB", "url": "https://genome-idx.s3.amazonaws.com/kraken/k2_standard_20250402.tar.gz"},
+                        {"key": 2, "name":"Standard-16",  "size":"~16GB", "url": "https://genome-idx.s3.amazonaws.com/kraken/k2_standard_08gb_20250402.tar.gz"},
+                        {"key": 3, "name":"Standard-8",  "size":"~8GB", "url": "https://genome-idx.s3.amazonaws.com/kraken/k2_standard_16gb_20250402.tar.gz"},
+                        {"key": 4, "name":"PlusPF",  "size":"~94GB", "url": "https://genome-idx.s3.amazonaws.com/kraken/k2_pluspfp_20250402.tar.gz"},
+                        {"key": 5, "name":"PlusPF-16",  "size":"~16GB", "url": "https://genome-idx.s3.amazonaws.com/kraken/k2_pluspfp_08gb_20250402.tar.gz"},
+                        {"key": 6, "name":"PlusPF-8",  "size":"~8GB", "url": "https://genome-idx.s3.amazonaws.com/kraken/k2_pluspfp_16gb_20250402.tar.gz"},
+                        {"key": 7, "name":"GTDB v226",  "size":"~644GB", "url": "https://genome-idx.s3.amazonaws.com/kraken/k2_gtdb_genome_reps_20250609.tar.gz"}
+                            ]
+                        }
+        
+                    },
+    "non_essential": ["BOHRA_PUBMLST_DB", "BOHRA_BLAST_DB", "BOHRA_MOBSUITE_DB"]
+}

@@ -1,5 +1,5 @@
 
-from bohra.launcher.Utils import CustomFormatter, _extract_tool_list
+from bohra.launcher.Utils import CustomFormatter, _extract_tool_list, _check_path
 import logging
 import subprocess
 import pathlib
@@ -150,26 +150,76 @@ def dependencies(_action:str = "install",
             #     LOGGER.critical("Some dependencies failed verification after installation.")
             #     return 1
 
-            
-        
+def _get_db_config(config:str=f"{pathlib.Path(__file__).parent.parent}/config/databases.json")->dict:
+    """
+    Get database configuration from json file.
+    """
+    if not pathlib.Path(config).exists():
+        LOGGER.critical(f"Database configuration file {config} does not exist.")
+        raise SystemExit
+    with open(config, 'r') as f:
+        db_cfg = json.load(f)
+    return db_cfg
 
-def _check_databases(db_install:bool=False)->int:
+def _construct_options_string(options:dict)->str:
+    """
+    Construct options string from dictionary.
+    """
+    options_list = []
+    for val in options:
+    
+        line = f"{val['key']} - {val['name']} (size {val['size']})"
+        options_list.append(line)
+    return "\n".join(options_list)
+
+def _check_databases(db_install:bool=False,
+                    database_path:str="",
+                    config:str=f"{pathlib.Path(__file__).parent.parent}/config/databases.json")->int:
     """
     Check that required databases are installed.
     """
     script_path = f"{pathlib.Path(__file__).parent}"
     LOGGER.info(f"Will now check databases required for Bohra. Please be patient this may take some time!!... Maybe get coffee.")
     db_check_cmd = 'get' if db_install else 'check'
-    process = subprocess.Popen(['bash', f"{script_path}/bohra_databases.sh", f"{db_check_cmd}"],stderr=subprocess.STDOUT, stdout=subprocess.PIPE, encoding='utf-8')
-    while process.poll() is None:
-        l = process.stdout.readline().strip() # This blocks until it receives a newline.
-        LOGGER.info(f"{l}")
+    db_cfg = _get_db_config(config=config)
 
-    if process.returncode != 0:
-        LOGGER.error(f"Error checking databases: {process.stderr}")
-        # raise SystemError
-        # return 1
-    else:
-        LOGGER.info("Databases checked successfully.")
-        LOGGER.info("Bohra is ready to go!")
-        return 0
+    for essential in db_cfg["essential"]:
+        var = os.getenv(essential)
+        
+        if var is None or not pathlib.Path(var).exists():
+            LOGGER.warning(f"Essential database {essential} not found or environment variable not set.")
+            if var == "KRAKEN2_DB_PATH":
+                LOGGER.info(f"You will need to provide the path to the Kraken2 database for Bohra run speciation and other species-specific analyses.")
+            if not db_install:
+                LOGGER.warning(f"If you wish to install missing databases, please run 'bohra init_databases --setup_databases --database_path <path>'.")
+            else:
+                LOGGER.info(f"You will need to select one of the following options to setup the database:")
+                options_str = _construct_options_string(db_cfg["essential"][essential]["urls"])
+                db_choice = input(f"Select an option to setup {essential}:\n{options_str}\nEnter option key: ")
+                selected_url = None
+                for option in db_cfg["essential"][essential]["urls"]:
+                    if option["key"] == db_choice:
+                        selected_url = option["url"]
+                        break
+                if selected_url is None:
+                    LOGGER.critical(f"Invalid option selected: {db_choice}. Exiting.")
+                    raise SystemExit
+                if database_path == "":
+                    database_path = input(f"Please provide the path to download and setup the {essential} database: ")
+                if _check_path(database_path):
+                    cmd = f"wget --continue -O {database_path} {selected_url} | bash -s -- {db_check_cmd} {database_path} {essential}"
+        else:
+            LOGGER.info(f"Essential database {essential} found at {var}.")
+    # process = subprocess.Popen(['bash', f"{script_path}/bohra_databases.sh", f"{db_check_cmd}"],stderr=subprocess.STDOUT, stdout=subprocess.PIPE, encoding='utf-8')
+    # while process.poll() is None:
+    #     l = process.stdout.readline().strip() # This blocks until it receives a newline.
+    #     LOGGER.info(f"{l}")
+
+    # if process.returncode != 0:
+    #     LOGGER.error(f"Error checking databases: {process.stderr}")
+    #     # raise SystemError
+    #     # return 1
+    # else:
+    #     LOGGER.info("Databases checked successfully.")
+    #     LOGGER.info("Bohra is ready to go!")
+    #     return 0
