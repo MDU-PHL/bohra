@@ -16,21 +16,21 @@ class CustomFormatter(logging.Formatter):
     grey = "\x1b[38;21m"
     yellow = "\x1b[33;21m"
     red = "\x1b[31;21m"
-    bold_red = "\x1b[31;1m"
+    
     reset = "\x1b[0m"
     format = "[%(levelname)s:%(asctime)s] %(message)s"
 
     FORMATS = {
         logging.DEBUG: grey + format + reset,
-        logging.INFO: grey + format + reset,
+        logging.INFO: format + reset,
         logging.WARNING: yellow + format + reset,
         logging.ERROR: red + format + reset,
-        logging.CRITICAL: bold_red + format + reset
+        logging.CRITICAL: red + format + reset
     }
 
     def format(self, record):
         log_fmt = self.FORMATS.get(record.levelno)
-        formatter = logging.Formatter(log_fmt,datefmt='%Y/%m/%d %I:%M:%S %p')
+        formatter = logging.Formatter(log_fmt,datefmt='%Y-%m-%d %I:%M:%S %p')
         return formatter.format(record)
     
 # Logger
@@ -41,7 +41,7 @@ ch.setLevel(logging.DEBUG)
 ch.setFormatter(CustomFormatter())
 # fh = logging.FileHandler('bohra_test.log')
 # fh.setLevel(logging.DEBUG)
-formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y/%m/%d %I:%M:%S %p') 
+formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p') 
 # fh.setFormatter(formatter)
 LOGGER.addHandler(ch) 
 # LOGGER.addHandler(fh)
