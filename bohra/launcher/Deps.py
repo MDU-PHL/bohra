@@ -182,7 +182,7 @@ def _check_databases(db_install:bool=False,
     LOGGER.info(f"Will now check databases required for Bohra. Please be patient this may take some time!!... Maybe get coffee.")
     db_check_cmd = 'get' if db_install else 'check'
     db_cfg = _get_db_config(config=config)
-
+    
     for essential in db_cfg["essential"]:
         var = os.getenv(essential)
         
@@ -198,28 +198,52 @@ def _check_databases(db_install:bool=False,
                 db_choice = input(f"Select an option to setup {essential}:\n{options_str}\nEnter option key: ")
                 selected_url = None
                 for option in db_cfg["essential"][essential]["urls"]:
-                    if option["key"] == db_choice:
+                    if str(option["key"]) == db_choice:
                         selected_url = option["url"]
+                        target = option["target"]
                         break
-                if selected_url is None:
+                if selected_url is None and db_choice != "0":
                     LOGGER.critical(f"Invalid option selected: {db_choice}. Exiting.")
                     raise SystemExit
+                elif db_choice == "0":
+                    existing_path = input(f"Please provide the existing path to the {essential} database: ")
+                    if _check_path(existing_path):
+                        new_essential_path = existing_path
+                        # LOGGER.info(f"Environment variable {essential} set to {existing_path}.")
+                        continue
+                    else:
+                        LOGGER.critical(f"Provided path {existing_path} is invalid. Exiting.")
+                        raise SystemExit
                 if database_path == "":
                     database_path = input(f"Please provide the path to download and setup the {essential} database: ")
                 if _check_path(database_path):
-                    cmd = f"wget --continue -O {database_path} {selected_url} | bash -s -- {db_check_cmd} {database_path} {essential}"
+                    cmd = f"wget --continue -O {database_path}/{target} {selected_url}"
+                    LOGGER.info(f"Running : {cmd}")
+                    if not _run_cmd(cmd.split()):
+                        LOGGER.critical(f"Error downloading database from {selected_url}. Exiting.")
+                        raise SystemExit
+                    else:
+                        new_essential_path = f"{database_path}/{pathlib.Path(target).name.split('.')[0]}"
+                        LOGGER.info(f"Uncompressing database {target}. This may take some time...")
+                        cmd = f"tar -xvzf {database_path}/{target} -C {database_path}"
+                        LOGGER.info(f"Running : {cmd}")
+                        if not _run_cmd(cmd.split()):
+                            LOGGER.critical(f"Error uncompressing database {target}. Exiting.")
+                            raise SystemExit
+                        LOGGER.info(f"Database {essential} downloaded.")
+                LOGGER.info(f"Setting environment variable {essential} to {new_essential_path}.")
+                cmd = f"conda env config vars set {essential}={new_essential_path} && conda deactivate && conda activate {os.getenv('CONDA_PREFIX')}"
+                LOGGER.info(f"Running : {cmd}")
+                # if not _run_cmd(cmd.split()):
+                #     LOGGER.critical(f"Error setting environment variable {essential}. Exiting.")
+                #     raise SystemExit
         else:
-            LOGGER.info(f"Essential database {essential} found at {var}.")
-    # process = subprocess.Popen(['bash', f"{script_path}/bohra_databases.sh", f"{db_check_cmd}"],stderr=subprocess.STDOUT, stdout=subprocess.PIPE, encoding='utf-8')
-    # while process.poll() is None:
-    #     l = process.stdout.readline().strip() # This blocks until it receives a newline.
-    #     LOGGER.info(f"{l}")
-
-    # if process.returncode != 0:
-    #     LOGGER.error(f"Error checking databases: {process.stderr}")
-    #     # raise SystemError
-    #     # return 1
-    # else:
-    #     LOGGER.info("Databases checked successfully.")
-    #     LOGGER.info("Bohra is ready to go!")
-    #     return 0
+            LOGGER.info(f"Database {essential} found at {var}.")
+    for other in db_cfg["non_essential"]:
+        var = os.getenv(other)
+        if var is None or not pathlib.Path(var).exists():
+            LOGGER.warning(f"Optional database {other} not found or environment variable not set.")
+            LOGGER.warning(f"Bohra will use the default databases that come with the tools for analyses requiring {other}. Otherwise you may be able to provide this at runtime.")
+        else:
+            LOGGER.info(f"Database {other} found at {var}.")
+   
