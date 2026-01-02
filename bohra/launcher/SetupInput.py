@@ -206,6 +206,6 @@ def find_data(reads:str,
                 bohra_df = pd.merge(bohra_df, df, on='Isolate', how='outer')
         # bohra_df = bohra_df.loc[:,~bohra_df.columns.duplicated()]
         bohra_df = bohra_df.sort_values(by='Isolate')
-        bohra_df = bohra_df.fillna('not_supplied')
+        bohra_df = bohra_df.fillna('')
         bohra_df.to_csv(outname,sep = "\t", index=False)
         LOGGER.info(f"Input files generated successfully and saved to '{outname}'.")

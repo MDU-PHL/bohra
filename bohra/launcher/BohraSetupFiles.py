@@ -145,7 +145,8 @@ def _make_workdir(_input:pd.DataFrame, workdir:str, report_outdir:str, replace_r
             
             for input_type in input_types:
                 user_supplied = row[1][input_type]
-                
+                if user_supplied == "not_supplied" or user_supplied == "":
+                    continue
                 if _check_sequence_file(pathlib.Path(user_supplied)):
                     # check that col is actually the r1 or r2
                     target_file = input_types[input_type]
