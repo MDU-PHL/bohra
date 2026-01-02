@@ -68,7 +68,7 @@ def _max_cpus(cpus:int) -> dict:
     avail = int(_get_cpu_limit_local(cpus=cpus))
     
     if cpus > avail:
-        LOGGER.error(f"You requested {cpus} CPUs but only {avail} are available. Please your available resources and try again.")
+        LOGGER.error(f"You requested {cpus} CPUs but only {avail} are available. Please check your available resources and try again.")
         raise SystemExit
     
     return cpus
