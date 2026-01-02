@@ -14,7 +14,7 @@ ch.setLevel(logging.DEBUG)
 ch.setFormatter(CustomFormatter())
 fh = logging.FileHandler('bohra_test.log')
 fh.setLevel(logging.DEBUG)
-formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y/%m/%d %I:%M:%S %p') 
+formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y%m/%d %I:%M:%S %p') 
 fh.setFormatter(formatter)
 LOGGER.addHandler(ch) 
 LOGGER.addHandler(fh)
@@ -64,7 +64,7 @@ def _check_test_data(path, isolate_list):
     LOGGER.info(f"All reads are found at {path}")
     return True
 
-def run_tests(cpus:int=1, shovill_ram:int=16):
+def run_tests(cpus:int=1, shovill_ram:int=16, wdir:str=str(pathlib.Path.cwd())):
     # check dependencies first
     # if dependencies(_action = "check") == 0:
     download_stub = "https://raw.githubusercontent.com/MDU-PHL/bohra/master/data"
@@ -89,7 +89,7 @@ def run_tests(cpus:int=1, shovill_ram:int=16):
     # setup the report directory for running and testing
     report_outdir = f"bohra_test_output_{datetime.datetime.now().strftime('%Y%m%d_%H%M%S')}"
     
-    cmd = f"bohra run full -i bohra_input.tsv -ref {reference} --cpus {cpus} --report_outdir {report_outdir} --shovill_ram {shovill_ram}"
+    cmd = f"bohra run full -i bohra_input.tsv -ref {reference} --cpus {cpus} --report_outdir {report_outdir} --workdir {pathlib.Path(wdir).resolve()} --shovill_ram {shovill_ram}"
     LOGGER.info(f"Running bohra with the command: {cmd}")
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     for line in proc.stdout:

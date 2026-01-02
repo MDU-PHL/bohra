@@ -130,11 +130,19 @@ def _check_outdir(workdir:str, report_outdir:str, replace_report:bool = False) -
         return True
     return True
 
+def _create_dir(path:str) -> bool:
+    try:
+        pathlib.Path(path).mkdir(parents=True, exist_ok=True)
+        return True
+    except Exception as e:
+        LOGGER.critical(f"Could not create directory {path}. Error: {e}")
+        return False
+    
 def _make_workdir(_input:pd.DataFrame, workdir:str, report_outdir:str, replace_report:bool = False) -> bool:
 
     columns = _get_columns_list()
     pereads = ["r1","r2"]
-    if _check_path(workdir) and _check_outdir(workdir, report_outdir, replace_report):
+    if _create_dir(workdir) and _check_outdir(workdir, report_outdir, replace_report):
         
         wd = pathlib.Path(workdir)
         input_table = _open_input_file(_file=_input)
@@ -174,4 +182,7 @@ def _make_workdir(_input:pd.DataFrame, workdir:str, report_outdir:str, replace_r
                         raise SystemExit
                 else:
                     LOGGER.warning(f"File {user_supplied} does not exist or is not accessible. Skipping link creation.")
+    else:
+        LOGGER.critical(f"Could not create output directories ({workdir} or {report_outdir}).")
+        raise SystemExit
     return "input_checked.tsv"

@@ -134,7 +134,7 @@ def _resource_opt() -> list:
             "name":"workdir",
             "help":"The directory where Bohra will be run, default is current directory",
             "default":pwd,
-            "type":click.Path(exists=True)
+            # "type":click.Path(exists=True)
         },
         {
             "name":"use_conda",
