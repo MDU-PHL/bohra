@@ -50,7 +50,7 @@ def _setup_comparative_args(kwargs:dict, command:dict, mtb:bool) -> dict:
         raise SystemExit
     # command = _accessory_params(kwargs=kwargs, command=command)
     annots = _get_annotation(kwargs['input_file'], mtb)
-    ref = _check_reference(kwargs['reference_genome'])
+    ref = _check_reference(kwargs['reference_genome'], kwargs['workdir'])
     mask = _check_mask(kwargs['mask'])
     if annots != "":
         command['params'].append(f"--annot_cols '{annots}'")

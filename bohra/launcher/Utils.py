@@ -697,16 +697,16 @@ def _check_input_snippy(input_file:str) -> bool:
     
     return reads
 
-def _check_reference(ref:str) -> bool:
+def _check_reference(ref:str, wdir:str) -> bool:
     """Check if the reference genome is a valid file."""
     
     if ref != "" and _check_path(ref):
         try:
             dst = pathlib.Path(ref).name
-            shutil.copy(ref, dst)
-            ref = f"{pathlib.Path.cwd() / dst}"
+            shutil.copy(ref, f"{pathlib.Path(wdir).resolve() / dst}")
+            ref = f"{pathlib.Path(wdir).resolve() / dst}"
         except SameFileError:
-            ref = f"{pathlib.Path.cwd() / dst}"
+            ref = f"{pathlib.Path(wdir).resolve() / dst}"
         return ref
     else:
         return "no_ref"
