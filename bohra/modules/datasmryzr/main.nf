@@ -31,6 +31,7 @@ process RUN_SMRYZR {
 
     output:
     path('*.html'), emit:report
+    path('summary.tsv'), emit:summary_tsv
     
 
     script:

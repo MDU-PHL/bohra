@@ -93,9 +93,24 @@ def make_comment(comments:list) -> str:
         return " | ".join(cmt)
     return ""
 
-
-
+def check_genome_size(val:list, genome_sizes:dict, type:str) -> str:
+    """
+    Check if the genome size is above the minimum size
+    """
+    if val[1] in genome_sizes:
+        max_size = float(genome_sizes[val[1]]["MAX_THRESHOLD"])
+        min_size = float(genome_sizes[val[1]]["MIN_THRESHOLD"])
+        if float(val[0]) >= min_size and float(val[0]) <= max_size:
+            return 1
+        else:
+            return f"Genome size ({type}): {val[0]}bp is outside the expected range for {val[1]}."
+    else:
+        return 1
+    
 def _generate_summary_table(input_file: str, results_files: list, output:list, min_depth:40, minquality : 30, minaln:70, strict:str) -> list:
+    with open(f"{pathlib.Path(__file__).parent / 'genome_ranges.json'}","r") as j:
+        genome_sizes = json.load(j)
+
     print("Generating summary table")
     list_of_filename = {
         "read_assessment.txt" : ["Isolate","Reads","GC", "Depth","Genome size", "is_control", "filesize", "Qscore"],
@@ -150,6 +165,10 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
     if sp_cols:
         summary["Species check"] = summary[sp_cols].apply(lambda x: check_species(x.tolist()), axis=1)
         summary["Species"] = summary[sp_cols].apply(lambda x: ':'.join(list(set(x))).strip(":"), axis=1)
+        if 'Genome size' in summary.columns:
+            summary["Genome size check"] = summary[["Genome size", "Species"]].apply(lambda x: check_genome_size(x, genome_sizes, 'reads'), axis=1)
+        if 'Length' in summary.columns:
+            summary["Assembly size check"] = summary[["Length", "Species"]].apply(lambda x: check_genome_size(x, genome_sizes, 'assembly'), axis=1)
         summary.drop(columns=sp_cols, inplace=True)
         cols = [i for i in summary.columns if i not in sp_cols]
     if "filesize" in summary.columns:
@@ -164,7 +183,7 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
         print("Checking number of contigs")
         bounds = check_asm(summary["# Contigs"].tolist())
         summary["Contigs check"] = summary[["# Contigs","is_control"]].apply(lambda x: check_contigs(bounds[1], bounds[0], x), axis=1)
-
+    
     check_cols = [i for i in list(summary.columns) if "check" in i]
     print(check_cols)
     check_cols.append("File size check")
