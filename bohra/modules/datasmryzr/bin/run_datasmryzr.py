@@ -359,6 +359,20 @@ def _get_other_files(results_files: list,ouput:list) -> str:
 
     return " ".join(other_files) if other_files else ""
 
+def _extract_core_sites(results_files: list, output:list) -> str:
+    """
+    Extract the core genome sites from the results files
+    """
+    numvarsites = 0
+    for file in results_files:
+        # print(file)
+        if pathlib.Path(file).exists() and "vcf" in file:
+            cmd = f"grep -v '#' {file} | wc -l"
+            p = subprocess.run(cmd, shell=True, capture_output=True, encoding='utf-8')
+            numvarsites = int(p.stdout.strip())
+
+    return f"--numvarsites {numvarsites}",output
+
 def _extract_pangenome_classification(results_files: list, output:list) -> str:
     """
     Extract the pangenome summary from the results files
@@ -433,6 +447,7 @@ def _combine_reads_iqr(results_files: list, output:list) -> str:
     return "",output,results_files
 
 def _run_datasmryzr(tree:str,
+                    numvarsites:str,
                     distance_matrix:str,
                     cluster_table:str,
                     core_genome:str,
@@ -453,7 +468,7 @@ def _run_datasmryzr(tree:str,
     """
     Run the datasmryzr pipeline
     """
-    cmd = f"datasmryzr --title '{job_id}' -c bohra_config.json -bg '{bkgd_color}' -fc '{text_color}' --pipeline {pipeline} --pipeline_version '{pipeline_version}' {no_downloadable_tables} {other_files} {pangenome_classification} {pangenome_rtab} {pangenome_groups} {tree} {distance_matrix} {cluster_table} {core_genome} {core_genome_report} {reference} {mask} {annotation} {read_assessment}"
+    cmd = f"datasmryzr --title '{job_id}' -c bohra_config.json -bg '{bkgd_color}' -fc '{text_color}' --pipeline {pipeline} --pipeline_version '{pipeline_version}' {no_downloadable_tables} {other_files} {pangenome_classification} {pangenome_rtab} {pangenome_groups} {tree} {distance_matrix} {cluster_table} {core_genome} {core_genome_report} {reference} {mask} {annotation} {read_assessment} {numvarsites}"
     print(cmd)
     p = subprocess.run(cmd, shell=True, capture_output=True)
     if p.returncode != 0:
@@ -564,6 +579,7 @@ def _compile(args):
     panclass,output = _extract_pangenome_classification(results_files, output)
     panrtab,output= _extract_pangenome_rtab(results_files, output)
     pangroups,output = _extract_pangenome_groups(results_files, output)
+    numvarsites,output = _extract_core_sites(results_files, output)
     # print(panclass, panrtab, pangroups)
     other_files = _get_other_files(results_files,output)
     other_files = other_files + " " + summary if summary else other_files
@@ -574,6 +590,7 @@ def _compile(args):
     pipeline_version = get_pipeline_version(args.results_files)
     ndt = '--no-downloadable-tables' if args.no_downloadable_tables.lower() == 'true' else ''
     p = _run_datasmryzr(tree,
+                        numvarsites,
                         distance_matrix,
                         cluster_table,
                         core_genome,
