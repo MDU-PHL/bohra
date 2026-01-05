@@ -100,7 +100,7 @@ def _install_envs(cfg:dict, envs_path:str, env:str="all",force_reinstall:bool=Fa
             if not pathlib.Path(yml_file).exists():
                 LOGGER.critical(f"Environment file {yml_file} does not exist.")
                 raise SystemExit
-            cmd = [installer, "env", "create", "-f", yml_file, "-p", f"{target_envs_dir}/{env_name}"]
+            cmd = [installer, "env", "create", "-y", "-f", yml_file, "-p", f"{target_envs_dir}/{env_name}"]
             if force_reinstall:
                 cmd.append("--force")
             if not _run_cmd(cmd):
