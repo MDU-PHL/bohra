@@ -2,6 +2,7 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
+  - python=3.11
   - meningotype
   - csvtk
   - biopython=1.85
