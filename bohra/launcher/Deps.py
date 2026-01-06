@@ -67,6 +67,31 @@ def _check_envs(cfg:dict)->bool:
                 LOGGER.info(f"{env} environment is found and {dep.split()[0]} appear to be installed properly.")
     return True
 
+def check_conda_version(version:str)->bool:
+
+    version_parts = version.split('.')
+    if version_parts[0].isdigit() and int(version_parts[0]) >= 25:
+        LOGGER.info("Conda version 25 or higher has been found.")
+        return True
+    else:
+        LOGGER.critical(f"Conda version {version} has been found. Bohra is designed for conda version 25 or higher. Unexpected behaviour may result - ideally update conda.")
+        return False
+
+
+def get_conda_version()->str:
+    """
+    Get conda version.
+    """
+    cmd = ["conda", "--version"]
+    process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, encoding='utf-8')
+    output, _ = process.communicate()
+    if process.returncode != 0:
+        LOGGER.warning(f"Error getting conda version.")
+        return ""
+    else:
+        version = output.strip().split()[-1]
+        LOGGER.info(f"Conda version: {version}")
+        return version
 
 def _install_envs(cfg:dict, envs_path:str, env:str="all",force_reinstall:bool=False)->bool:
     """
@@ -74,6 +99,7 @@ def _install_envs(cfg:dict, envs_path:str, env:str="all",force_reinstall:bool=Fa
     """
     # checking if mamba is installed
     installer = "conda"
+    version_25 = check_conda_version(get_conda_version())
     proc = subprocess.run(["which", "mamba"], capture_output=True, text=True)
     if proc.returncode == 0:
         installer = "mamba"
@@ -100,9 +126,11 @@ def _install_envs(cfg:dict, envs_path:str, env:str="all",force_reinstall:bool=Fa
             if not pathlib.Path(yml_file).exists():
                 LOGGER.critical(f"Environment file {yml_file} does not exist.")
                 raise SystemExit
-            cmd = [installer, "env", "create", "-y", "-f", yml_file, "-p", f"{target_envs_dir}/{env_name}"]
-            if force_reinstall:
+            cmd = [installer, "env", "create", "-y", "-f", yml_file, "-p", f"{target_envs_dir}/{env_name}"] if version_25 else [installer, "env", "create", "-f", yml_file, "-p", f"{target_envs_dir}/{env_name}"]
+            if force_reinstall and not version_25:
                 cmd.append("--force")
+            else:
+                subprocess.run([installer, "env", "remove", "-p", f"{target_envs_dir}/{env_name}", "-y"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             if not _run_cmd(cmd):
                 return False
             else:
