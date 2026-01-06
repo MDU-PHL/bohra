@@ -4,4 +4,5 @@ channels:
 dependencies:
   - csvtk
   - ska2
+  - pandas
  
