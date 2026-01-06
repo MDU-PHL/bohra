@@ -64,7 +64,8 @@ process ABRITAMR_GENERAL {
 
     """
     echo "ISOLATE,SPECIES_EXP,SPECIES_OBS,TEST_QC\n${meta.id},${meta.species},${meta.species},PASS" > qc.tmp.csv
-    abritamr report -q qc.tmp.csv -r bohra -m $summary_matches -p $summary_partials --sop general --sop_name reportable
+    csvtk -t cut -f -Species $summary_matches > summary_matches_tmp.txt || cp summary_matches.txt summary_matches_tmp.txt
+    abritamr report -q qc.tmp.csv -r bohra -m summary_matches_tmp.txt -p $summary_partials --sop general --sop_name reportable
     csvtk xlsx2csv -n reportable bohra_reportable.xlsx | csvtk rename -f 'MDU sample ID,Resistance genes (alleles) detected,Resistance genes (alleles) det (non-rpt),Species_obs' -n 'Isolate,Reportable AMR mechanisms,Other AMR mechanisms,Species' | csvtk cut -f 'Isolate,Reportable AMR mechanisms,Other AMR mechanisms,Species' |  csvtk csv2tab > reportable_amr_matches_tmp.txt
     $module_dir/separate_mechanisms.py reportable_amr_matches_tmp.txt
     """
