@@ -265,6 +265,32 @@ def _extract_tool_list(config_file:str, tool:str = "all")->dict:
         LOGGER.critical(f"Error reading config file: {e}")
         raise SystemExit
     
+def _get_util_options() -> dict:
+
+    util_opts = {
+        "generate-input":[
+
+        ],
+        "convert-input":[
+
+        ],
+        "module-info":[
+
+        ],
+        "show-fields":[
+
+        ],
+        "run-report":[
+
+        ],
+        "tojson":[
+
+        ],
+        "validate-inputs":[
+
+        ]
+    }
+
 def _get_dep_cmd_options() -> dict:
     """
     Get the click options available for each dependency
@@ -301,6 +327,7 @@ def _get_dep_cmd_options() -> dict:
     }
 
     return deps_opts
+
 
 def _get_run_cmd_options() -> dict:
     """
