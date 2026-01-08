@@ -269,7 +269,18 @@ def _get_util_options() -> dict:
 
     util_opts = {
         "generate-input":[
-
+            {"name" :'reads',
+              "default":"",
+              "help":"Path to search for reads files, e.g. *.f*q.gz"},
+            {"name":'contigs',
+                "default":"",
+                "help":"Path to search for assembly files, e.g. *.f*a"},
+            {"name":'isolate_ids',
+                "default":'',
+                "help":"Path to a file containing at least one column 'Isolate' with isolate names. Optionally add 'species' and other columns you wish to use for further annotation of trees."},
+            {"name":'outname',
+                "default":'bohra_input.tsv',
+                "help":"Name of the file to write the generated input table to."}
         ],
         "convert-input":[
 
@@ -290,6 +301,7 @@ def _get_util_options() -> dict:
 
         ]
     }
+    return util_opts
 
 def _get_dep_cmd_options() -> dict:
     """

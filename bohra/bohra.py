@@ -20,7 +20,7 @@ from bohra.version import version
 from click.exceptions import UsageError
 from click._compat import get_text_stderr
 
-from bohra.launcher.Utils import _get_run_cmd_options, _get_dep_cmd_options
+from bohra.launcher.Utils import _get_run_cmd_options, _get_dep_cmd_options, _get_util_options
 from bohra.commands.init_databases import init_databases
 # from bohra.commands.install import install 
 from bohra.commands.generate_input import generate_input
@@ -62,6 +62,13 @@ def deps():
     """
     pass
 
+@cli.group(no_args_is_help=True,invoke_without_command=True)
+def utils():
+    """
+    Bohra utilities.
+    """
+    pass
+
 
 def generic_options(_func: click.Command, options: dict) -> click.Command:
     """Add generic options to a Click command."""
@@ -87,6 +94,23 @@ def generic_options(_func: click.Command, options: dict) -> click.Command:
             )(_func)
     return _func
     
+
+def create_utils_subcommand_with_options(name, options_dict):
+    f"""Dynamically created a subcommand with options from a list."""
+
+    @utils.command(name=name, help = f"Help for {name} utility. COMING SOON.")
+    def utils_subcommand(**kwargs):
+        # try:
+        #     if dependencies(_action=name, kwargs=kwargs) == 0:
+        #         click.echo(f"Successfully completed {name}ing utilities.")
+        #     else:
+        #         raise UsageError(f"An error.")
+        # except Exception as e:
+        #     raise SystemExit
+        pass
+
+    utils_subcommand = generic_options(utils_subcommand, options_dict)
+    return utils_subcommand
 
 def create_deps_subcommand_with_options(name, options_dict):
     f"""Dynamically created a subcommand with options from a list."""
@@ -145,11 +169,15 @@ def create_run_subcommand_with_options(name, options_dict):
 
 run_cmd_opts = _get_run_cmd_options()
 dep_cmd_opt = _get_dep_cmd_options()
+util_cmd_opt = _get_util_options()
 for opt in run_cmd_opts:
     create_run_subcommand_with_options(name = opt, options_dict = run_cmd_opts[opt])
 
 for opt in dep_cmd_opt:
     create_deps_subcommand_with_options(name = opt, options_dict = dep_cmd_opt[opt])
+
+for opt in util_cmd_opt:
+    create_utils_subcommand_with_options(name = opt, options_dict = util_cmd_opt[opt])
 
 cli.add_command(init_databases.init_databases)
 # cli.add_command(install.install_deps)
