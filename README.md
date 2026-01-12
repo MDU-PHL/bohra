@@ -1,17 +1,35 @@
-[![Python 3.11](https://img.shields.io/badge/python-3.11-blue.svg)](https://www.python.org/downloads/release/python-3111/)
+[![CI](https://github.com/MDU-PHL/bohra/actions/workflows/BigCI.yml/badge.svg)](https://github.com/MDU-PHL/bohra/actions/workflows/CI.yml)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/MDU-PHL/bohra)](https://github.com/MDU-PHL/bohra/releases/latest)
 [![Conda Downloads](https://img.shields.io/conda/dn/bioconda/bohra)](https://anaconda.org/bioconda/bohra)
+[![Python](https://img.shields.io/badge/python-3.x-blue.svg)]
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![BigCI](https://github.com/MDU-PHL/bohra/actions/workflows/BigCI.yml/badge.svg)](https://github.com/MDU-PHL/bohra/actions/workflows/BigCI.yml)
-
 
 # Bohra
 
-You can find all documentation for `bohra` [here](https://mdu-phl.github.io/bohra/)
+Bohra is am extensive pipeline 
+for taking genome sequences
+(short reads or assemblies) 
+and running common bioinformatics assays
+across the, including genotyping,
+AMR detection, and phylogenetics.
+
+# Install
+```
+% conda create -n bohra -c bioconda bohra
+% bohra deps install
+% bohra --version
+```
+
+# Documentation
+
+Read the [Bohra website](https://mdu-phl.github.io/bohra/)
+to learn how to use all the availaile features.
+
+# Authors
+
+* [Kristy Horna](https://github.com/kristyhoran)
+* [Torsten Seemann](https://tseemann.github.io)
+
+## Logo
 
 ![logo](./docs/images/logo.svg)
-
-
-
-For bohra v2 please see our [wiki](https://github.com/MDU-PHL/bohra/wiki)
-
