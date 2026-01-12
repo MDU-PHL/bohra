@@ -39,9 +39,8 @@ to learn how to use all the availaile features.
 
 # Workflow
 
-<P>
 <IMG SRC="workflow.png" WIDTH="75%" ALIGN="left" ALT="Bohra workflow">
-</P>
+<BR><BR>
 
 # History
 
