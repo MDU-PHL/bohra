@@ -6,7 +6,7 @@
 
 # Bohra
 
-<IMG SRC="docs/images/logo.svg" ALIGN="right" WIDTH="4ex" ALT="Bohra Logo">
+<IMG SRC="docs/images/logo.svg" ALIGN="right" WIDTH="96" ALT="Bohra Logo">
 Bohra is am extensive pipeline 
 for taking genome sequences
 (short reads or assemblies) 
@@ -28,7 +28,8 @@ to learn how to use all the availaile features.
 
 # Workflow
 
-<P><IMG SRC="workflow.png" ALIGN="left" WIDTH="75%" ALT="Bohra workflow"></P>
+<IMG SRC="workflow.png" ALIGN="left" ALT="Bohra workflow">
+<BR>
 
 # Authors
 
