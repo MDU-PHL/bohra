@@ -6,19 +6,32 @@
 
 # Bohra
 
-<IMG SRC="docs/images/logo.svg" ALIGN="right" WIDTH="96" ALT="Bohra Logo">
+<IMG SRC="docs/images/logo.svg" ALIGN="right" WIDTH="64" ALT="Bohra Logo">
+
 Bohra is am extensive pipeline 
 for taking genome sequences
 (short reads or assemblies) 
 and running common bioinformatics assays
 across the, including
-[genotyping, AMR detection, and phylogenetics](#workflow).
+[genotyping, AMR detection, and phylogenetics](https://github.com/MDU-PHL/bohra#workflow).
 
-# Install
+<BR CLEAR="right" />
+
+# Installation
+
+1. Install the base packaghe
 ```
 % conda create -n bohra -c bioconda bohra
+% borha --version
+```
+2. Install all the analysis modules.
+This can take a long time (10-60 min) but it's worth it!
+```
 % bohra deps install
-% bohra --version
+```
+3. Test everthing worked ok
+```
+% bohra test --cpus 8 
 ```
 
 # Documentation
