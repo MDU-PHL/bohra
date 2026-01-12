@@ -15,8 +15,6 @@ and running common bioinformatics assays
 across the, including
 [genotyping, AMR detection, and phylogenetics](https://github.com/MDU-PHL/bohra#workflow).
 
-<BR CLEAR="right" />
-
 # Installation
 
 1. Install the base packaghe
@@ -41,8 +39,16 @@ to learn how to use all the availaile features.
 
 # Workflow
 
-<IMG SRC="workflow.png" ALIGN="left" ALT="Bohra workflow">
-<BR>
+<P>
+<IMG SRC="workflow.png" WIDTH="75%" ALIGN="left" ALT="Bohra workflow">
+</P>
+
+# History
+
+Bohra is a modern replacement for the 
+[Nullarbor](https://github.com/tseemann/nullarbor)
+pipeline. It is written in Python and Nextflow
+instead of Perl and Make.
 
 # Authors
 
