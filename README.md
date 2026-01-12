@@ -39,7 +39,7 @@ to learn how to use all the availaile features.
 
 # Workflow
 
-![Bohra workflow](wworkflow.png)
+![Bohra workflow](workflow.png)
 
 # History
 
