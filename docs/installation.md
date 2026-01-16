@@ -12,7 +12,7 @@ If you do not already have `conda` installed, you can check out the documentatio
 **2. Create and install bohra**
 
 ```
-mamba (or conda) install -c bioconda bohra
+mamba (or conda) create -n bohra -c bioconda bohra
 ```
 
 **3. Install dependencies and setup databases**

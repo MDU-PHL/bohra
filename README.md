@@ -8,7 +8,7 @@
 
 <IMG SRC="docs/images/logo.svg" ALIGN="right" WIDTH="64" ALT="Bohra Logo">
 
-Bohra is am extensive pipeline 
+Bohra is an extensive pipeline 
 for taking genome sequences
 (short reads or assemblies) 
 and running common bioinformatics assays
