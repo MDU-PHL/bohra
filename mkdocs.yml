@@ -6,6 +6,7 @@ nav:
   - Installation: installation.md
   - Running Bohra:
       - Overview: usage/overview.md
+      - Migration bohra2 to bohra3: usage/migration.md
       - Basic pipeline: usage/basic.md
       - Assembly pipeline: usage/assemble.md
       - Comparative pipeline: usage/comparative.md

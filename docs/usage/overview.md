@@ -10,6 +10,8 @@ Users have the option to supply paired-end fastq (support for ONT coming soon) a
 
 Additionally, you can also supply the species value and any optional sample metadata that may be useful.
 
+If you are moving across from bohra version 2 check out the [migration information](../usage/migration.md) 
+
 ## Input file
 
 `bohra` requires a single tab-delimited file as input, you can find examples [here] TO ADD.
