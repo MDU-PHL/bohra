@@ -55,8 +55,8 @@ csvtk -t pretty new_bohra_input.txt | less -S
 ```
 Should result in 
 
-| Isolate | r1 | r2 | assembly|
-|:---| :--- | :---| :---|
+| Isolate | r1 | r2 | assembly |
+|:--- | :--- | :---| :--- |
 | seq1 | /path/to/seq1_read1.fastq.gz| /path/to/seq1_read2.fastq.gz | /path/to/seq1_contig.fa|
 | seqn | /path/to/seqn_read1.fastq.gz| /path/to/seqn_read2.fastq.gz | /path/to/seqn_contig.fa|
 
@@ -73,18 +73,15 @@ If you would like to generate a completely new input file check out the instruct
 
 bohra version 2 pipelines can be run in bohra v3 
 
-| bohra v2 command | bohra v3 command | 
-|:--- | :---|
-| `bohra run -p full` | `bohra run full` |
-| `bohra run -p snps` | `bohra run comparative`|
-|`bohra run -p preview` | `bohra run comparative --comparative_tool mash` |
-|`bohra run -p amr_typing` | `bohra run amr_typing`|
+| bohra v2 command | bohra v3 command | bohra v3 input |
+|:--- | :---| :--- | 
+| `bohra run -p full` | `bohra run full` | paired-end fastq and/or assemblies |
+| `bohra run -p snps` | `bohra run comparative`| paired-end fastq and/or assemblies |
+|`bohra run -p preview` | `bohra run comparative --comparative_tool mash` | paired-end fastq and/or assemblies |
+|`bohra run -p amr_typing` | `bohra run amr_typing`| paired-end fastq and/or assemblies |
+| Not available | `bohra run tb` | paired-end fastq | 
 
-In addition, you can also run 
-```
-bohra run tb
-```
-Which will run tb phylogeny and AMR detection.
+
 
 ## Running with just assemlbies
 
