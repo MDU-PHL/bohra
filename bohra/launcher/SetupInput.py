@@ -103,8 +103,8 @@ def _glob_sequences(_dir: pathlib.Path,
         
         for iso in isolates:
             
-            seqs = sorted(pathlib.Path(_dir).rglob(f"*{iso}{CFG[sequence_type]['ext']}"))
-            LOGGER.info(f"Found {len(seqs)} {sequence_type} for {iso} in {_dir}.")
+            seqs = sorted(pathlib.Path(_dir).resolve().rglob(f"*{iso}{CFG[sequence_type]['ext']}"))
+            LOGGER.info(f"Found {len(seqs)} {sequence_type} for {iso} in {_dir.resolve()}.")
             if seqs == []:
                 seqs = sorted(pathlib.Path(_dir).rglob(f"{iso}/{CFG[sequence_type]['ext']}"))
             if len(seqs) >= CFG[sequence_type]['num_expected']:
