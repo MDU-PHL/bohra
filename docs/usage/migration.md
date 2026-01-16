@@ -27,6 +27,8 @@ tb           Help for the tb pipeline.
 
 6. Additional _in silico_ serotyping is also available, ShigaPass and sonneitype are now run where _Shigella_ species is detected.
 
+7. New look report html with some additional visualisations and more information about what was run. EXAMPLES COMING SOON
+
 ## Convert bohra v2 input file to bohra v3
 
 bohra v3 uses a single input file, rather than multiple that were previously used. If you have existing bohra version to input files you can convert them with csvtk (bohra command will shortly be available).
