@@ -54,6 +54,7 @@ Please note when running the above command **the order you supply the files is i
 csvtk -t pretty new_bohra_input.txt | less -S
 ```
 Should result in 
+
 | Isolate | r1 | r2 | assembly|
 |:---| :--- | :---| :---|
 | seq1 | /path/to/seq1_read1.fastq.gz| /path/to/seq1_read2.fastq.gz | /path/to/seq1_contig.fa|
