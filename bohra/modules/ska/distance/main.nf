@@ -28,16 +28,17 @@ process SKA_DISTANCE {
     scratch true
     
     input:
-    val(merged_skf)
+    val(merged_skf),val(ska_nk)
 
     output:
-    path('ska_measurement.tsv'), emit: distance_long
+    path('ska_distance_stats.tsv'), emit: distance_long
     path('distances.tsv'), emit: matrix
+
 
     script:
     """
-    ska distance -m ${params.ska_minfreq} $merged_skf > ska_measurement.tsv 
-    ${module_dir}/make_matrix.py ska_measurement.tsv 
+    ska distance -m ${params.ska_minfreq} $merged_skf > ska_distance_stats.tsv 
+    ${module_dir}/make_matrix.py ska_distance_stats.tsv $ska_nk
     """
         
 }
