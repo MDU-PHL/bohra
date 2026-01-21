@@ -188,6 +188,7 @@ workflow {
         results = results.concat( RELATIONSHIPS.out.clusters )
         results = results.concat( RELATIONSHIPS.out.stats )
         results = results.concat( RELATIONSHIPS.out.tree)
+        results = results.concat( RELATIONSHIPS.out.comparison_stats)
         versions = versions.concat( RELATIONSHIPS.out.version )
         versions = versions.concat( RELATIONSHIPS.out.tree_version )
 

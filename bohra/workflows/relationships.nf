@@ -23,13 +23,15 @@ workflow RELATIONSHIPS {
             core_vcf = RUN_SNPS.out.core_vcf
             core_full_aln = RUN_SNPS.out.core_full_aln
             version = RUN_SNPS.out.version
+            comparison_stats = Channel.empty()
         } 
         else if ( params.modules.contains("ska") ) {
             // add in a join to combine reads and asm
             RUN_SKA ( sequences )
             dists = RUN_SKA.out.dists
             clusters = RUN_SKA.out.clusters
-            stats = RUN_SKA.out.stats
+            stats = RUN_SKA.out.summarise
+            comparison_stats = RUN_SKA.out.stats
             core_aln = RUN_SKA.out.aln
             core_full_aln = Channel.empty()
             core_vcf = Channel.empty()
@@ -46,6 +48,7 @@ workflow RELATIONSHIPS {
             core_full_aln = Channel.empty()
             core_vcf = Channel.empty()
             version = RUN_MASH.out.version
+            comparison_stats = Channel.empty()
             
         }
         if (params.tree_input == "alignment" & params.modules.contains("tree")) {
@@ -67,6 +70,7 @@ workflow RELATIONSHIPS {
         
         dists = dists.ifEmpty( 'no_results' )
         clusters = clusters.ifEmpty( 'no_results' )
+        comparison_stats = comparison_stats.ifEmpty( 'no_results' )
         tree = tree.ifEmpty( 'no_results' )
         stats = stats.ifEmpty( 'no_results' )
         version = version.ifEmpty( 'no_version' )

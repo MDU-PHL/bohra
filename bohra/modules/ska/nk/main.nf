@@ -28,7 +28,7 @@ process SKA_NK {
     scratch true
     
     input:
-    val(merged_skf),val(ska_nk)
+    val(merged_skf)
 
     output:
     path('ska_summary_stats.tsv'), emit: summary_stats

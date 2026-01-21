@@ -33,7 +33,7 @@ workflow RUN_SKA {
         }
         // SNP_CLUSTER ( SKA_DISTANCE.out.matrix )
     emit:
-        comparison_stats = SKA_DISTANCE.out.distance_long
+        stats = SKA_DISTANCE.out.distance_long
         summarise = SKA_NK.out.summary_stats
         dists = SKA_DISTANCE.out.matrix
         aln = SKA_ALIGN.out.aln

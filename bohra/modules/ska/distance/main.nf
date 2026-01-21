@@ -28,7 +28,8 @@ process SKA_DISTANCE {
     scratch true
     
     input:
-    val(merged_skf),val(ska_nk)
+    val(merged_skf)
+    val(ska_nk)
 
     output:
     path('ska_distance_stats.tsv'), emit: distance_long
