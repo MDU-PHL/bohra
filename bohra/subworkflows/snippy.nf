@@ -64,7 +64,7 @@ workflow RUN_SNPS {
         if ( params.cluster ) {
             SNP_CLUSTER ( SNP_DISTS.out.matrix )
         } else {
-            SNP_CLUSTER.out.clusters = Chanel.empty().ifEmpty("not_available")
+            SNP_CLUSTER.out.clusters = Channel.empty().ifEmpty("not_available")
         }
         
     emit:

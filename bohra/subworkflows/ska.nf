@@ -29,7 +29,7 @@ workflow RUN_SKA {
         if( params.cluster ) {
             SNP_CLUSTER ( SKA_DISTANCE.out.matrix )
         } else {
-            SNP_CLUSTER.out.clusters = Chanel.empty().ifEmpty("not_available")
+            SNP_CLUSTER.out.clusters = Channel.empty().ifEmpty("not_available")
         }
         // SNP_CLUSTER ( SKA_DISTANCE.out.matrix )
     emit:
