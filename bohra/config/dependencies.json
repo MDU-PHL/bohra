@@ -1,4 +1,4 @@
-{
+{ "any2fasta":["any2fasta -v","csvtk version"],
   "meningotype":["meningotype --version","csvtk version"],
   "lissero":["lissero --version","csvtk version"],
   "mlst":["mlst --version","csvtk version"],
