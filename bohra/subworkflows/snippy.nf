@@ -49,7 +49,7 @@ workflow RUN_SNPS {
         }
                
 
-        SNIPPY_CORE ( alns, reference )  
+        SNIPPY_CORE ( alns, cleanedreference )  
         CORE_SNP_FILTER ( SNIPPY_CORE.out.core_full_aln )
         core_aln =  CORE_SNP_FILTER.out.aln
         core_full_aln = SNIPPY_CORE.out.core_full_aln
