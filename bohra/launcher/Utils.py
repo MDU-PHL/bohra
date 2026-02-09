@@ -430,25 +430,29 @@ def _get_run_cmd_options() -> dict:
                 "name":"minmap",
                 "short_name":"-mp",
                 "help":"Snippy - minimum read mapping quality to consider.",
-                "default":60
+                "default":60,
+                "type":float
             },
             {
                 "name":"basequal",
                 "short_name":"-bq",
                 "help":"Snippy - Minimum base quality to consider.",
-                "default":13
+                "default":13,
+                "type":float
             },
             {
                 "name":"minqual",
                 "short_name":"-mq",
                 "help":"Snippy - minimum QUALITY in VCF column 6",
-                "default":100
+                "default":100,
+                "type":float
             },
             {
                 "name":"minfrac",
                 "short_name":"-mf",
                 "help":"Snippy - minimum proportion for variant evidence",
-                "default":0
+                "default":0,
+                "type":float
             },
             {
                 "name":"fuzzy_core_prop",
@@ -465,7 +469,8 @@ def _get_run_cmd_options() -> dict:
             {
                 "name":"ska_minfreq",
                 "help":"Ska - minimum frequency for variant calling.",
-                "default":0.9
+                "default":0.9,
+                "type":float
             },
             {
                 "name": "ska_alnargs",
@@ -560,25 +565,29 @@ def _get_run_cmd_options() -> dict:
                 "name":"minmap",
                 "short_name":"-mp",
                 "help":"Snippy - minimum read mapping quality to consider.",
-                "default":60
+                "default":60,
+                "type":float
             },
             {
                 "name":"basequal",
                 "short_name":"-bq",
                 "help":"Snippy - Minimum base quality to consider.",
-                "default":13
+                "default":13,
+                "type":float
             },
             {
                 "name":"minqual",
                 "short_name":"-mq",
                 "help":"Snippy - minimum QUALITY in VCF column 6",
-                "default":100
+                "default":100,
+                "type":float
             },
             {
                 "name":"minfrac",
                 "short_name":"-mf",
                 "help":"Snippy - minimum proportion for variant evidence",
-                "default":0
+                "default":0,
+                "type":float
             },
             {
                 "name":"ignore_warnings",
