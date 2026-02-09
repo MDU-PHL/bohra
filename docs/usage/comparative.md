@@ -11,7 +11,7 @@ variant_detection --> alignment --> tree_generation --> report
 ```
 
  Please take note - it will not run any assembly based tools, like MLST or AMR. If these are required use the `full` pipeline. There are three tools available in `bohra` that can be used for this purpose
-1. `snippy` (default) - a reference based approach, detecting SNPS compared to a reference genome. This option can ONLY take paired-end fastq files as input and requires the provision of a reference genome.
+1. `snippy` (default) - a reference based approach, detecting SNPS compared to a reference genome. This option can ONLY take paired-end fastq files as input and requires the provision of a reference genome in **fasta format**.
 2. `ska2` - this is a reference free approach, inferring SNPS based on splits in kmers. You can use paired-end fastq and/or _de novo_ assemblies as input.
 3. `mash` - this is a quick reference free approach which allows for approximation of genetic distances between sequences. Like `ska2` you can provide paired-end fastq and/or _de novo_ assemblies as input.
 
