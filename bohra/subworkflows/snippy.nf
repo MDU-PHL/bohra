@@ -19,7 +19,8 @@ workflow RUN_SNPS {
         reads
         reference
     main:
-        cleaned_reference = ANY2FASTA ( reference ).out.cleaned_reference
+        ANY2FASTA ( reference )
+        cleaned_reference = ANY2FASTA.out.cleaned_reference
         SNIPPY ( reads.combine( cleaned_reference ) )  
         versions = SNIPPY.out.version.map { cfg, file -> file }.collect()
                                         .map { files -> tuple("version_snippy", files) }
@@ -49,7 +50,7 @@ workflow RUN_SNPS {
         }
                
 
-        SNIPPY_CORE ( alns, cleanedreference )  
+        SNIPPY_CORE ( alns, cleaned_reference )  
         CORE_SNP_FILTER ( SNIPPY_CORE.out.core_full_aln )
         core_aln =  CORE_SNP_FILTER.out.aln
         core_full_aln = SNIPPY_CORE.out.core_full_aln

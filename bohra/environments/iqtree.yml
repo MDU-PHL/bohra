@@ -5,3 +5,4 @@ dependencies:
   - csvtk
   - iqtree>=2
   - gotree
+  - snp-sites
