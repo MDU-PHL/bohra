@@ -1,0 +1,47 @@
+name: any2fasta
+description: generates a FASTA file from an input sequence file of any format
+keywords:
+  - assembly
+tools:
+  - snippy:
+      description: |
+        any2fasta generates a FASTA file from an input sequence file of any format
+      documentation: https://github.com/tseemann/any2fasta
+      doi: 
+params:
+  - outdir:
+      type: string
+      description: |
+        The pipeline's output directory. By default, the module will
+        output files into `$params.outdir/<SOFTWARE>`
+  - publish_dir_mode:
+      type: string
+      description: |
+        Value for the Nextflow `publishDir` mode parameter.
+        Available: symlink, rellink, link, copy, copyNoFollow, move.
+  - enable_conda:
+      type: boolean
+      description: |
+        Run the module with Conda using the software specified
+        via the `conda` directive
+  
+input:
+  - reference:
+      type: file
+      description: Reference sequence in any format
+      pattern: "*.{fa,fasta,fa.gz,fasta.gz,gbk,gbff,gbff.gz}"
+  
+
+output:
+  - cleaned_reference:
+      type: file
+      description: Reference sequence in FASTA format
+      pattern: "reference.fa"
+  
+  - version:
+      type: file
+      description: File containing software version
+      pattern: "*.{version_any2fasta.txt}"
+authors:
+  - "@kristyhoran"
+  

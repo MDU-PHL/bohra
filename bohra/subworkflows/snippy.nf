@@ -11,14 +11,16 @@ include { CORE_SNP_FILTER } from './../modules/core_snp_filter/main'
 include { SNP_CLUSTER } from './../modules/cluster/main'
 include { FILTER_CORE  } from './../modules/check_core/main'
 include { CHECK_CORE } from './../modules/check_core/main'
+include { ANY2FASTA } from './../modules/any2fasta/main'
+
 workflow RUN_SNPS {
 
     take:
         reads
         reference
     main:
-        
-        SNIPPY ( reads.combine( reference ) )  
+        cleaned_reference = ANY2FASTA ( reference ).out.cleaned_reference
+        SNIPPY ( reads.combine( cleaned_reference ) )  
         versions = SNIPPY.out.version.map { cfg, file -> file }.collect()
                                         .map { files -> tuple("version_snippy", files) }
         CSVTK_UNIQ ( versions )
