@@ -121,9 +121,9 @@ def create_deps_subcommand_with_options(name, options_dict):
             if dependencies(_action=name, kwargs=kwargs) == 0:
                 click.echo(f"Successfully completed {name}ing dependencies.")
             else:
-                raise UsageError(f"Dependency {name}ing failed.")
+                raise SystemExit(1)
         except Exception as e:
-            raise SystemExit
+            raise SystemExit(1)
 
 
     deps_subcommand = generic_options(deps_subcommand, options_dict)
