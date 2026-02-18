@@ -217,6 +217,12 @@ def _get_common_options() -> list:
             "default":"kraken2"
         },
         {
+            "name":"no-prokka",
+            "help":"Set --no-prokka if you do not want to annotate assemblies with prokka. Please note that this will result in no annotation of trees and no genbank files in the output.",
+            "is_flag":True,
+            "default":False
+        },
+        {
             "name":"no-auto-run",
             "default":False,
             "is_flag":True,
@@ -529,6 +535,139 @@ def _get_run_cmd_options() -> dict:
                 "default":"",
             }
         ],
+        "preview":[
+            {   "name":"comparative_tool",
+                "type":click.Choice(CFG["comparative_tools"]),
+                "help": "Tool to use for comparative genomics.",
+                "default": "mash",
+                "show_default": True
+            },
+            {
+                "name":"reference_genome",
+                "short_name":"-ref",
+                "help":"Path to reference genome (.gbk or .fa). This is only required if using snippy for comparative analysis.",
+                "default":""
+            },
+            {
+                "name":"mask",
+                "short_name":"-m",
+                "help":"Path to mask file for snippy, if using snippy for comparative analysis.",
+                "default":""
+            },
+            
+            {
+                "name":"gubbins",
+                "help":"Set to use gubbins for recombination correction - only when using snippy.",
+                "is_flag":True,
+                "default":False
+            },
+            {
+                "name":"snippy_args",
+                "help":"Additional arguments for snippy, if using snippy for comparative analysis.",
+                "default":""
+            },
+
+            {
+                "name":"minmap",
+                "short_name":"-mp",
+                "help":"Snippy - minimum read mapping quality to consider.",
+                "default":60,
+                "type":float
+            },
+            {
+                "name":"basequal",
+                "short_name":"-bq",
+                "help":"Snippy - Minimum base quality to consider.",
+                "default":13,
+                "type":float
+            },
+            {
+                "name":"minqual",
+                "short_name":"-mq",
+                "help":"Snippy - minimum QUALITY in VCF column 6",
+                "default":100,
+                "type":float
+            },
+            {
+                "name":"minfrac",
+                "short_name":"-mf",
+                "help":"Snippy - minimum proportion for variant evidence",
+                "default":0,
+                "type":float
+            },
+            {
+                "name":"ignore_warnings",
+                "help":"Set to ignore warnings during pipeline. Please note that this may lead to unexpected results.",
+                "is_flag":True,
+                "default":False
+            },
+            {
+                "name":"fuzzy_core_prop",
+                "help":"Snippy - proportion of core genome to use for fuzzy core genome analysis.",
+                "default":1.0,
+                "type":float
+            },
+            {
+                "name":"ska_minfreq",
+                "help":"Ska - minimum frequency for variant calling.",
+                "default":0.9
+            },
+            {
+                "name": "ska_alnargs",
+                "help":"Ska - additional arguments for alignment.",
+                "default":""
+            },
+            {
+                "name":"ska2_kszise",
+                "help":"Ska - kmer size for ska2, default is 31.",
+                "default":31
+            },
+            {
+                "name":"cluster/--no-cluster",
+                "help":"Set if you want to do hierarchical clustering.",
+                "is_flag":True,
+                "default":True
+            },
+            {
+                "name":"cluster_method",
+                "short_name":"-cm",
+                "help":"The clustering method to use, default is 'single'. NOT avaiLABLE for mash.",
+                "type":click.Choice(['single', 'average', 'complete', 'centroid', 'median', 'ward', 'weighted']),
+                "default":"single"
+            },
+            {
+                "name":"cluster_threshold",
+                "short_name":"-ct",
+                "help":"Comma separated list of thresholds to use for clustering, default is '10'. NOT available for mash.",
+                "type":str,
+                "default":"10"
+            },
+            {
+                "name":"phylo",
+                "help":"Set if you do want to generate a phylogenetic tree.",
+                "is_flag":True,
+                "default":True
+            },
+            {
+                "name":"tree_input",
+                type:click.Choice(["distance", "alignment"]),
+                "help":"Input type for tree building, either 'distance' or 'alignment'.",
+                "default":"distance"
+
+            },
+            {
+                "name":"tree_builder",
+                "help":"Tree builder to use for comparative analysis. ",
+                "default":"veryfasttree",
+                "type":click.Choice(['veryfasttree', 'iqtree']),
+                
+            },
+            {
+                "name":"annotations",
+                "help":"Comma separated list of annotations to use for the tree, default is 'Tx:cluster_threshold'. MUST be present in the input file.",
+                "default":"",
+            },
+        ],
         "full": [
             {   "name":"comparative_tool",
                 "type":click.Choice(CFG["comparative_tools"]),
@@ -652,7 +791,7 @@ def _get_run_cmd_options() -> dict:
             {
                 "name":"tree_builder",
                 "help":"Tree builder to use for comparative analysis.",
-                "default":"veryfasttree",
+                "default":"iqtree",
                 "type":click.Choice(['veryfasttree', 'iqtree']),
                 
             },

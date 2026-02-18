@@ -4,3 +4,4 @@ channels:
 dependencies:
   - ngmaster
   - csvtk
+  - python=3.6
