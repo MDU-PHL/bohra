@@ -149,8 +149,11 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
                 summary = pd.merge(summary, df, how = 'outer', on = "Isolate")
     summary["Comment"] = ""
     summary["Data assessment"] = 1
-    summary["is_control"] = summary["is_control"].fillna(False)
+    # print(summary)
+    
     summary = pd.merge(input_data, summary, how = 'left', on = "Isolate")
+    print(summary)
+    summary["is_control"] = summary["is_control"].fillna(False) if "is_control" in summary.columns else False
     summary = summary.fillna("")
     summary = summary.rename(columns = {"Match 1 (reads)":"Species (reads)","Match 1 (asm)":"Species (assembly)"})
     if 'ST' in summary.columns:
@@ -186,7 +189,8 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
     
     check_cols = [i for i in list(summary.columns) if "check" in i]
     print(check_cols)
-    check_cols.append("File size check")
+    if "filesize" in summary.columns:
+        check_cols.append("File size check")
     
     print(summary.columns)
     summary = summary.fillna("")
