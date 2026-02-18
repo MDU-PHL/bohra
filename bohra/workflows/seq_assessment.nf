@@ -60,7 +60,7 @@ workflow READ_ANALYSIS {
 }
 
 
-workflow ASSEMBLY_ANALYSIS {   
+workflow ASSEMBLY_ANALYSIS_FULL {   
 
     take:
         contigs
@@ -95,6 +95,45 @@ workflow ASSEMBLY_ANALYSIS {
         
         
 }
+
+
+
+workflow ASSEMBLY_ANALYSIS_PREVIEW {   
+
+    take:
+        contigs
+        
+    main:
+        // println contigs.view()
+        BOHRA_VERSION (  )
+        SEQKIT_GC ( contigs )
+        SEQKIT_STATS ( contigs )
+        // println SEQKIT_STATS.out.stats.view()
+        PROKKA ( contigs )
+        gff = PROKKA.out.gff.filter { cfg, files -> cfg.control != 'control' }
+        gff = gff.map { cfg, files -> files }.collect()
+        APS = PROKKA.out.prokka_txt.join( SEQKIT_STATS.out.stats )
+        COLLATE_ASM ( APS )
+        asm_stats = COLLATE_ASM.out.assembly.map { cfg, asm -> asm }.collect()
+        asm_stats = asm_stats.map { files -> tuple("assembly_assessment", files) }
+        versions_prokka = PROKKA.out.version.map { cfg, file -> file }.collect()
+                                         .map { files -> tuple("version_prokka", files) }
+        versions_seqkit = SEQKIT_STATS.out.version.map { cfg, file -> file }.collect()
+                                         .map { files -> tuple("version_seqkit", files) }
+        VERSION_PROKKA ( versions_prokka )
+        VERSION_SEQKIT_ASM ( versions_seqkit )
+
+        CSVTK_CONCAT ( asm_stats )
+    emit:
+        assembly_stats = CSVTK_CONCAT.out.collated
+        version_prokka = VERSION_PROKKA.out.version
+        version_seqkit_asm = VERSION_SEQKIT_ASM.out.version
+        version_bohra = BOHRA_VERSION.out.collated
+        gff
+        
+        
+}
+
 
 workflow VERSION_PROKKA {
     take:

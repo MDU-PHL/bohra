@@ -6,15 +6,16 @@ import pandas, pathlib
 HEADER = [f"Isolate\tAssembly length\t# Contigs\t# Gaps\tMin Contig size\tMax Contig size\tAvg Contig size\tAssembly N50\tCDS\trRNA"]
 
 def combine(prokka, asm, isolate, output):
-
-    gff = pandas.read_csv(prokka, sep = ':', header = None, names = ['cond', isolate])
+    if prokka != "":
+        gff = pandas.read_csv(prokka, sep = ':', header = None, names = ['cond', isolate])
+        gff = gff[gff['cond'].isin(['CDS', 'rRNA'])]
+        # print(gff)
+        rrna = gff[gff['cond'] == 'rRNA'][isolate].values[0].replace("\"","").strip() if not gff[gff['cond'] == 'rRNA'].empty else ''
+        cds = gff[gff['cond'] == 'CDS'][isolate].values[0].replace("\"","").strip()
+ 
     # print(gff)
     df = pandas.read_csv(asm, sep = '\t')
-    gff = gff[gff['cond'].isin(['CDS', 'rRNA'])]
-    # print(gff)
-    rrna = gff[gff['cond'] == 'rRNA'][isolate].values[0].replace("\"","").strip() if not gff[gff['cond'] == 'rRNA'].empty else ''
-    cds = gff[gff['cond'] == 'CDS'][isolate].values[0].replace("\"","").strip()
-    # print(rrna)
+       # print(rrna)
     # print(cds)
     print(df)
     bp = df['sum_len'].values[0]
@@ -25,7 +26,7 @@ def combine(prokka, asm, isolate, output):
     gaps= df['sum_gap'].values[0]
     n50 = df['N50'].values[0]
 
-    result = f"{isolate}\t{bp}\t{contigs}\t{gaps}\t{mincontigs}\t{avgcontigs}\t{maxcontigs}\t{n50}\t{cds}\t{rrna}"
+    result = f"{isolate}\t{bp}\t{contigs}\t{gaps}\t{mincontigs}\t{avgcontigs}\t{maxcontigs}\t{n50}\t{cds}\t{rrna}" if prokka != "" else f"{isolate}\t{bp}\t{contigs}\t{gaps}\t{mincontigs}\t{avgcontigs}\t{maxcontigs}\t{n50}\t"
     # print(result)
     HEADER.append(result)
     out = pathlib.Path(output)

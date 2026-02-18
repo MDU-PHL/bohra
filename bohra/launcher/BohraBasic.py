@@ -76,12 +76,17 @@ def _setup_basic_args(kwargs:dict, command:dict) -> dict:
 
     
     spn = _is_speciation(kwargs["speciation"]) 
+    nprk = kwargs["no_prokka"] 
     if spn:
         chk_db = _check_species_database(kwargs["speciation"], kwargs[f"{kwargs['speciation']}_db"])
         if chk_db:
             command['params'].append(chk_db)
             command['modules'].append(spn)
             command['params'].append(_species_tool(kwargs["speciation"]))
+    if nprk:
+        command['params'].append("--prokka false")
+    else:
+        command['params'].append("--prokka true")
     
     command = _accessory_params(kwargs=kwargs, command=command)
 
