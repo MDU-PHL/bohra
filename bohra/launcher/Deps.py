@@ -131,6 +131,7 @@ def _install_envs(cfg:dict, envs_path:str, env:str="all",force_reinstall:bool=Fa
                 cmd.append("--force")
             else:
                 subprocess.run([installer, "env", "remove", "-p", f"{target_envs_dir}/{env_name}", "-all"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+                subprocess.run(["df", "-h"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
             if not _run_cmd(cmd):
                 return False
             else:
@@ -171,6 +172,7 @@ def dependencies(_action:str = "install",
         env_to_install = kwargs.get('tool', 'all')
         if not _install_envs(dep_cfg, envs, env=env_to_install, force_reinstall=force_reinstall):
             LOGGER.critical("Error installing dependencies.")
+            
             return 1
         else:
             return 0

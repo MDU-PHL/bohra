@@ -6,7 +6,7 @@ import pandas, pathlib
 HEADER = [f"Isolate\tAssembly length\t# Contigs\t# Gaps\tMin Contig size\tMax Contig size\tAvg Contig size\tAssembly N50\tCDS\trRNA"]
 
 def combine(prokka, asm, isolate, output):
-    if prokka != "":
+    if prokka != "noprokka":
         gff = pandas.read_csv(prokka, sep = ':', header = None, names = ['cond', isolate])
         gff = gff[gff['cond'].isin(['CDS', 'rRNA'])]
         # print(gff)

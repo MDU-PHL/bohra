@@ -184,7 +184,7 @@ process COLLATE_SNIPPY_QCS {
     """
 }
 
-process COLLATE_ASM {
+process COLLATE_ASM_FULL {
     label 'process_medium'
     tag "$meta.id"
     label 'process_medium'
@@ -193,13 +193,34 @@ process COLLATE_ASM {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     cache 'lenient' 
     input:
-    tuple val(meta), path(prokka), path(stats)
+    tuple val(meta), path(stats), path(prokka)
     output:
     tuple val(meta), path ("assembly.txt"), emit: assembly
     
     script:
     """
     ${module_dir}/collate_asm.py $meta.id $prokka $stats assembly.txt
+    """
+
+
+}
+
+process COLLATE_ASM_QUICK {
+    label 'process_medium'
+    tag "$meta.id"
+    label 'process_medium'
+    publishDir "${params.outdir}",
+        mode: params.publish_dir_mode,
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
+    cache 'lenient' 
+    input:
+    tuple val(meta), path(stats), path(prokka)
+    output:
+    tuple val(meta), path ("assembly.txt"), emit: assembly
+    
+    script:
+    """
+    ${module_dir}/collate_asm.py $meta.id 'noprokka' $stats assembly.txt
     """
 
 

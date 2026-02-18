@@ -84,9 +84,8 @@ def _setup_basic_args(kwargs:dict, command:dict) -> dict:
             command['modules'].append(spn)
             command['params'].append(_species_tool(kwargs["speciation"]))
     if nprk:
-        command['params'].append("--prokka false")
-    else:
-        command['params'].append("--prokka true")
+        command['modules'].append("prokka")
+    
     
     command = _accessory_params(kwargs=kwargs, command=command)
 

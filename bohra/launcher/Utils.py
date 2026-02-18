@@ -118,8 +118,8 @@ def _get_pipelines(pipeline:str) -> list:
        "basic":"",
         "assemble":"assemble", 
         "amr_typing":"typing",
-        "tb":"mtb"
-        
+        "tb":"mtb",
+        "preview":"preview"
     }
 
 def _resource_opt() -> list:
@@ -812,7 +812,7 @@ def _get_run_cmd_options() -> dict:
     }
 
     cmd_opt = {}
-    for p in ["basic", "assemble", "amr_typing","full"]:  # Add other pipelines as needed
+    for p in ["basic", "assemble", "amr_typing","full","preview"]:  # Add other pipelines as needed
         opt.extend(all_options[p])
         popt = opt.copy()
         popt.extend(resource_options)
@@ -826,7 +826,10 @@ def _get_run_cmd_options() -> dict:
     tb.extend(all_options["tb"])
     tb.extend(resource_options)
     cmd_opt["tb"] = tb
-
+    preview = common_options.copy()
+    preview.extend(all_options["preview"])
+    preview.extend(resource_options)
+    cmd_opt["preview"] = preview
     return cmd_opt
 
 

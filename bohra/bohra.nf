@@ -41,7 +41,7 @@ input_file = file(params.isolates) // need to make this an input file
 
 println "Will run : $params.modules"
 // println samples
-include { READ_ANALYSIS;ASSEMBLY_ANALYSIS } from './workflows/seq_assessment'
+include { READ_ANALYSIS;ASSEMBLY_ANALYSIS_FULL;ASSEMBLY_ANALYSIS_QUICK } from './workflows/seq_assessment'
 include { RUN_ASSEMBLE } from './workflows/assemble'
 include { RUN_SPECIES_READS; RUN_SPECIES_ASM; COMBINE_SPECIES } from './workflows/species'
 include { RUN_TYPING } from './workflows/typing'
@@ -90,6 +90,19 @@ workflow {
         results = results.concat( RUN_ASSEMBLE.out.insertiqr )
         
     } 
+    if (params.modules.contains("prokka") ){
+        ASSEMBLY_ANALYSIS_FULL ( asm )
+        assembly_stats = ASSEMBLY_ANALYSIS_FULL.out.assembly_stats
+        versions = versions.concat( ASSEMBLY_ANALYSIS_FULL.out.version_prokka, ASSEMBLY_ANALYSIS_FULL.out.version_seqkit_asm )
+        // update the results with the assembly stats
+        results = results.concat( assembly_stats )
+    } else {
+            ASSEMBLY_ANALYSIS_QUICK ( asm )
+            assembly_stats = ASSEMBLY_ANALYSIS_QUICK.out.assembly_stats
+            versions = versions.concat( ASSEMBLY_ANALYSIS_QUICK.out.version_seqkit_asm )
+            // update the results with the assembly stats
+            results = results.concat( assembly_stats )
+    }
     ASSEMBLY_ANALYSIS ( asm )
     assembly_stats = ASSEMBLY_ANALYSIS.out.assembly_stats
     versions = versions.concat( ASSEMBLY_ANALYSIS.out.version_prokka, ASSEMBLY_ANALYSIS.out.version_seqkit_asm )

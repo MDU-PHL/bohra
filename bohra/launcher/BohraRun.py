@@ -73,6 +73,7 @@ def _funcs() -> dict:
         "amr_typing":[ _setup_typing_args],
         "full":[_setup_typing_args, _setup_comparative_args, _setup_pangenome_args ],
         "comparative":[ _setup_comparative_args ],
+        "preview":[ _setup_comparative_args ],
         "tb":[ _setup_comparative_args ],
     }
 
@@ -96,7 +97,7 @@ def _generate_bohra_command(
                   report_outdir=kwargs["report_outdir"], 
                   replace_report=kwargs["replace_report"]):
         LOGGER.info(f"Checking on the setup for the {pipeline} pipeline.")
-        dependencies(_action = "check")
+        # dependencies(_action = "check")
         max_cpus = int(_max_cpus(cpus=kwargs.get('cpus', 0)))
         LOGGER.info(f"Using {int(max_cpus)} CPUs for the {pipeline} pipeline.")
         profile,profile_config = _get_config(user_config=kwargs['profile_config'], title = kwargs['job_name'],cpus=max_cpus, wd = kwargs["workdir"])

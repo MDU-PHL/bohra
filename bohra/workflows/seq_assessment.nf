@@ -1,7 +1,7 @@
 #!/usr/bin/env nextflow
 
 include { SEQTK } from './../modules/seqtk/main' 
-include { COLLATE_STATS_ISOLATE;COLLATE_ASM } from './../modules/collation/main'
+include { COLLATE_STATS_ISOLATE;COLLATE_ASM_FULL;COLLATE_ASM_QUICK } from './../modules/collation/main'
 include { SEQKIT_STATS } from './../modules/seqkit/stats/main' 
 include { SEQKIT_GC } from './../modules/seqkit/fx2tab/main' 
 include { KMC } from './../modules/kmc/main' 
@@ -74,9 +74,9 @@ workflow ASSEMBLY_ANALYSIS_FULL {
         PROKKA ( contigs )
         gff = PROKKA.out.gff.filter { cfg, files -> cfg.control != 'control' }
         gff = gff.map { cfg, files -> files }.collect()
-        APS = PROKKA.out.prokka_txt.join( SEQKIT_STATS.out.stats )
+        APS = SEQKIT_STATS.out.stats.join( PROKKA.out.prokka_txt )
         COLLATE_ASM ( APS )
-        asm_stats = COLLATE_ASM.out.assembly.map { cfg, asm -> asm }.collect()
+        asm_stats = COLLATE_ASM_FULL.out.assembly.map { cfg, asm -> asm }.collect()
         asm_stats = asm_stats.map { files -> tuple("assembly_assessment", files) }
         versions_prokka = PROKKA.out.version.map { cfg, file -> file }.collect()
                                          .map { files -> tuple("version_prokka", files) }
@@ -98,7 +98,7 @@ workflow ASSEMBLY_ANALYSIS_FULL {
 
 
 
-workflow ASSEMBLY_ANALYSIS_PREVIEW {   
+workflow ASSEMBLY_ANALYSIS_QUICK {   
 
     take:
         contigs
@@ -109,24 +109,24 @@ workflow ASSEMBLY_ANALYSIS_PREVIEW {
         SEQKIT_GC ( contigs )
         SEQKIT_STATS ( contigs )
         // println SEQKIT_STATS.out.stats.view()
-        PROKKA ( contigs )
-        gff = PROKKA.out.gff.filter { cfg, files -> cfg.control != 'control' }
-        gff = gff.map { cfg, files -> files }.collect()
-        APS = PROKKA.out.prokka_txt.join( SEQKIT_STATS.out.stats )
-        COLLATE_ASM ( APS )
-        asm_stats = COLLATE_ASM.out.assembly.map { cfg, asm -> asm }.collect()
+        // PROKKA ( contigs )
+        // gff = PROKKA.out.gff.filter { cfg, files -> cfg.control != 'control' }
+        // gff = gff.map { cfg, files -> files }.collect()
+        // APS = PROKKA.out.prokka_txt.join( SEQKIT_STATS.out.stats )
+        COLLATE_ASM_QUICK ( SEQKIT_STATS.out.stats )
+        asm_stats = COLLATE_ASM_QUICK.out.assembly.map { cfg, asm -> asm }.collect()
         asm_stats = asm_stats.map { files -> tuple("assembly_assessment", files) }
-        versions_prokka = PROKKA.out.version.map { cfg, file -> file }.collect()
-                                         .map { files -> tuple("version_prokka", files) }
+        // versions_prokka = PROKKA.out.version.map { cfg, file -> file }.collect()
+        //                                  .map { files -> tuple("version_prokka", files) }
         versions_seqkit = SEQKIT_STATS.out.version.map { cfg, file -> file }.collect()
                                          .map { files -> tuple("version_seqkit", files) }
-        VERSION_PROKKA ( versions_prokka )
+        // VERSION_PROKKA ( versions_prokka )
         VERSION_SEQKIT_ASM ( versions_seqkit )
 
         CSVTK_CONCAT ( asm_stats )
     emit:
         assembly_stats = CSVTK_CONCAT.out.collated
-        version_prokka = VERSION_PROKKA.out.version
+        // version_prokka = VERSION_PROKKA.out.version
         version_seqkit_asm = VERSION_SEQKIT_ASM.out.version
         version_bohra = BOHRA_VERSION.out.collated
         gff
