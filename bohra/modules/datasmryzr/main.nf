@@ -53,6 +53,7 @@ process RUN_SMRYZR {
     --report_outdir '${params.report_outdir}' \
     --no-downloadable-tables ${params.no_downloadable_tables} \
     --ignore_warnings ${params.ignore_warnings} \
-    --modules '${params.modules}' 
+    --modules '${params.modules}' \
+    --tree_input ${params.tree_input} 
     """
 }

@@ -577,8 +577,38 @@ def get_pipeline_version(results_files: list) -> str:
             print(f"Error reading file {file}: {e}")
             return "not provided"
 
-def get_modules(modules: str) -> str:
-    pass
+def get_modules(modules: str, tree_input: str) -> str:
+    
+    if 'tree' in modules:
+
+        
+        mods = modules.split(",") if modules else []
+
+        comps = [
+            "snippy",
+            "mash",
+            "ska"
+        ]
+        inputs = [
+            "alignment",
+            "distance"
+        ]
+        comps_tool = ""
+        for m in mods:
+            if m in comps:
+                comps_tool = m
+        if tree_input != "":
+            tree_input = "Unknown tree input"
+        else:
+            for i in inputs:
+                if i in tree_input:
+                    tree_input = i
+        treebuilder = f"--treebuilder 'Tree constructed using {tree_input} based the {comps_tool} generated {tree_input}'"
+        return treebuilder
+    else:
+        return ""
+
+    
 
 def _compile(args):
     # print(f"{args.annot_cols}")
@@ -595,7 +625,7 @@ def _compile(args):
     core_genome_report,output = _extract_core_genome_report(results_files, output)
     summary,output = _generate_summary_table(args.input_file, results_files, output, 40, 30, 70,args.ignore_warnings)
     print(read_assessment)
-    
+    treebuilder = get_modules(args.modules, args.tree_input)
     panclass,output = _extract_pangenome_classification(results_files, output)
     panrtab,output= _extract_pangenome_rtab(results_files, output)
     pangroups,output = _extract_pangenome_groups(results_files, output)
@@ -611,6 +641,7 @@ def _compile(args):
     ndt = '--no-downloadable-tables' if args.no_downloadable_tables.lower() == 'true' else ''
     p = _run_datasmryzr(tree,
                         numvarsites,
+                        treebuilder,
                         distance_matrix,
                         cluster_table,
                         core_genome,
@@ -701,6 +732,14 @@ def set_parsers():
     parser.add_argument('--no-downloadable-tables',
         help='Disable downloadable tables in the report html.',
         default='false'
+    )
+    parser.add_argument('--modules',
+        help='Modules included in the report, used for determining which sections to include in the report and which comments to make.',
+        default=''
+    )   
+    parser.add_argument('--tree_input',
+        help='',
+        default=''
     )
     parser.set_defaults(func=_compile)
     args = parser.parse_args()
