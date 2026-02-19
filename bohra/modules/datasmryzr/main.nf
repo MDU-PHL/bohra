@@ -52,6 +52,7 @@ process RUN_SMRYZR {
     --pipeline ${params.pipeline} \
     --report_outdir '${params.report_outdir}' \
     --no-downloadable-tables ${params.no_downloadable_tables} \
-    --ignore_warnings ${params.ignore_warnings}
+    --ignore_warnings ${params.ignore_warnings} \
+    --modules '${params.modules}' 
     """
 }

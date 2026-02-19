@@ -129,7 +129,7 @@ workflow ASSEMBLY_ANALYSIS_QUICK {
         // version_prokka = VERSION_PROKKA.out.version
         version_seqkit_asm = VERSION_SEQKIT_ASM.out.version
         version_bohra = BOHRA_VERSION.out.collated
-        gff
+        // gff
         
         
 }

@@ -103,9 +103,9 @@ workflow {
             // update the results with the assembly stats
             results = results.concat( assembly_stats )
     }
-    ASSEMBLY_ANALYSIS ( asm )
-    assembly_stats = ASSEMBLY_ANALYSIS.out.assembly_stats
-    versions = versions.concat( ASSEMBLY_ANALYSIS.out.version_prokka, ASSEMBLY_ANALYSIS.out.version_seqkit_asm )
+    // ASSEMBLY_ANALYSIS ( asm )
+    // assembly_stats = ASSEMBLY_ANALYSIS.out.assembly_stats
+    // versions = versions.concat( ASSEMBLY_ANALYSIS.out.version_prokka, ASSEMBLY_ANALYSIS.out.version_seqkit_asm )
     // update the results with the assembly stats
     results = results.concat( assembly_stats )
     

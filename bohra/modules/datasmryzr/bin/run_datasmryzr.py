@@ -25,18 +25,23 @@ def check_species(species:list) -> str:
         return 1
     elif len(sp) > 1:
         return f"Species inconsistency."
-def check_val(val:float, min_val:float,metric) -> str:
+def check_val(val:float, min_val:float,metric, col) -> str:
     """
     Check if the coverage is above the minimum coverage
     """
-    if val[1]:
+    print(val)
+    try:
+        if val['is_control']:
+            return 1
+        if val[col] == "":
+            return 1
+        elif int(val[col]) >= min_val:
+            return 1
+        else:
+            return f"{metric}: {val[col]}, should be at least {min_val}`"
+    except Exception as e:
+        print(f"Error checking value: {e}")
         return 1
-    if val[0] == "":
-        return 1
-    elif int(val[0]) >= min_val:
-        return 1
-    else:
-        return f"{metric}: {val[0]}, should be at least {min_val}`"
 
 def check_val_aln(val:float, min_val:float,metric:str,strict:bool) -> str:
     """
@@ -74,9 +79,10 @@ def check_filesize(filesize) -> str:
     """
     Check if the file size is above the minimum size
     """
-    if filesize[1] == "":
+    print(filesize)
+    if filesize['Reads'] == "":
         return 1
-    if filesize[0] == ">20000000":
+    if filesize['filesize'] == ">20000000":
         return 1
     else:
         return "File below recommended size of 20Mbp"
@@ -87,7 +93,7 @@ def make_comment(comments:list) -> str:
     """
     cmt = []
     for i in comments:
-        if i != 1:
+        if f"{i}" != "1":
             cmt.append(i)
     if cmt:
         return " | ".join(cmt)
@@ -97,16 +103,19 @@ def check_genome_size(val:list, genome_sizes:dict, type:str) -> str:
     """
     Check if the genome size is above the minimum size
     """
-    if val[1] in genome_sizes:
-        max_size = float(genome_sizes[val[1]]["MAX_THRESHOLD"])
-        min_size = float(genome_sizes[val[1]]["MIN_THRESHOLD"])
-        if float(val[0]) >= min_size and float(val[0]) <= max_size:
-            return 1
+    try:
+        if val[1] in genome_sizes:
+            max_size = float(genome_sizes[val[1]]["MAX_THRESHOLD"])
+            min_size = float(genome_sizes[val[1]]["MIN_THRESHOLD"])
+            if float(val[0]) >= min_size and float(val[0]) <= max_size:
+                return 1
+            else:
+                return f"Genome size ({type}): {val[0]}bp is outside the expected range for {val[1]}."
         else:
-            return f"Genome size ({type}): {val[0]}bp is outside the expected range for {val[1]}."
-    else:
+            return 1
+    except Exception as e:
+        print(f"Error checking genome size: {e}")
         return 1
-    
 def _generate_summary_table(input_file: str, results_files: list, output:list, min_depth:40, minquality : 30, minaln:70, strict:str) -> list:
     with open(f"{pathlib.Path(__file__).parent / 'genome_ranges.json'}","r") as j:
         genome_sizes = json.load(j)
@@ -164,21 +173,23 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
             summary[i] = summary[i].apply(lambda x: int(x) if x != "" else "")
     
     sp_cols = [i for i in summary.columns if "Species" in i]
-    # print(summary)
+    print(summary)
     if sp_cols:
         summary["Species check"] = summary[sp_cols].apply(lambda x: check_species(x.tolist()), axis=1)
         summary["Species"] = summary[sp_cols].apply(lambda x: ':'.join(list(set(x))).strip(":"), axis=1)
-        if 'Genome size' in summary.columns:
+        if 'Genome size' in summary.columns and "Species" in summary.columns:
+            print(summary[["Genome size", "Species"]])
             summary["Genome size check"] = summary[["Genome size", "Species"]].apply(lambda x: check_genome_size(x, genome_sizes, 'reads'), axis=1)
-        if 'Length' in summary.columns:
+        if 'Length' in summary.columns and "Species" in summary.columns:
             summary["Assembly size check"] = summary[["Length", "Species"]].apply(lambda x: check_genome_size(x, genome_sizes, 'assembly'), axis=1)
         summary.drop(columns=sp_cols, inplace=True)
         cols = [i for i in summary.columns if i not in sp_cols]
     if "filesize" in summary.columns:
+        print(summary[["filesize","Reads"]])
         summary["File size check"] = summary[["filesize","Reads"]].apply(lambda x: check_filesize(x), axis=1)
         print(summary)
     if "Depth" in summary.columns:
-        summary["Coverage check"] = summary[["Depth","is_control"]].apply(lambda x: check_val(x, min_depth, "Avg depth"),axis=1)
+        summary["Coverage check"] = summary[["Depth","is_control"]].apply(lambda x: check_val(x, min_depth, "Avg depth","Depth"),axis=1)
     if "% Aligned" in summary.columns:
         summary["Alignment check"] = summary[["% Aligned", "is_control", "Aln_outlier"]].apply(lambda x:check_val_aln(x, minaln, "Alignment %",strict), axis=1)
 
@@ -196,7 +207,8 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
     summary = summary.fillna("")
     print(summary)
     summary["Comment"] = summary[check_cols].apply(lambda x: make_comment(x), axis=1)
-    summary["Data assessment"] = summary[check_cols].apply(lambda x: 1 if all(i == 1 for i in x.tolist()) else 0, axis=1)
+    print(summary[check_cols])
+    summary["Data assessment"] = summary[check_cols].apply(lambda x: 1 if all(f"{i}" in ["1",""] for i in x.tolist()) else 0, axis=1)
     if "Aln_outlier" in summary.columns:
         check_cols.append("Aln_outlier")
     # print(summary)
@@ -468,7 +480,8 @@ def _run_datasmryzr(tree:str,
                     read_assessment,
                     pipeline:str,
                     pipeline_version:str,
-                    no_downloadable_tables:str) -> str:    
+                    no_downloadable_tables:str,
+                    modules:str) -> str:    
     """
     Run the datasmryzr pipeline
     """
@@ -563,6 +576,9 @@ def get_pipeline_version(results_files: list) -> str:
         except Exception as e:
             print(f"Error reading file {file}: {e}")
             return "not provided"
+
+def get_modules(modules: str) -> str:
+    pass
 
 def _compile(args):
     # print(f"{args.annot_cols}")
