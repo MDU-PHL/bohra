@@ -135,7 +135,7 @@ def _install_envs(cfg:dict, envs_path:str, env:str="all",force_reinstall:bool=Fa
             if not _run_cmd(cmd):
                 return False
             else:
-                _run_cmd(subprocess.run(["df", "-h"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True))
+                _run_cmd(["df", "-h"])
                 if _check_envs( cfg={env_name: cfg[env_name]}):
                     LOGGER.info(f"Environment {env_name} installed and verified successfully.")
                 else:
