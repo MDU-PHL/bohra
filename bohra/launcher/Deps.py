@@ -131,7 +131,7 @@ def _install_envs(cfg:dict, envs_path:str, env:str="all",force_reinstall:bool=Fa
                 cmd.append("--force")
             else:
                 subprocess.run([installer, "env", "remove", "-p", f"{target_envs_dir}/{env_name}", "-all"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-                
+            _run_cmd(["df", "-h"])  
             if not _run_cmd(cmd):
                 return False
             else:
