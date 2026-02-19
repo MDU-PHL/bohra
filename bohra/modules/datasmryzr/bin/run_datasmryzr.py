@@ -481,11 +481,11 @@ def _run_datasmryzr(tree:str,
                     pipeline:str,
                     pipeline_version:str,
                     no_downloadable_tables:str,
-                    modules:str) -> str:    
+                    treebuilder:str) -> str:    
     """
     Run the datasmryzr pipeline
     """
-    cmd = f"datasmryzr --title '{job_id}' -c bohra_config.json -bg '{bkgd_color}' -fc '{text_color}' --pipeline {pipeline} --pipeline_version '{pipeline_version}' {no_downloadable_tables} {other_files} {pangenome_classification} {pangenome_rtab} {pangenome_groups} {tree} {distance_matrix} {cluster_table} {core_genome} {core_genome_report} {reference} {mask} {annotation} {read_assessment} {numvarsites}"
+    cmd = f"datasmryzr --title '{job_id}' -c bohra_config.json -bg '{bkgd_color}' -fc '{text_color}' --pipeline {pipeline} --pipeline_version '{pipeline_version}' {treebuilder} {no_downloadable_tables} {other_files} {pangenome_classification} {pangenome_rtab} {pangenome_groups} {tree} {distance_matrix} {cluster_table} {core_genome} {core_genome_report} {reference} {mask} {annotation} {read_assessment} {numvarsites}"
     print(cmd)
     p = subprocess.run(cmd, shell=True, capture_output=True)
     if p.returncode != 0:
@@ -597,13 +597,13 @@ def get_modules(modules: str, tree_input: str) -> str:
         for m in mods:
             if m in comps:
                 comps_tool = m
-        if tree_input != "":
+
+            if 'tree' in m:
+                tree_tool = m
+        if tree_input == "":
             tree_input = "Unknown tree input"
-        else:
-            for i in inputs:
-                if i in tree_input:
-                    tree_input = i
-        treebuilder = f"--treebuilder 'Tree constructed using {tree_input} based the {comps_tool} generated {tree_input}'"
+            
+        treebuilder = f"--treebuilder 'Tree constructed using {tree_tool} based on {comps_tool} generated {tree_input}'"
         return treebuilder
     else:
         return ""
@@ -639,9 +639,9 @@ def _compile(args):
     generate_config(args.cluster_method, args.cluster_threshold, args.pangenome_groups, args.kraken2_db, 'kraken2' if args.speciation == 'true' else "sylph", args.launchdir, args.reference)
     pipeline_version = get_pipeline_version(args.results_files)
     ndt = '--no-downloadable-tables' if args.no_downloadable_tables.lower() == 'true' else ''
+    print(treebuilder)
     p = _run_datasmryzr(tree,
                         numvarsites,
-                        treebuilder,
                         distance_matrix,
                         cluster_table,
                         core_genome,
@@ -659,7 +659,8 @@ def _compile(args):
                         read_assessment,
                         args.pipeline,
                         pipeline_version,
-                        ndt
+                        ndt,
+                        treebuilder
                         )
     
 

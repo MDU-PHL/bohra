@@ -131,11 +131,13 @@ def _install_envs(cfg:dict, envs_path:str, env:str="all",force_reinstall:bool=Fa
                 cmd.append("--force")
             else:
                 subprocess.run([installer, "env", "remove", "-p", f"{target_envs_dir}/{env_name}", "-all"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-            _run_cmd(["df", "-h"])  
+            # _run_cmd(["df", "-h"])  
             if not _run_cmd(cmd):
                 return False
             else:
-                _run_cmd(["df", "-h"])
+                # _run_cmd(["df", "-h"])
+                tst = subprocess.run("["df", "-h"]", capture_output=True, text=True)
+                LOGGER.info(f"Disk usage after installing {env_name} environment:\n{tst.stdout}")
                 if _check_envs( cfg={env_name: cfg[env_name]}):
                     LOGGER.info(f"Environment {env_name} installed and verified successfully.")
                 else:
