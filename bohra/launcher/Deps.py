@@ -136,7 +136,7 @@ def _install_envs(cfg:dict, envs_path:str, env:str="all",force_reinstall:bool=Fa
                 return False
             else:
                 # _run_cmd(["df", "-h"])
-                tst = subprocess.run("["df", "-h"]", capture_output=True, text=True)
+                tst = subprocess.run(["df", "-h"], capture_output=True, text=True)
                 LOGGER.info(f"Disk usage after installing {env_name} environment:\n{tst.stdout}")
                 if _check_envs( cfg={env_name: cfg[env_name]}):
                     LOGGER.info(f"Environment {env_name} installed and verified successfully.")
