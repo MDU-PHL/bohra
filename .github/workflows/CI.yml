@@ -31,13 +31,13 @@ jobs:
     steps:
       - name: Maximize build space
         uses: easimon/maximize-build-space@master
-        with:
-          root-reserve-mb: 32768
-          temp-reserve-mb: 32768
-          swap-size-mb: 16384
-          remove-dotnet: true
-          remove-android: true
-          remove-haskell: true
+        # with:
+        #   root-reserve-mb: 32768
+        #   temp-reserve-mb: 16384
+        #   swap-size-mb: 16384
+        #   remove-dotnet: true
+        #   remove-android: true
+        #   remove-haskell: true
 
       - name: Pull bohra
         uses: actions/checkout@v5
