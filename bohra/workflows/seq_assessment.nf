@@ -75,7 +75,7 @@ workflow ASSEMBLY_ANALYSIS_FULL {
         gff = PROKKA.out.gff.filter { cfg, files -> cfg.control != 'control' }
         gff = gff.map { cfg, files -> files }.collect()
         APS = SEQKIT_STATS.out.stats.join( PROKKA.out.prokka_txt )
-        COLLATE_ASM ( APS )
+        COLLATE_ASM_FULL ( APS )
         asm_stats = COLLATE_ASM_FULL.out.assembly.map { cfg, asm -> asm }.collect()
         asm_stats = asm_stats.map { files -> tuple("assembly_assessment", files) }
         versions_prokka = PROKKA.out.version.map { cfg, file -> file }.collect()
