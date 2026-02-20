@@ -83,7 +83,7 @@ def _setup_basic_args(kwargs:dict, command:dict) -> dict:
             command['params'].append(chk_db)
             command['modules'].append(spn)
             command['params'].append(_species_tool(kwargs["speciation"]))
-    if nprk:
+    if not nprk:
         command['modules'].append("prokka")
     
     
