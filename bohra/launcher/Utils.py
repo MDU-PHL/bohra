@@ -437,21 +437,21 @@ def _get_run_cmd_options() -> dict:
                 "short_name":"-mp",
                 "help":"Snippy - minimum read mapping quality to consider.",
                 "default":60,
-                "type":float
+                "type":int
             },
             {
                 "name":"basequal",
                 "short_name":"-bq",
                 "help":"Snippy - Minimum base quality to consider.",
                 "default":13,
-                "type":float
+                "type":int
             },
             {
                 "name":"minqual",
                 "short_name":"-mq",
                 "help":"Snippy - minimum QUALITY in VCF column 6",
                 "default":100,
-                "type":float
+                "type":int
             },
             {
                 "name":"minfrac",
@@ -572,21 +572,21 @@ def _get_run_cmd_options() -> dict:
                 "short_name":"-mp",
                 "help":"Snippy - minimum read mapping quality to consider.",
                 "default":60,
-                "type":float
+                "type":int
             },
             {
                 "name":"basequal",
                 "short_name":"-bq",
                 "help":"Snippy - Minimum base quality to consider.",
                 "default":13,
-                "type":float
+                "type":int
             },
             {
                 "name":"minqual",
                 "short_name":"-mq",
                 "help":"Snippy - minimum QUALITY in VCF column 6",
                 "default":100,
-                "type":float
+                "type":int
             },
             {
                 "name":"minfrac",
@@ -705,21 +705,21 @@ def _get_run_cmd_options() -> dict:
                 "short_name":"-mp",
                 "help":"Snippy - minimum read mapping quality to consider.",
                 "default":60,
-                "type":float
+                "type":int
             },
             {
                 "name":"basequal",
                 "short_name":"-bq",
                 "help":"Snippy - Minimum base quality to consider.",
                 "default":13,
-                "type":float
+                "type":int
             },
             {
                 "name":"minqual",
                 "short_name":"-mq",
                 "help":"Snippy - minimum QUALITY in VCF column 6",
                 "default":100,
-                "type":float
+                "type":int
             },
             {
                 "name":"minfrac",
