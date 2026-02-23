@@ -107,7 +107,7 @@ def _generate_bohra_command(
         kwargs["input_file"] = "input_checked.tsv"
         command["params"].append(f"--isolates {kwargs['input_file']}")
         LOGGER.info(f"Input file {kwargs['input_file']} added to command successfully.")
-        command = _setup_basic_args(kwargs=kwargs, command=command)
+        command = _setup_basic_args(kwargs=kwargs, command=command, pipeline=pipeline)
         mtb = True if pipeline == "tb" else False
         LOGGER.info(f"Setting up arguments for the {pipeline} pipeline.")
         for _func in _funcs()[pipeline]:

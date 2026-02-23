@@ -31,6 +31,9 @@ def _get_annotation(input_file:str, mtb:bool) -> str:
         
         for c in cols:
             if c not in std:
+                val = df[c].unique().tolist()
+                if len(val) == 1 and val[0] == "not_supplied":
+                    continue
                 annot_cols.append(c)
     if mtb:
         annot_cols.extend(['Phylogenetic lineage', "Predicted drug resistance"])

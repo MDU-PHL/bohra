@@ -297,7 +297,7 @@ def _make_annotation_file(input_file: list, result_files:list, annot_cols : str)
     """
     df = pd.DataFrame()
     annot_cols = annot_cols.split(",") if annot_cols else []
-    # print(annot_cols)
+    print(annot_cols)
     # print(pathlib.Path(input_file).exists())
     if len(annot_cols) > 0 and pathlib.Path(input_file).exists():
         # check if the file exists

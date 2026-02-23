@@ -3,7 +3,7 @@ import pathlib, subprocess, sys, pandas, numpy
 
 import pandas, pathlib
 
-HEADER = [f"Isolate\tAssembly length\t# Contigs\t# Gaps\tMin Contig size\tMax Contig size\tAvg Contig size\tAssembly N50\tCDS\trRNA"]
+
 
 def combine(prokka, asm, isolate, output):
     if prokka != "noprokka":
@@ -26,8 +26,9 @@ def combine(prokka, asm, isolate, output):
     gaps= df['sum_gap'].values[0]
     n50 = df['N50'].values[0]
 
-    result = f"{isolate}\t{bp}\t{contigs}\t{gaps}\t{mincontigs}\t{avgcontigs}\t{maxcontigs}\t{n50}\t{cds}\t{rrna}" if prokka != "" else f"{isolate}\t{bp}\t{contigs}\t{gaps}\t{mincontigs}\t{avgcontigs}\t{maxcontigs}\t{n50}\t"
+    result = f"{isolate}\t{bp}\t{contigs}\t{gaps}\t{mincontigs}\t{avgcontigs}\t{maxcontigs}\t{n50}\t{cds}\t{rrna}" if prokka != "noprokka" else f"{isolate}\t{bp}\t{contigs}\t{gaps}\t{mincontigs}\t{avgcontigs}\t{maxcontigs}\t{n50}"
     # print(result)
+    HEADER = [f"Isolate\tAssembly length\t# Contigs\t# Gaps\tMin Contig size\tMax Contig size\tAvg Contig size\tAssembly N50\tCDS\trRNA"] if prokka != "noprokka" else [f"Isolate\tAssembly length\t# Contigs\t# Gaps\tMin Contig size\tMax Contig size\tAvg Contig size\tAssembly N50"]
     HEADER.append(result)
     out = pathlib.Path(output)
     out.write_text('\n'.join(HEADER))

@@ -214,7 +214,7 @@ process COLLATE_ASM_QUICK {
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
     cache 'lenient' 
     input:
-    tuple val(meta), path(stats), path(prokka)
+    tuple val(meta), path(stats)
     output:
     tuple val(meta), path ("assembly.txt"), emit: assembly
     

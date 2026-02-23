@@ -72,11 +72,11 @@ def _accessory_params(kwargs:dict, command:dict) -> list:
     return command
 
 
-def _setup_basic_args(kwargs:dict, command:dict) -> dict:
+def _setup_basic_args(kwargs:dict, command:dict, pipeline:str) -> dict:
 
     
     spn = _is_speciation(kwargs["speciation"]) 
-    nprk = kwargs["no_prokka"] 
+    nprk = kwargs["no_prokka"] if pipeline != "preview" else True
     if spn:
         chk_db = _check_species_database(kwargs["speciation"], kwargs[f"{kwargs['speciation']}_db"])
         if chk_db:

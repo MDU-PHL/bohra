@@ -41,8 +41,8 @@ process MLST {
     // def _mlst_db = params.blast_db  ? "${params.blast_db}|$params.data_dir" : "default to conda path"
     def exclude = params.mlst_exclude != '' ? "--exclude ${params.mlst_exclude}" : ""
     """
-    mlst --json mlst.json --label $meta.id --nopath $contigs $_blast_db $_publst_db  $exclude > mlst.txt
-    $module_dir/add_header_mlst.py mlst.json
+    mlst --full --json mlst.json --label $meta.id --nopath $contigs --outfile mlst_tmp.txt $_blast_db $_publst_db  $exclude 
+    csvtk -t rename -f 'FILE,SCHEME,ST,STATUS,SCORE,ALLELES' -n 'Isolate,Scheme,ST,Status,Score,MLST_Alleles' mlst_tmp.txt > mlst.txt
     echo -e mlst'\t'\$CONDA_PREFIX'\t'\$(mlst -v)'\t'$_blast_db,$_publst_db'\t'${params.mlst_ref} | csvtk add-header -t -n 'tool,conda_env,version,database,reference' > version_mlst.txt
     """
     

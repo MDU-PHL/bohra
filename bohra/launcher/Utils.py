@@ -437,34 +437,34 @@ def _get_run_cmd_options() -> dict:
                 "short_name":"-mp",
                 "help":"Snippy - minimum read mapping quality to consider.",
                 "default":60,
-                "type":int
+                # "type":int
             },
             {
                 "name":"basequal",
                 "short_name":"-bq",
                 "help":"Snippy - Minimum base quality to consider.",
                 "default":13,
-                "type":int
+                # "type":int
             },
             {
                 "name":"minqual",
                 "short_name":"-mq",
                 "help":"Snippy - minimum QUALITY in VCF column 6",
                 "default":100,
-                "type":int
+                # "type":int
             },
             {
                 "name":"minfrac",
                 "short_name":"-mf",
                 "help":"Snippy - minimum proportion for variant evidence",
                 "default":0,
-                "type":float
+                # "type":float
             },
             {
                 "name":"fuzzy_core_prop",
                 "help":"Snippy - proportion of core genome to use for fuzzy core genome analysis.",
                 "default":1.0,
-                "type":float
+                # "type":float
             },
             {
                 "name":"ignore_warnings",
@@ -476,7 +476,7 @@ def _get_run_cmd_options() -> dict:
                 "name":"ska_minfreq",
                 "help":"Ska - minimum frequency for variant calling.",
                 "default":0.9,
-                "type":float
+                # "type":float
             },
             {
                 "name": "ska_alnargs",
@@ -572,28 +572,28 @@ def _get_run_cmd_options() -> dict:
                 "short_name":"-mp",
                 "help":"Snippy - minimum read mapping quality to consider.",
                 "default":60,
-                "type":int
+                # "type":int
             },
             {
                 "name":"basequal",
                 "short_name":"-bq",
                 "help":"Snippy - Minimum base quality to consider.",
                 "default":13,
-                "type":int
+                # "type":int
             },
             {
                 "name":"minqual",
                 "short_name":"-mq",
                 "help":"Snippy - minimum QUALITY in VCF column 6",
                 "default":100,
-                "type":int
+                # "type":int
             },
             {
                 "name":"minfrac",
                 "short_name":"-mf",
                 "help":"Snippy - minimum proportion for variant evidence",
                 "default":0,
-                "type":float
+                # "type":float
             },
             {
                 "name":"ignore_warnings",
@@ -605,7 +605,7 @@ def _get_run_cmd_options() -> dict:
                 "name":"fuzzy_core_prop",
                 "help":"Snippy - proportion of core genome to use for fuzzy core genome analysis.",
                 "default":1.0,
-                "type":float
+                # "type":float
             },
             {
                 "name":"ska_minfreq",
@@ -705,28 +705,28 @@ def _get_run_cmd_options() -> dict:
                 "short_name":"-mp",
                 "help":"Snippy - minimum read mapping quality to consider.",
                 "default":60,
-                "type":int
+                # "type":int
             },
             {
                 "name":"basequal",
                 "short_name":"-bq",
                 "help":"Snippy - Minimum base quality to consider.",
                 "default":13,
-                "type":int
+                # "type":int
             },
             {
                 "name":"minqual",
                 "short_name":"-mq",
                 "help":"Snippy - minimum QUALITY in VCF column 6",
                 "default":100,
-                "type":int
+                # "type":int
             },
             {
                 "name":"minfrac",
                 "short_name":"-mf",
                 "help":"Snippy - minimum proportion for variant evidence",
                 "default":0,
-                "type":float
+                # "type":float
             },
             {
                 "name":"ignore_warnings",
@@ -738,7 +738,7 @@ def _get_run_cmd_options() -> dict:
                 "name":"fuzzy_core_prop",
                 "help":"Snippy - proportion of core genome to use for fuzzy core genome analysis.",
                 "default":1.0,
-                "type":float
+                # "type":float
             },
             {
                 "name":"ska_minfreq",
@@ -853,8 +853,9 @@ def _compartive_args(tool:str,kwargs:dict, command:dict) -> dict:
     }
 
     for arg in comparative_args[tool]:
+        val = int(kwargs[arg]) if arg in ["minqual", "basequal", "minmap"] else kwargs[arg]
         if kwargs[arg] != "":
-            command['params'].append(f"--{arg} {kwargs[arg]}")
+            command['params'].append(f"--{arg} {val}")
     if kwargs['cluster']:
         command['params'].append(f"--cluster true")
         for arg in ["cluster_method", "cluster_threshold"]:
