@@ -2,6 +2,6 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - ngmaster
+  - ngmaster>=1.1.1
   - csvtk
-  - python=3.6
+  - python>=3.12

@@ -2,6 +2,6 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - lissero
+  - lissero>=0.4.10
   - csvtk
-  - python=3.6
+  - python>=3.12

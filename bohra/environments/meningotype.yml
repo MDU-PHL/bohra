@@ -2,7 +2,6 @@ channels:
   - bioconda
   - conda-forge
 dependencies:
-  - python=3.6
-  - meningotype
+  - python>=3.12
+  - meningotype>=0.8.6b
   - csvtk
-  - biopython=1.71
