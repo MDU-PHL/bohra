@@ -47,13 +47,14 @@ def check_val_aln(val:float, min_val:float,metric:str,strict:bool) -> str:
     """
     Check if the coverage is above the minimum coverage and not an outlier
     """
-    if val[1]:
+    print(val)
+    if val["is_control"]:
         return 1
-    if val[0] == "" and val[2] == "":
+    if val["% Aligned"] == "" and val["Aln_outlier"] == "":
         return 1
-    elif int(val[0]) >= min_val and val[2] == "":
+    elif int(val["% Aligned"]) >= min_val and val["Aln_outlier"] == "":
         return 1
-    elif val[2] != "":
+    elif val["Aln_outlier"] != "":
         return f"Isolate marked as outlier in core genome analysis and is remove from comparative dataset." if strict else f"Isolate marked as outlier in core genome analysis. Should be removed from comparative dataset and bohra rerun." 
     else:
         return f"{metric}: {val[0]}, should be at least {min_val}`"
