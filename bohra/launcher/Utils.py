@@ -179,6 +179,18 @@ def _resource_opt() -> list:
 
     return resource_options
 
+def _get_varied_options(pipeline:str) -> list:
+    """
+    Get the options that vary for each pipeline
+    :return: list of options
+    """
+    varied_options = {
+        "basic":[],
+        "assemble":[],
+        "amr_typing":[],
+        "tb":[],
+        "preview":[]
+    }
 
 def _get_common_options() -> list:
     """
@@ -210,18 +222,7 @@ def _get_common_options() -> list:
             "metavar":'BOHRA_KRAKEN2_DB',
             "show_default":True
         },
-        {
-            "name":"speciation",
-            "help":"Speciation will be performed by deafult. Use none if you do not need species detected.",
-            "type":click.Choice(['kraken2', 'none']),
-            "default":"kraken2"
-        },
-        {
-            "name":"no-prokka",
-            "help":"Set --no-prokka if you do not want to annotate assemblies with prokka. Please note that this will result in no annotation of trees and no genbank files in the output.",
-            "is_flag":True,
-            "default":False
-        },
+        
         {
             "name":"no-auto-run",
             "default":False,
@@ -362,8 +363,32 @@ def _get_run_cmd_options() -> dict:
     # opt.extend(resource_options)
     # print(opt)
     all_options = {
-        "basic": [],
+        "basic": [{
+            "name":"speciation",
+            "help":"Speciation will be performed by deafult. Use none if you do not need species detected.",
+            "type":click.Choice(['kraken2', 'none']),
+            "default":"kraken2"
+        },
+        {
+            "name":"no-prokka",
+            "help":"Set --no-prokka if you do not want to annotate assemblies with prokka. Please note that this will result in no annotation of trees and no genbank files in the output.",
+            "is_flag":True,
+            "default":False
+        }
+        ],
         "assemble": [
+                {
+                "name":"speciation",
+                "help":"Speciation will be performed by deafult. Use none if you do not need species detected.",
+                "type":click.Choice(['kraken2', 'none']),
+                "default":"kraken2"
+            },
+            {
+                "name":"no-prokka",
+                "help":"Set --no-prokka if you do not want to annotate assemblies with prokka. Please note that this will result in no annotation of trees and no genbank files in the output.",
+                "is_flag":True,
+                "default":False
+            },
             {
                 "name":"assembler",
                 "short_name":"-a",
@@ -384,6 +409,18 @@ def _get_run_cmd_options() -> dict:
 
         ],
         "amr_typing": [
+            {
+            "name":"speciation",
+            "help":"Speciation will be performed by deafult. Use none if you do not need species detected.",
+            "type":click.Choice(['kraken2', 'none']),
+            "default":"kraken2"
+            },
+            {
+                "name":"no-prokka",
+                "help":"Set --no-prokka if you do not want to annotate assemblies with prokka. Please note that this will result in no annotation of trees and no genbank files in the output.",
+                "is_flag":True,
+                "default":False
+            },
             {
                 "name":"blast_db",
                 "help":"Path to the mlst blast_db, defaults to what is installed in the environment.",
@@ -408,6 +445,18 @@ def _get_run_cmd_options() -> dict:
             }
         ],
         "tb":[
+            {
+            "name":"speciation",
+            "help":"Speciation will be performed by deafult. Use none if you do not need species detected.",
+            "type":click.Choice(['kraken2', 'none']),
+            "default":"kraken2"
+            },
+            {
+                "name":"no-prokka",
+                "help":"Set --no-prokka if you do not want to annotate assemblies with prokka. Please note that this will result in no annotation of trees and no genbank files in the output.",
+                "is_flag":True,
+                "default":False
+            },
             {   "name":"comparative_tool",
                 "type":click.Choice(CFG["comparative_tools"]),
                 "help": "Tool to use for comparative genomics.",
@@ -536,6 +585,18 @@ def _get_run_cmd_options() -> dict:
             }
         ],
         "preview":[
+            {
+            "name":"speciation",
+            "help":"Speciation will be performed by deafult. Use none if you do not need species detected.",
+            "type":click.Choice(['kraken2', 'none']),
+            "default":"none"
+            },
+            {
+                "name":"prokka",
+                "help":"Set --prokka if you want to annotate assemblies with prokka. Please note that this will result in no annotation of trees and no genbank files in the output.",
+                "is_flag":True,
+                "default":False
+            },
             {   "name":"comparative_tool",
                 "type":click.Choice(CFG["comparative_tools"]),
                 "help": "Tool to use for comparative genomics.",
@@ -669,6 +730,18 @@ def _get_run_cmd_options() -> dict:
             },
         ],
         "full": [
+            {
+            "name":"speciation",
+            "help":"Speciation will be performed by deafult. Use none if you do not need species detected.",
+            "type":click.Choice(['kraken2', 'none']),
+            "default":"kraken2"
+            },
+            {
+                "name":"no-prokka",
+                "help":"Set --no-prokka if you do not want to annotate assemblies with prokka. Please note that this will result in no annotation of trees and no genbank files in the output.",
+                "is_flag":True,
+                "default":False
+            },
             {   "name":"comparative_tool",
                 "type":click.Choice(CFG["comparative_tools"]),
                 "help": "Tool to use for comparative genomics.",
