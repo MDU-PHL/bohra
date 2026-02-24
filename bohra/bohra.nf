@@ -20,6 +20,7 @@ println "Running bohra - microbial genomics pipeline!"
 
 // get a list of samples
 def samples = [:]
+def rds = []
 def asms = [:]
 def asmblr = [:]
 def sp = [:]
@@ -32,12 +33,17 @@ input_file = file(params.isolates) // need to make this an input file
     line = line.split("\t")
         // println "The line is : $line"
         samples[line[0]] = line[0]
+        if (line[1] != "not_supplied") {
+            rds << line[0]
+        }
         asms[line[0]] = line[3]
         // asmblr[line[0]] = line[3]
         sp[line[0]] = line[4]
         ctrl[line[0]] = line[5] 
      }
     }
+// println "The samples are : $samples"
+// println "The samples with reads are : $rds"
 
 println "Will run : $params.modules"
 // println samples
@@ -61,10 +67,12 @@ workflow {
     //             .map {  files -> tuple([id: files.getParent().getName(), modules:samples[files.getParent().getName()], input_type:'ont_reads', asm :asms[files.getParent().getName()],assembler:asmblr[files.getParent().getName()],species:sp[files.getParent().getName()]], files)}
     
     asm = Channel.fromPath( ["${params.outdir}/*/contigs.fa"])       
-                .filter { files -> samples.containsKey(files.getParent().getName())} 
+                .filter { files -> samples.containsKey(files.getParent().getName())}
+                .filter { files -> rds.contains(files.getParent().getName()) == false } // only take assemblies for samples that don't have reads
                 .map {  files -> tuple([id: files.getParent().getName(), input_type:'asm', asm :files, species:sp[files.getParent().getName()], control: ctrl[files.getParent().getName()]], files)}
     
-    
+    // println reads_pe.view()
+    // println asm.view()
     results = Channel.empty()
 
     // println reads_pe.view()
@@ -78,41 +86,39 @@ workflow {
     versions = READ_ANALYSIS.out.version_seqkit_reads
     versions = versions.concat( READ_ANALYSIS.out.version_kmc )
     versions = versions.concat( READ_ANALYSIS.out.version_bohra )
-    // reads_pe = READ_ANALYSIS.out.reads_pe
+    reads_pe = READ_ANALYSIS.out.reads_pe
     // if there is assembly in the modules list then generate an assembly and run assembly analysis
-    
+    asm_out = Channel.empty()
     if (params.modules.contains("assemble") ){
         // assembly is only done if the input is reads
         RUN_ASSEMBLE ( reads_pe.filter { cfg, files -> cfg.control != 'control' } )
         // RUN_ASSEMBLE ( reads_ont )
-        asm = RUN_ASSEMBLE.out.contigs
+        asm_out = RUN_ASSEMBLE.out.contigs
+        
         versions = versions.concat( RUN_ASSEMBLE.out.versions )
         results = results.concat( RUN_ASSEMBLE.out.insertiqr )
         
     } 
+    asm_input = asm.mix(asm_out)
+    
     if (params.modules.contains("prokka") ){
-        ASSEMBLY_ANALYSIS_FULL ( asm )
+        ASSEMBLY_ANALYSIS_FULL ( asm_input )
         assembly_stats = ASSEMBLY_ANALYSIS_FULL.out.assembly_stats
         versions = versions.concat( ASSEMBLY_ANALYSIS_FULL.out.version_prokka, ASSEMBLY_ANALYSIS_FULL.out.version_seqkit_asm )
         // update the results with the assembly stats
         results = results.concat( assembly_stats )
     } else {
-            ASSEMBLY_ANALYSIS_QUICK ( asm )
+            ASSEMBLY_ANALYSIS_QUICK ( asm_input )
             assembly_stats = ASSEMBLY_ANALYSIS_QUICK.out.assembly_stats
             versions = versions.concat( ASSEMBLY_ANALYSIS_QUICK.out.version_seqkit_asm )
             // update the results with the assembly stats
             results = results.concat( assembly_stats )
     }
-    // ASSEMBLY_ANALYSIS ( asm )
-    // assembly_stats = ASSEMBLY_ANALYSIS.out.assembly_stats
-    // versions = versions.concat( ASSEMBLY_ANALYSIS.out.version_prokka, ASSEMBLY_ANALYSIS.out.version_seqkit_asm )
-    // update the results with the assembly stats
-    results = results.concat( assembly_stats )
-    
+   
     if (params.modules.contains("species") ){
         
         RUN_SPECIES_READS ( reads_pe )
-        RUN_SPECIES_ASM ( asm )
+        RUN_SPECIES_ASM ( asm_input )
         versions = versions.concat( RUN_SPECIES_READS.out.version, RUN_SPECIES_ASM.out.version )
         reads_species_obs = RUN_SPECIES_READS.out.species_obs
         asm_species_obs = RUN_SPECIES_ASM.out.species_obs
@@ -152,7 +158,7 @@ workflow {
     if (params.modules.contains("typing") ){
         // assembly is only done if the input is reads
         // find any tb as plasmid and mlst and abritamr no good - use tbtamr
-        asm_typing = asm.filter { cfg, asm -> cfg.species != 'Mycobacterium tuberculosis' }.filter { cfg, files -> cfg.control != 'control' }
+        asm_typing = asm_input.filter { cfg, asm -> cfg.species != 'Mycobacterium tuberculosis' }.filter { cfg, files -> cfg.control != 'control' }
         reads_nottb = reads_pe.filter { cfg, reads -> cfg.species != 'Mycobacterium tuberculosis' }.filter { cfg, files -> cfg.control != 'control' }
         reads_tb = reads_pe.filter { cfg, reads -> cfg.species == 'Mycobacterium tuberculosis' }.filter { cfg, files -> cfg.control != 'control' }
         RUN_TYPING ( asm_typing, reads_nottb )

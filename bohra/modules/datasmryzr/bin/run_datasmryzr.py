@@ -67,14 +67,14 @@ def check_contigs(upper, lower, contigs:list) -> str:
     """
     # print(contigs[0])
     # print(lower, upper)
-    if contigs[1]:
+    if contigs['is_control']:
         return 1
-    if contigs[0] == "":
+    if contigs['# Contigs'] == "":
         return 1
-    if (contigs[0] >= lower) and (contigs[0] <= upper):
+    if (contigs['# Contigs'] >= lower) and (contigs['# Contigs'] <= upper):
         return 1
     else:
-        return f"Number of contigs: {contigs[0]} is outside the expected range of {lower} and {upper}."
+        return f"Number of contigs: {contigs['# Contigs']} is outside the expected range of {lower} and {upper}."
 
 def check_filesize(filesize) -> str:
     """
