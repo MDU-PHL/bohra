@@ -38,7 +38,7 @@ process ABRITAMR {
     
     
     """
-    sp=\$($module_dir/extract_species.py $contigs)
+    sp=\$($module_dir/extract_species.py ${meta.species})
     abritamr run -c $contigs -px ${meta.id} -j $task.cpus \$sp
     cp ${meta.id}/* .
     $module_dir/add_species.py '${meta.species}' summary_matches.txt
