@@ -68,7 +68,7 @@ def _max_cpus(cpus:int) -> dict:
     avail = int(_get_cpu_limit_local(cpus=cpus))
     
     if cpus > avail:
-        LOGGER.warning(f"You requested {cpus} CPUs but average {avail} are available (load over 1,5,15 min). You may overload your system - take care.")
+        LOGGER.warning(f"You requested {cpus} CPUs but average {avail if avail > 0 else 0} are available (load over 1,5,15 min). You may overload your system - take care.")
         # raise SystemExit
     
     return cpus
