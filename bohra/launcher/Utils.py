@@ -363,21 +363,8 @@ def _get_run_cmd_options() -> dict:
     # opt.extend(resource_options)
     # print(opt)
     all_options = {
-        "basic": [{
-            "name":"speciation",
-            "help":"Speciation will be performed by deafult. Use none if you do not need species detected.",
-            "type":click.Choice(['kraken2', 'none']),
-            "default":"kraken2"
-        },
-        {
-            "name":"no-prokka",
-            "help":"Set --no-prokka if you do not want to annotate assemblies with prokka. Please note that this will result in no annotation of trees and no genbank files in the output.",
-            "is_flag":True,
-            "default":False
-        }
-        ],
-        "assemble": [
-                {
+        "basic": [
+            {
                 "name":"speciation",
                 "help":"Speciation will be performed by deafult. Use none if you do not need species detected.",
                 "type":click.Choice(['kraken2', 'none']),
@@ -388,7 +375,10 @@ def _get_run_cmd_options() -> dict:
                 "help":"Set --no-prokka if you do not want to annotate assemblies with prokka. Please note that this will result in no annotation of trees and no genbank files in the output.",
                 "is_flag":True,
                 "default":False
-            },
+            }
+        ],
+        "assemble": [
+                
             {
                 "name":"assembler",
                 "short_name":"-a",
@@ -409,18 +399,7 @@ def _get_run_cmd_options() -> dict:
 
         ],
         "amr_typing": [
-            # {
-            # "name":"speciation",
-            # "help":"Speciation will be performed by deafult. Use none if you do not need species detected.",
-            # "type":click.Choice(['kraken2', 'none']),
-            # "default":"kraken2"
-            # },
-            # {
-            #     "name":"no-prokka",
-            #     "help":"Set --no-prokka if you do not want to annotate assemblies with prokka. Please note that this will result in no annotation of trees and no genbank files in the output.",
-            #     "is_flag":True,
-            #     "default":False
-            # },
+            
             {
                 "name":"blast_db",
                 "help":"Path to the mlst blast_db, defaults to what is installed in the environment.",
@@ -730,18 +709,7 @@ def _get_run_cmd_options() -> dict:
             },
         ],
         "full": [
-            {
-            "name":"speciation",
-            "help":"Speciation will be performed by deafult. Use none if you do not need species detected.",
-            "type":click.Choice(['kraken2', 'none']),
-            "default":"kraken2"
-            },
-            {
-                "name":"no-prokka",
-                "help":"Set --no-prokka if you do not want to annotate assemblies with prokka. Please note that this will result in no annotation of trees and no genbank files in the output.",
-                "is_flag":True,
-                "default":False
-            },
+            
             {   "name":"comparative_tool",
                 "type":click.Choice(CFG["comparative_tools"]),
                 "help": "Tool to use for comparative genomics.",
@@ -885,13 +853,19 @@ def _get_run_cmd_options() -> dict:
     }
 
     cmd_opt = {}
-    for p in ["basic", "assemble", "amr_typing","full","preview"]:  # Add other pipelines as needed
+    for p in ["basic", "assemble", "amr_typing","full"]:  # Add other pipelines as needed
+        # print(p)
+        # print(opt)
         opt.extend(all_options[p])
+        # print(opt)
         popt = opt.copy()
         popt.extend(resource_options)
         cmd_opt[p] = popt
+        # print(cmd_opt[p])
     
+
     comp = common_options.copy()
+    comp.extend(all_options["basic"])
     comp.extend(all_options["full"])
     comp.extend(resource_options)
     cmd_opt["comparative"] = comp
