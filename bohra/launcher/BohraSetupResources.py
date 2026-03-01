@@ -51,7 +51,7 @@ def _get_cpu_limit_local(cpus: int = 0) -> int:
 
     total_cores = os.cpu_count()
     one,five,fifteen = psutil.getloadavg()
-    avail = total_cores - max(one,five,fifteen)
+    avail = total_cores - (sum([one,five,fifteen])/3)
 
     return avail
     
@@ -68,8 +68,8 @@ def _max_cpus(cpus:int) -> dict:
     avail = int(_get_cpu_limit_local(cpus=cpus))
     
     if cpus > avail:
-        LOGGER.error(f"You requested {cpus} CPUs but only {avail} are available. Please check your available resources and try again.")
-        raise SystemExit
+        LOGGER.warning(f"You requested {cpus} CPUs but average {avail} are available (load over 1,5,15 min). You may overload your system - take care.")
+        # raise SystemExit
     
     return cpus
 

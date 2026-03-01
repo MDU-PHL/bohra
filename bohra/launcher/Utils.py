@@ -172,6 +172,12 @@ def _resource_opt() -> list:
             "is_flag":True,
             "default":False
         },
+        # {
+        #     "name":"no-check",
+        #     "help":"Set to skip dependency checks for conda environments. Please note that this may lead to unexpected results if you do not have the correct conda environments installed.",
+        #     "is_flag":True,
+        #     "default":False
+        # }
         
         
     
