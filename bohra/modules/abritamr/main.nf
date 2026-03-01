@@ -36,12 +36,12 @@ process ABRITAMR {
     tuple val(meta), path('version_abritamr.txt'), emit: version
     script:
     
-    
+    def spcs = meta.containsKey('species_obs') ? meta.species_obs : meta.species
     """
-    sp=\$($module_dir/extract_species.py ${meta.species})
+    sp=\$($module_dir/extract_species.py '${spcs}')
     abritamr run -c $contigs -px ${meta.id} -j $task.cpus \$sp
     cp ${meta.id}/* .
-    $module_dir/add_species.py '${meta.species}' summary_matches.txt
+    $module_dir/add_species.py '${spcs}' summary_matches.txt
     echo -e abritamr'\t'\$CONDA_PREFIX'\t'\$(abritamr -v)'\t'${params.abritamr_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_abritamr.txt
     """
 }

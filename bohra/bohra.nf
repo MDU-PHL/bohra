@@ -134,12 +134,11 @@ workflow {
        
         species_tmp = COMBINE_SPECIES.out.species_obs
                                             .map { cfg, species_obs -> tuple(cfg.id, cfg, species_obs.trim() ) }
-        // println species_tmp.view()
         reads = reads_pe.map { cfg, files -> tuple(cfg.id, cfg, files) }
         reads_pe = reads.join( species_tmp )
                                 .map { id, cfg_reads, files, cfg_spieces,  species_obs -> tuple(cfg_reads + [species:species_obs.trim()] , files) }
                          
-        asm_tmp = asm.map { cfg, files -> tuple(cfg.id, cfg , files) }
+        asm_tmp = asm_input.map { cfg, files -> tuple(cfg.id, cfg , files) }
         asm = asm_tmp.join( species_tmp )
                                 .map { id, cfg_asm, files, cfg_spieces, species_obs -> tuple(cfg_asm + [species:species_obs.trim()] , files) }
         
@@ -154,13 +153,20 @@ workflow {
         results = results.concat( RUN_TBTAMR.out.results )
         versions = versions.concat( RUN_TBTAMR.out.version )
     }
-
+    
     if (params.modules.contains("typing") ){
         // assembly is only done if the input is reads
         // find any tb as plasmid and mlst and abritamr no good - use tbtamr
-        asm_typing = asm_input.filter { cfg, asm -> cfg.species != 'Mycobacterium tuberculosis' }.filter { cfg, files -> cfg.control != 'control' }
-        reads_nottb = reads_pe.filter { cfg, reads -> cfg.species != 'Mycobacterium tuberculosis' }.filter { cfg, files -> cfg.control != 'control' }
-        reads_tb = reads_pe.filter { cfg, reads -> cfg.species == 'Mycobacterium tuberculosis' }.filter { cfg, files -> cfg.control != 'control' }
+        if (params.modules.contains("species")){
+            asm_typing = asm.filter { cfg, asm -> cfg.species_obs != 'Mycobacterium tuberculosis' }.filter { cfg, files -> cfg.control != 'control' }
+            reads_nottb = reads_pe.filter { cfg, reads -> cfg.species_obs != 'Mycobacterium tuberculosis' }.filter { cfg, files -> cfg.control != 'control' }
+            reads_tb = reads_pe.filter { cfg, reads -> cfg.species_obs == 'Mycobacterium tuberculosis' }.filter { cfg, files -> cfg.control != 'control' }
+       
+        } else {
+            asm_typing = asm_input.filter { cfg, asm -> cfg.species != 'Mycobacterium tuberculosis' }.filter { cfg, files -> cfg.control != 'control' }
+            reads_nottb = reads_pe.filter { cfg, reads -> cfg.species != 'Mycobacterium tuberculosis' }.filter { cfg, files -> cfg.control != 'control' }
+            reads_tb = reads_pe.filter { cfg, reads -> cfg.species == 'Mycobacterium tuberculosis' }.filter { cfg, files -> cfg.control != 'control' }
+        }
         RUN_TYPING ( asm_typing, reads_nottb )
         resistome = RUN_TYPING.out.resistome
         virulome = RUN_TYPING.out.virulome
