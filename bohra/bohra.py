@@ -40,14 +40,17 @@ def _show_usage_error(self, file=None):
     click.echo('ERROR: %s' % self.format_message(), file=file, color=color)
 
 UsageError.show = _show_usage_error
-
-@click.group(no_args_is_help=True,invoke_without_command=True)
+CONTEXT_SETTINGS = dict(
+    help_option_names=['-h', '--help'],
+    
+)
+@click.group(no_args_is_help=True, context_settings=CONTEXT_SETTINGS, invoke_without_command=True)
 @click.version_option(version, message='%(prog)s %(version)s')
 # @click.pass_context
 def cli():
     pass
 
-@cli.group(no_args_is_help=True,invoke_without_command=True)
+@cli.group(no_args_is_help=True, context_settings=CONTEXT_SETTINGS, invoke_without_command=True)
 def run():
     """
     Run the Bohra pipeline.
@@ -62,7 +65,7 @@ def deps():
     """
     pass
 
-@cli.group(no_args_is_help=True,invoke_without_command=True)
+@cli.group(no_args_is_help=True, context_settings=CONTEXT_SETTINGS, invoke_without_command=True)
 def utils():
     """
     Bohra utilities.
