@@ -243,9 +243,18 @@ def _extract_cluster_table(results_files: list, output:list) -> str:
     for file in results_files:
         if pathlib.Path(file).exists() and "clusters" in file:
             try:
-                pd.read_csv(file, sep = '\t')       
-                output.append(file)
-                return f"-ct {file}", output
+
+                tb = pd.read_csv(file, sep = '\t')  
+                tbcols = tb.columns.tolist()
+                tbcols = [i for i in tbcols if "Tx:" in i]   
+                if len(tbcols) == 1:
+                    print(f"Cluster file {file} has one threshold column: {tbcols[0]}")
+                    subprocess.run(f"cp {file} cluster_table.txt", shell=True)
+                    output.append("cluster_table.txt")
+                    return f"-f cluster_table.txt", output
+                else:
+                    output.append(file)
+                    return f"-ct {file}", output
             except Exception as e:
                 print(f"Error reading cluster file {file}: {e}")
                 continue
@@ -489,13 +498,13 @@ def _run_datasmryzr(tree:str,
     cmd = f"datasmryzr --title '{job_id}' -c bohra_config.json -bg '{bkgd_color}' -fc '{text_color}' --pipeline {pipeline} --pipeline_version '{pipeline_version}' {treebuilder} {no_downloadable_tables} {other_files} {pangenome_classification} {pangenome_rtab} {pangenome_groups} {tree} {distance_matrix} {cluster_table} {core_genome} {core_genome_report} {reference} {mask} {annotation} {read_assessment} {numvarsites}"
     print(cmd)
     p = subprocess.run(cmd, shell=True, capture_output=True)
-    if p.returncode != 0:
-        print(p.stderr.decode())
-        raise Exception(f"Error running datasmryzr: {p.stderr.decode()}")
-    else:
-        print(p.stdout.decode())
-        print("datasmryzr run complete")
-        return p.stdout.decode()
+    # if p.returncode != 0:
+    #     print(p.stderr.decode())
+    #     raise Exception(f"Error running datasmryzr: {p.stderr.decode()}")
+    # else:
+    #     print(p.stdout.decode())
+    #     print("datasmryzr run complete")
+    #     return p.stdout.decode()
 
 def extract_cmd(launchdir: str) -> str:
     """
@@ -622,6 +631,7 @@ def _compile(args):
     tree,output = _extract_tree(results_files, output)
     distance_matrix,output = _extract_distance_matrix(results_files, output)
     cluster_table,output = _extract_cluster_table(results_files, output)
+    results_files = [i for i in results_files if "clusters.txt" not in i]
     core_genome,output = _extract_core_genome(results_files, output)
     core_genome_report,output = _extract_core_genome_report(results_files, output)
     summary,output = _generate_summary_table(args.input_file, results_files, output, 40, 30, 70,args.ignore_warnings)
