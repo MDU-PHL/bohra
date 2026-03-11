@@ -90,7 +90,7 @@ def _get_required_columns() -> dict:
     return {
         "required":["Isolate"],
         "must_have": ["r1","assembly"],
-        "optional": ["r2", "species","is_control"]
+        "optional": ["r2", "Species_expected","is_control"]
     }
 
 
