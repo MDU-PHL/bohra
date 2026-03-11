@@ -25,7 +25,7 @@ process KRAKEN2 {
     
     input:
     tuple val(meta), path(sequences)
-    kraken2_db
+    val(kraken2_db)
     
 
     output:

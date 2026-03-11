@@ -670,7 +670,7 @@ def _compile(args):
                         read_assessment,
                         args.pipeline,
                         pipeline_version,
-                        ndt,
+                        # ndt,
                         treebuilder
                         )
     
