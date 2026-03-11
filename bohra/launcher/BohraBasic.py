@@ -64,7 +64,7 @@ def _accessory_params(kwargs:dict, command:dict) -> list:
     if not kwargs['force']:
         command['params'].append("-resume")
 
-    command['params'].append(f"--background_color '{kwargs['background_color']}'  --text_color '{kwargs['text_color']}' --job_id {kwargs['job_name']}")
+    command['params'].append(f"--job_id {kwargs['job_name']}")
     return command
 
 

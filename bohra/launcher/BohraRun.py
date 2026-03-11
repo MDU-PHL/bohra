@@ -47,12 +47,12 @@ def _init_command_dict(profile:str, cpus:int, job_name:str, prefix:str, pipeline
         f"--report_outdir {report_outdir}",
         f"-profile {profile}",
         f"--outdir {outdir}",
-        f"--no_downloadable_tables {'true' if no_downloadable_tables else 'false'}",
+        # f"--no_downloadable_tables {'true' if no_downloadable_tables else 'false'}",
         f"--pipeline {pipeline}",
         f"-executor.cpus {cpus}",
         "-with-trace",
         f"--job_id {job_name}",
-        f"--conda_prefix {prefix}",
+        # f"--conda_prefix {prefix}",
                 ], "modules":[]}
 
     if profile_config != "":
@@ -98,7 +98,7 @@ def _generate_bohra_command(
                   replace_report=kwargs["replace_report"]):
         LOGGER.info(f"Checking on the setup for the {pipeline} pipeline.")
         # if not kwargs["no-check"]:
-        dependencies(_action = "check")
+        # dependencies(_action = "check")
             
         max_cpus = int(_max_cpus(cpus=kwargs.get('cpus', 0)))
         LOGGER.info(f"Using {int(max_cpus)} CPUs for the {pipeline} pipeline.")

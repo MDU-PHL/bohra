@@ -490,12 +490,12 @@ def _run_datasmryzr(tree:str,
                     read_assessment,
                     pipeline:str,
                     pipeline_version:str,
-                    no_downloadable_tables:str,
+                    # no_downloadable_tables:str,
                     treebuilder:str) -> str:    
     """
     Run the datasmryzr pipeline
     """
-    cmd = f"datasmryzr --title '{job_id}' -c bohra_config.json -bg '{bkgd_color}' -fc '{text_color}' --pipeline {pipeline} --pipeline_version '{pipeline_version}' {treebuilder} {no_downloadable_tables} {other_files} {pangenome_classification} {pangenome_rtab} {pangenome_groups} {tree} {distance_matrix} {cluster_table} {core_genome} {core_genome_report} {reference} {mask} {annotation} {read_assessment} {numvarsites}"
+    cmd = f"datasmryzr --title '{job_id}' -c bohra_config.json -bg '{bkgd_color}' -fc '{text_color}' --pipeline {pipeline} --pipeline_version '{pipeline_version}' {treebuilder} {other_files} {pangenome_classification} {pangenome_rtab} {pangenome_groups} {tree} {distance_matrix} {cluster_table} {core_genome} {core_genome_report} {reference} {mask} {annotation} {read_assessment} {numvarsites}"
     print(cmd)
     p = subprocess.run(cmd, shell=True, capture_output=True)
     # if p.returncode != 0:
@@ -649,7 +649,7 @@ def _compile(args):
     annotation = _make_annotation_file(args.input_file, results_files, f"{args.annot_cols}")
     generate_config(args.cluster_method, args.cluster_threshold, args.pangenome_groups, args.kraken2_db, 'kraken2' if args.speciation == 'true' else "sylph", args.launchdir, args.reference)
     pipeline_version = get_pipeline_version(args.results_files)
-    ndt = '--no-downloadable-tables' if args.no_downloadable_tables.lower() == 'true' else ''
+    # ndt = '--no-downloadable-tables' if args.no_downloadable_tables.lower() == 'true' else ''
     print(treebuilder)
     p = _run_datasmryzr(tree,
                         numvarsites,
@@ -741,10 +741,7 @@ def set_parsers():
     help = '',
     default = ''
     )
-    parser.add_argument('--no-downloadable-tables',
-        help='Disable downloadable tables in the report html.',
-        default='false'
-    )
+    
     parser.add_argument('--modules',
         help='Modules included in the report, used for determining which sections to include in the report and which comments to make.',
         default=''

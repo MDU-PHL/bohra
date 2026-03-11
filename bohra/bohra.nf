@@ -46,6 +46,9 @@ input_file = file(params.isolates) // need to make this an input file
 // println "The samples with reads are : $rds"
 
 println "Will run : $params.modules"
+println "use_conda has been set to "
+println "Dependencies are installed at  : ${params.dependency_prefix}"
+
 // println samples
 include { READ_ANALYSIS;ASSEMBLY_ANALYSIS_FULL;ASSEMBLY_ANALYSIS_QUICK } from './workflows/seq_assessment'
 include { RUN_ASSEMBLE } from './workflows/assemble'
