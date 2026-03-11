@@ -9,6 +9,7 @@ include { CSVTK_CONCAT;CSVTK_UNIQ } from './../modules/csvtk/main'
 workflow RUN_SPECIES_READS {
     take:
         sequences
+        kraken2_db
     main:
         
         if ( params.use_kraken2 ) {
@@ -32,13 +33,14 @@ workflow RUN_SPECIES_READS {
 workflow RUN_SPECIES_ASM {
     take:
         sequences
+        kraken2_db
     main:
         species = sequences.map { cfg, files -> tuple(cfg, "no_results") }
         species_raw = sequences.map { cfg, files -> tuple(cfg, "no_results") }
         species_obs = sequences.map { cfg, files -> tuple(cfg, "no_results") }
         version = Channel.empty()
         if ( params.use_kraken2 ) {
-            RUN_KRAKEN ( sequences )
+            RUN_KRAKEN ( sequences, kraken2_db )
             species_raw = RUN_KRAKEN.out.species_raw
             species = RUN_KRAKEN.out.species
             species_obs = RUN_KRAKEN.out.species_obs

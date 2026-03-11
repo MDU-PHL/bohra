@@ -29,6 +29,8 @@ process MLST {
 
     input:
     tuple val(meta), path(contigs)
+    val(mlst_blast)
+    val(mlst_data)
 
     output:
     tuple val(meta), path('mlst.txt'), emit: mlst
@@ -36,8 +38,8 @@ process MLST {
     tuple val(meta), path('version_mlst.txt'), emit: version
 
     script:
-    def _blast_db = params.blast_db != "no_db" ? "--blastdb ${params.blast_db}" : ""
-    def _publst_db = params.data_dir != "no_db" ? "--datadir ${params.data_dir}" : ""
+    def _blast_db = mlst_blast != "no_db" ? "--blastdb ${mlst_blast}" : ""
+    def _publst_db = mlst_data != "no_db" ? "--datadir ${mlst_data}" : ""
     // def _mlst_db = params.blast_db  ? "${params.blast_db}|$params.data_dir" : "default to conda path"
     def exclude = params.mlst_exclude != '' ? "--exclude ${params.mlst_exclude}" : ""
     """

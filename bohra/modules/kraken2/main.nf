@@ -25,6 +25,7 @@ process KRAKEN2 {
     
     input:
     tuple val(meta), path(sequences)
+    kraken2_db
     
 
     output:
@@ -39,7 +40,7 @@ process KRAKEN2 {
     --threads $task.cpus \
     --report kraken2.tab \
     --output - \
-    -db $params.kraken2_db \
+    -db $kraken2_db \
     --memory-mapping 2> /dev/null
 
     $module_dir/collate_kraken2.py $meta.id kraken2.tab species.txt
