@@ -59,12 +59,8 @@ def _check_species_database(speciation:str, database:str) -> str:
 def _accessory_params(kwargs:dict, command:dict) -> list:
     """Returns a list of accessory parameters for the command."""
     
-    if kwargs['use_conda']:
-
-        if _check_path(kwargs['dependency_prefix']):
-            command['params'].append(f"--dependency_prefix {kwargs['dependency_prefix']}")
-            command['params'].append("-with-conda")
-            command['params'].append(f"--enable_conda { 'true' if kwargs['use_conda'] else 'false' }")
+    command['params'].append("-with-conda")
+    command['params'].append(f"--enable_conda true")
     if not kwargs['force']:
         command['params'].append("-resume")
 

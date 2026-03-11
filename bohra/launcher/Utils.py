@@ -136,17 +136,17 @@ def _resource_opt() -> list:
             "default":pwd,
             # "type":click.Path(exists=True)
         },
-        {
-            "name":"use_conda",
-            "help":"Use separate conda environments for each nextflow process.",
-            "is_flag":True,
-            "default":True
-        },
-        {
-            "name":"dependency_prefix",
-            "help":"The path to where your pre-installed conda bohra-envs are stored. This can be provided in your profiles settings as well - it assumes you have pre-configured all of your conda environments for each process run by bohra, this is an advanced setting. Please take care if you are changing it.",
-            "default":f"{pathlib.Path( os.getenv('CONDA_PREFIX')) /  'bohra_conda_envs'}" if os.getenv('CONDA_PREFIX') else f"",
-        },
+        # {
+        #     "name":"use_conda",
+        #     "help":"Use separate conda environments for each nextflow process.",
+        #     "is_flag":True,
+        #     "default":True
+        # },
+        # {
+        #     "name":"dependency_prefix",
+        #     "help":"The path to where your pre-installed conda bohra-envs are stored. This can be provided in your profiles settings as well - it assumes you have pre-configured all of your conda environments for each process run by bohra, this is an advanced setting. Please take care if you are changing it.",
+        #     "default":f"{pathlib.Path( os.getenv('CONDA_PREFIX')) /  'bohra_conda_envs'}" if os.getenv('CONDA_PREFIX') else f"",
+        # },
         {
             "name":"profile_config",
             "help":"Path to the profile config file.",
