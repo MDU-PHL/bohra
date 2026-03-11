@@ -211,7 +211,7 @@ def _get_common_options() -> list:
         {
             "name":"input_file",
             "short_name":"-i",
-            "help":"Path to tab-delimited input file. Required columns are 'Isolate', 'r1', 'r2', and 'assembly'. Optional column is 'species'. You can also supply additional columns of your choice for ttree annotation.",
+            "help":"Path to tab-delimited input file. Required columns are 'Isolate', 'r1', 'r2', and 'assembly'. Optional column is 'Species_expected'. You can also supply additional columns of your choice for ttree annotation.",
             "default":'',
             "show_default":True
         },
