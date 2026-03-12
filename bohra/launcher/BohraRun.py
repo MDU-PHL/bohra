@@ -97,8 +97,8 @@ def _generate_bohra_command(
                   report_outdir=kwargs["report_outdir"], 
                   replace_report=kwargs["replace_report"]):
         LOGGER.info(f"Checking on the setup for the {pipeline} pipeline.")
-        # if not kwargs["no-check"]:
-        # dependencies(_action = "check")
+        if not kwargs["no_check"]:
+            dependencies(_action = "check")
             
         max_cpus = int(_max_cpus(cpus=kwargs.get('cpus', 0)))
         LOGGER.info(f"Using {int(max_cpus)} CPUs for the {pipeline} pipeline.")

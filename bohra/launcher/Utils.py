@@ -172,12 +172,12 @@ def _resource_opt() -> list:
             "is_flag":True,
             "default":False
         },
-        # {
-        #     "name":"no-check",
-        #     "help":"Set to skip dependency checks for conda environments. Please note that this may lead to unexpected results if you do not have the correct conda environments installed.",
-        #     "is_flag":True,
-        #     "default":False
-        # }
+        {
+            "name":"no-check",
+            "help":"Set to skip dependency checks for conda environments. Please note that this may lead to unexpected results if you do not have the correct conda environments installed.",
+            "is_flag":True,
+            "default":False
+        }
         
         
     
@@ -236,16 +236,7 @@ def _get_common_options() -> list:
             "help":"Set --no-auto-run to prevent the pipeline from running automatically. You will need to copy and paste the command to run the pipeline yourself."
         },
         
-        # {
-        #     "name":"text_color",
-        #     "help":"Color to use for the text in the report html. Default is 'white'.",
-        #     "default":"#ffffff",
-        # },
-        # {
-        #     "name":"background_color",
-        #     "help":"Color to use for the background in the report html. Default is '#343a40'.",
-        #     "default":"#343a40",
-        # },
+        
         {
             "name":"trim/--no-trim",
             "help":"Set if you want to trim reads using fastp. Please note that this will duplicate reads. You may notice that you use alot more disk space if you are trimming.",
