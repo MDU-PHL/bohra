@@ -22,11 +22,14 @@ If you are moving across from bohra version 2 check out the [migration informati
 | r1 | The path to read 1 | If an assembly file is not supplied you must supply reads | 
 | r2 | The path to read 2 | If an assembly file is not supplied you must supply reads |
 | assembly | The path to the assembly for the isolate | If reads are not supplied you must supply an assembly file |
-| Species_expected | The expected species of the sample or 'control'.  | No |
+| Species_expected | The expected species of the sample or 'control'. the proper species name (not the _ joined name from amrfinder) | No |
 
 **Species_expected column**
 
-If you do not require speciation as part of the pipeline and already know the species, you can provide it here. Please note if no speciation is undertaken, `bohra` will use this value to undertake typing and AMR mechanisms/inferrence. If the species in this column is NOT accurate - unexpected results may occur. Please note that species detected from sequence trumps the Species_expected value. Were you supply a value in the Species_expected column and also run speciation, the species detected from the sequences will be used to determine the AMR and also serotyping outputs. 
+If you do not require speciation as part of the pipeline and already know the species, you can provide it here. Please note if no speciation is undertaken, `bohra` will use this value to undertake typing and AMR mechanisms/inferrence. If the species in this column is NOT accurate - unexpected results may occur. 
+
+Please note that species detected from sequence trumps the Species_expected value. Were you supply a value in the Species_expected column and also run speciation, the species detected from the sequences will be used to determine the AMR and also serotyping outputs.  If you would like to run bohra and force a particular species, then use the Species_expected column and `--speciation none`.
+
 
 **Controls**
 
