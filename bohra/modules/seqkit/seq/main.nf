@@ -27,7 +27,7 @@ process SEQKIT_SEQ {
     tuple val(meta), path(input_files)
 
     output:
-    tuple val(meta), path('contigs.fa'), emit: contigs
+    tuple val(meta), path('contigs_filtered.fa'), emit: contigs
 
     script:
     
