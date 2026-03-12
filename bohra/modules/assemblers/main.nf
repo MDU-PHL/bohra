@@ -26,7 +26,7 @@ process ASSEMBLER_PE {
     tuple val(meta), path(reads)
 
     output:
-    tuple val(meta), path('contigs.fa') , emit: contigs
+    tuple val(meta), path('contigs_unfilt.fa') , emit: contigs
     tuple val(meta), path('version_assembler.txt') , emit: version
 
     script:
@@ -35,7 +35,7 @@ process ASSEMBLER_PE {
         """
         if [ -e $meta.asm ]
         then
-            cp $meta.asm contigs.fa
+            cp $meta.asm contigs_unfilt.fa
             echo -e Assembly file supplied'\t'Not applicable'\t'${meta.asm}'\t'Not applicable | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_assembler.txt
         else
             echo "No assembly file found" >> assembly.log
@@ -44,14 +44,14 @@ process ASSEMBLER_PE {
     else if ( meta.asm == "not_supplied" && params.assembler == "shovill_spades" ) {
         """
         shovill --R1 ${reads[0]} --R2 ${reads[1]} --outdir current --cpus $task.cpus --ram ${params.shovill_ram}
-        cp current/contigs.fa contigs.fa
+        cp current/contigs.fa contigs_unfilt.fa
         version=\$(shovill --version)
         echo -e shovill'\t'\$CONDA_PREFIX'\t'\$(shovill -v)'\t'${params.shovill_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_assembler.txt
         """
     } else if ( meta.asm == "not_supplied" && params.assembler == "shovill_skesa" ) {
         """
         shovill --R1 ${reads[0]} --R2 ${reads[1]} --outdir current --cpus $task.cpus --ram ${params.shovill_ram} --assembler skesa
-        cp current/contigs.fa contigs.fa
+        cp current/contigs.fa contigs_unfilt.fa
         version=\$(shovill --version)
         echo -e shovill'\t'\$CONDA_PREFIX'\t'\$(shovill -v)'\t'${params.shovill_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_assembler.txt
         """
@@ -59,14 +59,14 @@ process ASSEMBLER_PE {
         """
         tmp_dir=\$(mktemp -d)
         spades.py -1 ${reads[0]} -2 ${reads[1]} -o current -t $task.cpus ${params.spades_args} --tmp-dir \$tmp_dir
-        cp current/contigs.fasta contigs.fa
+        cp current/contigs.fasta contigs_unfilt.fa
         rm -rf \$tmp_dir
         echo -e spades'\t'\$CONDA_PREFIX'\t'\$(spades.py -v)'\t'${params.spades_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_spades.txt
         """
     } else if (meta.asm == "not_supplied" && params.assembler == "skesa"  ) {
         """
         skesa --fastq ${reads[0]},${reads[1]} --cores $task.cpus --vector_percent 1.0 \
-        --contigs_out contigs.fa
+        --contigs_out contigs_unfilt.fa
         echo -e skesa'\t'\$CONDA_PREFIX'\t'\$(skesa -v)'\t'${params.skesa_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_assembler.txt
         """
     } else {

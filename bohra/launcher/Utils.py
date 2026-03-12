@@ -392,6 +392,11 @@ def _get_run_cmd_options() -> dict:
                 "name":"shovill_ram",
                 "help":"Amount of RAM to allocate to shovill assembler.",
                 "default":16
+            },
+            {
+                "name":"min_contig_length",
+                "help":"Minimum contig length to filter assemblies.",
+                "default":200
             }
 
         ],

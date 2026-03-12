@@ -1,0 +1,7 @@
+name: bohra-seqkit
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - seqkit=2.1.0
+  - csvtk=0.25.0
