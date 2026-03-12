@@ -24,8 +24,7 @@ process KRAKEN2 {
     scratch true
     
     input:
-    tuple val(meta), path(sequences)
-    val(kraken2_db)
+    tuple val(meta), path(sequences), path(kraken2_db)
     
 
     output:

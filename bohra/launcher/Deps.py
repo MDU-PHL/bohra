@@ -19,6 +19,36 @@ fh.setFormatter(formatter)
 LOGGER.addHandler(ch) 
 LOGGER.addHandler(fh)
 
+def _check_tools_db(dep:str)->bool:
+
+    pth = pathlib.Path(os.getenv('CONDA_PREFIX')) / "bohra_conda_envs" / dep 
+    LOGGER.info(f"Checking databases for {dep} in path {pth}")
+    if dep == "mob_suite":
+        dbpth = "databases"
+    elif dep == "ectyper":
+        dbpth = "Data"
+
+    else:
+        # LOGGER.warning(f"No database check implemented for {dep}. Please ensure that any required databases for {dep} are installed and configured properly.")
+        return True
+    
+    dbdir = sorted(pth.glob(f"lib/python3.*/site-packages/{dep}/{dbpth}/"))
+    # print(dbdir)
+    LOGGER.info(f"Looking for {dep} databases in {pth}/lib/python3.*/site-packages/{dep}/{dbpth}/")
+    if len(dbdir) == 0:
+        
+        return False
+    else:
+        dbfiles = sorted(dbdir[-1].glob('*'))
+        # print(dbfiles)
+        if len(dbfiles) == 0:
+            return False
+        else:
+            for f in dbfiles:
+                if f.stat().st_size == 0 and f.is_file() and not f.name.startswith('__'):
+                    print(f"{f} is empty")
+                    return False
+    return True
 
 def _run_cmd(cmd:list, check:bool=False)-> bool:
 
@@ -65,6 +95,10 @@ def _check_envs(cfg:dict)->bool:
                 return False
             else:
                 LOGGER.info(f"{env} environment is found and {dep.split()[0]} appear to be installed properly.")
+        if env in ["mob_suite", "ectyper"]:
+            if not _check_tools_db(env):
+                LOGGER.critical(f"Dependency {env} not installed properly.")
+                return False
     return True
 
 def check_conda_version(version:str)->bool:

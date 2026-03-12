@@ -17,11 +17,10 @@ workflow RUN_TYPING {
     take:
         asm
         reads
-        mlst_blast
-        mlst_data
+        
     main:
         
-        RUN_MLST ( asm, mlst_blast, mlst_data )
+        RUN_MLST ( asm )
         mlst = RUN_MLST.out.collated_mlst
         SEROTYPES ( asm, reads )
         serotypes = SEROTYPES.out.collated_typers

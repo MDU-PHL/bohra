@@ -8,7 +8,7 @@ include { CSVTK_UNIQ } from './../modules/csvtk/main'
 workflow RUN_KRAKEN {
     take:
         sequences
-
+    
     main:
         
         KRAKEN2 ( sequences )

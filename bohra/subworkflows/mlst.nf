@@ -6,10 +6,15 @@ workflow RUN_MLST {
     
     take:
         asm
-        
+        // mlst_blast
+        // mlst_data
         
     main:
-        MLST ( asm )
+       
+        mlst_input = asm.combine(Channel.value(params.blast_db))
+        mlst_input = mlst_input.combine(Channel.value(params.data_dir))
+        
+        MLST ( mlst_input )
         mlst = MLST.out.mlst.map { cfg,file -> file}.collect().map { files -> tuple("mlst", files)}
         CONCAT_FILES ( mlst )
         collated_mlst = CONCAT_FILES.out.collated

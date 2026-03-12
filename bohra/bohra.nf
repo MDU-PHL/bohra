@@ -119,20 +119,31 @@ workflow {
     }
    
     if (params.modules.contains("species") ){
-        species_db = Channel.fromPath(params.kraken2_db)
-        RUN_SPECIES_READS ( reads_pe, species_db )
-        RUN_SPECIES_ASM ( asm_input, species_db )
-        versions = versions.concat( RUN_SPECIES_READS.out.version, RUN_SPECIES_ASM.out.version )
-        reads_species_obs = RUN_SPECIES_READS.out.species_obs
-        asm_species_obs = RUN_SPECIES_ASM.out.species_obs
-        sp_res = reads_species_obs.map { cfg,species -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, species.trim() ) }
-        asm_res = asm_species_obs.map { cfg,species -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, species.trim() ) }
-        COMBINE_SPECIES ( 
+        
+        RUN_SPECIES_READS ( reads_pe )
+
+        RUN_SPECIES_ASM ( asm_input )
+        //  RUN_SPECIES_READS ( reads_pe, species_db )
+        //  RUN_SPECIES_ASM ( asm_input, species_db )
+         COMBINE_SPECIES ( 
             RUN_SPECIES_READS.out.species_obs, 
             RUN_SPECIES_READS.out.species,
             RUN_SPECIES_ASM.out.species_obs, 
             RUN_SPECIES_ASM.out.species
             )
+         species_report = COMBINE_SPECIES.out.species_summary
+         results = results.concat( species_report )
+        versions = versions.concat( RUN_SPECIES_READS.out.version, RUN_SPECIES_ASM.out.version )
+        reads_species_obs = RUN_SPECIES_READS.out.species_obs
+        asm_species_obs = RUN_SPECIES_ASM.out.species_obs
+        sp_res = reads_species_obs.map { cfg,species -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, species.trim() ) }
+        asm_res = asm_species_obs.map { cfg,species -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, species.trim() ) }
+        // COMBINE_SPECIES ( 
+        //     RUN_SPECIES_READS.out.species_obs, 
+        //     RUN_SPECIES_READS.out.species,
+        //     RUN_SPECIES_ASM.out.species_obs, 
+        //     RUN_SPECIES_ASM.out.species
+        //     )
         
        
         species_tmp = COMBINE_SPECIES.out.species_obs
@@ -158,8 +169,7 @@ workflow {
     }
     
     if (params.modules.contains("typing") ){
-        mlst_blast = Channel.fromPath(params.mlst_blast).ifEmpty('no_db')
-        mlst_data = Channel.fromPath(params.mlst_data).ifEmpty('no_db')
+        
         // assembly is only done if the input is reads
         // find any tb as plasmid and mlst and abritamr no good - use tbtamr
         if (params.modules.contains("species")){
@@ -172,7 +182,7 @@ workflow {
             reads_nottb = reads_pe.filter { cfg, reads -> cfg.species != 'Mycobacterium tuberculosis' }.filter { cfg, files -> cfg.control != 'control' }
             reads_tb = reads_pe.filter { cfg, reads -> cfg.species == 'Mycobacterium tuberculosis' }.filter { cfg, files -> cfg.control != 'control' }
         }
-        RUN_TYPING ( asm_typing, reads_nottb )
+        RUN_TYPING ( asm_typing, reads_nottb  )
         resistome = RUN_TYPING.out.resistome
         virulome = RUN_TYPING.out.virulome
         plasmid = RUN_TYPING.out.plasmid
@@ -239,6 +249,6 @@ workflow {
         versions = versions.concat( RUN_PANAROO.out.version )
     }
 
-    // println results.view()
+    // // println results.view()
     RUN_COMPILE ( results, versions )
 }

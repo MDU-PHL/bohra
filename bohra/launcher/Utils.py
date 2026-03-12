@@ -409,12 +409,12 @@ def _get_run_cmd_options() -> dict:
             {
                 "name":"blast_db",
                 "help":"Path to the mlst blast_db, defaults to what is installed in the environment.",
-                "default":f"{os.getenv('BOHRA_BLAST_DB', '')}"
+                "default":f"{os.getenv('BLAST_DB', '')}"
             },
             {
                 "name":"data_dir",
                 "help":"Path to the mlst datadir, defaults to what is installed in the environment.",
-                "default":f"{os.getenv('BOHRA_PUBMLST_DB','')}"
+                "default":f"{os.getenv('PUBMLST_DB','')}"
             },
             {
                 "name":"mlst_exclude",
