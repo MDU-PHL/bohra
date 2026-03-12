@@ -24,9 +24,9 @@ If you are moving across from bohra version 2 check out the [migration informati
 | assembly | The path to the assembly for the isolate | If reads are not supplied you must supply an assembly file |
 | Species_expected | The expected species of the sample or 'control'.  | No |
 
-**Species column**
+**Species_expected column**
 
-If you do not require speciation as part of the pipeline and already know the species, you can provide it here. Please note if no speciation is undertaken, `bohra` will use this value to undertake typing and AMR mechanisms/inferrence. If the species in this column is NOT accurate - unexpected results may occur.
+If you do not require speciation as part of the pipeline and already know the species, you can provide it here. Please note if no speciation is undertaken, `bohra` will use this value to undertake typing and AMR mechanisms/inferrence. If the species in this column is NOT accurate - unexpected results may occur. Please note that species detected from sequence trumps the Species_expected value. Were you supply a value in the Species_expected column and also run speciation, the species detected from the sequences will be used to determine the AMR and also serotyping outputs. 
 
 **Controls**
 
