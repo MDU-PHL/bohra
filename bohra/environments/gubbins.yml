@@ -4,3 +4,4 @@ channels:
 dependencies:
   - csvtk
   - gubbins>=3
+  - snp-sites

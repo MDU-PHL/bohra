@@ -2,5 +2,6 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
-  - abritamr
   - csvtk
+  - abritamr
+  

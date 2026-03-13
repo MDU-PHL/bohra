@@ -95,7 +95,7 @@ def make_comment(comments:list) -> str:
     cmt = []
     for i in comments:
         if f"{i}" != "1":
-            cmt.append(i)
+            cmt.append(f"{i}")
     if cmt:
         return " | ".join(cmt)
     return ""
