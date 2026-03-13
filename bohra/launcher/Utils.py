@@ -328,7 +328,14 @@ def _get_dep_cmd_options() -> dict:
                 "name": "tool",
                 "type":click.Choice(envs_list + ["all"], case_sensitive=False),
                 "default":"all",
-                "help":"Update only a specific set of tools from a single environment. Should really only be used for development and/or testing purposes."
+                "help":"Update only a specific set of tools from a single environment."
+            },
+            {
+                "name":"force",
+                "help":"Set to force re-installation of all dependencies, even if they are already installed.",
+                "is_flag":True,
+                "default":False
+
             }
         ],
         "check":[

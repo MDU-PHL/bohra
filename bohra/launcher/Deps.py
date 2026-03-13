@@ -5,7 +5,7 @@ import subprocess
 import pathlib
 import os
 import json
-
+import datetime
 # Logger
 LOGGER =logging.getLogger(__name__) 
 LOGGER.setLevel(logging.DEBUG)
@@ -75,16 +75,35 @@ def _run_cmd(cmd:list, check:bool=False)-> bool:
 
 
     
-def _check_envs(cfg:dict)->bool:
+def _check_envs(cfg:dict, yml_file:str="", check_yml:bool=False)->bool:
     """
     Check if conda environments directory exists.
     """
     bohra_env_dir = f"{os.getenv('CONDA_PREFIX')}"
     target_envs_dir = f"{bohra_env_dir}/bohra_conda_envs"
+    LOGGER.info(f"Checking dependencies in environments located in: {target_envs_dir}")
     for env in cfg:
 
         for dep in cfg[env]:
             env_name = f"{target_envs_dir}/{env}"
+            if check_yml and yml_file != "":
+                yname = pathlib.Path(yml_file).name
+                if not pathlib.Path(yml_file).exists():
+                    LOGGER.critical(f"Environment file {yml_file} does not exist.")
+                    raise SystemExit
+                else:
+                    LOGGER.info(f"Environment file {yml_file} found. Comparing to existing environment {env_name}/{yname} if it exists.")
+                    if pathlib.Path(f"{env_name}/{yname}").exists():
+                        if not _run_cmd(["diff", "-q", yml_file, f"{env_name}/{yname}"]):
+                            LOGGER.warning(f"Environment file {yml_file} does not match existing environment file {env_name}/{yname}. This may indicate that the environment is not up to date with the latest configuration.")
+                            return False
+                        else:
+                            LOGGER.info(f"Environment file {yml_file} matches existing environment file {env_name}/{yname}.")
+                            return True
+                    else:
+                        LOGGER.warning(f"Environment file {env_name}/{yname} does not exist. Cannot compare to {yml_file}.")
+                        return False
+
             if not pathlib.Path(env_name).exists():
                 LOGGER.warning(f"Conda environment {env} not found at {env_name}.")
                 return False
@@ -127,7 +146,16 @@ def get_conda_version()->str:
         LOGGER.info(f"Conda version: {version}")
         return version
 
-def _install_envs(cfg:dict, envs_path:str, env:str="all",force_reinstall:bool=False)->bool:
+def _action_installation(installer:str, yml_file:str, target_envs_dir:str, env_name:str, version_25:bool=False, force_reinstall:bool=False)->None:
+
+    cmd = [installer, "env", "create", "-y", "-f", yml_file, "-p", f"{target_envs_dir}/{env_name}" ] if version_25 else [installer, "env", "create", "-f", yml_file, "-p", f"{target_envs_dir}/{env_name}"]
+    if not version_25:
+        cmd.append("--force")
+    else:
+        subprocess.run([installer, "env", "remove", "-p", f"{target_envs_dir}/{env_name}", "-all"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    return cmd
+
+def _install_envs(cfg:dict, envs_path:str,_action:str="install", env:str="all",force_reinstall:bool=False)->bool:
     """
     Install conda environments.
     """
@@ -135,6 +163,7 @@ def _install_envs(cfg:dict, envs_path:str, env:str="all",force_reinstall:bool=Fa
     installer = "conda"
     version_25 = check_conda_version(get_conda_version())
     proc = subprocess.run(["which", "mamba"], capture_output=True, text=True)
+    print(_action, env, force_reinstall)
     if proc.returncode == 0:
         installer = "mamba"
         LOGGER.info("Using mamba to install dependencies.")
@@ -151,32 +180,31 @@ def _install_envs(cfg:dict, envs_path:str, env:str="all",force_reinstall:bool=Fa
     if env != "all":
         cfg = {env: cfg[env]}
     for env_name in cfg:
-        if _check_envs(cfg={env_name: cfg[env_name]}) and not force_reinstall:
-            LOGGER.info(f"Environment {env_name} already installed and force_reinstall is False. Skipping installation.")
+        LOGGER.info(f"Processing {env_name} environment.")
+        yml_file = f"{envs_path}/{env_name}.yml"
+
+        if _action == "install" or (_action == "update" and force_reinstall):
+            LOGGER.info(f"Installing environment {env_name} with configuration from {yml_file}. This will override any existing installations.")
+            cmd = _action_installation(installer, yml_file, target_envs_dir, env_name, version_25=version_25, force_reinstall=force_reinstall)
+            _run_cmd(cmd)
+            # print(cmd)
+        elif _action == "update" and not force_reinstall:
+            # check if there is an exisitng installation and if the yml file matches the existing installation
+            if _check_envs(cfg={env_name: cfg[env_name]},check_yml=True,yml_file = yml_file):
+                LOGGER.info(f"Environment {env_name} already installed and force_reinstall is False. Skipping installation.")
+            else:
+                LOGGER.info(f"Updating environment {env_name} with configuration from {yml_file}.")
+                cmd = _action_installation(installer, yml_file, target_envs_dir, env_name, version_25=version_25, force_reinstall=force_reinstall)
+                _run_cmd(cmd)
             # continue
-        else:
-            LOGGER.info(f"Setting up environment: {env_name}")
-            yml_file = f"{envs_path}/{env_name}.yml"
-            if not pathlib.Path(yml_file).exists():
-                LOGGER.critical(f"Environment file {yml_file} does not exist.")
-                raise SystemExit
-            cmd = [installer, "env", "create", "-y", "-f", yml_file, "-p", f"{target_envs_dir}/{env_name}" ] if version_25 else [installer, "env", "create", "-f", yml_file, "-p", f"{target_envs_dir}/{env_name}"]
-            if force_reinstall and not version_25:
-                cmd.append("--force")
-            else:
-                subprocess.run([installer, "env", "remove", "-p", f"{target_envs_dir}/{env_name}", "-all"], stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
-            # _run_cmd(["df", "-h"])  
-            if not _run_cmd(cmd):
-                return False
-            else:
-                # _run_cmd(["df", "-h"])
-                # tst = subprocess.run(["df", "-h"], capture_output=True, text=True)
-                # LOGGER.info(f"Disk usage after installing {env_name} environment:\n{tst.stdout}")
-                if _check_envs( cfg={env_name: cfg[env_name]}):
-                    LOGGER.info(f"Environment {env_name} installed and verified successfully.")
-                else:
-                    LOGGER.critical(f"Environment {env_name} failed verification after installation.")
-                    return False
+
+        if _check_envs( cfg={env_name: cfg[env_name]}):
+            LOGGER.info(f"Environment {env_name} installed and verified successfully.")
+            cp_cmd = ["cp", yml_file, f"{target_envs_dir}/{env_name}/"]
+            LOGGER.info(f"Updating stored environment yml")
+            _run_cmd(cp_cmd)
+            pathlib.Path(f"{target_envs_dir}/{env_name}/installation_status.txt").write_text(f"Installation successful for {env_name} environment {datetime.datetime.now()}.")
+
     LOGGER.info("All dependencies installed successfully and verified.")
     return True
 
@@ -205,9 +233,10 @@ def dependencies(_action:str = "install",
             LOGGER.info("All dependencies are installed properly.")
             return 0
     elif _action in ['install', 'update']:
-        force_reinstall = True if _action == 'update' else False
+        force_reinstall = kwargs.get('force', False) if _action == 'update' else False
         env_to_install = kwargs.get('tool', 'all')
-        if not _install_envs(dep_cfg, envs, env=env_to_install, force_reinstall=force_reinstall):
+        print(force_reinstall)
+        if not _install_envs(dep_cfg, envs, _action = _action,env=env_to_install, force_reinstall=force_reinstall):
             LOGGER.critical("Error installing dependencies.")
             
             return 1
