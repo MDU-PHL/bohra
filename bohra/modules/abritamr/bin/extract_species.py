@@ -5,6 +5,11 @@ import sys, json, pathlib
 
 available_species = json.load(open(f"{pathlib.Path(__file__).parent.resolve() / 'species.json'}", 'r'))
 species_obs = sys.argv[1].strip()
+spo = species_obs.split()
+
+spo = [s.split("_")[0] for s in spo]
+
+species_obs = " ".join(spo)
 
 if species_obs.replace(" ", "_") in available_species['abritamr_species'] :
     print(f"-sp {species_obs.replace(' ', '_')}")
