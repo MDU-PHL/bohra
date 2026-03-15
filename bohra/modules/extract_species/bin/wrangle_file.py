@@ -10,6 +10,10 @@ if tool == "sylph":
     sp = df["Species"].values[0]
 else:
     sp = df["Match 1"].values[0]
+    spo = sp.split()
+    spo = [s.split("_")[0] for s in spo]
+    sp = " ".join(spo)
+
 
 
 print(sp)
