@@ -28,7 +28,7 @@ process MASH_SKETCH {
     
 
     input:
-    tuple val(meta), path(reads)
+    tuple val(meta), path(sequences)
 
     output:
     tuple val(meta), path('*.msh'), emit: sketch
@@ -38,7 +38,7 @@ process MASH_SKETCH {
     def input_file = meta.input_type != "pe_reads" ?"$sequences" : "-r ${sequences[0]} ${sequences[1]}"
     def mval = meta.input_type == "pe_reads" ? '-m 5' : ''
     """
-    mash sketch -p $task.cpus $input_file $mval -k 25 -C -s 10000 $meta.id -o ${meta.id}
+    mash sketch -p $task.cpus $mval -k 25 -C $meta.id -o ${meta.id} -s 10000 $input_file 
     echo -e mash'\t'\$CONDA_PREFIX'\t'\$(mash --version)'\t'${params.mash_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_mash.txt
     """
     
