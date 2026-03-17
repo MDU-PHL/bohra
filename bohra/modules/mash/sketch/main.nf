@@ -35,7 +35,7 @@ process MASH_SKETCH {
     tuple val(meta), path('version_mash.txt'), emit: version
 
     script:
-    def input_file = meta.input_type != "pe_reads" ?"$sequences" : "-r ${sequences[0]} ${sequences[1]}"
+    def input_file = meta.input_type != "pe_reads" ?"$sequences" : "-r ${sequences[0]}"
     def mval = meta.input_type == "pe_reads" ? '-m 5' : ''
     """
     mash sketch -p $task.cpus $mval -k 25 -C $meta.id -o ${meta.id} -s 10000 $input_file 
