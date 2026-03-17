@@ -35,8 +35,10 @@ process MASH_SKETCH {
     tuple val(meta), path('version_mash.txt'), emit: version
 
     script:
+    def input_file = meta.input_type != "pe_reads" ?"$sequences" : "-r ${sequences[0]} ${sequences[1]}"
+    def mval = meta.input_type == "pe_reads" ? '-m 5' : ''
     """
-    mash sketch -r ${reads[0]} -m 5 -k 21 -C $meta.id -o ${meta.id}
+    mash sketch -p $task.cpus $input_file $mval -k 25 -C -s 10000 $meta.id -o ${meta.id}
     echo -e mash'\t'\$CONDA_PREFIX'\t'\$(mash --version)'\t'${params.mash_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_mash.txt
     """
     
