@@ -84,14 +84,16 @@ def combine_plasmid_data(plasmid: pd.DataFrame, amrfinder: pd.DataFrame, contigs
         ctgs = [f"{i.split()[0]}" for i in tmp["contig_id"].unique()]
         mni.append(tmp["mash_neighbor_identification"].unique()[0])
         poc.append(",".join(ctgs))
-        ag.append(",".join(sorted(amrfinder[amrfinder["Contig id"].isin(ctgs)]["Gene symbol"].unique())))
+        cl = "Gene symbol" if "Gene symbol" in amrfinder.columns else "Element symbol"
+        ag.append(",".join(sorted(amrfinder[amrfinder["Contig id"].isin(ctgs)][cl].unique())))
         rt.append(",".join(tmp["rep_type(s)"].unique()))
         child = {"Isolate": sid,}
         child["Plasmid accession"] = p
         child["Plasmid species"] = tmp["mash_neighbor_identification"].unique()[0]
         child["Present on contigs"] = ",".join([f"{i.split()[0]}" for i in tmp["contig_id"].unique()])
         child["Replicon type"] = ",".join(tmp["rep_type(s)"].unique())
-        child["AMR genes"] = ",".join(sorted(amrfinder[amrfinder["Contig id"].isin(ctgs)]["Gene symbol"].unique()))
+        cl = "Gene symbol" if "Gene symbol" in amrfinder.columns else "Element symbol"
+        child["AMR genes"] = ",".join(sorted(amrfinder[amrfinder["Contig id"].isin(ctgs)][cl].unique()))
         data["_children"].append(child)
     data["Plasmid accession"] = "|".join(mnm) if mnm != [] else ""
     data["Plasmid species"] = "|".join(mni) if mni != [] else ""
