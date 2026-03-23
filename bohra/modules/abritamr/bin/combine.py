@@ -28,8 +28,8 @@ def extract_contigs_plasmids(plasmid: pd.DataFrame) -> list:
     return contigs
 
 def extract_genes_on_plasmid(amrfinder: pd.DataFrame, contigs: list) -> list:
-    
-    genes_on_plasmid = amrfinder[amrfinder["Contig id"].isin(contigs)]["Gene symbol"].unique()
+    cl = "Gene symbol" if "Gene symbol" in amrfinder.columns else "Element symbol"
+    genes_on_plasmid = amrfinder[amrfinder["Contig id"].isin(contigs)][cl].unique()
     return genes_on_plasmid
 
 def get_plasmid_designation_species(plasmid: pd.DataFrame, ctg:str) -> tuple:
@@ -49,7 +49,8 @@ def make_amr_df(genes_dict: dict, genes_on_plasmid:list, plasmid:pd.DataFrame, a
             res = []
             for gene in genes_dict[row]:
                 if gene in genes_on_plasmid:
-                    ctg = amrout[amrout["Gene symbol"] == gene]["Contig id"].unique()[0]
+                    cl = "Gene symbol" if "Gene symbol" in amrout.columns else "Element symbol"
+                    ctg = amrout[amrout[cl] == gene]["Contig id"].unique()[0]
                     plasmid_designation, plasmid_species = get_plasmid_designation_species(plasmid, ctg)
                     gene = f"{gene}[P]"
                 
