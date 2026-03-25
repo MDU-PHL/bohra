@@ -131,19 +131,12 @@ workflow {
             RUN_SPECIES_ASM.out.species_obs, 
             RUN_SPECIES_ASM.out.species
             )
-         species_report = COMBINE_SPECIES.out.species_summary
-         results = results.concat( species_report )
         versions = versions.concat( RUN_SPECIES_READS.out.version, RUN_SPECIES_ASM.out.version )
         reads_species_obs = RUN_SPECIES_READS.out.species_obs
         asm_species_obs = RUN_SPECIES_ASM.out.species_obs
         sp_res = reads_species_obs.map { cfg,species -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, species.trim() ) }
         asm_res = asm_species_obs.map { cfg,species -> tuple(cfg.id, cfg.findAll {it.key != 'input_type'}, species.trim() ) }
-        // COMBINE_SPECIES ( 
-        //     RUN_SPECIES_READS.out.species_obs, 
-        //     RUN_SPECIES_READS.out.species,
-        //     RUN_SPECIES_ASM.out.species_obs, 
-        //     RUN_SPECIES_ASM.out.species
-        //     )
+        
         
        
         species_tmp = COMBINE_SPECIES.out.species_obs
