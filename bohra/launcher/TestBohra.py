@@ -97,7 +97,11 @@ def run_tests(cpus:int=1, shovill_ram:int=16, wdir:str=str(pathlib.Path.cwd())):
 
     # Wait for the process to complete and get the return code
     proc.wait()
-    
+    if not _check_bohra_success(expected_output=f"{report_outdir}/bohra.html"):
+        LOGGER.critical(f"Bohra pipeline failed.")
+        raise SystemExit(1)
+    else:
+        return True
     # else:
     #     LOGGER.critical(f"Some bohra dependencies are missing or not installed properly. Please run 'bohra deps install' and try again.")
     #     raise SystemExit    

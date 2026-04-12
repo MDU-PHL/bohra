@@ -2,6 +2,7 @@ import click
 import pathlib
 import os
 from bohra.launcher.TestBohra import run_tests
+from bohra.launcher.BohraRun import _check_bohra_success
 
 @click.command()
 @click.option('--cpus',
@@ -19,5 +20,4 @@ def test(cpus:int=1, shovill_ram:int=16, wdir:str=str(pathlib.Path.cwd())):
     """
     
     proc = run_tests(cpus=cpus, shovill_ram=shovill_ram, wdir=wdir)
-    if proc.returcode != 0:
-        raise SystemExit(1)
+    
