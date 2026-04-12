@@ -4,5 +4,5 @@ channels:
 dependencies:
   - csvtk
   - pip:
-    - datasmryzr==0.4.0
+    - datasmryzr>=0.4.1
     
