@@ -18,4 +18,6 @@ def test(cpus:int=1, shovill_ram:int=16, wdir:str=str(pathlib.Path.cwd())):
     Check that bohra is installed correctly and runs as expected.
     """
     
-    run_tests(cpus=cpus, shovill_ram=shovill_ram, wdir=wdir)
+    proc = run_tests(cpus=cpus, shovill_ram=shovill_ram, wdir=wdir)
+    if proc.returcode != 0:
+        raise SystemExit(1)
