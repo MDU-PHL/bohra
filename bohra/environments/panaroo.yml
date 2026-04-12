@@ -5,5 +5,5 @@ dependencies:
   - panaroo
   - python=3.10
   - csvtk
-
+  - biopython=1.86
 
