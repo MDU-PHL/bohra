@@ -127,6 +127,7 @@ def _resource_opt() -> list:
     resource_options = [
         {   
             "name":"cpus",
+            "aliases":["threads"],
             "help":"Number of max CPU cores to run, will define how many rules are run at a time, if 0 then the avail cpus will be determined at time of launch",
             "default":1,
         },
@@ -1011,4 +1012,3 @@ def _get_target(outpath:str, title:str) -> str:
         name = f"{title.replace(' ', '_').replace(':', '_').replace('/', '_').lower()}.nf.config"
         return pathlib.Path(outpath) / name
     raise FileNotFoundError(f"Output path {outpath} does not exist.")
-

@@ -76,10 +76,14 @@ def utils():
 def generic_options(_func: click.Command, options: dict) -> click.Command:
     """Add generic options to a Click command."""
     for opt in options:
+        param_decls = [f"--{opt['name']}"]
+        if 'short_name' in opt:
+            param_decls.append(f"{opt['short_name']}")
+        for alias in opt.get('aliases', []):
+            param_decls.append(f"--{alias}")
         if 'short_name' in opt:
             click.option(
-                f"--{opt['name']}",
-                f"{opt['short_name']}",
+                *param_decls,
                 type=opt.get('type', None),
                 default=opt.get('default', None),
                 help=opt.get('help', ''),
@@ -88,7 +92,7 @@ def generic_options(_func: click.Command, options: dict) -> click.Command:
             )(_func) # Apply the decorator to the function
         else:
             click.option(
-                f"--{opt['name']}",
+                *param_decls,
                 type=opt.get('type', None),
                 default=opt.get('default', None),
                 help=opt.get('help', ''),
@@ -192,4 +196,3 @@ cli.add_command(bohratest.test)
 
 if __name__ == '__main__':
     cli()
-
