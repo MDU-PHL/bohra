@@ -81,24 +81,14 @@ def generic_options(_func: click.Command, options: dict) -> click.Command:
             param_decls.append(f"{opt['short_name']}")
         for alias in opt.get('aliases', []):
             param_decls.append(f"--{alias}")
-        if 'short_name' in opt:
-            click.option(
-                *param_decls,
-                type=opt.get('type', None),
-                default=opt.get('default', None),
-                help=opt.get('help', ''),
-                show_default= True,
-                is_flag= opt.get('is_flag', False),
-            )(_func) # Apply the decorator to the function
-        else:
-            click.option(
-                *param_decls,
-                type=opt.get('type', None),
-                default=opt.get('default', None),
-                help=opt.get('help', ''),
-                show_default= True,
-                is_flag= opt.get('is_flag', False),
-            )(_func)
+        click.option(
+            *param_decls,
+            type=opt.get('type', None),
+            default=opt.get('default', None),
+            help=opt.get('help', ''),
+            show_default= True,
+            is_flag= opt.get('is_flag', False),
+        )(_func) # Apply the decorator to the function
     return _func
     
 
