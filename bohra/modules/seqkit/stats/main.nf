@@ -34,13 +34,13 @@ process SEQKIT_STATS {
     
     if ( meta.input_type == 'asm'){
     """
-    cat $input_files | seqkit stats --all -T -i ${meta.id} > assembly_statistics.txt
-    echo -e seqkit'\t'\$CONDA_PREFIX'\t'\$(seqkit version)'\t'${params.seqkit_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_seqkit.txt
+    cat $input_files | seqkit --threads 1 stats --all -T -i ${meta.id} > assembly_statistics.txt
+    echo -e seqkit'\t'\$CONDA_PREFIX'\t'\$(seqkit version)'\t'${params.seqkit_ref} | csvtk -j 1 add-header -t -n 'tool,conda_env,version,reference' > version_seqkit.txt
     """
     } else {   
     """
-    cat ${input_files[0]} ${input_files[1]} | seqkit stats -T -i ${meta.id} --all > read_statistics.txt
-    echo -e seqkit'\t'\$CONDA_PREFIX'\t'\$(seqkit version)'\t'${params.seqkit_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_seqkit.txt
+    cat ${input_files[0]} ${input_files[1]} | seqkit --threads 1 stats -T -i ${meta.id} --all > read_statistics.txt
+    echo -e seqkit'\t'\$CONDA_PREFIX'\t'\$(seqkit version)'\t'${params.seqkit_ref} | csvtk -j 1 add-header -t -n 'tool,conda_env,version,reference' > version_seqkit.txt
     """ 
     }
     

@@ -32,7 +32,7 @@ process SEQKIT_SEQ {
     script:
     
     """
-    seqkit seq -m ${params.min_contig_length} $input_files > contigs_filtered.fa
+    seqkit --threads 1 seq -m ${params.min_contig_length} $input_files > contigs_filtered.fa
     """
        
 }

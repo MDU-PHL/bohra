@@ -35,7 +35,7 @@ process CSVTK_CONCAT {
     // Added soft-links to original fastqs for consistent naming in MultiQC
     def input_files = input.join(' ')
     """
-    csvtk -t concat -k -u '' $input_files > ${output_name}.txt
+    csvtk -j 1 -t concat -k -u '' $input_files > ${output_name}.txt
     """
         
 }
@@ -72,7 +72,7 @@ process CSVTK_UNIQ {
     // Added soft-links to original fastqs for consistent naming in MultiQC
     def input_files = input.join(' ')
     """
-    csvtk concat -u '' -t $input_files | csvtk grep -t -v -f 2 -r -p 'Not Applicable' | csvtk uniq -t > ${output_name}.txt
+    csvtk -j 1 concat -u '' -t $input_files | csvtk -j 1 grep -t -v -f 2 -r -p 'Not Applicable' | csvtk -j 1 uniq -t > ${output_name}.txt
     """
         
 }
