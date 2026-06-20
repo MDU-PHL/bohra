@@ -74,27 +74,25 @@ def utils():
 
 
 def generic_options(_func: click.Command, options: dict) -> click.Command:
-    """Add generic options to a Click command."""
+    """Add generic options to a Click command.
+
+    Option dictionaries may include an optional ``aliases`` list of
+    additional long-form flag names.
+    """
     for opt in options:
+        param_decls = [f"--{opt['name']}"]
         if 'short_name' in opt:
-            click.option(
-                f"--{opt['name']}",
-                f"{opt['short_name']}",
-                type=opt.get('type', None),
-                default=opt.get('default', None),
-                help=opt.get('help', ''),
-                show_default= True,
-                is_flag= opt.get('is_flag', False),
-            )(_func) # Apply the decorator to the function
-        else:
-            click.option(
-                f"--{opt['name']}",
-                type=opt.get('type', None),
-                default=opt.get('default', None),
-                help=opt.get('help', ''),
-                show_default= True,
-                is_flag= opt.get('is_flag', False),
-            )(_func)
+            param_decls.append(f"{opt['short_name']}")
+        for alias in opt.get('aliases', []):
+            param_decls.append(f"--{alias}")
+        click.option(
+            *param_decls,
+            type=opt.get('type', None),
+            default=opt.get('default', None),
+            help=opt.get('help', ''),
+            show_default=True,
+            is_flag=opt.get('is_flag', False),
+        )(_func) # Apply the decorator to the function
     return _func
     
 
@@ -192,4 +190,3 @@ cli.add_command(bohratest.test)
 
 if __name__ == '__main__':
     cli()
-

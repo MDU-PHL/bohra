@@ -5,7 +5,7 @@ from bohra.launcher.TestBohra import run_tests
 from bohra.launcher.BohraRun import _check_bohra_success
 
 @click.command()
-@click.option('--cpus',
+@click.option('--cpus', '--threads', 'cpus',
               default=1,
               help="Number of CPUs to use for testing Bohra installation.") 
 @click.option('--shovill_ram',
