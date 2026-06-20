@@ -86,8 +86,8 @@ def generic_options(_func: click.Command, options: dict) -> click.Command:
             type=opt.get('type', None),
             default=opt.get('default', None),
             help=opt.get('help', ''),
-            show_default= True,
-            is_flag= opt.get('is_flag', False),
+            show_default=True,
+            is_flag=opt.get('is_flag', False),
         )(_func) # Apply the decorator to the function
     return _func
     
