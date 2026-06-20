@@ -32,12 +32,11 @@ process SEQKIT_GC {
     script:
     """
     cat ${input_files[0]} ${input_files[1]} \
-    | seqkit fx2tab -H --name --only-id --avg-qual --gc \
-    | csvtk summary -t -i -f 2:mean,3:mean > read_qual.txt
-    echo -e seqkit'\t'\$CONDA_PREFIX'\t'\$(seqkit version)'\t'${params.seqkit_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_seqkit.txt
+    | seqkit --threads 1 fx2tab -H --name --only-id --avg-qual --gc \
+    | csvtk -j 1 summary -t -i -f 2:mean,3:mean > read_qual.txt
+    echo -e seqkit'\t'\$CONDA_PREFIX'\t'\$(seqkit version)'\t'${params.seqkit_ref} | csvtk -j 1 add-header -t -n 'tool,conda_env,version,reference' > version_seqkit.txt
     """
 
     
     
 }
-
