@@ -74,7 +74,11 @@ def utils():
 
 
 def generic_options(_func: click.Command, options: dict) -> click.Command:
-    """Add generic options to a Click command."""
+    """Add generic options to a Click command.
+
+    Option dictionaries may include an optional ``aliases`` list of
+    additional long-form flag names.
+    """
     for opt in options:
         param_decls = [f"--{opt['name']}"]
         if 'short_name' in opt:
