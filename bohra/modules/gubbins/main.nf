@@ -7,8 +7,11 @@ def options    = initOptions(params.options)
 process GUBBINS {
     
     label 'process_high'
+    
     publishDir "${params.outdir}",
-        mode: params.publish_dir_mode
+        mode: 'copy',
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:params.report_outdir) }
+    
     scratch true
     cache 'lenient'
     
