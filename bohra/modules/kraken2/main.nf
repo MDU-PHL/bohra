@@ -37,12 +37,12 @@ process KRAKEN2 {
     """
     kraken2  $input_file \
     --threads $task.cpus \
-    --report kraken2.tab \
+    --report kraken2_${meta.input_type}.tab \
     --output - \
     -db $kraken2_db \
     --memory-mapping 2> /dev/null
 
-    $module_dir/collate_kraken2.py $meta.id kraken2.tab species.txt
+    $module_dir/collate_kraken2.py $meta.id kraken2_${meta.input_type}.tab species_${meta.input_type}.txt
     echo -e kraken2'\t'\$CONDA_PREFIX'\t'\$(kraken2 --version | grep version)'\t'$params.kraken2_db'\t'${params.kraken2_ref} | csvtk add-header -t -n 'tool,conda_env,version,database,reference' > version_kraken2.txt
     """
 }
