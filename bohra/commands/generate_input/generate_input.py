@@ -23,7 +23,7 @@ def generate_input(reads, contigs, isolate_ids, outname):
     """
     Generare input files for the Bohra pipeline.
     """
-    
+    print("in generate input")
     if not reads and not contigs:
         click.echo("Please specify  --reads and/or --contigs.")
         return

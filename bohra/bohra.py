@@ -100,14 +100,19 @@ def generic_options(_func: click.Command, options: dict) -> click.Command:
 
 def create_utils_subcommand_with_options(name, options_dict):
     f"""Dynamically created a subcommand with options from a list."""
-
-    @utils.command(name=name, help = f"Help for {name} utility. COMING SOON.")
+    h = "Help for generating bohra input file" if name == "" else f"Help for {name} utility. COMING SOON."
+    @utils.command(name=name, help = h)
     def utils_subcommand(**kwargs):
         # try:
-        #     if dependencies(_action=name, kwargs=kwargs) == 0:
-        #         click.echo(f"Successfully completed {name}ing utilities.")
+        #     if name == "generate-input":
+        #         # print(**kwargs)
+        #         print("trying to generate input")
+        #         generate_input(reads = kwargs['reads'], contigs = kwargs['contigs'])
+        #     # if dependencies(_action=name, kwargs=kwargs) == 0:
+        #     #     click.echo(f"Successfully completed {name}ing utilities.")
         #     else:
-        #         raise UsageError(f"An error.")
+        #         pass
+        #     #     raise UsageError(f"An error.")
         # except Exception as e:
         #     raise SystemExit
         pass
