@@ -18,23 +18,23 @@ import subprocess
 
 
 
-def create_logger():
+
 
 
 # Logger
-    LOGGER =logging.getLogger(__name__) 
-    LOGGER.setLevel(logging.DEBUG)
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    ch.setFormatter(CustomFormatter())
-    fh = logging.FileHandler('bohra.log')
-    fh.setLevel(logging.DEBUG)
-    formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p') 
-    fh.setFormatter(formatter)
-    LOGGER.addHandler(ch) 
-    LOGGER.addHandler(fh)
+LOGGER =logging.getLogger(__name__) 
+LOGGER.setLevel(logging.DEBUG)
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+ch.setFormatter(CustomFormatter())
+fh = logging.FileHandler('bohra.log')
+fh.setLevel(logging.DEBUG)
+formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p') 
+fh.setFormatter(formatter)
+LOGGER.addHandler(ch) 
+LOGGER.addHandler(fh)
 
-    return LOGGER
+    
 
 def _setup_working_directory(input_file:str,
                              workdir : str) -> bool:
@@ -94,46 +94,42 @@ def _make_command(command: dict) -> str:
     return cmd
 
 def _generate_bohra_command(
-        
         pipeline: str,
         kwargs: dict) -> str:
     # print(kwargs)
-    lggr = create_logger()
     if _make_workdir(workdir=kwargs["workdir"],   
                   _input=kwargs["input_file"], 
                   report_outdir=kwargs["report_outdir"], 
                   replace_report=kwargs["replace_report"]):
-        lggr.info(f"Checking on the setup for the {pipeline} pipeline.")
+        LOGGER.info(f"Checking on the setup for the {pipeline} pipeline.")
         if not kwargs["no_check"]:
             dependencies(_action = "check")
         max_cpus = int(_max_cpus(cpus=kwargs.get('threads', 0)))
-        lggr.info(f"Using {int(max_cpus)} CPUs for the {pipeline} pipeline.")
+        LOGGER.info(f"Using {int(max_cpus)} CPUs for the {pipeline} pipeline.")
         profile,profile_config = _get_config(user_config=kwargs['profile_config'], title = kwargs['job_name'],cpus=max_cpus, wd = kwargs["workdir"])
         command = _init_command_dict(profile=profile, profile_config = profile_config, cpus=max_cpus, job_name = kwargs.get('job_name', 'bohra'), prefix=kwargs.get('conda_prefix', 'bohra'), pipeline=pipeline, trim = kwargs["trim"], report_outdir=kwargs["report_outdir"], outdir=kwargs['workdir'], no_downloadable_tables=kwargs['no_downloadable_tables'])
         
         # update kwargs with checked input file
         kwargs["input_file"] = "input_checked.tsv"
         command["params"].append(f"--isolates {kwargs['input_file']}")
-        lggr.info(f"Input file {kwargs['input_file']} added to command successfully.")
+        LOGGER.info(f"Input file {kwargs['input_file']} added to command successfully.")
         command = _setup_basic_args(kwargs=kwargs, command=command, pipeline=pipeline)
         mtb = True if pipeline == "tb" else False
-        lggr.info(f"Setting up arguments for the {pipeline} pipeline.")
+        LOGGER.info(f"Setting up arguments for the {pipeline} pipeline.")
         for _func in _funcs()[pipeline]:
             command = _func(kwargs=kwargs, command=command, mtb = mtb)
         # command = _funcs()[pipeline](kwargs=kwargs, command=command)
         
         cmd = _make_command(command=command)
-
-        execute_cmd(lggr= lggr, cmd = cmd)
-        return True
+        return cmd
     else:
-        lggr.error(f"Failed to create the working directory {kwargs['workdir']}.")
+        LOGGER.error(f"Failed to create the working directory {kwargs['workdir']}.")
         raise SystemError
         
-def _run_bohra_cmd(lggr,
+def _run_bohra_cmd(
         cmd: str) -> subprocess.CompletedProcess:
     
-    lggr.info(f"Running the command: {cmd}")
+    LOGGER.info(f"Running the command: {cmd}")
     proc = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
     for line in proc.stdout:
         print(line, end='')
@@ -141,34 +137,32 @@ def _run_bohra_cmd(lggr,
     # Wait for the process to complete and get the return code
     proc.wait()
     return proc
-def _check_bohra_success(lggr,expected_output: str ) -> bool:
-    lggr.info(f"Checking for the expected output: {expected_output}")
+def _check_bohra_success(expected_output: str) -> bool:
+    LOGGER.info(f"Checking for the expected output: {expected_output}")
     if pathlib.Path(expected_output).exists():
-        lggr.info(f"The bohra run has completed successfully.")
+        LOGGER.info(f"The bohra run has completed successfully.")
         return True
     else:
-        lggr.critical(f"The bohra run failed to generate the expected output: {expected_output}.")
+        LOGGER.critical(f"The bohra run failed to generate the expected output: {expected_output}.")
         return False
 
-def execute_cmd(lggr, cmd :str, auto_run: bool) -> bool:
-    
-    if kwargs["no_auto_run"]:
-            lggr.info(f"Please paste the following command to run the pipeline:\n\033[1m{cmd}\033[0m")
-    else:
-        proc = _run_bohra_cmd(cmd=cmd)
-        # check for success
-        if not _check_bohra_success(expected_output=pathlib.Path(kwargs['report_outdir']) / f"{kwargs['job_name']}.html"):
-            lggr.critical(f"Bohra pipeline failed.")
-            raise SystemExit(1)
-        else:
-            return True
+
 
 def run_bohra(
         pipeline: str,
         kwargs: dict) -> bool:
     
         # generate the command
-        cmd = _generate_bohra_command(pipeline=pipeline, kwargs=kwargs, lggr= create_logger())
-        
+        cmd = _generate_bohra_command(pipeline=pipeline, kwargs=kwargs)
+
         # if no_auto_run is set, just print the command OR run it
-        
+        if kwargs["no_auto_run"]:
+            LOGGER.info(f"Please paste the following command to run the pipeline:\n\033[1m{cmd}\033[0m")
+        else:
+            proc = _run_bohra_cmd(cmd=cmd)
+            # check for success
+            if not _check_bohra_success(expected_output=pathlib.Path(kwargs['report_outdir']) / f"{kwargs['job_name']}.html"):
+                LOGGER.critical(f"Bohra pipeline failed.")
+                raise SystemExit(1)
+            else:
+                return True
