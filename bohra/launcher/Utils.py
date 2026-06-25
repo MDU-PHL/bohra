@@ -127,7 +127,12 @@ def _resource_opt() -> list:
     resource_options = [
         {   
             "name":"cpus",
-            "help":"Number of max CPU cores to run, will define how many rules are run at a time, if 0 then the avail cpus will be determined at time of launch",
+            "help":"Alias for threads. Number of max CPU cores to run, will define how many rules are run at a time, if 0 then the avail cpus will be determined at time of launch",
+            "default":1,
+        },
+        {   
+            "name":"threads",
+            "help":"Alias for cpus. Number of max CPU cores to run, will define how many rules are run at a time, if 0 then the avail cpus will be determined at time of launch",
             "default":1,
         },
         {
