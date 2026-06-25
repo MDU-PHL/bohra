@@ -31,12 +31,12 @@ workflow READ_ANALYSIS {
         
         // println reads_pe_checked.view()
         SEQKIT_STATS ( reads_pe_checked )
-        SEQKIT_GC ( reads_pe_checked )
+        // SEQKIT_GC ( reads_pe_checked )
         KMC ( reads_pe_checked )
-        SEQTK ( reads_pe_checked )
-        COMBD = SEQKIT_STATS.out.stats.join( SEQKIT_GC.out.stats )
-        COMBD = COMBD.join( KMC.out.genome_size )
-        COMBD = COMBD.join( SEQTK.out.seqtk_stats )
+        // SEQTK ( reads_pe_checked )
+        // COMBD = SEQKIT_STATS.out.stats.join( SEQKIT_GC.out.stats )
+        COMBD = SEQKIT_STATS.out.stats.join( KMC.out.genome_size )
+        // COMBD = COMBD.join( SEQTK.out.seqtk_stats )
         COLLATE_STATS_ISOLATE ( COMBD )
         seq_stats = COLLATE_STATS_ISOLATE.out.read_assessment.map { cfg, seq -> seq }.collect() // TODO add in Q score
         seq_stats = seq_stats.map { files -> tuple("read_assessment", files) }

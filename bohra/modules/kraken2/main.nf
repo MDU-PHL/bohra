@@ -29,7 +29,7 @@ process KRAKEN2 {
 
     output:
     tuple val(meta), path('kraken2_*.tab'), emit: species_raw
-    tuple val(meta), path('species_*.txt'), emit: species
+    // tuple val(meta), path('species_*.txt'), emit: species
     tuple val(meta), path('version_kraken2.txt'), emit: version
 
     script:

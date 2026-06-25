@@ -4,6 +4,7 @@ include { EXTRACT_SPECIES } from './../modules/extract_species/main'
 include { COMBINE_SPECIES_VALS } from './../modules/combine_species_vals/main'
 include { COMBINE_SPECIES_REPORT } from './../modules/combine_species/main'
 include { CSVTK_CONCAT;CSVTK_UNIQ } from './../modules/csvtk/main'
+include { COLLATE_KRAKEN2 } from './../modules/collation/main'
 
 
 workflow RUN_SPECIES_READS {
@@ -15,7 +16,8 @@ workflow RUN_SPECIES_READS {
             species_input = sequences.combine(Channel.value(params.kraken2_db))
             RUN_KRAKEN ( species_input )
             species_raw = RUN_KRAKEN.out.species_raw
-            species = RUN_KRAKEN.out.species
+            COLLATE_KRAKEN2 (species_raw )
+            species = COLLATE_KRAKEN2.out.species
             species_obs = RUN_KRAKEN.out.species_obs
             version = RUN_KRAKEN.out.version
         } 
@@ -41,7 +43,8 @@ workflow RUN_SPECIES_ASM {
             species_input = sequences.combine(Channel.value(params.kraken2_db))
             RUN_KRAKEN ( species_input )
             species_raw = RUN_KRAKEN.out.species_raw
-            species = RUN_KRAKEN.out.species
+            COLLATE_KRAKEN2 (species_raw )
+            species = COLLATE_KRAKEN2.out.species
             species_obs = RUN_KRAKEN.out.species_obs
             version = RUN_KRAKEN.out.version
         

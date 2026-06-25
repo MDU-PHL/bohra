@@ -17,7 +17,7 @@ process COLLATE_STATS_ISOLATE {
     cache 'lenient' 
     scratch true
     input:
-    tuple val(meta), path(seqkit_stats), path(seqkit_qual), path(genome_size), path(qcscore)
+    tuple val(meta), path(seqkit_stats), path(genome_size)
 
     output:
     tuple val(meta), path ("read_assessment.txt"), emit: read_assessment
@@ -25,7 +25,7 @@ process COLLATE_STATS_ISOLATE {
     script:
     """
     ${module_dir}/collate_stats.py $meta.id $seqkit_stats  \
-    $seqkit_qual $genome_size $qcscore read_assessment.txt $meta.control '$meta.check'
+    $genome_size read_assessment.txt $meta.control '$meta.check'
     """
     
 }
@@ -270,4 +270,31 @@ process COLLATE_ABRITMAR {
     $module_dir/collate_tables.py $output_name $resistomes
     """
 
+}
+
+
+
+process COLLATE_KRAKEN2 {
+    tag "$meta.id"
+    label 'process_high'
+    publishDir "${params.outdir}",
+        mode: params.publish_dir_mode,
+        saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:"${meta.id}", publish_id:meta.id) }
+    
+    
+    cache 'lenient'
+    scratch true
+    
+    input:
+    tuple val(meta), path(kraken)
+    
+
+    output:
+    tuple val(meta), path('species_*.txt'), emit: species
+
+    script:
+    
+    """
+    $module_dir/collate_kraken2.py $meta.id $kraken species_${meta.input_type}.txt
+    """
 }
