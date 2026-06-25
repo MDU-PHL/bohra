@@ -126,15 +126,12 @@ def _resource_opt() -> list:
     pwd = f"{os.getenv('BOHRA_WD', pathlib.Path.cwd())}"
     resource_options = [
         {   
-            "name":"cpus",
-            "help":"Alias for threads. Number of max CPU cores to run, will define how many rules are run at a time, if 0 then the avail cpus will be determined at time of launch",
-            "default":1,
-        },
-        {   
             "name":"threads",
-            "help":"Alias for cpus. Number of max CPU cores to run, will define how many rules are run at a time, if 0 then the avail cpus will be determined at time of launch",
+            "short_name": "--cpus",
+            "help":"Number of max CPU cores to run, will define how many rules are run at a time, if 0 then the avail cpus will be determined at time of launch",
             "default":1,
         },
+        
         {
             "name":"workdir",
             "help":"The directory where Bohra will be run, default is current directory",

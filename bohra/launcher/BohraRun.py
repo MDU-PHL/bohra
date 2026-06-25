@@ -99,8 +99,7 @@ def _generate_bohra_command(
         LOGGER.info(f"Checking on the setup for the {pipeline} pipeline.")
         if not kwargs["no_check"]:
             dependencies(_action = "check")
-        cps = max(kwargs.get('cpus', 0), kwargs.get('threads', 0))
-        max_cpus = int(_max_cpus(cpus=cps))
+        max_cpus = int(_max_cpus(cpus=kwargs.get('threads', 0)))
         LOGGER.info(f"Using {int(max_cpus)} CPUs for the {pipeline} pipeline.")
         profile,profile_config = _get_config(user_config=kwargs['profile_config'], title = kwargs['job_name'],cpus=max_cpus, wd = kwargs["workdir"])
         command = _init_command_dict(profile=profile, profile_config = profile_config, cpus=max_cpus, job_name = kwargs.get('job_name', 'bohra'), prefix=kwargs.get('conda_prefix', 'bohra'), pipeline=pipeline, trim = kwargs["trim"], report_outdir=kwargs["report_outdir"], outdir=kwargs['workdir'], no_downloadable_tables=kwargs['no_downloadable_tables'])
