@@ -6,7 +6,7 @@ def options    = initOptions(params.options)
 
 process SEQKIT_STATS {
     tag "$meta.id"
-    label 'process_medium'
+    label 'process_low'
     publishDir "${params.outdir}",
         mode: params.publish_dir_mode,
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:meta.id, publish_id:meta.id) }
@@ -34,12 +34,12 @@ process SEQKIT_STATS {
     
     if ( meta.input_type == 'asm'){
     """
-    cat $input_files | seqkit stats --all -T -i ${meta.id} > assembly_statistics.txt
+    cat $input_files | seqkit stats -j $task.cpus --all -T -i ${meta.id} > assembly_statistics.txt
     echo -e seqkit'\t'\$CONDA_PREFIX'\t'\$(seqkit version)'\t'${params.seqkit_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_seqkit.txt
     """
     } else {   
     """
-    cat ${input_files[0]} ${input_files[1]} | seqkit stats -T -i ${meta.id} --all > read_statistics.txt
+    cat ${input_files[0]} ${input_files[1]} | seqkit stats -j $task.cpus -T -i ${meta.id} --all > read_statistics.txt
     echo -e seqkit'\t'\$CONDA_PREFIX'\t'\$(seqkit version)'\t'${params.seqkit_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_seqkit.txt
     """ 
     }
