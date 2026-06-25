@@ -16,8 +16,7 @@ workflow RUN_SPECIES_READS {
             species_input = sequences.combine(Channel.value(params.kraken2_db))
             RUN_KRAKEN ( species_input )
             species_raw = RUN_KRAKEN.out.species_raw
-            COLLATE_KRAKEN2 (species_raw )
-            species = COLLATE_KRAKEN2.out.species
+            species = RUN_KRAKEN.out.species
             species_obs = RUN_KRAKEN.out.species_obs
             version = RUN_KRAKEN.out.version
         } 
@@ -43,8 +42,7 @@ workflow RUN_SPECIES_ASM {
             species_input = sequences.combine(Channel.value(params.kraken2_db))
             RUN_KRAKEN ( species_input )
             species_raw = RUN_KRAKEN.out.species_raw
-            COLLATE_KRAKEN2 (species_raw )
-            species = COLLATE_KRAKEN2.out.species
+            species = RUN_KRAKEN.out.species
             species_obs = RUN_KRAKEN.out.species_obs
             version = RUN_KRAKEN.out.version
         
