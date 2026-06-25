@@ -63,7 +63,7 @@ def _run_cmd(cmd:list, check:bool=False)-> bool:
         if len(l.split()) > 0 and not check:
             LOGGER.info(f"{l}")
     if process.returncode != 0:
-        print(process.args)
+        # print(process.args)
         LOGGER.warning(f"Error running command: {' '.join(cmd)}")
         if len( process.stdout.read().strip()) > 0:
             LOGGER.warning(f"{process.stdout.read()}")
@@ -163,7 +163,7 @@ def _install_envs(cfg:dict, envs_path:str,_action:str="install", env:str="all",f
     installer = "conda"
     version_25 = check_conda_version(get_conda_version())
     proc = subprocess.run(["which", "mamba"], capture_output=True, text=True)
-    print(_action, env, force_reinstall)
+    # print(_action, env, force_reinstall)
     if proc.returncode == 0:
         installer = "mamba"
         LOGGER.info("Using mamba to install dependencies.")
@@ -235,7 +235,7 @@ def dependencies(_action:str = "install",
     elif _action in ['install', 'update']:
         force_reinstall = kwargs.get('force', False) if _action == 'update' else False
         env_to_install = kwargs.get('tool', 'all')
-        print(force_reinstall)
+        # print(force_reinstall)
         if not _install_envs(dep_cfg, envs, _action = _action,env=env_to_install, force_reinstall=force_reinstall):
             LOGGER.critical("Error installing dependencies.")
             
