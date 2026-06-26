@@ -26,7 +26,11 @@ import numpy as np
 try:
     sp = pd.read_csv(f"{sys.argv[2]}", sep = "\t", header = None, names = ["perc","cumulative",'direct','rank','taxon_id','name'])
     sp['name'] = sp['name'].apply(lambda x: x.strip())
-    uc = sp[sp['rank'] == "U"]['perc'].values[0]
+    uc = sp[sp['rank'] == "U"]
+    if uc.shape[0] == 0:
+        uc = 0
+    else:
+        uc = uc['perc'].values[0]
     print(uc)
     spc = sp[sp['rank'] == "S"].sort_values(['perc'], ascending = False).head(3)
     print(spc)
@@ -42,8 +46,10 @@ try:
         levs = levs +1
     
     df = pd.DataFrame(res, index = [0])
-    print(df[["Isolate","Unclassified (%)","Match 1","Detected_1 (%)","Match 2","Detected_2 (%)","Match 3","Detected_3 (%)"]])
-    df[["Isolate","Unclassified (%)","Match 1","Detected_1 (%)","Match 2","Detected_2 (%)","Match 3","Detected_3 (%)"]].to_csv(f"{sys.argv[3]}", sep = "\t", index = False)
+    cols = ["Isolate","Unclassified (%)","Match 1","Detected_1 (%)","Match 2","Detected_2 (%)","Match 3","Detected_3 (%)"]
+    cols = [i for i in cols if i in df.columns.tolist()]
+    print(df[cols])
+    df[cols].to_csv(f"{sys.argv[3]}", sep = "\t", index = False)
 except Exception as e:
     print(f"Something has gone wrong opening the kraken report: {e}")
 

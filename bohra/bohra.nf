@@ -85,6 +85,7 @@ workflow {
     READ_ANALYSIS ( reads_pe )
     read_stats = READ_ANALYSIS.out.read_stats
     reads_pe = READ_ANALYSIS.out.reads_pe
+    // println reads_pe.view()
     results = results.concat( read_stats)
     versions = READ_ANALYSIS.out.version_seqkit_reads
     versions = versions.concat( READ_ANALYSIS.out.version_kmc )
@@ -208,7 +209,8 @@ workflow {
             reads = reads_pe.filter { cfg,files -> cfg.control != 'control' }.map { cfg, files -> tuple(cfg.id, cfg, files) }
             // 
             asm_tmp = asm.filter { cfg,files -> cfg.control != 'control' }.map { cfg, files -> tuple(cfg.id, cfg , files) }
-            // println reads.view()
+            println reads.view()
+            println asm_tmp.view()
             sequences = reads.join(asm_tmp, remainder:true).map( v -> { v.size() == 4 ? v[1] ? [v[1],v[2]] : [v[2],v[3]]  : [v[1],v[2]]} )
            
         } 

@@ -48,12 +48,16 @@ def _missing_reads(input_table: pd.DataFrame) -> bool:
 
 def _setup_typing_args(kwargs:dict, command:dict, mtb:False) -> dict:
 
-    typing_dbs = ["blast_db", "data_dir", "mobsuite_db"]
+    # typing_dbs = ["mlst_dbdir", "mobsuite_db"]
+    typing_dbs = {
+        "blastdb": f"{kwargs['mlst_dbdir']}/blast/mlst.fa",
+        "datadir":f"{kwargs['mlst_dbdir']}/pubmlst",
+        "mobsuite_db": f"{kwargs['mobsuite_db']}"}
     input_table = _open_input_file(kwargs['input_file'])
     command = _setup_assembly_args(kwargs, command, mtb)
     command['modules'].append('typing')
     for d in typing_dbs:
-        db = _check_databases(path = kwargs[d], dtbtype = d)
+        db = _check_databases(path = typing_dbs[d], dtbtype = d)
         command["params"].append(db)
 
     exclude = eval(kwargs['mlst_exclude'])

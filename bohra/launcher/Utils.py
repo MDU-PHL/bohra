@@ -412,15 +412,15 @@ def _get_run_cmd_options() -> dict:
         "amr_typing": [
             
             {
-                "name":"blast_db",
-                "help":"Path to the mlst blast_db, defaults to what is installed in the environment.",
-                "default":f"{os.getenv('BLAST_DB', '')}"
+                "name":"mlst_dbdir",
+                "help":"Path to the mlst blast and publmlst, defaults to what is installed in the environment.",
+                "default":f"{os.getenv('MLST_DBDIR', '')}"
             },
-            {
-                "name":"data_dir",
-                "help":"Path to the mlst datadir, defaults to what is installed in the environment.",
-                "default":f"{os.getenv('PUBMLST_DB','')}"
-            },
+            # {
+            #     "name":"data_dir",
+            #     "help":"Path to the mlst datadir, defaults to what is installed in the environment.",
+            #     "default":f"{os.getenv('PUBMLST_DB','')}"
+            # },
             {
                 "name":"mlst_exclude",
                 "short_name":"-me",
