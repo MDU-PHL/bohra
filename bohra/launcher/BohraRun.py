@@ -85,7 +85,7 @@ def _funcs() -> dict:
 def _make_command(command: dict) -> str:
     """Constructs the command string from the command dictionary."""
     
-    cmd = f"nextflow -Dnxf.pool.type=sync run {pathlib.Path(__file__).parent.parent.resolve() / 'bohra.nf'} " 
+    cmd = f"export NXF_SYNTAX_PARSER=v1 && nextflow -Dnxf.pool.type=sync run {pathlib.Path(__file__).parent.parent.resolve() / 'bohra.nf'} " 
     
     cmd += " ".join(command["params"])
     if command["modules"]:
