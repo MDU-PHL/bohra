@@ -25,11 +25,13 @@ def _check_databases(path :str, dtbtype:str) -> dict:
     
     if path == "":
         LOGGER.info(f"No database path provided using default databases installed for {dtbtype}.")
-        
         return f"--{dtbtype} no_db"
     elif _check_path(path):
+        LOGGER.info(f"Found database path for {dtbtype}.")
         return f"--{dtbtype} {path}"
-
+    else:
+        LOGGER.info(f"No database path provided using default databases installed for {dtbtype}.")
+        return f"--{dtbtype} no_db"
 
 def _missing_reads(input_table: pd.DataFrame) -> bool:
 
@@ -49,15 +51,18 @@ def _missing_reads(input_table: pd.DataFrame) -> bool:
 def _setup_typing_args(kwargs:dict, command:dict, mtb:False) -> dict:
 
     # typing_dbs = ["mlst_dbdir", "mobsuite_db"]
+    # LOGGER.info(f"adding dbs")
     typing_dbs = {
-        "blastdb": f"{kwargs['mlst_dbdir']}/blast/mlst.fa",
-        "datadir":f"{kwargs['mlst_dbdir']}/pubmlst",
+        "blast_db": f"{kwargs['mlst_dbdir']}/blast/mlst.fa",
+        "data_dir":f"{kwargs['mlst_dbdir']}/pubmlst",
         "mobsuite_db": f"{kwargs['mobsuite_db']}"}
     input_table = _open_input_file(kwargs['input_file'])
     command = _setup_assembly_args(kwargs, command, mtb)
     command['modules'].append('typing')
     for d in typing_dbs:
+        LOGGER.info(f"Checking the {d} db at {typing_dbs[d]}")
         db = _check_databases(path = typing_dbs[d], dtbtype = d)
+        # LOGGER.info(f"{db} will be added to run paramaters")
         command["params"].append(db)
 
     exclude = eval(kwargs['mlst_exclude'])
