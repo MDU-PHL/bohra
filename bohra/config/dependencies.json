@@ -31,5 +31,6 @@
   "seqtk":["csvtk version"],
   "shigapass":["blastn -version","csvtk version"],
   "cluster":["csvtk version"],
-  "sccmec":["sccmec --version", "csvtk version"]
+  "sccmec":["sccmec --version", "csvtk version"],
+  "auriclass": ["auriclass --version", "csvtk version"]
 }
