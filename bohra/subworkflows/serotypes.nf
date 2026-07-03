@@ -8,6 +8,7 @@ include { ECTYPER } from './../modules/ectyper/main'
 include { EMMTYPER } from './../modules/emmtyper/main'
 include { SHIGAPASS } from './../modules/shigapass/main'
 include { SONNEITYPE } from './../modules/sonneitype/main'
+include { SCCMEC } from './../modules/sccmec/main'
 include {CSVTK_CONCAT;CSVTK_UNIQ } from './../modules/csvtk/main'
 include { CONCAT_FILES } from './../modules/utils/main'
 workflow SEROTYPES {
@@ -19,6 +20,7 @@ workflow SEROTYPES {
     main:
         
         listeria = asm.filter { cfg, contigs -> cfg.species == 'Listeria monocytogenes'}
+        saureus = asm.filter { cfg, contigs -> cfg.species == 'Staphylococcus aureus'}
         nmen = asm.filter { cfg, contigs -> cfg.species == 'Neisseria meningitidis'}
         ngono = asm.filter { cfg, contigs -> cfg.species == 'Neisseria gonorrhoeae'}
         salmonella = asm.filter { cfg, contigs -> cfg.species =~ 'Salmonella'}
@@ -56,6 +58,9 @@ workflow SEROTYPES {
         SONNEITYPE ( sonnei )
         sonnei_typers = SONNEITYPE.out.typer.map {cfg, typer -> typer }.collect()
         sonnei_version = SONNEITYPE.out.version.map {cfg, version -> version }.collect()
+        SCCMEC ( saureus )
+        sccmec_typers = SCCMEC.out.typer.map {cfg, typer -> typer }.collect()
+        sccmec_version = SCCMEC.out.version.map {cfg, version -> version }.collect()
 
         // typers = lissero_typers.concat ( salmo_typers, nmen_typers, ngono_typers, klebs_typers, ecoli_typers,emm_typers ).flatten().toList().map { files -> tuple("typer", files)}
         // println typers.view()
@@ -69,7 +74,9 @@ workflow SEROTYPES {
         emm_typing = CONCAT_EMMTYPER ( emm_typers.map {files -> tuple("emmtyper", files)} )
         shigapass = CONCAT_SHIGAPASS ( shigella_typers.map {files -> tuple("shigapass", files)} )
         sonnei_typing = CONCAT_SONNEITYPE ( sonnei_typers.map {files -> tuple("sonneitype", files)} )
-        collated_typers =  lissero_typing.concat(kleb_typing,salmo_typing,nmen_typing,ngono_typing,ecoli_typing,emm_typing, shigapass, sonnei_typing)
+        sccmed_typing = CONCAT_SCCMEC ( sccmec_typers.map {files -> tuple("sccmec", files)} )
+        
+        collated_typers =  lissero_typing.concat(kleb_typing,salmo_typing,nmen_typing,ngono_typing,ecoli_typing,emm_typing, shigapass, sonnei_typing,sccmed_typing)
         versions = lissero_version.concat ( salmo_version, nmen_version, ngono_version, klebs_version, ecoli_version, emm_version ).map { files -> tuple("version_serotypes", files)}
         
         // CONCAT_FILES ( typers )
@@ -80,6 +87,15 @@ workflow SEROTYPES {
         collated_typers = collated_typers.toList()
         collated_versions
 
+}
+
+workflow CONCAT_SCCMEC {
+    take:
+        saureus
+    main:
+        CONCAT_FILES ( saureus )
+    emit:
+        collated_sccmec = CONCAT_FILES.out.collated
 }
 
 workflow CONCAT_KLEBORATE {
