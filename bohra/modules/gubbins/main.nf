@@ -12,7 +12,7 @@ process GUBBINS {
         mode: 'copy',
         saveAs: { filename -> saveFiles(filename:filename, options:params.options, publish_dir:params.report_outdir) }
     
-    scratch true
+    // scratch true
     cache 'lenient'
     
     if ( params.enable_conda ) {
@@ -27,13 +27,15 @@ process GUBBINS {
 
     output:
     path('gubbins.aln'), emit: gubbins
+    path('*.recombination_predictions.gff'), emit: gubbins_gff
+    path('*summary_of_snp_distribution.vcf'), emit: gubbins_vcf
     path("version_gubbins.txt"), emit: version
     // tuple val(meta), path('spades.log'), emit: log
 
     script:
     """
-    run_gubbins.py -c $task.cpus  --prefix clean $cleaned
-    snp-sites -c clean.filtered_polymorphic_sites.fasta > gubbins.aln
+    run_gubbins.py -c $task.cpus  --prefix gubbins $cleaned
+    snp-sites -c gubbins.filtered_polymorphic_sites.fasta > gubbins.aln
     echo -e gubbins'\t'\$CONDA_PREFIX'\t'\$(run_gubbins.py --version)'\t'${params.gubbins_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_gubbins.txt
     echo -e snp-sites'\t'\$CONDA_PREFIX'\t'\$(snp-sites -V)  >> version_gubbins.txt
     """
