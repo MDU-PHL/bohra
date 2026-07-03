@@ -61,6 +61,7 @@ workflow RUN_SNPS {
         if ( params.gubbins ){
             GUBBINS ( cleaned_aln )
             core_aln = GUBBINS.out.gubbins
+            core_vcf = GUBBINS.out.gubbins_vcf
         }
         
         SNP_DISTS ( core_aln )

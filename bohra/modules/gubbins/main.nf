@@ -28,7 +28,7 @@ process GUBBINS {
     output:
     path('gubbins.aln'), emit: gubbins
     path('*.recombination_predictions.gff'), emit: gubbins_gff
-    path('*summary_of_snp_distribution.vcf'), emit: gubbins_vcf
+    path('*.summary_of_snp_distribution.vcf'), emit: gubbins_vcf
     path("version_gubbins.txt"), emit: version
     // tuple val(meta), path('spades.log'), emit: log
 
