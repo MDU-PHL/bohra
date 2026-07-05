@@ -28,7 +28,6 @@
   "sonneitype":["mykrobe --version","csvtk version"],
   "classify-pangenome":["R --version"],
   "datasmryzr":["datasmryzr --version","csvtk version"],
-  "seqtk":["csvtk version"],
   "shigapass":["blastn -version","csvtk version"],
   "cluster":["csvtk version"],
   "sccmec":["sccmec --version", "csvtk version"],

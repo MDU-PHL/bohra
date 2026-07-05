@@ -1,7 +1,0 @@
-name: bohra-seqtk
-channels:
-  - conda-forge
-  - bioconda
-dependencies:
-  - seqtk=1.4
-  - csvtk=0.25.0

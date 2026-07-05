@@ -27,12 +27,11 @@ LOGGER.setLevel(logging.DEBUG)
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 ch.setFormatter(CustomFormatter())
-fh = logging.FileHandler('bohra.log')
-fh.setLevel(logging.DEBUG)
+
 formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p') 
-fh.setFormatter(formatter)
+
 LOGGER.addHandler(ch) 
-LOGGER.addHandler(fh)
+
 
     
 
@@ -146,7 +145,10 @@ def _check_bohra_success(expected_output: str) -> bool:
         LOGGER.critical(f"The bohra run failed to generate the expected output: {expected_output}.")
         return False
 
-
+# fh = logging.FileHandler('bohra.log')
+# fh.setLevel(logging.DEBUG)
+# fh.setFormatter(formatter)
+# LOGGER.addHandler(fh)
 
 def run_bohra(
         pipeline: str,

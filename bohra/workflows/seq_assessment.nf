@@ -1,6 +1,5 @@
 #!/usr/bin/env nextflow
 
-include { SEQTK } from './../modules/seqtk/main' 
 include { COLLATE_STATS_ISOLATE;COLLATE_ASM_FULL;COLLATE_ASM_QUICK } from './../modules/collation/main'
 include { SEQKIT_STATS } from './../modules/seqkit/stats/main' 
 include { SEQKIT_GC } from './../modules/seqkit/fx2tab/main' 
@@ -31,12 +30,8 @@ workflow READ_ANALYSIS {
         
         // println reads_pe_checked.view()
         SEQKIT_STATS ( reads_pe_checked )
-        // SEQKIT_GC ( reads_pe_checked )
         KMC ( reads_pe_checked )
-        // SEQTK ( reads_pe_checked )
-        // COMBD = SEQKIT_STATS.out.stats.join( SEQKIT_GC.out.stats )
         COMBD = SEQKIT_STATS.out.stats.join( KMC.out.genome_size )
-        // COMBD = COMBD.join( SEQTK.out.seqtk_stats )
         COLLATE_STATS_ISOLATE ( COMBD )
         seq_stats = COLLATE_STATS_ISOLATE.out.read_assessment.map { cfg, seq -> seq }.collect() // TODO add in Q score
         seq_stats = seq_stats.map { files -> tuple("read_assessment", files) }
@@ -108,11 +103,6 @@ workflow ASSEMBLY_ANALYSIS_QUICK {
         BOHRA_VERSION (  )
         SEQKIT_GC ( contigs )
         SEQKIT_STATS ( contigs )
-        // println SEQKIT_STATS.out.stats.view()
-        // PROKKA ( contigs )
-        // gff = PROKKA.out.gff.filter { cfg, files -> cfg.control != 'control' }
-        // gff = gff.map { cfg, files -> files }.collect()
-        // APS = PROKKA.out.prokka_txt.join( SEQKIT_STATS.out.stats )
         COLLATE_ASM_QUICK ( SEQKIT_STATS.out.stats )
         asm_stats = COLLATE_ASM_QUICK.out.assembly.map { cfg, asm -> asm }.collect()
         asm_stats = asm_stats.map { files -> tuple("assembly_assessment", files) }
