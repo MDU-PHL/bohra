@@ -78,10 +78,11 @@ workflow SEROTYPES {
         emm_typing = CONCAT_EMMTYPER ( emm_typers.map {files -> tuple("emmtyper", files)} )
         shigapass = CONCAT_SHIGAPASS ( shigella_typers.map {files -> tuple("shigapass", files)} )
         sonnei_typing = CONCAT_SONNEITYPE ( sonnei_typers.map {files -> tuple("sonneitype", files)} )
-        sccmed_typing = CONCAT_SCCMEC ( sccmec_typers.map {files -> tuple("sccmec", files)} )
+        sccme_typing = CONCAT_SCCMEC ( sccmec_typers.map {files -> tuple("sccmec", files)} )
+        auris_typing = CONCAT_AURICLASS ( auris_typers.map {files -> tuple("auriclass", files)} )
         
-        collated_typers =  lissero_typing.concat(kleb_typing,salmo_typing,nmen_typing,ngono_typing,ecoli_typing,emm_typing, shigapass, sonnei_typing,sccmed_typing)
-        versions = lissero_version.concat ( salmo_version, nmen_version, ngono_version, klebs_version, ecoli_version, emm_version ).map { files -> tuple("version_serotypes", files)}
+        collated_typers =  lissero_typing.concat(kleb_typing,salmo_typing,nmen_typing,ngono_typing,ecoli_typing,emm_typing, shigapass, sonnei_typing,sccme_typing, auris_typing)
+        versions = lissero_version.concat ( salmo_version, nmen_version, ngono_version, klebs_version, ecoli_version, emm_version, shigella_version,sonnei_version,sccmec_version,auris_version ).map { files -> tuple("version_serotypes", files)}
         
         // CONCAT_FILES ( typers )
         CSVTK_UNIQ ( versions )
@@ -100,6 +101,16 @@ workflow CONCAT_SCCMEC {
         CONCAT_FILES ( saureus )
     emit:
         collated_sccmec = CONCAT_FILES.out.collated
+}
+
+
+workflow CONCAT_AURICLASS {
+    take:
+        auris
+    main:
+        CONCAT_FILES ( auris )
+    emit:
+        collated_auris = CONCAT_FILES.out.collated
 }
 
 workflow CONCAT_KLEBORATE {

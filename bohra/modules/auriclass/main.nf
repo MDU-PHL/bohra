@@ -34,8 +34,8 @@ process AURICLASS {
     script:
     def reads = sequences.join(' ')
     """
-    auriclass --name  ${meta.id} -o tmp.csv $reads
-    csvtk rename -f Sample -n Isolate tmp.csv| csvtk csv2tab  > typer_${getSoftwareName(task.process)}.txt
+    auriclass --name  ${meta.id} -o tmp.tsv $reads
+    csvtk -t rename -f Sample -n Isolate tmp.tsv > typer_${getSoftwareName(task.process)}.txt
     echo -e auriclass'\t'\$CONDA_PREFIX'\t'\$(auriclass --version)'\t'${params.sccme_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_auriclass.txt
     """
     
