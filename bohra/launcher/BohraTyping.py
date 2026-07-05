@@ -64,10 +64,11 @@ def _setup_typing_args(kwargs:dict, command:dict, mtb:False) -> dict:
         db = _check_databases(path = typing_dbs[d], dtbtype = d)
         # LOGGER.info(f"{db} will be added to run paramaters")
         command["params"].append(db)
-
+    novel_mlst = kwargs["novel_mlst"] if kwargs["novel_mlst"] != "" else "no_novel"
+    command["params"].append(f"--novel_mlst {novel_mlst}")
     exclude = eval(kwargs['mlst_exclude'])
     
     if exclude != []:
         command['params'].append(f"--mlst_exclude {','.join(exclude)}")
-
+    
     return command

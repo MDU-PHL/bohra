@@ -34,14 +34,16 @@ process MLST {
     output:
     tuple val(meta), path('mlst.txt'), emit: mlst
     tuple val(meta), path('mlst.json'), emit: json
+    tuple val(meta), path('novel_*'), optional: true
     tuple val(meta), path('version_mlst.txt'), emit: version
 
     script:
     def _blast_db = blast_db != "no_db" ? "--blastdb ${blast_db}" : ""
     def _publst_db = data_dir != "no_db" ? "--datadir ${data_dir}" : ""
+    def _novel = params.novel_mlst != "no_novel" ? "--novel novel_${params.novel_mlst}" : ""
     def exclude = params.mlst_exclude != '' ? "--exclude ${params.mlst_exclude}" : ""
     """
-    mlst --full --json mlst.json --label $meta.id --nopath $contigs --outfile mlst_tmp.txt $_blast_db $_publst_db  $exclude 
+    mlst --full --json mlst.json --label $meta.id --nopath $contigs --outfile mlst_tmp.txt $_blast_db $_publst_db  $exclude $_novel
     csvtk -t rename -f 'FILE,SCHEME,ST,STATUS,SCORE,ALLELES' -n 'Isolate,Scheme,ST,Status,Score,MLST_Alleles' mlst_tmp.txt > mlst.txt
     echo -e mlst'\t'\$CONDA_PREFIX'\t'\$(mlst -v)'\t'$_blast_db,$_publst_db'\t'${params.mlst_ref} | csvtk add-header -t -n 'tool,conda_env,version,database,reference' > version_mlst.txt
     """

@@ -429,6 +429,12 @@ def _get_run_cmd_options() -> dict:
                 "multiple":True
             },
             {
+                "name" : "novel_mlst",
+                "short_name" : "-nm",
+                "help": "Filename to save detected novel mlst alleles to.",
+                "default": ""
+            },
+            {
                 "name":"mobsuite_db",
                 "help":"Path to the mobsuite_db, defaults to what is installed in the bohra-mob_suite environment.",
                 "default":f"{os.getenv('BOHRA_MOBSUITE_DB','')}"
