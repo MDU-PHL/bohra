@@ -105,13 +105,13 @@ def check_genome_size(val:list, genome_sizes:dict, type:str) -> str:
     Check if the genome size is above the minimum size
     """
     try:
-        if val[1] in genome_sizes:
-            max_size = float(genome_sizes[val[1]]["MAX_THRESHOLD"])
-            min_size = float(genome_sizes[val[1]]["MIN_THRESHOLD"])
-            if float(val[0]) >= min_size and float(val[0]) <= max_size:
+        if val["Species"] in genome_sizes:
+            max_size = float(genome_sizes[val["Species"]]["MAX_THRESHOLD"])
+            min_size = float(genome_sizes[val["Species"]]["MIN_THRESHOLD"])
+            if float(val["Genome size"]) >= min_size and float(val["Genome size"]) <= max_size:
                 return 1
             else:
-                return f"Genome size ({type}): {val[0]}bp is outside the expected range for {val[1]}."
+                return f"Genome size ({type}): {val["Genome size"]}bp is outside the expected range for {val["Species"]}."
         else:
             return 1
     except Exception as e:
@@ -162,7 +162,7 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
     # print(summary)
     
     summary = pd.merge(input_data, summary, how = 'left', on = "Isolate")
-    print(summary)
+    # print(summary)
     summary["is_control"] = summary["is_control"].fillna(False) if "is_control" in summary.columns else False
     summary = summary.fillna("")
     summary = summary.rename(columns = {"Match 1 (reads)":"Species (reads)","Match 1 (asm)":"Species (assembly)"})
@@ -174,7 +174,7 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
             summary[i] = summary[i].apply(lambda x: int(x) if x != "" else "")
     
     sp_cols = [i for i in summary.columns if "Species" in i]
-    print(summary)
+    # print(summary)
     if sp_cols:
         summary["Species check"] = summary[sp_cols].apply(lambda x: check_species(x.tolist()), axis=1)
         summary["Species"] = summary[sp_cols].apply(lambda x: ':'.join(list(set(x))).strip(":"), axis=1)
@@ -186,9 +186,9 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
         summary.drop(columns=sp_cols, inplace=True)
         cols = [i for i in summary.columns if i not in sp_cols]
     if "filesize" in summary.columns:
-        print(summary[["filesize","Reads"]])
+        # print(summary[["filesize","Reads"]])
         summary["File size check"] = summary[["filesize","Reads"]].apply(lambda x: check_filesize(x), axis=1)
-        print(summary)
+        # print(summary)
     if "Depth" in summary.columns:
         summary["Coverage check"] = summary[["Depth","is_control"]].apply(lambda x: check_val(x, min_depth, "Avg depth","Depth"),axis=1)
     if "% Aligned" in summary.columns:
@@ -200,27 +200,33 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
         summary["Contigs check"] = summary[["# Contigs","is_control"]].apply(lambda x: check_contigs(bounds[1], bounds[0], x), axis=1)
     
     check_cols = [i for i in list(summary.columns) if "check" in i]
-    print(check_cols)
+    # print(check_cols)
     if "filesize" in summary.columns:
         check_cols.append("File size check")
     
-    print(summary.columns)
+    # print(summary.columns)
     summary = summary.fillna("")
-    print(summary)
+    # print(summary)
     summary["Comment"] = summary[check_cols].apply(lambda x: make_comment(x), axis=1)
-    print(summary[check_cols])
+    # print(summary[check_cols])
     summary["Data assessment"] = summary[check_cols].apply(lambda x: 1 if all(f"{i}" in ["1",""] for i in x.tolist()) else 0, axis=1)
     if "Aln_outlier" in summary.columns:
         check_cols.append("Aln_outlier")
     # print(summary)
     summary.drop(columns=check_cols, inplace=True)
-    print(summary)
+    # print(summary)
     if not summary.empty:
         
         summary.to_csv("summary.tsv", sep = '\t', index = False)
         output.append("summary.tsv")
-        return "-f summary.tsv", output
-    return "",output 
+        if 'Species' in summary.columns.tolist():
+            spdf = summary[["Isolate","Species"]]
+        else:
+            spdf = pd.DataFrame()
+   
+        return "-f summary.tsv", output,spdf
+    
+    return "",output,spdf
 
 
 def _extract_tree(results_files: list, output : list) -> str:
@@ -372,7 +378,7 @@ def _get_mask(mask: str) -> str:
         return f"-m {mask}"
     return ""
 
-def _get_other_files(results_files: list,ouput:list) -> str:
+def _get_other_files(results_files: list,ouput:list, spdf:pd.DataFrame) -> str:
     """
     Extract the other files from the results files
     """
@@ -380,7 +386,18 @@ def _get_other_files(results_files: list,ouput:list) -> str:
     for file in results_files:
         # print(file)
         if file not in ouput and pathlib.Path(file).exists() and ("txt" in file or "tsv" in file or "json" in file):
-            other_files.append(f"-f {file}")
+            tmp = pd.read_csv(file, sep = "\t")
+            fn = file
+            if not spdf.empty and 'Species' not in tmp.columns and 'version' not in fn:
+                try:
+                    print(tmp.columns)
+                    print(spdf.columns)
+                    tmp = tmp.merge(spdf, how = "left")
+                    fn = pathlib.Path(fn).name
+                    tmp.to_csv(fn, sep = "\t", index = False)
+                except:
+                    print("Can't merge species")
+            other_files.append(f"-f {fn}")
         
 
     return " ".join(other_files) if other_files else ""
@@ -634,7 +651,7 @@ def _compile(args):
     results_files = [i for i in results_files if "clusters.txt" not in i]
     core_genome,output = _extract_core_genome(results_files, output)
     core_genome_report,output = _extract_core_genome_report(results_files, output)
-    summary,output = _generate_summary_table(args.input_file, results_files, output, 40, 30, 70,args.ignore_warnings)
+    summary,output,spdf = _generate_summary_table(args.input_file, results_files, output, 40, 30, 70,args.ignore_warnings)
     print(read_assessment)
     treebuilder = get_modules(args.modules, args.tree_input)
     panclass,output = _extract_pangenome_classification(results_files, output)
@@ -642,7 +659,7 @@ def _compile(args):
     pangroups,output = _extract_pangenome_groups(results_files, output)
     numvarsites,output = _extract_core_sites(results_files, output)
     # print(panclass, panrtab, pangroups)
-    other_files = _get_other_files(results_files,output)
+    other_files = _get_other_files(results_files,output,spdf)
     other_files = other_files + " " + summary if summary else other_files
     reference = _get_reference(args.reference)
     mask = _get_mask(args.mask)
