@@ -11,12 +11,13 @@ LOGGER.setLevel(logging.DEBUG)
 ch = logging.StreamHandler()
 ch.setLevel(logging.DEBUG)
 ch.setFormatter(CustomFormatter())
-fh = logging.FileHandler('bohra.log')
-fh.setLevel(logging.DEBUG)
+# fh = logging.FileHandler('bohra.log')
+# fh.setLevel(logging.DEBUG)
 formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p') 
-fh.setFormatter(formatter)
+# fh.setFormatter(formatter)
 LOGGER.addHandler(ch) 
-LOGGER.addHandler(fh)
+# LOGGER.addHandler(fh)
+
 
 def _get_annotation(input_file:str, mtb:bool) -> str:
     annot_cols =[]

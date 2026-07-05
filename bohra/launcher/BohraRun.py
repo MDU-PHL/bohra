@@ -96,6 +96,8 @@ def _generate_bohra_command(
         pipeline: str,
         kwargs: dict) -> str:
     # print(kwargs)
+    
+    LOGGER = logfile()
     if _make_workdir(workdir=kwargs["workdir"],   
                   _input=kwargs["input_file"], 
                   report_outdir=kwargs["report_outdir"], 
@@ -136,6 +138,7 @@ def _run_bohra_cmd(
     # Wait for the process to complete and get the return code
     proc.wait()
     return proc
+
 def _check_bohra_success(expected_output: str) -> bool:
     LOGGER.info(f"Checking for the expected output: {expected_output}")
     if pathlib.Path(expected_output).exists():
@@ -145,14 +148,24 @@ def _check_bohra_success(expected_output: str) -> bool:
         LOGGER.critical(f"The bohra run failed to generate the expected output: {expected_output}.")
         return False
 
-# fh = logging.FileHandler('bohra.log')
-# fh.setLevel(logging.DEBUG)
-# fh.setFormatter(formatter)
-# LOGGER.addHandler(fh)
+def logfile():
+
+    LOGGER =logging.getLogger(__name__) 
+    LOGGER.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('[%(levelname)s:%(asctime)s] %(message)s', datefmt='%Y-%m-%d %I:%M:%S %p') 
+
+    fh = logging.FileHandler('bohra.log')
+    fh.setLevel(logging.DEBUG)
+    fh.setFormatter(formatter)
+    LOGGER.addHandler(fh)
+
+    return LOGGER
+
 
 def run_bohra(
         pipeline: str,
-        kwargs: dict) -> bool:
+        kwargs: dict,
+        ) -> bool:
     
         # generate the command
         cmd = _generate_bohra_command(pipeline=pipeline, kwargs=kwargs)
