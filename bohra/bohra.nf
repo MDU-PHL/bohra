@@ -209,8 +209,8 @@ workflow {
             reads = reads_pe.filter { cfg,files -> cfg.control != 'control' }.map { cfg, files -> tuple(cfg.id, cfg, files) }
             // 
             asm_tmp = asm.filter { cfg,files -> cfg.control != 'control' }.map { cfg, files -> tuple(cfg.id, cfg , files) }
-            println reads.view()
-            println asm_tmp.view()
+            // println reads.view()
+            // println asm_tmp.view()
             sequences = reads.join(asm_tmp, remainder:true).map( v -> { v.size() == 4 ? v[1] ? [v[1],v[2]] : [v[2],v[3]]  : [v[1],v[2]]} )
            
         } 

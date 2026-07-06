@@ -385,7 +385,7 @@ def _get_other_files(results_files: list,ouput:list, spdf:pd.DataFrame) -> str:
     other_files = []
     for file in results_files:
         # print(file)
-        if file not in ouput and pathlib.Path(file).exists() and ("txt" in file or "tsv" in file or "json" in file):
+        if file not in ouput and pathlib.Path(file).exists() and ("txt" in file or "tsv" in file or "json" in file) and 'distances' not in file:
             tmp = pd.read_csv(file, sep = "\t")
             fn = file
             if not spdf.empty and 'Species' not in tmp.columns and 'version' not in fn:
