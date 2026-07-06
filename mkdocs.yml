@@ -12,10 +12,10 @@ nav:
       - Comparative pipeline: usage/comparative.md
       - Full pipeline: usage/full.md
       - TB pipeline: usage/tb.md
-  - Guides:
-      - Quality Control: guides/quality_control.md
-      - Comparative Genomics: guides/comparative_genomics.md
-      - TB Analysis: guides/tb_analysis.md
+  - Cookbook:
+      - Quality Control: cookbook/quality_control.md
+      - Comparative Genomics: cookbook/comparative_genomics.md
+      - TB Analysis: cookbook/tb_analysis.md
   - Contributing: contributing.md
   - License: license.md
 theme:

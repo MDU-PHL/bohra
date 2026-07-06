@@ -1,10 +1,41 @@
 # The home of bohra
 
-![pretty](images/bohra_doc.png)
-
 **Comprehensive sequence characterisation for microbial genomics**
 
-## Introduction
+
+The `bohra` pipeline is designed to be flexible and modular, allowing for inputs from paired-end fastq and/or assemblies, with direct support for ONT coming soon.
+
+Stand alone html reports are generated for easy sharing and visualisation of the results.
+
+## Installation
+
+
+### Recommended (conda or mamba)
+
+**1. Install conda (skip this step if you already have conda installed)**
+
+If you do not already have `conda` installed, you can check out the documentation [here](https://docs.conda.io/projects/conda/en/stable/user-guide/install/index.html). We recommend you install [`miniforge`](https://github.com/conda-forge/miniforge)
+
+
+**2. Create and install bohra**
+
+```
+mamba (or conda) create -n bohra -c bioconda bohra
+```
+
+**3. Install dependencies and setup databases**
+
+```
+conda activate bohra
+bohra deps install
+```
+
+Details of database setup and 
+
+## Motivation
+
+
+![pretty](images/bohra_doc.png)
 
 `bohra` is microbial genomics pipeline, designed predominantly for use in public health, but may also be useful in research settings. It leverages existing high quality bioinformatics tools, to provide users with an easily accessible report of comprehensive analysis results of bacterial sequence data to for characterisation of single samples or for outbreak investigations or population studies. 
 
@@ -17,9 +48,6 @@
 7. Pangenome analysis.
 
 
-The pipeline is designed to be flexible and modular, allowing for inputs from paired end fastq or assemblies, with direct support for ONT coming soon.
-
-Stand alone html reports are generated for easy sharing and visualisation of the results.
 
 
 

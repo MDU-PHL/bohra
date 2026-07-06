@@ -381,7 +381,8 @@ def _get_run_cmd_options() -> dict:
                 "help":"Set --no-prokka if you do not want to annotate assemblies with prokka. Please note that this will result in no annotation of trees and no genbank files in the output.",
                 "is_flag":True,
                 "default":False
-            }
+            },
+            
         ],
         "assemble": [
                 
