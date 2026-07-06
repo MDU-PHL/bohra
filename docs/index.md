@@ -1,11 +1,13 @@
 # The home of bohra
 
-**Comprehensive sequence characterisation for microbial genomics**
+**Comprehensive sequence characterisation for microbial genomics - Documentation under contruction - thank you for your patience.**
 
 
 The `bohra` pipeline is designed to be flexible and modular, allowing for inputs from paired-end fastq and/or assemblies, with direct support for ONT coming soon.
 
 Stand alone html reports are generated for easy sharing and visualisation of the results.
+
+Usage instructions can be found [here](usage/overview.md)
 
 ## Installation
 
