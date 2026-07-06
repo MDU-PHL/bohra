@@ -32,7 +32,7 @@ conda activate bohra
 bohra deps install
 ```
 
-Details of database setup and 
+Details of database setup and other options for installation can be found [here](installation.md)
 
 ## Motivation
 
