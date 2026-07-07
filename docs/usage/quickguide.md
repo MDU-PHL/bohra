@@ -1,4 +1,4 @@
-# Usage overview
+# Getting started
 
 Users have the option to supply paired-end fastq (support for ONT coming soon) and/or _de novo_ assemblies as inputs into the pipeline. 
 
@@ -45,6 +45,14 @@ This will generate a file called `my_data.txt` (defaults to `bohra_input.tsv`) w
 ## 2. Choose a pipeline
 
 ### For quality control
+
+```
+bohra run preview -i input_file.tsv -j my_basic_pipeline --cpus N
+```
+
+This command will run basic read assessment and also run `mash` to allow you to assess your dataset for poor quality and/or identify outliers which are not suitable for a comparative analysis. 
+
+It can also give you good overview for understanding your pathogen population and determining next steps.
 
 ### For comparative analysis (AKA trees/snps)
 
