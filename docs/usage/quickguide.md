@@ -43,11 +43,11 @@ bohra generate-input --isolate_ids <table_name>.txt --reads /path/to/reads --con
 This will generate a file called `my_data.txt` (defaults to `bohra_input.tsv`) which you can use as input into `bohra`.
 
 ## 2. Choose a pipeline
-
+All pipelines will output a directory with a html summary file and line list results from all sequences in your analysis. This folder is called `report` by default but can be set using the `--report_outdir` flag.
 ### For quality control
 
 ```
-bohra run preview -i input_file.tsv -j my_basic_pipeline --cpus N
+bohra run preview -i input_file.tsv -j my_basic_pipeline --cpus N --report_outdir your_report
 ```
 
 This command will run basic read assessment and also run `mash` to allow you to assess your dataset for poor quality and/or identify outliers which are not suitable for a comparative analysis. 
@@ -56,9 +56,58 @@ It can also give you good overview for understanding your pathogen population an
 
 ### For comparative analysis (AKA trees/snps)
 
+**`snippy`**
+
+`snippy` is the default comparative analysis tool. 
+
+
+```
+bohra run comparative -i input_file.tsv -j my_snippy_pipeline --cpus N --report_outdir your_report -ref your_reference.fa
+```
+
+`bohra` will also accept a gbk reference genome. However, correct `snippy` functioning requires a fasta formatted genome. `bohra` will check the format and generate a `snippy` friendly reference to align to. 
+
+**`ska2`**
+
+This is an alternative to reference based comparative analysis. You can use ska2 in `bohra` if you have assemblies rather than reads, or if you have a mix. Or if you simply want to use a reference free approach.
+
+Please note that when using large datasets, ska2 may take a long time to run. It is advisable to run ska2 on datasets that you already know are likely related to reduce run time and also increase the quality of the comparisons.
+
+
+```
+bohra run comparative --comparative_tool ska -i input_file.tsv -j my_ska_pipeline --cpus N --report_outdir your_report
+```
+
 ### For AMR and serotyping
 
+`bohra` has serotyping options for many species, the full list can be found [here]. In addition, where available species-specific AMR gene detection and phenotypic predictions may be undertaken.  There is no need for you to specify which typer to use, this will be determined based on species detected in the sequences supplied.
+
+
+```
+bohra run amr_typing -i input_file.tsv -j my_typing_pipeline --cpus N --report_outdir your_report
+```
+
+If you have supplied paired-end reads as your inputs, `bohra` will generate assemblies for use in typing and amr processes. The default assembler is `shovill` with `spades`, but users can change this if required. See [advanced usage]().
+
 ### Complete pipeline
+
+```
+bohra run full -i input_file.tsv -j my_full_pipeline --cpus N --report_outdir your_report
+```
+This pipeline will run basic sequence assessment, comparative analysis, typing and AMR gene detection.
+
+## 3. Interpretation of report.
+
+The `bohra` pipeline generates a folder with all the combined results from all sequences in the analysis as well as a html report file, that can be shared.
+
+- Summary tab (`summary.tsv`) is a collection of key results from the analysis and will include basic sequence metrics, species information and provides information about the quality of the sequence. 
+- Species tab (`species.txt`) is a summary of the kraken2 results, indicating the top 3 species identified in the sequences as well as the amount of unclassified. Where you have paired-end and assembly data, the species from both of these sequence types will be provided for comparison.
+- Resistome tab (`resistome.txt`) and Virulence (`virulence.txt`) are the raw results of `abritamr`, with genes detected from assemblies grouped by the drug class to which they are assigned.
+- Reportable AMR tab (`reportable_amr_mechanisms.txt`) displays the AMR mechanisms that were identified and are classified as relevant for reporting in the context of clinical and/or public health based on the species that is detected in the sequence.
+- Core genome stats tab (`core_genome_stats.txt`) details the quality of each alignment. Graphical depiction of the variants across sites in the genome as well as the distribution of alignment metrics are accompanied by a table detailing whether the % alignment. Note that sequences with an alignment % < 2SD from median will be excluded from analysis by default. The behaviour can be changed by using the `--ignore-warnings` flag when running a comparative analysis.
+
+For detailed information about other output files and tables please check [here]().
+
 
 ## Important considerations.
 **Species_expected column**
