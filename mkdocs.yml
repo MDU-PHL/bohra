@@ -4,14 +4,14 @@ site_url: https://mduphl.github.io/bohra/
 nav:
   - About: index.md
   - Installation: installation.md
-  - Running Bohra:
-      - Overview: usage/overview.md
-      - Migration bohra2 to bohra3: usage/migration.md
+  - Usage:
+      - Quick guide: usage/quickguide.md
       - Basic pipeline: usage/basic.md
       - Assembly pipeline: usage/assemble.md
       - Comparative pipeline: usage/comparative.md
       - Full pipeline: usage/full.md
       - TB pipeline: usage/tb.md
+      - Migration bohra2 to bohra3: usage/migration.md
   - Cookbook:
       - Quality Control: cookbook/quality_control.md
       - Comparative Genomics: cookbook/comparative_genomics.md

@@ -12,9 +12,9 @@ Additionally, you can also supply the species value and any optional sample meta
 
 If you are moving across from bohra version 2 check out the [migration information](../usage/migration.md) 
 
-## Input file
+## 1. Generate your input file
 
-`bohra` requires a single tab-delimited file as input, you can find examples [here] TO ADD.
+`bohra` requires a single tab-delimited file as input.
 
 | Column name | Description | Required? | 
 | :---: | :---: | :---: | 
@@ -24,6 +24,35 @@ If you are moving across from bohra version 2 check out the [migration informati
 | assembly | The path to the assembly for the isolate | If reads are not supplied you must supply an assembly file |
 | Species_expected | The expected species of the sample or 'control'. the proper species name (not the _ joined name from amrfinder) | No |
 
+
+**`bohra` can generate the input file for you**
+
+If you have 
+
+* A table with a list of isolates and other data (species or other metadata) (column 'Isolate' must be included) 
+
+AND/OR
+
+* Paths to your reads and/or contigs
+
+`bohra` can generate the input file for you. 
+
+```
+bohra generate-input --isolate_ids <table_name>.txt --reads /path/to/reads --contigs /path/to/contigs --outname my_data.txt
+```
+This will generate a file called `my_data.txt` (defaults to `bohra_input.tsv`) which you can use as input into `bohra`.
+
+## 2. Choose a pipeline
+
+### For quality control
+
+### For comparative analysis (AKA trees/snps)
+
+### For AMR and serotyping
+
+### Complete pipeline
+
+## Important considerations.
 **Species_expected column**
 
 If you do not require speciation as part of the pipeline and already know the species, you can provide it here. Please note if no speciation is undertaken, `bohra` will use this value to undertake typing and AMR mechanisms/inferrence. If the species in this column is NOT accurate - unexpected results may occur. 
@@ -44,7 +73,7 @@ You may also provide additional columns of relevant metadata in your input file.
 
 If you have 
 
-* A table with a list of isolates and othe data (species or other metadata) (column 'Isolate' must be included) 
+* A table with a list of isolates and other data (species or other metadata) (column 'Isolate' must be included) 
 
 AND/OR
 
