@@ -2,5 +2,6 @@ channels:
   - conda-forge
   - bioconda
 dependencies:
+  - python>=3.11,<3.14
   - mob_suite
   - csvtk

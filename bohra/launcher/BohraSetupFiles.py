@@ -5,7 +5,7 @@ import pathlib
 import os
 import logging
 import shutil
-
+import subprocess
 
 # Logger
 LOGGER =logging.getLogger(__name__) 
@@ -168,7 +168,19 @@ def _make_workdir(_input:pd.DataFrame, workdir:str, report_outdir:str, replace_r
                     try:
                         LOGGER.info(f"Creating directory {row[1][columns[0]]} in {workdir}")
                         target = pathlib.Path(wd / row[1][columns[0]] / target_file)
-                        if not target.exists():
+                        if not target.exists(follow_symlinks= False) :
+                            LOGGER.info(f"{target} does not exist")
+                            pathlib.Path(f"{wd / row[1][columns[0]]}").mkdir(parents=True, exist_ok=True)
+                            target.symlink_to(user_supplied)
+                            if target.exists():
+                                LOGGER.info(f"Successfully linked {user_supplied} to {target}.")
+                            else:
+                                LOGGER.critical(f"{target} does not exist after linking.")
+                                raise SystemExit
+                        elif  target.is_symlink() and not target.exists(follow_symlinks= True):
+                            LOGGER.warning(f"{target} seems to be a broken symlink. Will clean up and relink")
+                            LOGGER.info(f"{target} does not exist")
+                            subprocess.run(f"rm -rf {target}", shell = True)
                             pathlib.Path(f"{wd / row[1][columns[0]]}").mkdir(parents=True, exist_ok=True)
                             target.symlink_to(user_supplied)
                             if target.exists():

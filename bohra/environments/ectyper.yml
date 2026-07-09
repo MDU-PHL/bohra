@@ -3,4 +3,5 @@ channels:
   - bioconda
 dependencies:
   - ectyper>=2
+  - python>=3.11,<3.14
   - csvtk
