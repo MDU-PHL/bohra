@@ -140,6 +140,7 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
             input_data = input_data.drop(columns=[col])
     # print(list_of_filename)
     summary = pd.DataFrame()
+    
     for file in results_files:
         # print(file)
         if pathlib.Path(file).name in list_of_filename and pathlib.Path(file).exists():
@@ -158,7 +159,7 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
             else:
                 summary = pd.merge(summary, df, how = 'outer', on = "Isolate")
     summary["Comment"] = ""
-    summary["Data assessment"] = 1
+    # summary["QA"] = 1
     # print(summary)
     
     summary = pd.merge(input_data, summary, how = 'left', on = "Isolate")
@@ -209,12 +210,14 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
     # print(summary)
     summary["Comment"] = summary[check_cols].apply(lambda x: make_comment(x), axis=1)
     # print(summary[check_cols])
-    summary["Data assessment"] = summary[check_cols].apply(lambda x: 1 if all(f"{i}" in ["1",""] for i in x.tolist()) else 0, axis=1)
+    summary["QA"] = summary[check_cols].apply(lambda x: 1 if all(f"{i}" in ["1",""] for i in x.tolist()) else 0, axis=1)
     if "Aln_outlier" in summary.columns:
         check_cols.append("Aln_outlier")
     # print(summary)
     summary.drop(columns=check_cols, inplace=True)
     # print(summary)
+    col = summary.pop('QA')
+    summary.insert(1, 'QA', col)  
     if not summary.empty:
         
         summary.to_csv("summary.tsv", sep = '\t', index = False)
