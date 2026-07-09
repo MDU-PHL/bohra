@@ -239,9 +239,9 @@ def dependencies(_action:str = "install",
         if not _install_envs(dep_cfg, envs, _action = _action,env=env_to_install, force_reinstall=force_reinstall):
             LOGGER.critical("Error installing dependencies.")
             
-            return 1
+            return False
         else:
-            return 0
+            return True
             # else:
             #     LOGGER.critical("Some dependencies failed verification after installation.")
             #     return 1
