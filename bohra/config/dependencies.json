@@ -5,7 +5,7 @@
   "prokka":["prokka --version","csvtk version"],
   "snpdists":["snp-dists -v","csvtk version"],
   "ngmaster":["ngmaster --version","csvtk version"],
-  "assemblers":["shovill --version","spades.py -v","skesa --version","csvtk version"],
+  "assemblers":["shovill --check","csvtk version"],
   "emmtyper":["emmtyper --version","csvtk version"],
   "seqkit":["seqkit version","csvtk version"],
   "fastp":["fastp --version","csvtk version"],
