@@ -126,7 +126,7 @@ def create_deps_subcommand_with_options(name, options_dict):
     @deps.command(name=name, help = f"Help for {name}ing dependencies.")
     def deps_subcommand(**kwargs):
         try:
-            if dependencies(_action=name, kwargs=kwargs) == 0:
+            if dependencies(_action=name, kwargs=kwargs) == True:
                 click.echo(f"Successfully completed {name}ing dependencies.")
             else:
                 raise SystemExit(1)
