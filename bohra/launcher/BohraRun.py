@@ -104,7 +104,9 @@ def _generate_bohra_command(
                   replace_report=kwargs["replace_report"]):
         LOGGER.info(f"Checking on the setup for the {pipeline} pipeline.")
         if not kwargs["no_check"]:
-            dependencies(_action = "check")
+            if not dependencies(_action = "check"):
+                LOGGER.critical(f"Your dependencies are not installed correctly. Please check you setup or raise an issue at https://github.com/MDU-PHL/bohra/issues")
+                raise SystemExit(1)
         max_cpus = int(_max_cpus(cpus=kwargs.get('threads', 0)))
         LOGGER.info(f"Using {int(max_cpus)} CPUs for the {pipeline} pipeline.")
         profile,profile_config = _get_config(user_config=kwargs['profile_config'], title = kwargs['job_name'],cpus=max_cpus, wd = kwargs["workdir"])

@@ -228,10 +228,10 @@ def dependencies(_action:str = "install",
         if not _check_envs(dep_cfg):
             tool = kwargs.get('tool', 'all')
             LOGGER.critical(f"There are missing or improperly installed dependencies. Please run 'bohra deps install' to install.")
-            return 1
+            return False
         else:
             LOGGER.info("All dependencies are installed properly.")
-            return 0
+            return True
     elif _action in ['install', 'update']:
         force_reinstall = kwargs.get('force', False) if _action == 'update' else False
         env_to_install = kwargs.get('tool', 'all')
