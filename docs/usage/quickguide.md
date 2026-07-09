@@ -1,4 +1,4 @@
-# Getting started
+# Quick start
 
 Users have the option to supply paired-end fastq (support for ONT coming soon) and/or _de novo_ assemblies as inputs into the pipeline. 
 

@@ -15,5 +15,5 @@
                         }
         
                     },
-    "non_essential": ["BOHRA_PUBMLST_DB", "BOHRA_BLAST_DB", "BOHRA_MOBSUITE_DB"]
+    "non_essential": ["MLST_DBDIR", "BOHRA_MOBSUITE_DB"]
 }
