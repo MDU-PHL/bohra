@@ -105,7 +105,17 @@ This pipeline will run basic sequence assessment, comparative analysis, typing a
 
 ## 3. Interpretation of report.
 
-The `bohra` pipeline generates a folder with all the combined results from all sequences in the analysis as well as a html report file, that can be shared.
+The `bohra` pipeline generates a folder for each sequence in the analysis with raw results. In addtion a summary folder with all the combined results (name set with `--report_outdir` or `report` by default) from all sequences in the analysis as well as a html report file, that can be shared.
+
+```
+|--seqid_1
+      | all results files
+|--seqid_2
+      | all results file
+|--report
+      | summarised results files
+      | bohra.html
+```
 
 - Summary tab (`summary.tsv`) is a collection of key results from the analysis and will include basic sequence metrics, species information and provides information about the quality of the sequence. 
 - Species tab (`species.txt`) is a summary of the kraken2 results, indicating the top 3 species identified in the sequences as well as the amount of unclassified. Where you have paired-end and assembly data, the species from both of these sequence types will be provided for comparison.
