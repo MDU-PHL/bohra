@@ -9,7 +9,7 @@ sequence --> speciation --> report
 
 
 ```
-bohra run basic -i input_file.tsv -j my_basic_pipeline
+bohra run basic -i input_file.tsv -j my_basic_pipeline --cpus X
 ```
 where
 - `-i/--input_file` is a tab-delimited file formatted as described [here](../usage/overview.md)

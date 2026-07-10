@@ -1,11 +1,14 @@
 # Pipeline overview
 
-| Pipeline name | Speciation | Sequence assessment | Assemble | MLST | Serotyping | AMR | Plasmid detection | Tree | Distances/Comparative analysis | Pangenome|
-| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |:---: |
-| [basic](../pipelines/basic.md) | Optional | Yes | No | No | No | No | No | No | No | No |
-| [preview](../pipelines/preview.md) | Optional | Yes | No | No | No | No | No | Yes (default - mash) | Yes (default - mash) |No |
-| [assemble](../pipelines/assemble.md) | Optional | Yes | Yes | No | No | No | No | No | No | No |
-| [amr_typing](../pipelines/amr_typing.md) | Optional | Yes | Yes (if required) | Yes | Yes (if speciation is on) | Yes | Yes | No | No | No |
-| [comparative](../pipelines/comparative.md) | Optional | Yes | No | No | No | No | No | Yes (default - iqtree) | Yes (default - snippy)| No |
-| [full](../pipelines/full.md) | Optional | Yes | Yes (if required) | Yes | Yes (if speciation is on)| Yes | Yes | Yes (default - iqtree) | Yes (default - snippy)| Yes |
-| [tb](../pipelines/tb.md) | Optional | Yes | No | No | No | Yes | No | Yes (default - iqtree) | Yes (default - snippy)| Yes |
+
+| Module | [basic](../pipelines/basic.md) | [preview](../pipelines/preview.md)| [assemble](../pipelines/assemble.md) | [amr_typing](../pipelines/amr_typing.md) | [comparative](../pipelines/comparative.md) | [full](../pipelines/full.md) |[tb](../pipelines/tb.md)|
+| :---: |:---: |:---: |:---: |:---: |:---: |:---: |:---: |
+|Speciation|Optional|Optional|Optional|Optional|Optional|Optional|Optional|
+|Assemble| No | No | Yes | Yes (if required) | No | Yes | No|
+|MLST| No | No | No | Yes | No | Yes | No |
+|Serotype | No | No | No | Yes (if speciation done) | No | Yes | No |
+|AMR | No | No | No | Yes | No | Yes | Yes |
+| Plasmid detection | No | No | No | Yes | No | Yes | No |
+| Tree | No | Yes (default quicktree)| No | No | Yes (default iqtree) |Yes (default iqtree)| Yes (default iqtree)|
+|Distance/comparative analysis| No | Yes (mash) |No | No | Yes (default snippy) | Yes (default snippy) | Yes (default snippy) | 
+| Pangenome | No | No | No | No | No | Yes  | No  
