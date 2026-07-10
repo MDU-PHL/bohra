@@ -7,6 +7,7 @@
 
 | Module | [basic](../pipelines/basic.md) | [preview](../pipelines/preview.md)| [assemble](../pipelines/assemble.md) | [amr_typing](../pipelines/amr_typing.md) | [comparative](../pipelines/comparative.md) | [full](../pipelines/full.md) |[tb](../pipelines/tb.md)|
 | :---: |:---: |:---: |:---: |:---: |:---: |:---: |:---: |
+|Sequence assessment|Yes|Yes|Yes|Optional|Yes|Yes|Yes|
 |Speciation|Optional|Optional|Optional|Optional|Optional|Optional|Optional|
 |Assemble| No | No | Yes | Yes (if required) | No | Yes | No|
 |MLST| No | No | No | Yes | No | Yes | No |
