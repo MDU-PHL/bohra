@@ -1,4 +1,4 @@
-# Pipeline overview
+# Pipelines overview
 
 
 | Module | [basic](../pipelines/basic.md) | [preview](../pipelines/preview.md)| [assemble](../pipelines/assemble.md) | [amr_typing](../pipelines/amr_typing.md) | [comparative](../pipelines/comparative.md) | [full](../pipelines/full.md) |[tb](../pipelines/tb.md)|

@@ -13,6 +13,7 @@ fastq --> assembly --> annotation --> sequence_assessment
 assembly --> typing
 assembly --> AMR
 assembly --> speciation
+assembly --> plasmid_detection --> AMR
 speciation --> typing --> report
 speciation --> AMR --> report
 fastq --> sequence_assessment --> report
@@ -20,14 +21,14 @@ fastq --> speciation --> report
 ```
 
 
-This pipeline will use `abritamr` for AMR mechanism detection and undertake species appropriate serotyping. Please note that if you do not supply a species and set `--speciation none` there will be no species specific AMR or serotyping done.
-You can provide paired-end fastq and/or assemblies as input for this pipeline. If only paired-end fastq supplied, assembly will be run to generata appropriate inputs for `abritamr` and serotyping. If you would like to use a an assembly combination different from the default you will need to specify
+This pipeline will use `abritamr` for AMR mechanism detection and undertake species appropriate serotyping (where speciation is done or species is supplied)
+You can provide paired-end fastq and/or assemblies as input for this pipeline. If only paired-end fastq supplied, assembly will be run to generate appropriate inputs for `abritamr` and serotyping. If you would like to use an assembly combination different from the default you will need to specify
 
-1. where inputs are only (or mostly paired-end fastq) and you want to use a different assembler to the default of `shovill + spades`.
+1. where inputs are only (or mostly paired-end fastq) and you want to use a different assembler to the default of `shovill + spades`
 ```
-bohra run amr_typing -i input_file.tsv -j my_typing_pipeline -a shovill_skesa
+bohra run amr_typing -i input_file.tsv -j my_typing_pipeline -a shovill_skesa --cpus X
 ```
 2. where inputs are assemblies (or you are happy to stick with `shovill + spades` )
 ```
-bohra run amr_typing -i input_file.tsv -j my_typing_pipeline
+bohra run amr_typing -i input_file.tsv -j my_typing_pipeline --cpus X
 ```

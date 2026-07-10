@@ -15,5 +15,5 @@ distances --> tree_generation --> report
 
 
 ```
-bohra run preview -i input_file.tsv -j my_preview_pipeline
+bohra run preview -i input_file.tsv -j my_preview_pipeline --cpus X
 ```

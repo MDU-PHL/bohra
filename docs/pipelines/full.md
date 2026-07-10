@@ -12,6 +12,7 @@ speciation --> typing --> report
 assembly --> typing
 speciation --> AMR --> report
 assembly --> AMR
+assembly --> plasmid_detection --> AMR
 assembly --> pangenome --> report
 assembly -- "only possible with reference free" --> variant_detection
 fastq --> variant_detection --> distances --> cluster --> report
@@ -24,5 +25,5 @@ Like the `comparative` pipeline, you can select the comparative tool, tree build
 For example
 
 ```
-bohra run full -i input_file.tsv -j my_full_pipeline -ref <path_to_reference.fa(gbk)> --tree_builder iqtree --cluster_threshold 6,26
+bohra run full -i input_file.tsv -j my_full_pipeline -ref <path_to_reference.fa(gbk)> --tree_builder iqtree --cluster_threshold 6,26 --cpus X
 ```

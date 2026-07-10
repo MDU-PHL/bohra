@@ -22,17 +22,17 @@ Further customisation includes selection of the data which is used to generate t
 
 Additionally - you can select the tree builder to use. `VeryFastTree` is the default tree builder - as it is very quick. But if required you can also use `IQtree`.
 
-1. `IQtree`
-2. `VeryFastTree` (default)
+1. `IQtree` (default)
+2. `VeryFastTree` 
 
 
 For example
 
 **snippy (alignment and iqtree) and cluster at a threshold of <= 5 and <= 25**
 ```
-bohra run comparative -i input_file.tsv -j my_snippy_pipeline -ref <path_to_reference.fa(gbk)> --tree_builder iqtree --cluster_threshold 6,26
+bohra run comparative -i input_file.tsv -j my_snippy_pipeline -ref <path_to_reference.fa(gbk)>  --cluster_threshold 6,26 --cpus X
 ```
 **ska2 (distance and veryfastree) and cluster at a threshold of <= 5 and <= 25, using complete linkage**
 ```
-bohra run comparative -i input_file.tsv -j my_ska2_pipeline --comparative_tool ska2 --cluster_method complete --cluster_threshold 6,26
+bohra run comparative -i input_file.tsv -j my_ska2_pipeline --comparative_tool ska2 --cluster_method complete --tree-builder veryfasttree --cluster_threshold 6,26 --cpus X
 ```
