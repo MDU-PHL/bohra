@@ -1,6 +1,9 @@
 # Pipelines overview
 
 
+`bohra` has 6 pipelines which will use different combinations of modules to generate specific results. 
+
+**if full table not visible please scroll**
 | Module | [basic](../pipelines/basic.md) | [preview](../pipelines/preview.md)| [assemble](../pipelines/assemble.md) | [amr_typing](../pipelines/amr_typing.md) | [comparative](../pipelines/comparative.md) | [full](../pipelines/full.md) |[tb](../pipelines/tb.md)|
 | :---: |:---: |:---: |:---: |:---: |:---: |:---: |:---: |
 |Speciation|Optional|Optional|Optional|Optional|Optional|Optional|Optional|

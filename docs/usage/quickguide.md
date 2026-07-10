@@ -50,7 +50,8 @@ This will generate a file called `my_data.txt` (defaults to `bohra_input.tsv`) w
 
 ## 2. Choose a pipeline
 All pipelines will output a directory with a html summary file and line list results from all sequences in your analysis. This folder is called `report` by default but can be set using the `--report_outdir` flag.
-### For quality control
+
+### For quality control or rapid assessment of a dataset
 
 ```
 bohra run preview -i input_file.tsv -j my_basic_pipeline --cpus N --report_outdir your_report
@@ -112,7 +113,7 @@ The `bohra` pipeline generates a folder with all the combined results from all s
 - Reportable AMR tab (`reportable_amr_mechanisms.txt`) displays the AMR mechanisms that were identified and are classified as relevant for reporting in the context of clinical and/or public health based on the species that is detected in the sequence.
 - Core genome stats tab (`core_genome_stats.txt`) details the quality of each alignment. Graphical depiction of the variants across sites in the genome as well as the distribution of alignment metrics are accompanied by a table detailing whether the % alignment. Note that sequences with an alignment % < 2SD from median will be excluded from analysis by default. The behaviour can be changed by using the `--ignore-warnings` flag when running a comparative analysis.
 
-For detailed information about other output files and tables please check [here]().
+For detailed information about other output files and tables please check [here](../usage/report.md).
 
 
 ## Important considerations.
