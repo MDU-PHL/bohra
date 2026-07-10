@@ -40,7 +40,7 @@ This tab will detail the amount of unclassified reads in each sequence and the t
 
 This table reflects all the tools that were used in the analysis, with references and version numbers.
 
-## AMR and typing
+## AMR and typing tabs
 
 ### MLST
 
@@ -61,3 +61,40 @@ This tab outlines the MLST results for all sequences in the dataset.
 - _Klebsiella_ species
 
 Each serotyper will have its own menu tab (where more than one typer is run). Key columns will be displayed, with raw results available in each sequence directory.
+
+### Plasmid
+This is a nested table for each sequence with details of any potential plasmids identified, the species of origin of the plasmid and any AMR genes that were identified.
+
+### Resistome
+This table is a combination of the summary output of `abritAMR` and `mob_suite`, identifying AMR genes and SNPs and annotating possible association with a plasmid.
+
+### Reportable_AMR
+This table is generated from `abritAMR` and represents the genes and SNPs detected that are clincally relevant/reportable for the species detected.
+
+### Virulence
+Similar to the resistome table, this table represents virulence factors identified from `abritAMR`.
+
+## Comparative tabs
+
+### Tree
+Were a comparative or preview pipeline was run a tree will be generate and displayed. This tree can be navigate via right clicking on internal nodes to step into the tree. 
+
+### Reference based comparison
+
+Were `snippy` was used as the comparative tool (default) a `Core genome stats` tab will be visible. This table will detail the alignment statisitics and also has a graph for users to identify outliers. Were a sequence is < 2SD from median, it will be annotated in this table. Additionally, a graph with the distribution of variants across the reference genome will also be visible.
+
+### Reference free comparison
+
+Were `ska2` is used as the comparative tool, there will be a `SKA summary stats` file which will provide information about the quality of each pairwise comparison made.
+
+### Distances
+
+The distance matrix is accompanied by two visualisations, a heat map and a graph of the pairwise distance distribution.
+
+### Clusters
+
+`bohra` will also perform heirachical clustering (using single-linkage) based on user supplied thresholds. The table will provide a view of the distance matrices for each cluster and also graphical representation of the inter and intra cluster distances at each threshold.
+
+### Pangenome
+
+Where the `full` pipeline is run, `bohra` generates some pangenome visualisations, indicating the breakdown of core and pan genes and also were clustering is done, a graph showing how the pangenome for each group relates.
