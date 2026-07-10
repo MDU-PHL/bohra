@@ -1,6 +1,6 @@
 # Installation
 
-**Note the following instructions are for pre-release installation for `bohra` version 3**
+
 
 ## Recommended (conda or mamba)
 
