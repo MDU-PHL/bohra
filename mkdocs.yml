@@ -6,12 +6,14 @@ nav:
   - Installation: installation.md
   - Usage:
       - Quick guide: usage/quickguide.md
-      - Basic pipeline: usage/basic.md
-      - Assembly pipeline: usage/assemble.md
-      - Comparative pipeline: usage/comparative.md
-      - Full pipeline: usage/full.md
-      - TB pipeline: usage/tb.md
       - Migration bohra2 to bohra3: usage/migration.md
+  - Pipelines:
+      - Pipelines overview: pipelines/overview.md
+      - Basic pipeline: pipelines/basic.md
+      - Assembly pipeline: pipelines/assemble.md
+      - Comparative pipeline: pipelines/comparative.md
+      - Full pipeline: pipelines/full.md
+      - TB pipeline: pipelines/tb.md
   - Cookbook:
       - Quality Control: cookbook/quality_control.md
       - Comparative Genomics: cookbook/comparative_genomics.md
