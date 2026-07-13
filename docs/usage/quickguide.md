@@ -4,6 +4,8 @@
 
 `bohra` is a flexible pipeline and allows users to customise the workflows used. This page will provide you a quick start guide to how to trigger the more common features. You can find additional details and options for these and other pipelines [here](../pipelines/overview.md)
 
+If you just want to see some frequently asked questions and commands check out the [cookbook](../cookbook/how_to.md)
+
 Users have the option to supply paired-end fastq (support for ONT coming soon) and/or _de novo_ assemblies as inputs into the pipeline. 
 
 - Paired-end fastq only - where you only have paired-end fastq `bohra` will generate _de novo_ assemblies if required.
