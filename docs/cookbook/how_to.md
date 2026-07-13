@@ -10,7 +10,7 @@ bohra generate-input --reads /path/to/reads --contigs /path/to/contigs --outname
 - You will need a folder with all of your sequences in it.
 - `bohra` will match read 1 and read 2 and use the string before the first `_`  as the isolate identifier.
 - If your input sequences are assemblies, `bohra` will use the string before the first `.` as the isolate identifier. 
-- Note if these do not match (ie)
+- **Note** if these do not match (ie the name of the assembly is not the same as the reads) `bohra` will potentially create multiple entries.
 
 ## Run `mash` to assess dataset?
 
