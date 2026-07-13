@@ -44,3 +44,16 @@ bohra run amr_typing -i input_file.tsv --cpus N
 ```
 bohra run full -i input_file.tsv --cpus N -ref your_reference.fa --gubbins
 ```
+
+## Remove (or add a new sequence)?
+
+If you want to remove or add a new sequence to an analysis, simply remove (or add) the new information to the input file and re-rerun your command in the same directory. The pipeline will only re-run process for which there is a new input, there is no need to create a new folder each time. 
+- New trees will be run because the input to the tree process will be different
+- Sequence assessment and single sample processes (such as assembly, MLST, AMR) will not be re-run on existing samples.
+
+**NOTE** 
+In your working directory the pipeline will create a folder called `work`. This is essentially the cache for your all of your analyses. If you remove this folder for any reason - your whole analysis will re-run the next time you trigger it. There will be no history or cache of results. 
+
+## Rerun with different settings?
+
+If you would like to modify a setting, for example modify `--fuzzy_core_prop` setting, you can do this in the same directory as you previously ran in. It is recommended that you do not overwrite the existing report directory, so as to keep record of what your results looked like with different conditions. Similar to adding or removing a sequence, only processes directly impacted by your change will be re-run.

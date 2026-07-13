@@ -21,7 +21,7 @@ nav:
       - Full pipeline: pipelines/full.md
       - TB pipeline: pipelines/tb.md
   
-  - Contributing: contributing.md
+#   - Contributing: contributing.md
   - License: license.md
 theme:
   name: material
