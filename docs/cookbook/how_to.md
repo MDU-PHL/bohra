@@ -38,3 +38,9 @@ bohra run full --comparative_tool ska -i input_file.tsv --cpus N
 ```
 bohra run amr_typing -i input_file.tsv --cpus N
 ```
+
+## Remove recombination?
+
+```
+bohra run full -i input_file.tsv --cpus N -ref your_reference.fa --gubbins
+```

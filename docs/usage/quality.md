@@ -14,9 +14,9 @@ The `bohra` pipeline outputs a html report with all results for the pipeline tha
 | :---:| :---:| :---:| 
 | Filesize | > 2000000 MB | pe-reads|
 | Genome size | Genome size as assessed from PE-reads and/or number of base pairs in assembly within range for expected species | pe-reads and assemblies
-| Avg Q score | > 20 | pe-reads |
 | Estimated depth of coverage | > 40x | pe-reads |
-| % alignment | < SD median dataset alignment | pe-reads with `snippy`|
+| % alignment | < 2SD median dataset alignment | pe-reads with `snippy`|
+| number contigs | +/- 2SD median | assembly|
 
 Depending upon your input data and the pipeline run some or all of the following may be available to you.
 
