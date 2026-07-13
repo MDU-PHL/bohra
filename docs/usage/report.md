@@ -4,6 +4,8 @@ The `bohra` pipeline generates a html report that allows you to share your resul
 
 This report will be different based on the pipeline you ran, with not all result tables and figures visible for all pipelines.
 
+An example report can be found [here](../images/example_report.html)
+
 ## Header
 
 The report header provides a summary of the analysis, list user name, pipeline that was run, data, number of sequences in the analysis and the `bohra` version.
