@@ -1,4 +1,4 @@
-# How do I?
+# How do I
 
 ## Generate an input file?
 
@@ -16,4 +16,25 @@ bohra generate-input --reads /path/to/reads --contigs /path/to/contigs --outname
 
 ```
 bohra run preview -i input_file.tsv -j my_basic_pipeline --cpus N --report_outdir your_report
+```
+
+## Run the full pipeline?
+
+```
+bohra run full -i input_file.tsv --cpus N -ref your_reference.fa
+```
+
+## Change the cluster threshold?
+```
+bohra run full -i input_file.tsv --cpus N -ref your_reference.fa -ct 6,11,21
+```
+
+## Use ska instead of `snippy`?
+```
+bohra run full --comparative_tool ska -i input_file.tsv --cpus N 
+```
+
+## Just run amr and serotype?
+```
+bohra run amr_typing -i input_file.tsv --cpus N
 ```

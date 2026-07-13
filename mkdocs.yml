@@ -8,6 +8,7 @@ nav:
       - Quick guide: usage/quickguide.md
       - Inputs: usage/inputs.md
       - Understanding the report: usage/report.md
+      - Quality: usage/quality.md
       - Migration bohra2 to bohra3: usage/migration.md
   - Pipelines:
       - Pipelines overview: pipelines/overview.md
@@ -17,9 +18,8 @@ nav:
       - Full pipeline: pipelines/full.md
       - TB pipeline: pipelines/tb.md
   - Cookbook:
-      - Quality Control: cookbook/quality_control.md
-      - Comparative Genomics: cookbook/comparative_genomics.md
-      - TB Analysis: cookbook/tb_analysis.md
+      - How do I?: cookbook/how_to.md
+      - Troubleshooting: cookbook/faq.md
   - Contributing: contributing.md
   - License: license.md
 theme:
