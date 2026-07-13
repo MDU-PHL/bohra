@@ -28,6 +28,12 @@ bohra run full -i input_file.tsv --cpus N -ref your_reference.fa
 ```
 bohra run full -i input_file.tsv --cpus N -ref your_reference.fa -ct 6,11,21
 ```
+## Change the cluster method
+```
+bohra run full -i input_file.tsv --cpus N -ref your_reference.fa -ct 6,11,21 --cluster_method complete
+bohra run full -i input_file.tsv --cpus N -ref your_reference.fa -ct 6,11,21 --cluster_method average
+```
+There are also `centroid`, `median`, `ward` and `weighted` as possible clustering methods. `single` is the default.
 
 ## Use ska instead of `snippy`?
 ```

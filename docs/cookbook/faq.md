@@ -2,6 +2,10 @@
 
 If you run into an error or other issue that you are unsure of or is not clear - please create an [issue](https://github.com/MDU-PHL/bohra/issues). If we are not aware of a problem it won't get fixed.
 
+
+You can also check out the advanced options [here](../usage/advanced.md).
+
+
 ## I have an error `Output directory already exists`
 
 `bohra` does not blindly overwrite existing aggregated and summarised report folder. 

@@ -7,7 +7,7 @@ The `bohra` pipeline is designed to be flexible and modular, allowing for inputs
 
 Stand alone html reports are generated for easy sharing and visualisation of the results.
 
-Usage instructions can be found [here](usage/overview.md)
+Usage instructions can be found [here](usage/quickguide.md)
 
 ## Installation
 
