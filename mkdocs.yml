@@ -4,6 +4,9 @@ site_url: https://mduphl.github.io/bohra/
 nav:
   - About: index.md
   - Installation: installation.md
+  - Cookbook:
+      - How do I?: cookbook/how_to.md
+      - Troubleshooting: cookbook/faq.md
   - Usage:
       - Quick guide: usage/quickguide.md
       - Inputs: usage/inputs.md
@@ -17,9 +20,7 @@ nav:
       - Comparative pipeline: pipelines/comparative.md
       - Full pipeline: pipelines/full.md
       - TB pipeline: pipelines/tb.md
-  - Cookbook:
-      - How do I?: cookbook/how_to.md
-      - Troubleshooting: cookbook/faq.md
+  
   - Contributing: contributing.md
   - License: license.md
 theme:
