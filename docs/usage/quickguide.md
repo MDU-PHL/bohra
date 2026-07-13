@@ -20,33 +20,17 @@ If you are moving across from bohra version 2 check out the [migration informati
 
 ## 1. Generate your input file
 
-`bohra` requires a single tab-delimited file as input.
-
-| Column name | Description | Required? | 
-| :---: | :---: | :---: | 
-| Isolate | This is the name of the sequence or sample and will appear throughout `bohra` outputs. It must be unique.| Yes|
-| r1 | The path to read 1 | If an assembly file is not supplied you must supply reads | 
-| r2 | The path to read 2 | If an assembly file is not supplied you must supply reads |
-| assembly | The path to the assembly for the isolate | If reads are not supplied you must supply an assembly file |
-| Species_expected | The expected species of the sample or 'control'. the proper species name (not the _ joined name from amrfinder) | No |
-
-
-**`bohra` can generate the input file for you**
-
-If you have 
-
-* A table with a list of isolates and other data (species or other metadata) (column 'Isolate' must be included) 
-
-AND/OR
-
-* Paths to your reads and/or contigs
-
-`bohra` can generate the input file for you. 
+`bohra` requires a single tab-delimited file as input. This can be generated with:
 
 ```
-bohra generate-input --isolate_ids <table_name>.txt --reads /path/to/reads --contigs /path/to/contigs --outname my_data.txt
+bohra generate-input --reads /path/to/reads --contigs /path/to/contigs --outname my_data.txt
 ```
 This will generate a file called `my_data.txt` (defaults to `bohra_input.tsv`) which you can use as input into `bohra`.
+
+**Please note**
+You must supply at least one of `--reads` OR `--contigs`. You can supply both - but please be aware that your assemblies must be named in line with your sample/isolate names. For example `sample_name_A.fa`, `sample_name_B.fa` and so on.
+
+Details of input file can be found [here](../usage/inputs.md)
 
 ## 2. Choose a pipeline
 All pipelines will output a directory with a html summary file and line list results from all sequences in your analysis. This folder is called `report` by default but can be set using the `--report_outdir` flag.

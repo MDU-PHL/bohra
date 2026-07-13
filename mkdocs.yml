@@ -6,8 +6,9 @@ nav:
   - Installation: installation.md
   - Usage:
       - Quick guide: usage/quickguide.md
-      - Migration bohra2 to bohra3: usage/migration.md
+      - Inputs: usage/inputs.md
       - Understanding the report: usage/report.md
+      - Migration bohra2 to bohra3: usage/migration.md
   - Pipelines:
       - Pipelines overview: pipelines/overview.md
       - Basic pipeline: pipelines/basic.md

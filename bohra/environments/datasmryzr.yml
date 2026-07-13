@@ -4,7 +4,7 @@ channels:
 dependencies:
   - csvtk
   - pip:
-    - datasmryzr>=0.4.4
+    - datasmryzr>=0.4.5
     - mycolorpy==1.5.1
     - matplotlib==3.10.8
     
