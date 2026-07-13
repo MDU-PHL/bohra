@@ -13,7 +13,7 @@ def check_asm(contigs:list)-> tuple:
     iqr = q3 - q1
     lower_bound = q1 - (1.5 * iqr)
     upper_bound = q3 + (1.5 * iqr)
-    # print(f"Lower bound: {lower_bound}, Upper bound: {upper_bound}")
+    # #print(f"Lower bound: {lower_bound}, Upper bound: {upper_bound}")
     return lower_bound, upper_bound
 
 def check_species(species:list) -> str:
@@ -29,7 +29,7 @@ def check_val(val:float, min_val:float,metric, col) -> str:
     """
     Check if the coverage is above the minimum coverage
     """
-    print(val)
+    #print(val)
     try:
         if val['is_control']:
             return 1
@@ -40,14 +40,14 @@ def check_val(val:float, min_val:float,metric, col) -> str:
         else:
             return f"{metric}: {val[col]}, should be at least {min_val}`"
     except Exception as e:
-        print(f"Error checking value: {e}")
+        #print(f"Error checking value: {e}")
         return 1
 
 def check_val_aln(val:float, min_val:float,metric:str,strict:bool) -> str:
     """
     Check if the coverage is above the minimum coverage and not an outlier
     """
-    print(val)
+    #print(val)
     if val["is_control"]:
         return 1
     if val["% Aligned"] == "" and val["Aln_outlier"] == "":
@@ -65,8 +65,8 @@ def check_contigs(upper, lower, contigs:list) -> str:
     """
     Check if the number of contigs is within the expected range
     """
-    # print(contigs[0])
-    # print(lower, upper)
+    # #print(contigs[0])
+    # #print(lower, upper)
     if contigs['is_control']:
         return 1
     if contigs['# Contigs'] == "":
@@ -80,7 +80,7 @@ def check_filesize(filesize) -> str:
     """
     Check if the file size is above the minimum size
     """
-    print(filesize)
+    #print(filesize)
     if filesize['Reads'] == "":
         return 1
     if filesize['filesize'] == ">20000000":
@@ -115,13 +115,13 @@ def check_genome_size(val:list, genome_sizes:dict, type:str) -> str:
         else:
             return 1
     except Exception as e:
-        print(f"Error checking genome size: {e}")
+        #print(f"Error checking genome size: {e}")
         return 1
 def _generate_summary_table(input_file: str, results_files: list, output:list, min_depth:40, minquality : 30, minaln:70, strict:str) -> list:
     with open(f"{pathlib.Path(__file__).parent / 'genome_ranges.json'}","r") as j:
         genome_sizes = json.load(j)
 
-    print("Generating summary table")
+    #print("Generating summary table")
     list_of_filename = {
         "read_assessment.txt" : ["Isolate","Reads","GC", "Depth","Genome size", "is_control", "filesize", "Qscore"],
         "assembly_assessment.txt":["Isolate","Length","# Contigs","Assembly N50"],
@@ -138,11 +138,11 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
     for col in input_data.columns:
         if col in colsblcklst:
             input_data = input_data.drop(columns=[col])
-    # print(list_of_filename)
+    # #print(list_of_filename)
     summary = pd.DataFrame()
     
     for file in results_files:
-        # print(file)
+        # #print(file)
         if pathlib.Path(file).name in list_of_filename and pathlib.Path(file).exists():
             if 'mlst' in pathlib.Path(file).name:
                 df = pd.read_csv(file, sep = '\t', dtype=str)
@@ -160,10 +160,10 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
                 summary = pd.merge(summary, df, how = 'outer', on = "Isolate")
     summary["Comment"] = ""
     # summary["QA"] = 1
-    # print(summary)
+    # #print(summary)
     
     summary = pd.merge(input_data, summary, how = 'left', on = "Isolate")
-    # print(summary)
+    # #print(summary)
     summary["is_control"] = summary["is_control"].fillna(False) if "is_control" in summary.columns else False
     summary = summary.fillna("")
     summary = summary.rename(columns = {"Match 1 (reads)":"Species (reads)","Match 1 (asm)":"Species (assembly)"})
@@ -175,47 +175,47 @@ def _generate_summary_table(input_file: str, results_files: list, output:list, m
             summary[i] = summary[i].apply(lambda x: int(x) if x != "" else "")
     
     sp_cols = [i for i in summary.columns if "Species" in i]
-    # print(summary)
+    # #print(summary)
     if sp_cols:
         summary["Species check"] = summary[sp_cols].apply(lambda x: check_species(x.tolist()), axis=1)
         summary["Species"] = summary[sp_cols].apply(lambda x: ':'.join(list(set(x))).strip(":"), axis=1)
         if 'Genome size' in summary.columns and "Species" in summary.columns:
-            print(summary[["Genome size", "Species"]])
+            #print(summary[["Genome size", "Species"]])
             summary["Genome size check"] = summary[["Genome size", "Species"]].apply(lambda x: check_genome_size(x, genome_sizes, 'reads'), axis=1)
         if 'Length' in summary.columns and "Species" in summary.columns:
             summary["Assembly size check"] = summary[["Length", "Species"]].apply(lambda x: check_genome_size(x, genome_sizes, 'assembly'), axis=1)
         summary.drop(columns=sp_cols, inplace=True)
         cols = [i for i in summary.columns if i not in sp_cols]
     if "filesize" in summary.columns:
-        # print(summary[["filesize","Reads"]])
+        # #print(summary[["filesize","Reads"]])
         summary["File size check"] = summary[["filesize","Reads"]].apply(lambda x: check_filesize(x), axis=1)
-        # print(summary)
+        # #print(summary)
     if "Depth" in summary.columns:
         summary["Coverage check"] = summary[["Depth","is_control"]].apply(lambda x: check_val(x, min_depth, "Avg depth","Depth"),axis=1)
     if "% Aligned" in summary.columns:
         summary["Alignment check"] = summary[["% Aligned", "is_control", "Aln_outlier"]].apply(lambda x:check_val_aln(x, minaln, "Alignment %",strict), axis=1)
 
     if "# Contigs" in summary.columns:
-        print("Checking number of contigs")
+        #print("Checking number of contigs")
         bounds = check_asm(summary["# Contigs"].tolist())
         summary["Contigs check"] = summary[["# Contigs","is_control"]].apply(lambda x: check_contigs(bounds[1], bounds[0], x), axis=1)
     
     check_cols = [i for i in list(summary.columns) if "check" in i]
-    # print(check_cols)
+    # #print(check_cols)
     if "filesize" in summary.columns:
         check_cols.append("File size check")
     
-    # print(summary.columns)
+    # #print(summary.columns)
     summary = summary.fillna("")
-    # print(summary)
+    # #print(summary)
     summary["Comment"] = summary[check_cols].apply(lambda x: make_comment(x), axis=1)
-    # print(summary[check_cols])
+    # #print(summary[check_cols])
     summary["QA"] = summary[check_cols].apply(lambda x: 1 if all(f"{i}" in ["1",""] for i in x.tolist()) else 0, axis=1)
     if "Aln_outlier" in summary.columns:
         check_cols.append("Aln_outlier")
-    # print(summary)
+    # #print(summary)
     summary.drop(columns=check_cols, inplace=True)
-    # print(summary)
+    # #print(summary)
     col = summary.pop('QA')
     summary.insert(1, 'QA', col)  
     if not summary.empty:
@@ -248,7 +248,7 @@ def _extract_cluster_table(results_files: list, output:list) -> str:
     """
     Extract the distance matrix from the results files
     """
-    # print(output)
+    # #print(output)
     for file in results_files:
         if pathlib.Path(file).exists() and "clusters" in file:
             try:
@@ -257,7 +257,7 @@ def _extract_cluster_table(results_files: list, output:list) -> str:
                 tbcols = tb.columns.tolist()
                 tbcols = [i for i in tbcols if "Tx:" in i]   
                 if len(tbcols) == 1:
-                    print(f"Cluster file {file} has one threshold column: {tbcols[0]}")
+                    #print(f"Cluster file {file} has one threshold column: {tbcols[0]}")
                     subprocess.run(f"cp {file} cluster_table.txt", shell=True)
                     output.append("cluster_table.txt")
                     return f"-f cluster_table.txt", output
@@ -265,16 +265,16 @@ def _extract_cluster_table(results_files: list, output:list) -> str:
                     output.append(file)
                     return f"-ct {file}", output
             except Exception as e:
-                print(f"Error reading cluster file {file}: {e}")
+                #print(f"Error reading cluster file {file}: {e}")
                 continue
-    # print(output)
+    # #print(output)
     return "",output
 
 def _extract_distance_matrix(results_files: list, output:list) -> str:
     """
     Extract the distance matrix from the results files
     """
-    # print(output)
+    # #print(output)
     for file in results_files:
         if pathlib.Path(file).exists() and "distances" in file and "tsv" in file:       
             try:
@@ -282,9 +282,9 @@ def _extract_distance_matrix(results_files: list, output:list) -> str:
                 output.append(file)
                 return f"-dm {file}", output
             except Exception as e:
-                print(f"Error reading cluster file {file}: {e}")
+                #print(f"Error reading cluster file {file}: {e}")
                 continue
-    # print(output)
+    # #print(output)
     return "",output
 
 def _extract_core_genome(results_files: list, output:list) -> str:
@@ -315,8 +315,8 @@ def _make_annotation_file(input_file: list, result_files:list, annot_cols : str)
     """
     df = pd.DataFrame()
     annot_cols = annot_cols.split(",") if annot_cols else []
-    print(annot_cols)
-    # print(pathlib.Path(input_file).exists())
+    #print(annot_cols)
+    # #print(pathlib.Path(input_file).exists())
     if len(annot_cols) > 0 and pathlib.Path(input_file).exists():
         # check if the file exists
         cols = ["Isolate"]
@@ -326,15 +326,15 @@ def _make_annotation_file(input_file: list, result_files:list, annot_cols : str)
             if a in df.columns:
                 cols.append(a)
         df = df[cols]
-        # print(df)
+        # #print(df)
         
     for _file in result_files:
-        # print(_file)
+        print(_file)
         if "cluster" in _file:
-            # print("Found cluster file")
+            print("Found cluster file")
             clst = pd.read_csv(_file, sep = '\t')
             clst = clst.rename(columns = {"ID":"Isolate"})
-            # print(clst)
+            # #print(clst)
             if not df.empty:
                 df = df.merge(clst, how = 'left', on ="Isolate")
             else:
@@ -342,29 +342,29 @@ def _make_annotation_file(input_file: list, result_files:list, annot_cols : str)
         else:
             try:
                 tmp = pd.read_csv(_file, sep = '\t')
-                # print(tmp)
+                # #print(tmp)
                 tmp_cols = ["Isolate"]
                 for col in tmp.columns:
                     if col in annot_cols:
                         tmp_cols.append(col)
-                # print(tmp_cols)
+                # #print(tmp_cols)
                 if tmp_cols != ["Isolate"]:
                     tmp = tmp[tmp_cols]
-                    # print(tmp)
-                    # print(df)
+                    # #print(tmp)
+                    # #print(df)
                     if not df.empty:
                         df = df.merge(tmp, how = 'left', on ="Isolate")
                     else:
                         df = tmp
             except Exception as e:
                 print(f"Error reading file {_file}: {e}")
-        # print(df)
+        # #print(df)
     
     if not df.empty:
         df.to_csv("annotation_file.tsv", sep = '\t', index = False)
     
-    return   "--annotate annotation_file.tsv" if not df.empty else ""
-    # return ""
+    # return   "--annotate annotation_file.tsv" if not df.empty else ""
+    return ""
     
 def _get_reference(reference: str) -> str:
     """
@@ -388,14 +388,14 @@ def _get_other_files(results_files: list,ouput:list, spdf:pd.DataFrame) -> str:
     """
     other_files = []
     for file in results_files:
-        # print(file)
+        # #print(file)
         if file not in ouput and pathlib.Path(file).exists() and ("txt" in file or "tsv" in file or "json" in file) and 'distances' not in file:
             tmp = pd.read_csv(file, sep = "\t")
             fn = file
             if not spdf.empty and 'Species' not in tmp.columns and 'version' not in fn:
                 try:
-                    print(tmp.columns)
-                    print(spdf.columns)
+                    #print(tmp.columns)
+                    #print(spdf.columns)
                     tmp = tmp.merge(spdf, how = "left")
                     fn = pathlib.Path(fn).name
                     tmp.to_csv(fn, sep = "\t", index = False)
@@ -412,7 +412,7 @@ def _extract_core_sites(results_files: list, output:list) -> str:
     """
     numvarsites = 0
     for file in results_files:
-        # print(file)
+        # #print(file)
         if pathlib.Path(file).exists() and "vcf" in file:
             cmd = f"grep -v '#' {file} | wc -l"
             p = subprocess.run(cmd, shell=True, capture_output=True, encoding='utf-8')
@@ -445,7 +445,7 @@ def _extract_pangenome_groups(results_files: list, output:list) -> str:
     Extract the pangenome groups from the results files
     """
     for file in results_files:
-        # print(file)
+        # #print(file)
         if pathlib.Path(file).exists() and "group.txt" in file:
             output.append(file)
             return f"--pangenome_groups {file}",output
@@ -458,38 +458,38 @@ def _combine_reads_iqr(results_files: list, output:list) -> str:
     """
     read_assessment = pd.DataFrame()
     for file in results_files:
-        print(file)
+        #print(file)
         if pathlib.Path(file).exists() and pathlib.Path(file).name in ["read_assessment.txt","insertiqr.txt"]:
             iiqr = pd.read_csv(file, sep = '\t')
-            print(iiqr)
+            #print(iiqr)
             if read_assessment.empty:
                 read_assessment = iiqr
             else:
                 read_assessment = pd.merge(read_assessment, iiqr, how = 'outer', on = "Isolate")
-            print(f"Should be removing file: {file}")
+            #print(f"Should be removing file: {file}")
             # results_files.remove(file)
    
         # if pathlib.Path(file).exists() and "read_assessment.txt" in file:
         #     ra = pd.read_csv(file, sep = '\t')
-        #     print(ra)
+        #     #print(ra)
         #     if read_assessment.empty:
         #         read_assessment = ra
         #     else:
         #         read_assessment = pd.merge(read_assessment, ra, how = 'outer', on = "Isolate")
-        #     print(f"Should be removing file: {file}")
+        #     #print(f"Should be removing file: {file}")
         #     results_files.remove(file)
-    # print(read_assessment)
+    # #print(read_assessment)
     if not read_assessment.empty:
             for f in ["read_assessment.txt", "insertiqr.txt"]:
                 for i in results_files:
                     if f in i:
-                        print(f"Removing {i} from results_files")
+                        #print(f"Removing {i} from results_files")
                         results_files.remove(i)
             
             read_assessment.to_csv("read_assessment.txt", sep = '\t', index = False)
             results_files.append("read_assessment.txt")
             output.append("read_assessment.txt")
-            # print(results_files)
+            # #print(results_files)
             return f"-f read_assessment.txt",output,results_files
     return "",output,results_files
 
@@ -517,14 +517,14 @@ def _run_datasmryzr(tree:str,
     Run the datasmryzr pipeline
     """
     cmd = f"datasmryzr --title '{job_id}' -c bohra_config.json -bg '{bkgd_color}' -fc '{text_color}' --pipeline {pipeline} --pipeline_version '{pipeline_version}' {treebuilder} {other_files} {pangenome_classification} {pangenome_rtab} {pangenome_groups} {tree} {distance_matrix} {cluster_table} {core_genome} {core_genome_report} {reference} {mask} {annotation} {read_assessment} {numvarsites}"
-    print(cmd)
+    #print(cmd)
     p = subprocess.run(cmd, shell=True, capture_output=True)
     # if p.returncode != 0:
-    #     print(p.stderr.decode())
+    #     #print(p.stderr.decode())
     #     raise Exception(f"Error running datasmryzr: {p.stderr.decode()}")
     # else:
-    #     print(p.stdout.decode())
-    #     print("datasmryzr run complete")
+    #     #print(p.stdout.decode())
+    #     #print("datasmryzr run complete")
     #     return p.stdout.decode()
 
 def extract_cmd(launchdir: str) -> str:
@@ -581,13 +581,13 @@ def generate_config(cluster_method:str,
         for rpl in key:
             if key[rpl] != "":
                 cfg = cfg.replace(rpl, key[rpl])
-        # print(cfg)
+        # #print(cfg)
         dct = literal_eval(cfg)
         if "speciation" in dct["comments"]:
             sp = "kraken2" if speciation == "kraken2" else "sylph"
             sprow = dct["comments"]["speciation"].get(sp, [])
             dct["comments"]["speciation"] = sprow
-        print(dct["comments"]["speciation"])
+        #print(dct["comments"]["speciation"])
     with open("bohra_config.json" , "w") as o:
         json.dump(dct, o , indent = 4)
 
@@ -605,7 +605,7 @@ def get_pipeline_version(results_files: list) -> str:
                 version = versions[versions['tool'] == 'bohra']['version'].values
                 return version[0] if len(version) > 0 else "not provided"
         except Exception as e:
-            print(f"Error reading file {file}: {e}")
+            #print(f"Error reading file {file}: {e}")
             return "not provided"
 
 def get_modules(modules: str, tree_input: str) -> str:
@@ -642,9 +642,9 @@ def get_modules(modules: str, tree_input: str) -> str:
     
 
 def _compile(args):
-    # print(f"{args.annot_cols}")
-    # print(args.results_files)
-    # print(args.speciation)
+    # #print(f"{args.annot_cols}")
+    # #print(args.results_files)
+    # #print(args.speciation)
     output = []
     results_files = args.results_files
     results_files = [i for i in results_files if pathlib.Path(i).exists()]
@@ -656,13 +656,13 @@ def _compile(args):
     core_genome,output = _extract_core_genome(results_files, output)
     core_genome_report,output = _extract_core_genome_report(results_files, output)
     summary,output,spdf = _generate_summary_table(args.input_file, results_files, output, 40, 30, 70,args.ignore_warnings)
-    print(read_assessment)
+    #print(read_assessment)
     treebuilder = get_modules(args.modules, args.tree_input)
     panclass,output = _extract_pangenome_classification(results_files, output)
     panrtab,output= _extract_pangenome_rtab(results_files, output)
     pangroups,output = _extract_pangenome_groups(results_files, output)
     numvarsites,output = _extract_core_sites(results_files, output)
-    # print(panclass, panrtab, pangroups)
+    # #print(panclass, panrtab, pangroups)
     other_files = _get_other_files(results_files,output,spdf)
     other_files = other_files + " " + summary if summary else other_files
     reference = _get_reference(args.reference)
@@ -671,7 +671,7 @@ def _compile(args):
     generate_config(args.cluster_method, args.cluster_threshold, args.pangenome_groups, args.kraken2_db, 'kraken2' if args.speciation == 'true' else "sylph", args.launchdir, args.reference)
     pipeline_version = get_pipeline_version(args.results_files)
     # ndt = '--no-downloadable-tables' if args.no_downloadable_tables.lower() == 'true' else ''
-    print(treebuilder)
+    #print(treebuilder)
     p = _run_datasmryzr(tree,
                         numvarsites,
                         distance_matrix,
@@ -777,7 +777,7 @@ def set_parsers():
     if vars(args) == {}:
         parser.print_help(sys.stderr)
     else:
-        # print(args)
+        # #print(args)
         args.func(args)
 	
 
