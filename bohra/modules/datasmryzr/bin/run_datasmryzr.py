@@ -363,8 +363,8 @@ def _make_annotation_file(input_file: list, result_files:list, annot_cols : str)
     if not df.empty:
         df.to_csv("annotation_file.tsv", sep = '\t', index = False)
     
-    # return   "--annotate annotation_file.tsv" if not df.empty else ""
-    return ""
+    return   "--annotate annotation_file.tsv" if not df.empty else ""
+    # return ""
     
 def _get_reference(reference: str) -> str:
     """
