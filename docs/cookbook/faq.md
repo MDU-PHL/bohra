@@ -6,6 +6,20 @@ If you run into an error or other issue that you are unsure of or is not clear -
 You can also check out the advanced options [here](../usage/advanced.md).
 
 
+## I only have reads - can I still use `bohra`?
+
+Yes you can. Primarily most of the processes in `bohra` are based on pe-reads and were assemblies are required they will be generated and stored in the sample directory for future use.
+
+## What if I only have assemblies - will `bohra` still run?
+
+Yes it will. However, it is important to be aware that any process which require reads, such as some serotyping, snippy and some types of AMR mechanisms may not be run if there are no reads. If you would like to do a comparative analysis and only have assemblies, you can use `--comparative_tool mash` or `--comparative_tool ska`.
+
+## Why does `bohra` run kraken on reads and assemblies?
+
+For quality assessment of your data, if the most abundant species in the pe-reads is different to the most abundant species detected in the assembled genomes, this indicates that there is something strange in your sequence data. It could be contamination, it could be low sequence depth and it is important to further investigate these cases.
+
+
+
 ## I have an error `Output directory already exists`
 
 `bohra` does not blindly overwrite existing aggregated and summarised report folder. 
