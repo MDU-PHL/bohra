@@ -257,7 +257,7 @@ def _extract_cluster_table(results_files: list, output:list) -> str:
                 tbcols = tb.columns.tolist()
                 tbcols = [i for i in tbcols if "Tx:" in i]   
                 if len(tbcols) == 1:
-                    #print(f"Cluster file {file} has one threshold column: {tbcols[0]}")
+                    print(f"Cluster file {file} has one threshold column: {tbcols[0]}")
                     subprocess.run(f"cp {file} cluster_table.txt", shell=True)
                     output.append("cluster_table.txt")
                     return f"-f cluster_table.txt", output
@@ -315,7 +315,7 @@ def _make_annotation_file(input_file: list, result_files:list, annot_cols : str)
     """
     df = pd.DataFrame()
     annot_cols = annot_cols.split(",") if annot_cols else []
-    #print(annot_cols)
+    print(annot_cols)
     # #print(pathlib.Path(input_file).exists())
     if len(annot_cols) > 0 and pathlib.Path(input_file).exists():
         # check if the file exists
@@ -329,12 +329,12 @@ def _make_annotation_file(input_file: list, result_files:list, annot_cols : str)
         # #print(df)
         
     for _file in result_files:
-        print(_file)
+        # print(_file)
         if "cluster" in _file:
             print("Found cluster file")
             clst = pd.read_csv(_file, sep = '\t')
             clst = clst.rename(columns = {"ID":"Isolate"})
-            # #print(clst)
+            # print(clst)
             if not df.empty:
                 df = df.merge(clst, how = 'left', on ="Isolate")
             else:
@@ -363,8 +363,8 @@ def _make_annotation_file(input_file: list, result_files:list, annot_cols : str)
     if not df.empty:
         df.to_csv("annotation_file.tsv", sep = '\t', index = False)
     
-    # return   "--annotate annotation_file.tsv" if not df.empty else ""
-    return ""
+    return   "--annotate annotation_file.tsv" if not df.empty else ""
+    # return ""
     
 def _get_reference(reference: str) -> str:
     """
@@ -517,7 +517,7 @@ def _run_datasmryzr(tree:str,
     Run the datasmryzr pipeline
     """
     cmd = f"datasmryzr --title '{job_id}' -c bohra_config.json -bg '{bkgd_color}' -fc '{text_color}' --pipeline {pipeline} --pipeline_version '{pipeline_version}' {treebuilder} {other_files} {pangenome_classification} {pangenome_rtab} {pangenome_groups} {tree} {distance_matrix} {cluster_table} {core_genome} {core_genome_report} {reference} {mask} {annotation} {read_assessment} {numvarsites}"
-    #print(cmd)
+    print(cmd)
     p = subprocess.run(cmd, shell=True, capture_output=True)
     # if p.returncode != 0:
     #     #print(p.stderr.decode())
@@ -651,6 +651,7 @@ def _compile(args):
     read_assessment,output,results_files = _combine_reads_iqr(results_files, output)
     tree,output = _extract_tree(results_files, output)
     distance_matrix,output = _extract_distance_matrix(results_files, output)
+    annotation = _make_annotation_file(args.input_file, results_files, f"{args.annot_cols}")
     cluster_table,output = _extract_cluster_table(results_files, output)
     results_files = [i for i in results_files if "clusters.txt" not in i]
     core_genome,output = _extract_core_genome(results_files, output)
@@ -663,15 +664,17 @@ def _compile(args):
     pangroups,output = _extract_pangenome_groups(results_files, output)
     numvarsites,output = _extract_core_sites(results_files, output)
     # #print(panclass, panrtab, pangroups)
+    # print(results_files)
     other_files = _get_other_files(results_files,output,spdf)
     other_files = other_files + " " + summary if summary else other_files
     reference = _get_reference(args.reference)
     mask = _get_mask(args.mask)
-    annotation = _make_annotation_file(args.input_file, results_files, f"{args.annot_cols}")
+    
     generate_config(args.cluster_method, args.cluster_threshold, args.pangenome_groups, args.kraken2_db, 'kraken2' if args.speciation == 'true' else "sylph", args.launchdir, args.reference)
     pipeline_version = get_pipeline_version(args.results_files)
     # ndt = '--no-downloadable-tables' if args.no_downloadable_tables.lower() == 'true' else ''
     #print(treebuilder)
+    print(annotation)
     p = _run_datasmryzr(tree,
                         numvarsites,
                         distance_matrix,

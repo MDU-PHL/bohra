@@ -553,7 +553,7 @@ def _get_run_cmd_options() -> dict:
                 "short_name":"-ct",
                 "help":"Comma separated list of thresholds to use for clustering",
                 "type":str,
-                "default":"5,12"
+                "default":"6,13"
             },
             {
                 "name":"phylo",
@@ -698,7 +698,7 @@ def _get_run_cmd_options() -> dict:
                 "short_name":"-ct",
                 "help":"Comma separated list of thresholds to use for clustering, default is '10'. NOT available for mash.",
                 "type":str,
-                "default":"10"
+                "default":"11,21"
             },
             {
                 "name":"phylo",
