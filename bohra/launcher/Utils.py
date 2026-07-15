@@ -377,8 +377,8 @@ def _get_run_cmd_options() -> dict:
                 "default":"kraken2"
             },
             {
-                "name":"no-prokka",
-                "help":"Set --no-prokka if you do not want to annotate assemblies with prokka. Please note that this will result in no annotation of trees and no genbank files in the output.",
+                "name":"fastprokka",
+                "help":"Set --fastprokka if you want rapid annotation assemblies with prokka. Please note that gff files may not be complete.",
                 "is_flag":True,
                 "default":False
             },
@@ -407,7 +407,8 @@ def _get_run_cmd_options() -> dict:
                 "name":"min_contig_length",
                 "help":"Minimum contig length to filter assemblies.",
                 "default":200
-            }
+            },
+            
 
         ],
         "amr_typing": [
@@ -448,12 +449,7 @@ def _get_run_cmd_options() -> dict:
             "type":click.Choice(['kraken2', 'none']),
             "default":"kraken2"
             },
-            {
-                "name":"fastprokka",
-                "help":"Set --fastprokka if you do not want to annotate assemblies with prokka. Please note that this will result in no annotation of trees and no genbank files in the output.",
-                "is_flag":True,
-                "default":False
-            },
+            
             {   "name":"comparative_tool",
                 "type":click.Choice(CFG["comparative_tools"]),
                 "help": "Tool to use for comparative genomics.",

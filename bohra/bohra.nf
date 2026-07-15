@@ -50,7 +50,7 @@ println "use_conda has been set to "
 println "Dependencies are installed at  : ${params.dependency_prefix}"
 
 // println samples
-include { READ_ANALYSIS;ASSEMBLY_ANALYSIS_FULL;ASSEMBLY_ANALYSIS_QUICK } from './workflows/seq_assessment'
+include { READ_ANALYSIS;ASSEMBLY_ANALYSIS } from './workflows/seq_assessment'
 include { RUN_ASSEMBLE } from './workflows/assemble'
 include { RUN_SPECIES_READS; RUN_SPECIES_ASM; COMBINE_SPECIES } from './workflows/species'
 include { RUN_TYPING } from './workflows/typing'
@@ -104,20 +104,12 @@ workflow {
         
     } 
     asm_input = asm.mix(asm_out)
+    ASSEMBLY_ANALYSIS ( asm_input )
+    assembly_stats = ASSEMBLY_ANALYSIS.out.assembly_stats
+    versions = versions.concat( ASSEMBLY_ANALYSIS.out.version_prokka, ASSEMBLY_ANALYSIS.out.version_seqkit_asm )
+    // update the results with the assembly stats
+    results = results.concat( assembly_stats )
     
-    if (params.modules.contains("prokka") ){
-        ASSEMBLY_ANALYSIS_FULL ( asm_input )
-        assembly_stats = ASSEMBLY_ANALYSIS_FULL.out.assembly_stats
-        versions = versions.concat( ASSEMBLY_ANALYSIS_FULL.out.version_prokka, ASSEMBLY_ANALYSIS_FULL.out.version_seqkit_asm )
-        // update the results with the assembly stats
-        results = results.concat( assembly_stats )
-    } else {
-            ASSEMBLY_ANALYSIS_QUICK ( asm_input )
-            assembly_stats = ASSEMBLY_ANALYSIS_QUICK.out.assembly_stats
-            versions = versions.concat( ASSEMBLY_ANALYSIS_QUICK.out.version_seqkit_asm )
-            // update the results with the assembly stats
-            results = results.concat( assembly_stats )
-    }
    
     if (params.modules.contains("species") ){
         

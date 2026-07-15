@@ -55,7 +55,7 @@ workflow READ_ANALYSIS {
 }
 
 
-workflow ASSEMBLY_ANALYSIS_FULL {   
+workflow ASSEMBLY_ANALYSIS {   
 
     take:
         contigs
