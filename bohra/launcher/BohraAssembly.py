@@ -32,5 +32,6 @@ def _setup_assembly_args(kwargs:dict, command:dict, mtb:False) -> dict:
     command['params'].append(f"--min_contig_length {kwargs['min_contig_length']}")
     if kwargs["spades_args"] != "":
         command['params'].append(f"--spades_args {kwargs['spades_args']}")
-    
+    if kwargs["fastprokka"]:
+        command['params'].append(f"--fastprokka true")
     return command
