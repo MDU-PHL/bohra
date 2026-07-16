@@ -39,7 +39,7 @@ process ABRITAMR {
     def spcs = meta.containsKey('species_obs') ? meta.species_obs : meta.species
     """
     sp=\$($module_dir/extract_species.py '${spcs}')
-    abritamr run -c $contigs -px ${meta.id} -j $task.cpus \$sp
+    abritamr run -c $contigs -px ${meta.id} -j $task.cpus \$sp 2> >(sed 's/The following erro has been reported/The following error has been reported/g' >&2)
     cp ${meta.id}/* .
     $module_dir/add_species.py '${spcs}' summary_matches.txt
     echo -e abritamr'\t'\$CONDA_PREFIX'\t'\$(abritamr -v)'\t'${params.abritamr_ref} | csvtk add-header -t -n 'tool,conda_env,version,reference' > version_abritamr.txt
