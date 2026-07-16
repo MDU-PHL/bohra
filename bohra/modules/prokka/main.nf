@@ -25,7 +25,7 @@ process PROKKA {
     scratch true
     
     input:
-    tuple val(meta), path(contigs)
+    tuple val(meta), path(contigs), val(fastprokka)
 
     output:
     tuple val(meta), path('*.gff'), emit: gff
@@ -33,7 +33,7 @@ process PROKKA {
     tuple val(meta), path('version_prokka.txt'), emit: version
 
     script:
-    def fast = meta.fastprokka ?"--notrna --fast --noanno " : ""
+    def fast = fastprokka ?"--notrna --fast --noanno " : ""
     """
     prokka --outdir $meta.id --prefix $meta.id --mincontiglen 500 --force $contigs --cpus $task.cpus --compliant $fast
     cp ${meta.id}/${meta.id}.gff ${meta.id}.gff

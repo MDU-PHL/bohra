@@ -226,7 +226,7 @@ workflow {
         if( params.pangenome_groups == "clusters") {
             groups = RELATIONSHIPS.out.clusters
         }
-        gff = ASSEMBLY_ANALYSIS_FULL.out.gff
+        gff = ASSEMBLY_ANALYSIS.out.gff
         RUN_PANAROO ( gff,groups )
 
         

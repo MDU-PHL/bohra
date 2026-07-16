@@ -60,13 +60,16 @@ workflow ASSEMBLY_ANALYSIS {
     take:
         contigs
         
+        
     main:
         // println contigs.view()
         BOHRA_VERSION (  )
         SEQKIT_GC ( contigs )
         SEQKIT_STATS ( contigs )
         // println SEQKIT_STATS.out.stats.view()
-        PROKKA ( contigs )
+        
+        prokka_input = contigs.combine(Channel.value(params.fastprokka))
+        PROKKA ( prokka_input )
         gff = PROKKA.out.gff.filter { cfg, files -> cfg.control != 'control' }
         gff = gff.map { cfg, files -> files }.collect()
         APS = SEQKIT_STATS.out.stats.join( PROKKA.out.prokka_txt )
