@@ -377,6 +377,11 @@ def _get_run_cmd_options() -> dict:
                 "default":"kraken2"
             },
             {
+                "name":"host",
+                "help":"Host species.",
+                "default":"Homo sapiens"
+            },
+            {
                 "name":"fastprokka",
                 "help":"Set --fastprokka if you want rapid annotation assemblies with prokka. Please note that gff files may not be complete.",
                 "is_flag":True,

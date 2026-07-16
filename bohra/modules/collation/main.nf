@@ -295,6 +295,6 @@ process COLLATE_KRAKEN2 {
     script:
     
     """
-    $module_dir/collate_kraken2.py $meta.id $kraken species_${meta.input_type}.txt
+    $module_dir/collate_kraken2.py $meta.id $meta.host $kraken species_${meta.input_type}.txt
     """
 }
