@@ -82,7 +82,7 @@ def _setup_basic_args(kwargs:dict, command:dict, pipeline:str) -> dict:
             command['params'].append(_species_tool(kwargs["speciation"]))
     
     command['params'].append(f"--fastprokka {prk}")
-    command['params'].append(f"--host {kwargs['host']}")
+    command['params'].append(f"--host '{kwargs['host']}' ")
     
     command = _accessory_params(kwargs=kwargs, command=command)
 

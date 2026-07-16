@@ -24,10 +24,10 @@ import numpy as np
 # outfile.write_text('\n'.join(SPECIES_TEXT))
 
 try:
-    sp = pd.read_csv(f"{sys.argv[2]}", sep = "\t", header = None, names = ["perc","cumulative",'direct','rank','taxon_id','name'])
+    sp = pd.read_csv(f"{sys.argv[3]}", sep = "\t", header = None, names = ["perc","cumulative",'direct','rank','taxon_id','name'])
     sp['name'] = sp['name'].apply(lambda x: x.strip())
     uc = sp[sp['rank'] == "U"]
-    host= sp[sp['name'] == sys.argv[3]]
+    host= sp[sp['name'] == sys.argv[2]]
     if uc.shape[0] == 0:
         uc = 0
     else:
@@ -44,7 +44,7 @@ try:
     res = {
         "Isolate": f"{sys.argv[1]}",
         "Unclassified (%)" : uc,
-        f"{sys.argv[3]}": hst
+        f"{sys.argv[2]} (%)": hst
         }
     for row in spc.iterrows():
         res[f"Match {levs}"] = row[1]["name"]
@@ -52,7 +52,7 @@ try:
         levs = levs +1
     
     df = pd.DataFrame(res, index = [0])
-    cols = ["Isolate","Unclassified (%)","Match 1","Detected_1 (%)","Match 2","Detected_2 (%)","Match 3","Detected_3 (%)"]
+    cols = ["Isolate","Unclassified (%)",f"{sys.argv[2]} (%)", "Match 1","Detected_1 (%)","Match 2","Detected_2 (%)","Match 3","Detected_3 (%)"]
     cols = [i for i in cols if i in df.columns.tolist()]
     print(df[cols])
     df[cols].to_csv(f"{sys.argv[4]}", sep = "\t", index = False)
