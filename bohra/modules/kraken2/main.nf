@@ -40,7 +40,7 @@ process KRAKEN2 {
     --report kraken2_${meta.input_type}.tab \
     --output - \
     -db $kraken2_db \
-    --memory-mapping 2> /dev/null
+    2> /dev/null
 
     echo -e kraken2'\t'\$CONDA_PREFIX'\t'\$(kraken2 --version | grep version)'\t'$params.kraken2_db'\t'${params.kraken2_ref} | csvtk add-header -t -n 'tool,conda_env,version,database,reference' > version_kraken2.txt
     """
